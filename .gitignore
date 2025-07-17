@@ -1,0 +1,14 @@
+# Python 가상환경
+backend-python/venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Node.js
+frontend/node_modules/
+frontend/.env
+
+# IDE/OS
+.vscode/
+.DS_Store
