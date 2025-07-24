@@ -18,3 +18,9 @@ class ConceptGenerateResponse(BaseModel):
     mechanics: str
     storyline: str
     createdAt: datetime
+
+# 재생성
+class ConceptRegenerateRequest(BaseModel):
+    conceptId: int
+    planId: int
+    feedback: str
