@@ -93,3 +93,77 @@ def regenerate_concept(concept_id: int, feedback: str, planId: int) -> dict:
             "hint": str(e),
             "raw": response
         }
+    
+# 컨셉 기반 요소 생성
+# 컨셉 조회용 임시 데이터로(concept_store) 수정필요
+concept_store = {
+    5566: {
+        "theme": "요리경쟁",
+        "playerCount": "2명",
+        "averageWeight": 2.3,
+        "ideaText": "플레이어는 주어진 재료를 활용하여 레시피를 완성하고 심사위원들의 평가를 받는 요리 대회를 펼칩니다.",
+        "mechanics": "재료 수집, 레시피 완성, 심사 평가",
+        "storyline": "세계적인 요리 대회에 참가한 플레이어들이 최고의 요리를 만들어서 우승을 차지하기 위해 경쟁합니다."
+    }
+}
+
+def expand_concept(concept_id: int, focus: str, detailLevel: str) -> dict:
+    # 컨셉 조회
+    concept_data = concept_store.get(concept_id)
+    if concept_data is None:
+        return {
+            "error": "존재하지 않는 conceptId입니다.",
+            "hint": f"conceptId {concept_id} 에 해당하는 컨셉이 없습니다."
+        }
+
+    prompt = f"""
+컨셉 정보를 기반으로 보드게임의 상세 설계 요소를 생성해주세요.
+
+컨셉 정보:
+- 테마: {concept_data['theme']}
+- 아이디어: {concept_data['ideaText']}
+- 메커닉: {concept_data['mechanics']}
+- 스토리라인: {concept_data['storyline']}
+
+{focus}에 집중하며, {detailLevel} 수준으로 구체적으로 작성해주세요.
+
+반드시 아래 구조의 JSON 하나로만 반환해주세요:
+
+예시:
+{{
+  "interactions": ["동맹/배신", "비공개 행동"],
+  "resources": ["자원 카드", "시간 토큰"],
+  "flow": [
+    "자원 수집",
+    "행동 선택",
+    "전투 또는 설득",
+    "투표 및 평판 변화"
+  ],
+  "designTips": [
+    "자원마다 희소성을 달리하여 전략성을 부여하세요.",
+    "동맹 후 배신 시 보너스 or 패널티를 부여하여 심리전을 유도하세요."
+  ]
+}}
+"""
+    response = call_openai(prompt)
+
+    try:
+        # JSON 파싱 후 필드 보강
+        json_start = response.find('{')
+        json_end = response.rfind('}') + 1
+        json_text = response[json_start:json_end]
+        parsed = json.loads(json_text)
+
+        # 혹시 키가 빈 경우
+        for key in ["interactions", "resources", "flow", "designTips"]:
+            if key not in parsed:
+                parsed[key] = []
+
+        return parsed
+
+    except Exception as e:
+        return {
+            "error": "LLM 응답 파싱 실패",
+            "hint": str(e),
+            "raw": response
+        }

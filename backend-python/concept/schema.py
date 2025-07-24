@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-# from typing import List
+from typing import List
 from datetime import datetime
 
 # dto
@@ -24,3 +24,15 @@ class ConceptRegenerateRequest(BaseModel):
     conceptId: int
     planId: int
     feedback: str
+
+# 컨셉기반요소생성
+class ConceptExpansionRequest(BaseModel):
+    conceptId: int
+    focus: str
+    detailLevel: str
+
+class ConceptExpansionResponse(BaseModel):
+    interactions: List[str]
+    resources: List[str]
+    flow: List[str]
+    designTips: List[str]
