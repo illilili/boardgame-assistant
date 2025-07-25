@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from goal.router import router as goal_router
-from concept.generator import generate_concept, expand_concept
-from concept.schema import ConceptRequest, ExpansionRequest
+from concept.generator import generate_concept, expand_concept, generate_goal
+from concept.schema import ConceptRequest, ExpansionRequest, GoalRequest
 
 app = FastAPI()
 app.include_router(goal_router)
@@ -17,3 +17,7 @@ def regenerate_concept_api(req: ConceptRequest):
 @app.post("/api/plans/expand-concept")
 def expand_concept_api(req: ExpansionRequest):
     return expand_concept(req.base_concept)
+
+@app.post("/api/plans/generate-goal")
+def generate_goal_api(req: GoalRequest):
+    return generate_goal(req.concept_id)
