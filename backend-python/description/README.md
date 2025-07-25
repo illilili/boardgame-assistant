@@ -8,12 +8,36 @@
 - [ ] /api/content/generate-description-script API 구현
 
 
-
+가상환경 활성화
+source venv/bin/activate
 
 pip install sqlalchemy pymysql
 pip install python-dotenv
 pip install fastapi[all]
 pip install openai
+pip install sqlalchemy
+pip install sqlalchemy openai python-dotenv pymysql
+
+
+FastAPI 서버 실행
+PYTHONPATH=./backend-python uvicorn app:app --reload
+
+
+MariaDB 백그라운드 실행
+docker run -d \
+  --name mariadb \
+  -e MYSQL_ROOT_PASSWORD=123123d \
+  -e MYSQL_DATABASE=boardgame \
+  -p 3306:3306 \
+  mariadb
+
+
+plan_id, project_id 생성된 설명 스크립트를 description 유형으로 DB(Content 또는 Description)에 저장할 때 사용됩니다.
+rulebook_id         Rulebook 테이블에서 해당 ID의 룰북 데이터를 조회합니다.
+룰북 데이터로 설명 스크립트 생성
+
+
+
 
 backend-python/
     nit_db.py	DB 테이블 생성용 초기화 스크립트 (SQLAlchemy 기반) #######테스트용 임시 룰북 데이터를 Rulebook 테이블에 삽입
