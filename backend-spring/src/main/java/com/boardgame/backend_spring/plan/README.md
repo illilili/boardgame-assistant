@@ -10,6 +10,7 @@ plan/
 │   ├── PlanSubmitRequestDto.java          ← 기획안 승인 요청용 DTO
 │   ├── PlanVersionSaveRequestDto.java     ← 기획안 버전 저장용 DTO
 │   └── PlanDetailResponseDto.java         ← 기획안 상세 조회 응답 DTO
+추가 예정
 │
 ├── entity/
 │   ├── Plan.java                          ← 기획안 메인 엔티티
