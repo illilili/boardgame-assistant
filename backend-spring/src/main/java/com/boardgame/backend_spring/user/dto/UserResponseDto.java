@@ -15,11 +15,11 @@ public class UserResponseDto {
 
     public static UserResponseDto fromEntity(User user) {
         return new UserResponseDto(
-                user.getId(),
+                user.getUserId(),
                 user.getName(),
                 user.getEmail(),
                 user.getCompany(),
-                user.getRole().name()
+                user.getRole() != null ? user.getRole().name() : null
         );
     }
 }

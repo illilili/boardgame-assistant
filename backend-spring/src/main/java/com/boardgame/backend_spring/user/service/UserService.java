@@ -1,5 +1,8 @@
 package com.boardgame.backend_spring.user.service;
 
+import com.boardgame.backend_spring.global.error.CustomException;
+import com.boardgame.backend_spring.global.error.ErrorCode;
+import com.boardgame.backend_spring.user.dto.MyPageInfoResponseDto;
 import com.boardgame.backend_spring.user.dto.UserCreateRequestDto;
 import com.boardgame.backend_spring.user.dto.UserResponseDto;
 import com.boardgame.backend_spring.user.entity.User;
@@ -29,5 +32,19 @@ public class UserService {
 
     public Optional<UserResponseDto> getUserById(Long id) {
         return userRepository.findById(id).map(UserResponseDto::fromEntity);
+    }
+
+    // 마이페이지 조회 기능 추가
+    public MyPageInfoResponseDto getMyPageInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return new MyPageInfoResponseDto(
+                user.getUserId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCompany(),
+                user.getRole() != null ? user.getRole().name() : null
+        );
     }
 }
