@@ -25,6 +25,7 @@ class Generate3DModelRequest(BaseModel):
     elementName: str
     description: str  # DTO에 description으로 되어있어 role 대신 사용
     style: str
+    componentType: str
 
 # Generate3DModelResponse DTO
 class Generate3DModelResponse(BaseModel):
@@ -38,24 +39,25 @@ class Generate3DModelResponse(BaseModel):
 @router.post("/generate-3d", response_model=Generate3DModelResponse, tags=["3D Model"])
 async def api_generate_3d_model(request: Generate3DModelRequest):
     """
-    (최적화) 시간이 오래 걸리는 작업을 별도 스레드에서 처리하여 서버 블로킹을 방지합니다.
+    게임 구성요소 정보를 받아 3D 모델의 초안과 최종본을 생성하고 URL을 반환합니다.
     """
     try:
-        # 1단계: OpenAI 프롬프트 생성 (별도 스레드에서 실행)
+        # 1단계: OpenAI 프롬프트 생성 시, componentType을 함께 전달
         visual_prompt = await run_in_threadpool(
             create_visual_prompt,
             item_name=request.elementName,
             item_description=request.description,
-            art_style=request.style
+            art_style=request.style,
+            component_type=request.componentType  # <-- [추가] componentType 전달
         )
         if not visual_prompt:
             raise HTTPException(status_code=500, detail="OpenAI 프롬프트 생성에 실패했습니다.")
 
-        # 2단계: Meshy AI 모델링 프로세스 실행 (별도 스레드에서 실행)
+        # 2단계: Meshy AI 모델링 프로세스 실행
         result_data = await run_in_threadpool(
             meshy_client.generate_model,
             prompt=visual_prompt,
-            art_style=request.style
+            art_style="realistic" # Meshy AI에는 범용 스타일을 전달
         )
         
         if result_data:
@@ -69,7 +71,6 @@ async def api_generate_3d_model(request: Generate3DModelRequest):
             raise HTTPException(status_code=500, detail="3D 모델 생성에 실패했습니다.")
 
     except Exception as e:
-        # HTTPException이 아닌 다른 예외 발생 시 처리
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
-       
+

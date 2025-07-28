@@ -21,19 +21,23 @@ load_dotenv()
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # --- 2. OpenAI 프롬프트 생성 기능 ---
-def create_visual_prompt(item_name: str, item_description: str, art_style: str) -> Optional[str]:
+def create_visual_prompt(item_name: str, item_description: str, art_style: str,component_type: str) -> Optional[str]:
     """OpenAI를 사용해 3D 모델링을 위한 시각적 묘사 프롬프트를 생성합니다."""
-    logging.info(f"[OpenAI] '{item_name}'의 시각적 프롬프트 생성을 시작합니다.")
+    logging.info(f"[OpenAI] '{item_name}' ('{component_type}')의 시각적 프롬프트 생성을 시작합니다.")
     try:
         system_prompt = (
-           "You are a creative prompt engineer for a text-to-3D AI. "
-           "Your task is to create a concise but detailed visual description in English for a **board game piece miniature**, "
-           "based on a game item's name, its role, and desired art style. "
-           "The model should be suitable as a **physical, tabletop game component,** focusing on a **clear silhouette** and recognizable features. "
-           "Describe materials, shape, and key features. "
-           "IMPORTANT: The entire description must be under 500 characters."
+            "You are an expert board game component designer, crafting prompts for a text-to-3D generator. "
+            "Your goal is to translate a game item's concept into a vivid and physically plausible 3D model description in English. "
+            "You will be given the item's name, its role, a desired art style, and its **component type (e.g., Resource Token, Player Marker)**. "
+            
+            "**You MUST adapt the 3D model's structure to fit its component type:** "
+            "- For a **'Player Marker'** or **'Unit Miniature'**, it must have a **flat circular base** so it can stand on the game board. "
+            "- For a **'Resource Token'**, it should be a **small, easy-to-handle, and possibly stackable object.** "
+            
+            "Focus on a clear silhouette suitable for a tabletop game. The entire description must be under 500 characters."
         )
         user_prompt = (
+            f"Game Component Type: {component_type}\n"
             f"Game Item Name: {item_name}\n"
             f"Item's Role/Description: {item_description}\n"
             f"Art Style: {art_style}"
@@ -126,13 +130,23 @@ class MeshyClient:
 # --- 4. 메인 테스트 로직 ---
 if __name__ == '__main__':
     meshy_client = MeshyClient(api_key=os.getenv("MESHY_API_KEY"))
-    test_component = {"name": "불의 검", "description": "적에게 불타는 피해 2를 가한다.", "style": "realistic"}
     
+    # 1. 'componentType'을 포함한 테스트 데이터 정의
+    test_component = {
+        "name": "암살자의 단검",
+        "description": "공격 시 상대방의 방어력을 1 무시합니다.",
+        "style": "realistic",
+        "componentType": "Player Marker" # <-- '플레이어 말' 유형이라고 명시
+    }
+    
+    # 2. 함수 호출 시 componentType 전달
     visual_prompt = create_visual_prompt(
         item_name=test_component["name"],
         item_description=test_component["description"],
-        art_style=test_component["style"]
+        art_style=test_component["style"],
+        component_type=test_component["componentType"]
     )
+
 
     if visual_prompt:
         # 이 부분에서 generate_model을 정상적으로 호출할 수 있습니다.
