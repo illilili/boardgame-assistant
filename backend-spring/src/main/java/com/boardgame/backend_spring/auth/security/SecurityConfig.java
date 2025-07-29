@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // 관리자용
                         .requestMatchers("/api/users/mypage").authenticated()  // mypage만 인증 필요
                         .anyRequest().permitAll()                              // 나머지는 인증 없이 열어둠
                 )

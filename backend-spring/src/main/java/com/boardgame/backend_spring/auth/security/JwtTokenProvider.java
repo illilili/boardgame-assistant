@@ -16,9 +16,10 @@ public class JwtTokenProvider {
     private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 30; // 30분
 
     // JWT 생성
-    public String createAccessToken(String email) {
+    public String createAccessToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALID_TIME))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -42,5 +43,14 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    // JWT에서 role 추출
+    public String getRoleFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role", String.class);
     }
 }

@@ -44,7 +44,7 @@ public class AuthService {
         }
 
         // JWT 생성
-        String accessToken = jwtTokenProvider.createAccessToken(user.getEmail());
+        String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().name());
         String refreshToken = "not-implemented"; // refresh는 나중에
 
         return new LoginResponse(accessToken, refreshToken);
