@@ -7,7 +7,7 @@
 - [ ] 썸네일용 짧은 키워드 생성 → 이미지 API 호출
 - [ ] /api/content/generate-thumbnail API 구현
 
-## 📁 프로젝트 구조
+##  프로젝트 구조
 
 
 src
@@ -18,7 +18,7 @@ src
  requirements.txt         # 프로젝트 의존성 목록
 .env                     # 환경 변수 파일 (예: OpenAI API 키)
  README.md                # 프로젝트 설명 문서
-## 🛠️ 설치 방법
+##  설치 방법
 저장소 클론
 
 git clone <repository-url>
@@ -32,7 +32,7 @@ pip install -r requirements.txt
 
 OPENAI_API_KEY=your_api_key_here
 
-## 🚀 사용 방법
+##  사용 방법
 썸네일 키워드 생성
 
 src/thumbnail.py의 generate_thumbnail_keywords 함수를 사용하여 보드게임 기획안에 기반한 키워드를 생성할 수 있습니다.
