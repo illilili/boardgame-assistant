@@ -6,6 +6,11 @@ import java.util.HashMap;
 
 @Service
 public class ContentServiceImpl implements ContentService {
+
+    @Override
+    public void deleteContent(Long contentId) {
+        // 실제 삭제 로직 필요. 현재는 더미 구현
+    }
     @Override
     public ContentDetailResponse getContentDetail(Long contentId) {
         // 더미 데이터 반환 (실제 구현 필요)
@@ -20,16 +25,47 @@ public class ContentServiceImpl implements ContentService {
         );
         return response;
     }
-
+    // --- 생성/조회 기능 더미 구현 ---
     @Override
     public ContentSaveResponse saveContent(ContentSaveRequest request) {
-        // 더미 응답 (실제 저장 로직 필요)
         return new ContentSaveResponse(3015L, "콘텐츠가 성공적으로 저장되었습니다.");
     }
 
     @Override
     public ContentSubmitResponse submitContent(ContentSubmitRequest request) {
-        // 더미 응답 (실제 제출 로직 필요)
         return new ContentSubmitResponse(request.getContentId(), "PENDING_REVIEW", "검토 요청이 정상적으로 접수되었습니다.");
+    }
+
+    
+    @Override
+    public TextGenerateResponse generateText(TextGenerateRequest request) {
+        TextGenerateResponse.GeneratedText text = new TextGenerateResponse.GeneratedText(1001L, "카드 효과", "적을 2턴간 기절시킵니다.");
+        return new TextGenerateResponse(request.getPlanId(), request.getContentType(), java.util.Collections.singletonList(text));
+    }
+
+    @Override
+    public ImageGenerateResponse generateImage(ImageGenerateRequest request) {
+        return new ImageGenerateResponse(2001L, "https://example.com/image/2001.png");
+    }
+
+    @Override
+    public RulebookGenerateResponse generateRulebook(RulebookGenerateRequest request) {
+        return new RulebookGenerateResponse("기본 규칙서", "https://example.com/rulebook/plan" + request.getPlanId() + ".pdf", java.time.LocalDateTime.now());
+    }
+
+    @Override
+    public DescriptionScriptResponse generateDescriptionScript(DescriptionScriptRequest request) {
+        DescriptionScriptResponse.Script script = new DescriptionScriptResponse.Script("게임 소개", java.util.Arrays.asList("이 게임은...", "목표는..."));
+        return new DescriptionScriptResponse(request.getPlanId(), request.getTarget(), script, "약 2분");
+    }
+
+    @Override
+    public Generate3DModelResponse generate3DModel(Generate3DModelRequest request) {
+        return new Generate3DModelResponse(3001L, "https://example.com/3d/preview/3001.glb", "https://example.com/3d/refined/3001.glb", "READY");
+    }
+
+    @Override
+    public ThumbnailGenerationResponse generateThumbnail(ThumbnailGenerationRequest request) {
+        return new ThumbnailGenerationResponse(4001L, "https://example.com/thumbnail/4001.png");
     }
 }

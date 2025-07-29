@@ -9,6 +9,7 @@
 - 썸네일 이미지 생성
 - 설명 스크립트 자동 생성
 - 콘텐츠 저장/상세조회/제출/저작권 검토 등
+- 콘텐츠 삭제
 
 ## 주요 API 예시
 - `POST /api/content/generate-rulebook` : 룰북 초안 자동 생성
@@ -17,9 +18,10 @@
 - `POST /api/content/generate-image` : 카드/아이템 이미지 자동 생성
 - `POST /api/content/generate-3d` : 3D 모델 생성
 - `POST /api/content/generate-thumbnail` : 썸네일 이미지 생성
-- `POST /api/content/version/save` : 콘텐츠 저장
+- `POST /api/content/save` : 콘텐츠 저장
 - `GET /api/content/{contentId}` : 콘텐츠 상세 조회
 - `POST /api/content/submit` : 콘텐츠 제출
+- `Delet /api/content/{contentId}` : 콘텐츠 삭제
 
 ## 주요 DTO 예시
 - RuleGenerateRequest / RuleRegenerateRequest
