@@ -7,6 +7,13 @@ import java.util.HashMap;
 @Service
 public class ContentServiceImpl implements ContentService {
 
+    private final PythonApiService pythonApiService;
+    
+    // 생성자를 통한 의존성 주입
+    public ContentServiceImpl(PythonApiService pythonApiService) {
+        this.pythonApiService = pythonApiService;
+    }
+
     @Override
     public void deleteContent(Long contentId) {
         // 실제 삭제 로직 필요. 현재는 더미 구현
@@ -66,6 +73,19 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     public ThumbnailGenerationResponse generateThumbnail(ThumbnailGenerationRequest request) {
-        return new ThumbnailGenerationResponse(4001L, "https://example.com/thumbnail/4001.png");
+        try {
+            // Python API 서버 상태 확인
+            if (!pythonApiService.isHealthy()) {
+                throw new RuntimeException("Python API 서버에 연결할 수 없습니다.");
+            }
+            
+            // Python API 호출하여 실제 썸네일 생성
+            return pythonApiService.generateThumbnail(request);
+            
+        } catch (Exception e) {
+            // 오류 발생 시 기본 응답 반환
+            System.err.println("썸네일 생성 중 오류 발생: " + e.getMessage());
+            return new ThumbnailGenerationResponse(4001L, "https://example.com/thumbnail/4001.png");
+        }
     }
 }

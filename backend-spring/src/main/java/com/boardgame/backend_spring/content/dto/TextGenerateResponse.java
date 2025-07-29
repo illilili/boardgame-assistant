@@ -24,7 +24,9 @@ public class TextGenerateResponse {
         public String getText() { return text; }
         public void setText(String text) { this.text = text; }
     }
-
+    public TextGenerateResponse(){
+        
+    }
     public TextGenerateResponse(Long planId, String contentType, List<GeneratedText> generatedTexts) {
         this.planId = planId;
         this.contentType = contentType;
