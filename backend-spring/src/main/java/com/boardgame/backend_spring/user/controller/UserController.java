@@ -7,6 +7,8 @@ import com.boardgame.backend_spring.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.boardgame.backend_spring.user.entity.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 /**
  * 사용자(User) 관련 API 컨트롤러
@@ -46,8 +48,8 @@ public class UserController {
      * @param userId 사용자 ID
      * @return 사용자 마이페이지 정보 (기획안 수, 프로젝트 수 등 포함 가능)
      */
-    @GetMapping("/{userId}/mypage")
-    public ResponseEntity<MyPageInfoResponseDto> getMyPage(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getMyPageInfo(userId));
+    @GetMapping("/mypage")
+    public ResponseEntity<MyPageInfoResponseDto> getMyPage(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.getMyPageInfo(user.getUserId()));
     }
 }

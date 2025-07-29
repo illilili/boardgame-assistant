@@ -9,12 +9,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.boardgame.backend_spring.auth.security.JwtTokenProvider;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public SignupResponse signup(SignupRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -40,9 +43,9 @@ public class AuthService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        // TODO: JWT 토큰 생성 로직으로 대체
-        String accessToken = "mock-access-token";
-        String refreshToken = "mock-refresh-token";
+        // JWT 생성
+        String accessToken = jwtTokenProvider.createAccessToken(user.getEmail());
+        String refreshToken = "not-implemented"; // refresh는 나중에
 
         return new LoginResponse(accessToken, refreshToken);
     }

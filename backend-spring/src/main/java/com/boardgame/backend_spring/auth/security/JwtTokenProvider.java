@@ -1,30 +1,46 @@
 package com.boardgame.backend_spring.auth.security;
 
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
+import java.util.Date;
+
 
 @Component
 public class JwtTokenProvider {
 
-    // secretKey, token 만료시간 등 설정 필요
+    @Value("${jwt.secret}")
+    private String secretKey;
 
-    public String createAccessToken(String userEmail) {
-        // TODO: 실제 JWT 발급 로직으로 교체
-        return "mock-access-token-" + UUID.randomUUID();
+    private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 30; // 30분
+
+    // JWT 생성
+    public String createAccessToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALID_TIME))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 
-    public String createRefreshToken() {
-        return "mock-refresh-token-" + UUID.randomUUID();
-    }
-
-    public String getUserEmailFromToken(String token) {
-        // TODO: JWT 디코딩해서 userEmail 추출하는 로직으로 대체
-        return "mock@example.com";
-    }
-
+    // JWT 유효성 검사
     public boolean validateToken(String token) {
-        // TODO: 토큰 유효성 검증 로직 추가
-        return token != null && token.startsWith("mock");
+        try {
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    // JWT에서 email 추출
+    public String getUserEmailFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }

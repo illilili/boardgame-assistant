@@ -1,5 +1,8 @@
 package com.boardgame.backend_spring.user.service;
 
+import com.boardgame.backend_spring.project.dto.ProjectSummaryDto;
+import java.util.List;
+import java.util.stream.Collectors;
 import com.boardgame.backend_spring.global.error.CustomException;
 import com.boardgame.backend_spring.global.error.ErrorCode;
 import com.boardgame.backend_spring.user.dto.MyPageInfoResponseDto;
@@ -37,14 +40,19 @@ public class UserService {
     // 마이페이지 조회 기능 추가
     public MyPageInfoResponseDto getMyPageInfo(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-        return new MyPageInfoResponseDto(
-                user.getUserId(),
-                user.getName(),
-                user.getEmail(),
-                user.getCompany(),
-                user.getRole() != null ? user.getRole().name() : null
-        );
+        List<ProjectSummaryDto> projects = user.getProjects().stream()
+                .map(ProjectSummaryDto::from)
+                .collect(Collectors.toList());
+
+        return MyPageInfoResponseDto.builder()
+                .userId(user.getUserId())
+                .userName(user.getName())
+                .email(user.getEmail())
+                .company(user.getCompany())
+                .role(user.getRole() != null ? user.getRole().name() : "UNKNOWN")
+                .participatingProjects(projects)
+                .build();
     }
 }

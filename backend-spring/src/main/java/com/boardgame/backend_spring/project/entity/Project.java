@@ -1,4 +1,5 @@
 package com.boardgame.backend_spring.project.entity;
+import java.util.List;
 
 import com.boardgame.backend_spring.user.entity.User;
 import jakarta.persistence.*;
@@ -24,4 +25,7 @@ public class Project {
     private Integer price; // 자동 책정 후 저장됨
 
     private LocalDateTime createdAt;
+
+    @ManyToMany(mappedBy = "projects")
+    private List<User> participants;
 }

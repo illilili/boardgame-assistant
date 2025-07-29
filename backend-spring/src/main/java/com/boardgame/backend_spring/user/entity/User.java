@@ -1,4 +1,6 @@
 package com.boardgame.backend_spring.user.entity;
+import com.boardgame.backend_spring.project.entity.Project;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,4 +29,12 @@ public class User {
     public enum Role {
         PLANNER, DEVELOPER, PUBLISHER, ADMIN
     }
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_project",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_id")
+    )
+    private List<Project> projects;
 }

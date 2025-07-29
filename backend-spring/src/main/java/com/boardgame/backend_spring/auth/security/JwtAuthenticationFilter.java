@@ -13,10 +13,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 
+import com.boardgame.backend_spring.user.entity.User;
+import com.boardgame.backend_spring.user.repository.UserRepository;
+
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository; // 유저 정보
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -31,11 +35,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtTokenProvider.validateToken(token)) {
                 String email = jwtTokenProvider.getUserEmailFromToken(token);
 
-                // 지금은 권한 없이 빈 인증 객체 생성
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+                User user = userRepository.findByEmail(email)
+                        .orElse(null);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (user != null) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         }
 
