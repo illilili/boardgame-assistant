@@ -25,7 +25,7 @@ class Generate3DModelRequest(BaseModel):
     elementName: str
     description: str  # DTO에 description으로 되어있어 role 대신 사용
     style: str
-    componentType: str
+
 
 # Generate3DModelResponse DTO
 class Generate3DModelResponse(BaseModel):
@@ -47,8 +47,7 @@ async def api_generate_3d_model(request: Generate3DModelRequest):
             create_visual_prompt,
             item_name=request.elementName,
             item_description=request.description,
-            art_style=request.style,
-            component_type=request.componentType  # <-- [추가] componentType 전달
+            art_style=request.style, 
         )
         if not visual_prompt:
             raise HTTPException(status_code=500, detail="OpenAI 프롬프트 생성에 실패했습니다.")

@@ -20,24 +20,25 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 load_dotenv()
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+
 # --- 2. OpenAI 프롬프트 생성 기능 ---
-def create_visual_prompt(item_name: str, item_description: str, art_style: str,component_type: str) -> Optional[str]:
+def create_visual_prompt(item_name: str, item_description: str, art_style: str) -> Optional[str]:
     """OpenAI를 사용해 3D 모델링을 위한 시각적 묘사 프롬프트를 생성합니다."""
-    logging.info(f"[OpenAI] '{item_name}' ('{component_type}')의 시각적 프롬프트 생성을 시작합니다.")
+    logging.info(f"[OpenAI] '{item_name}' 의 시각적 프롬프트 생성을 시작합니다.")
     try:
         system_prompt = (
             "You are an expert board game component designer, crafting prompts for a text-to-3D generator. "
-            "Your goal is to translate a game item's concept into a vivid and physically plausible 3D model description in English. "
-            "You will be given the item's name, its role, a desired art style, and its **component type (e.g., Resource Token, Player Marker)**. "
+            "Your goal is to translate a game item's concept into a vivid and plausible 3D model description in English. "
+            "The 'Game Item Name' you receive will often include the component type (e.g., 'Dark Knight Player Marker', 'Crystal Resource Token'). "
             
-            "**You MUST adapt the 3D model's structure to fit its component type:** "
-            "- For a **'Player Marker'** or **'Unit Miniature'**, it must have a **flat circular base** so it can stand on the game board. "
-            "- For a **'Resource Token'**, it should be a **small, easy-to-handle, and possibly stackable object.** "
+            "**You MUST identify the component type from the name and adapt the 3D model's structure accordingly:** "
+            "- If the name includes **'Player Marker'** or **'Unit Miniature'**, the model must have a **flat circular base** to stand on the board. "
+            "- If the name includes **'Resource Token'**, it should be a **small, easy-to-handle, and possibly stackable object.** "
             
             "Focus on a clear silhouette suitable for a tabletop game. The entire description must be under 500 characters."
         )
         user_prompt = (
-            f"Game Component Type: {component_type}\n"
+
             f"Game Item Name: {item_name}\n"
             f"Item's Role/Description: {item_description}\n"
             f"Art Style: {art_style}"
@@ -144,7 +145,6 @@ if __name__ == '__main__':
         item_name=test_component["name"],
         item_description=test_component["description"],
         art_style=test_component["style"],
-        component_type=test_component["componentType"]
     )
 
 
