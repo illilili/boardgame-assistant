@@ -11,6 +11,7 @@ plt.rcParams['font.family'] = 'NanumGothic'
 
 # CSV 파일 경로
 csv_path = 'data/boardgame_detaildata_1-101_공백.csv'
+os.makedirs("plots", exist_ok=True)
 
 if not os.path.exists(csv_path):
     raise FileNotFoundError(f"{csv_path} 파일이 존재하지 않습니다.")
@@ -19,7 +20,7 @@ if not os.path.exists(csv_path):
 df = pd.read_csv(csv_path)
 
 # 가격 전처리 ($ 제거 및 숫자로 변환)
-df['amazon_price'] = df['amazon_price'].replace('[\$,]', '', regex=True)
+df['amazon_price'] = df['amazon_price'].replace(r'[\$,]', '', regex=True)
 df['amazon_price'] = pd.to_numeric(df['amazon_price'], errors='coerce')
 
 # 최소나이 전처리 ('14+' → 14)
@@ -55,6 +56,16 @@ sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f")
 plt.title('아마존 가격과 수치형 컬럼 간의 상관관계 히트맵')
 plt.tight_layout()
 plt.savefig('plots/heatmap_price_correlation.png')
+plt.close()
+
+# 🎯 산점도 저장: 난이도 vs 아마존 가격
+plt.figure(figsize=(8, 6))
+sns.scatterplot(x='난이도', y='amazon_price', data=df, alpha=0.6)
+plt.title('난이도와 아마존 가격의 관계')
+plt.xlabel('난이도')
+plt.ylabel('Amazon Price ($)')
+plt.tight_layout()
+plt.savefig('plots/scatter_difficulty_vs_price.png')
 plt.close()
 
 print("✅ 분석 완료! 다음 이미지가 plots 폴더에 저장되었습니다:")

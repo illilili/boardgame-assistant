@@ -14,8 +14,8 @@ DB_CONFIG = {
     "host": "localhost",
     "port": 3306,
     "user": "root",
-    "password": "yourpassword",
-    "database": "boardgame_db",
+    "password": "123123d",
+    "database": "boardgame",
     "charset": "utf8mb4"
 }
 
@@ -40,8 +40,8 @@ def estimate_price(req: EstimateRequest):
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT categories, min_age, difficulty
-            FROM game_plan
+            SELECT category, min_age, difficulty
+            FROM plan
             WHERE plan_id = %s
         """, (req.plan_id,))
         row = cursor.fetchone()
