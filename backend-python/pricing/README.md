@@ -6,3 +6,28 @@
 ## 구현할 항목
 - [ ] 가격 산정 기준 모델 설계
 - [ ] /api/pricing/estimate API 구현
+
+
+
+
+pip install joblib
+pip install fastapi uvicorn pymysql pandas numpy scikit-learn
+
+
+
+
+sudo apt update
+sudo apt install -y fonts-nanum
+sudo fc-cache -fv
+
+
+pip install scikit-learn
+
+pip install pandas matplotlib seaborn
+
+python analyze_boardgame.py
+python analyze_boardgame_1.py
+python model_train.py
+
+
+uvicorn app:app --reload
