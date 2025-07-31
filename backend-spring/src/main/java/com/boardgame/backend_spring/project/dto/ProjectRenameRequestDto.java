@@ -3,6 +3,6 @@ package com.boardgame.backend_spring.project.dto;
 import lombok.Getter;
 
 @Getter
-public class ProjectCreateRequestDto {
-    private String title;
+public class ProjectRenameRequestDto {
+    private String newTitle;
 }
