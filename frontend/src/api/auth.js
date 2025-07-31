@@ -13,6 +13,10 @@ export const login = async (data)=>{
     return response.data
 }
 
+export const logout = async ()=>{
+    const response = await axios.post(`${BASE_URL}/api/auth/logout`)
+    return response.data
+}
 
 //////////////////////// 더미데이터 확인용
 
@@ -43,5 +47,13 @@ export const login = async (data)=>{
 //     refreshToken: 'mockRefreshToken456',
 //     role: 'ROLE_USER',
 //     message: '로그인 성공!',
+//   };
+// };
+
+//// 로그아웃 더미데이터
+// export const logout = async () => {
+//   console.log('Mock logout 요청됨');
+//   return {
+//     message: '로그아웃 되었습니다.',
 //   };
 // };
