@@ -1,38 +1,132 @@
-.App {
-  text-align: center;
+/* 기본 스타일 초기화 및 전체 폰트 설정 */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #f0fffa 0%, #ffffff 70%);
+  color: #333;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* 전체 컨테이너 */
+.container {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  padding: 0 5%;
+}
+
+/* 메인 영역이 남은 공간을 모두 차지하도록 설정 */
+main {
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+}
+
+/* --- 헤더 --- */
+.app-header {
+  padding: 20px 0;
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  align-items: center;
+}
+
+.app-header nav button {
+  border: none;
+  padding: 10px 24px;
+  margin-left: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-login {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+}
+
+.btn-login:hover {
+  background-color: #f5f5f5;
+}
+
+.btn-signup {
+  background-color: #2dd4bf; /* Teal color */
   color: white;
+  border: 1px solid #2dd4bf;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-signup:hover {
+  background-color: #14b8a6;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+
+/* --- 메인 콘텐츠 --- */
+.main-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  width: 100%;
+  max-width: 1100px;
+}
+
+.text-section {
+  flex: 1;
+  max-width: 450px;
+}
+
+.text-section h1 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  color: #14b8a6; /* Darker Teal */
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.text-section p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #555;
+}
+
+.image-section {
+  flex: 1;
+}
+
+.image-section img {
+  width: 100%;
+  max-width: 550px;
+  height: auto;
+}
+
+
+/* --- 푸터 --- */
+.app-footer {
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #eeeeee;
+}
+
+.footer-logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.footer-nav a {
+  margin-left: 30px;
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.footer-nav a:hover {
+  color: #14b8a6;
 }
