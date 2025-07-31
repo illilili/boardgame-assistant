@@ -4,12 +4,12 @@ import axios from 'axios';
 const BASE_URL = 'http://localhost:4000';
 
 export const signup = async (data)=>{
-    const response = await axios.post(`${BASE_URL}/api/signup`, data)
+    const response = await axios.post(`${BASE_URL}/api/auth/signup`, data)
     return response.data
 }
 
 export const login = async (data)=>{
-    const response = await axios.post(`${BASE_URL}/api/login`, data)
+    const response = await axios.post(`${BASE_URL}/api/auth/login`, data)
     return response.data
 }
 
@@ -30,7 +30,7 @@ export const login = async (data)=>{
 //   });
 // };
 
-////// 로그인 더미데이터
+//// 로그인 더미데이터
 // export const login = async (data) => {
 //   console.log('Mock login 요청됨:', data);
 
