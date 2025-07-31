@@ -1,11 +1,18 @@
 import logo from './logo.svg';
 import './App.css';
 
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import SignUp from './pages/auth/SignUp';
+
+
 function App() {
     return (
-    <div className="bg-red-600 text-white p-6 rounded-lg">
-      TailwindCSS 작동 확인! 🎉
-    </div>
+      <Router>
+        <Routes>
+           <Route path="/signup" element={<SignUp/>} /> 
+        </Routes>
+      </Router>
   );
 }
 
