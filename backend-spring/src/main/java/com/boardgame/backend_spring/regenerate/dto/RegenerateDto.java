@@ -17,9 +17,4 @@ public class RegenerateDto {
     public record OriginalConcept(long conceptId, long planId, String theme, String playerCount, double averageWeight, String ideaText, String mechanics, String storyline, String createdAt) {}
 
 
-    // 2. Components Regeneration DTOs
-    public record ComponentsRequest(int componentId, String feedback) {}
-    public record ComponentsResponse(int componentId, List<ComponentItem> components) {}
-    public record ComponentItem(String type, String name, String effect, String visualType) {}
-
 }

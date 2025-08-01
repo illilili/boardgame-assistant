@@ -87,10 +87,6 @@ public class RegenerateService {
         );
     }
 
-    public RegenerateDto.ComponentsResponse regenerateComponents(RegenerateDto.ComponentsRequest request) {
-        // 이 메서드도 필요시 DB 연동 로직 추가
-        return restTemplate.postForObject(regenComponentsApiUrl, request, RegenerateDto.ComponentsResponse.class);
-    }
 
 
 }
