@@ -4,6 +4,8 @@ import './Plan.css';
 
 // 분리된 컴포넌트들을 import 합니다.
 import GameConceptCreator from './GameConceptCreator';
+import Goal from './Goal';
+import Components from './Components';
 import RuleCreator from './RuleCreator';
 import ComponentCreator from './ComponentCreator';
 import Review from './Review';
@@ -15,8 +17,9 @@ import WelcomeScreen from './WelcomeScreen';
 // --- 데이터 및 메인 컴포넌트 ---
 const workspaceNavItems = [
   { id: 'concept', title: '게임 컨셉 제작', component: <GameConceptCreator /> },
+  { id: 'goal', title: '게임 목표 설계', component: <Goal/>},  
   { id: 'rules', title: '규칙 생성', component: <RuleCreator /> },
-  { id: 'components', title: '자원 및 구성 요소 생성', component: <ComponentCreator /> },
+  { id: 'components', title: '게임 구성요소 생성', component: <Components/>},
   { id: 'review', title: '검토', component: <Review /> },
 ];
 

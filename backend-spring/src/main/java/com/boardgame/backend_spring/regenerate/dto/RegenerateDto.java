@@ -22,7 +22,22 @@ public class RegenerateDto {
     public record ComponentsResponse(int componentId, List<ComponentItem> components) {}
     public record ComponentItem(String type, String name, String effect, String visualType) {}
 
-    // 3. Rule Regeneration DTOs
-    public record RuleRequest(int ruleId, String feedback) {}
+    public record RuleRequest(long ruleId, String feedback) {} // int -> long
     public record RuleResponse(int ruleId, String turnStructure, List<String> actionRules, String victoryCondition, List<String> penaltyRules, String designNote) {}
+
+    // FastAPI에 재생성 요청을 보낼 때 사용할 내부 DTO
+    public record FastApiRegenRuleRequest(
+            // 게임 컨셉 정보
+            String theme,
+            String mechanics,
+            String mainGoal,
+            // 개선할 원본 규칙 정보
+            int original_ruleId,
+            String original_turnStructure,
+            List<String> original_actionRules,
+            String original_victoryCondition,
+            List<String> original_penaltyRules,
+            // 사용자 피드백
+            String feedback
+    ) {}
 }
