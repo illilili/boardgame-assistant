@@ -10,6 +10,12 @@ export const getMyPageInfo = async () =>{
     return response.data
 }
 
+// 프로필 정보 수정
+export const editProfile = async (userId, data) => {
+  const response = await axios.put(`${BASE_URL}/api/users/${userId}/profile`, data);
+  return response.data;
+};
+
 
 
 /////// 임시 데이터
@@ -26,3 +32,8 @@ export const getMyPageInfo = async () =>{
 // }
 
 
+////////// 임시 - 프로필 정보 수정
+// export const editProfile = async (userId, data) => {
+//   const response = await axios.put(`${BASE_URL}/api/users/${userId}/profile`, data);
+//   return response.data;
+// };
