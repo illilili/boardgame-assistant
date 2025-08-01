@@ -1,4 +1,7 @@
 package com.boardgame.backend_spring.goal.repository;
 
-public class GameObjectiveRepository {
+import com.boardgame.backend_spring.goal.entity.GameObjective;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface GameObjectiveRepository extends JpaRepository<GameObjective, Long> {
 }

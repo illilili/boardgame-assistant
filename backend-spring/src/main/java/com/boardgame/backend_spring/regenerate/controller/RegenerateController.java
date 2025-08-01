@@ -17,24 +17,5 @@ public class RegenerateController {
         this.regenerateService = regenerateService;
     }
 
-    @PostMapping("/regenerate-concept")
-    public ResponseEntity<?> regenerateConcept(@RequestBody RegenerateDto.ConceptRequest request) {
-        try {
-            return ResponseEntity.ok(regenerateService.regenerateConcept(request));
-        } catch (Exception e) { return ResponseEntity.internalServerError().body(e.getMessage()); }
-    }
 
-    @PostMapping("/regenerate-components")
-    public ResponseEntity<?> regenerateComponents(@RequestBody RegenerateDto.ComponentsRequest request) {
-        try {
-            return ResponseEntity.ok(regenerateService.regenerateComponents(request));
-        } catch (Exception e) { return ResponseEntity.internalServerError().body(e.getMessage()); }
-    }
-
-    @PostMapping("/regenerate-rule")
-    public ResponseEntity<?> regenerateRule(@RequestBody RegenerateDto.RuleRequest request) {
-        try {
-            return ResponseEntity.ok(regenerateService.regenerateRule(request));
-        } catch (Exception e) { return ResponseEntity.internalServerError().body(e.getMessage()); }
-    }
 }
