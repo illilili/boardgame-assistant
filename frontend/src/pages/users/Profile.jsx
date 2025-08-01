@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { uploadProfilePic, editProfile } from '../../api/users';
+
 
 const Profile = () => {
   const [avatarPreview, setAvatarPreview] = useState('');
@@ -23,37 +25,37 @@ const Profile = () => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
+    const handleSubmit = async () => {
     try {
-      let avatarUrl = '';
+        const userId = localStorage.getItem('userId'); // 유저 ID 가져오기
+        if (!userId) {
+        alert('로그인이 필요합니다.');
+        return;
+        }
 
-      // 이미지 업로드 (있을 경우)
-      if (avatarFile) {
+        let avatarUrl = '';
+
+        if (avatarFile) {
         const formData = new FormData();
         formData.append('profileImage', avatarFile);
 
-        const res = await axios.post(
-          `/api/users/{userId}/upload-profile-image`,
-          formData,
-          { headers: { 'Content-Type': 'multipart/form-data' } }
-        );
+        const res = await uploadProfilePic(userId, formData); 
+        avatarUrl = res.imageUrl;
+        }
 
-        avatarUrl = res.data.avatarUrl;
-      }
-
-      // 프로필 정보 수정
-      await axios.patch(`/api/users/{userId}/profile`, {
+        // 프로필 정보 수정
+        await editProfile(userId, {
         ...profile,
         avatar: avatarUrl
-      });
+        });
 
-      alert('프로필이 저장됐습니다!');
-      setIsEditing(false);
+        alert('프로필이 저장됐습니다!');
+        setIsEditing(false);
     } catch (err) {
-      console.error(err);
-      alert('수정 중 오류가 발생했습니다');
+        console.error(err);
+        alert('수정 중 오류가 발생했습니다');
     }
-  };
+};
 
   return (
     <div className="max-w-3xl mx-auto p-8 ">
