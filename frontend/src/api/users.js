@@ -1,8 +1,7 @@
 // 마이페이지, 유저 관련 
 
 import axios from 'axios';
-
-const BASE_URL = 'https://your.backend.api.com'
+const BASE_URL = 'http://localhost:8080';
 
 // 마이페이지 정보 조회
 export const getMyPageInfo = async () =>{

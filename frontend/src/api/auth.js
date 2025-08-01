@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 백엔드 API주소 - 변경 필요
-const BASE_URL = 'http://localhost:4000';
+const BASE_URL = 'http://localhost:8080';
 
 export const signup = async (data)=>{
     const response = await axios.post(`${BASE_URL}/api/auth/signup`, data)
