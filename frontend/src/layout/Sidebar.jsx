@@ -4,6 +4,8 @@ import { AiFillHome } from 'react-icons/ai'; //홈 버튼
 import { FaUserCircle } from 'react-icons/fa';
 import { FiMoreHorizontal } from 'react-icons/fi';
 
+// api import
+import { logout } from '../api/auth.js';
 
 // 사이드바 아이템 임시 
 const navItems = [
@@ -17,9 +19,26 @@ const user = {
   avatar: '',
 };
 
-
 export default function Sidebar() {
   const location = useLocation();
+
+  //로그아웃 핸들러
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      const result = await logout();
+      alert(result.message); // "로그아웃 되었습니다."
+      // 토큰 및 권한 정보 제거 - 추후 보고 삭제하거나 조정필요할듯
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('role');
+      // 리디렉션
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+      alert('로그아웃 중 오류가 발생했습니다.');
+    }
+  };
 
   return (
     <aside className="w-80 bg-gray-100 border-r border-gray-300 shadow-lg p-4 flex flex-col h-screen">
@@ -73,9 +92,9 @@ export default function Sidebar() {
 
 
         {/* 로그아웃 */}
-        <Link to="/logout" className="px-4 py-2 rounded hover:bg-red-100 text-red-500 font-semibold">
-          로그아웃
-        </Link>
+        <button onClick={handleLogout} className="px-4 py-2 rounded hover:bg-red-100 text-red-500 font-semibold">
+         로그아웃
+        </button>
 
       </div>
     </aside>
