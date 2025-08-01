@@ -10,4 +10,7 @@ public class SignupRequest {
     private String email;
     private String password;
     private String company;
+
+    // 약관 동의 여부
+    private boolean agreedToTerms;
 }
