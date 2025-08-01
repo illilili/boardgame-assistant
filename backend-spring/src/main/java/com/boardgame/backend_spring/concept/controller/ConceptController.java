@@ -8,18 +8,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/plans") // API 경로 설정
+@RequestMapping("/api/plans")
 @RequiredArgsConstructor
-// React 개발 서버(localhost:3000)에서의 요청을 허용 (CORS 설정)
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000") // React 앱 주소 허용
 public class ConceptController {
 
     private final ConceptService conceptService;
 
+    // 새로운 컨셉 생성
     @PostMapping("/generate-concept")
     public ResponseEntity<ConceptResponseDto> generateConcept(@RequestBody ConceptRequestDto requestDto) {
         ConceptResponseDto responseDto = conceptService.generateConcept(requestDto);
         return ResponseEntity.ok(responseDto);
+    }
+
+    // [수정] 모든 컨셉의 '상세 정보' 목록을 반환하는 API
+    @GetMapping("/concepts")
+    public ResponseEntity<List<ConceptResponseDto>> getAllConcepts() {
+        return ResponseEntity.ok(conceptService.getAllConcepts());
     }
 }
