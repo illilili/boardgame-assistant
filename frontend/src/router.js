@@ -4,6 +4,8 @@ import Home from './mainPage/Home';
 import MainContent from './mainPage/MainContent';
 import Header from './mainPage/Header';
 import Footer from './mainPage/Footer';
+import Plan from './plan/Plan';
+
 const router = createBrowserRouter([
     {
         id: 0,
@@ -24,6 +26,11 @@ const router = createBrowserRouter([
         id: 3,
         path:'/footer',
         elment: <Footer/>
+    },
+    {
+        id: 4,
+        path:'/plan',
+        element: <Plan/>
     }
 
 
