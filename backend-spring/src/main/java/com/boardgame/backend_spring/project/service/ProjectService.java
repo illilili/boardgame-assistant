@@ -24,6 +24,12 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
 
+    // TODO: 승인된 기획안(plan) 기준으로 컴포넌트 목록 반환
+    // public PlanDocUrlResponseDto getPlanDoc(Long projectId) { ... }
+
+    // TODO: 기획안(plan)에 연결된 컴포넌트(component) + 콘텐츠(content) 기반 개발 할 일 목록
+    // public TaskListResponseDto getTasksByProject(Long projectId) { ... }
+
     public ProjectCreateResponseDto createProject(ProjectCreateRequestDto dto, User user) {
         // 역할 검사: PLANNER만 허용
         if (user.getRole() != User.Role.PLANNER) {
