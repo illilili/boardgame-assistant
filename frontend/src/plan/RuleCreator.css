@@ -35,6 +35,42 @@
   justify-content: center;
 }
 
+/* --- 탭 네비게이션 (추가된 스타일) --- */
+/* 사용법: .rule-form-section 내부에 이 구조를 추가하세요.
+<div class="tab-navigation">
+  <button class="tab-button">새로 만들기</button>
+  <button class="tab-button active">다시 만들기</button>
+</div>
+*/
+.tab-navigation {
+  display: flex;
+  border-bottom: 1px solid #EAEAEA;
+  margin-bottom: 32px;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #888888;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: color 0.2s, border-color 0.2s;
+  margin-bottom: -1px; /* 컨테이너의 하단 테두리와 겹치게 함 */
+}
+
+.tab-button:hover {
+  color: #2c2825;
+}
+
+.tab-button.active {
+  color: #E58A4E;
+  border-bottom-color: #E58A4E;
+}
+
+
 .rule-form-section h2 {
   font-size: 1.75rem;
   font-weight: 700;
