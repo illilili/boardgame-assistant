@@ -1,3 +1,4 @@
+// 파일: component/entity/SubTask.java
 package com.boardgame.backend_spring.component.entity;
 
 import jakarta.persistence.*;

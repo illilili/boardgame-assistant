@@ -1,8 +1,10 @@
+// 파일: component/dto/GenerateComponentDto.java
 package com.boardgame.backend_spring.component.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class GenerateComponentDto {
     public record FastApiResponse(@JsonProperty("components") List<FastApiComponentItem> components) {}
 
     @Data
+    @NoArgsConstructor
     public static class FastApiComponentItem {
         private String type;
         private String title;

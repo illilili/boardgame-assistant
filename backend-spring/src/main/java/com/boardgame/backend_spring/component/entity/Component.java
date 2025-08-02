@@ -1,3 +1,4 @@
+// 파일: component/entity/Component.java
 package com.boardgame.backend_spring.component.entity;
 
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
@@ -21,17 +22,16 @@ public class Component {
     @Column(length = 500)
     private String title;
 
-    // [수정] 상세 정보를 담을 필드 추가
     @Column(length = 2000)
-    private String roleAndEffect; // 역할과 효과
+    private String roleAndEffect;
 
     @Column(length = 1000)
-    private String artConcept; // 아트 컨셉
+    private String artConcept;
 
     @Column(length = 1000)
-    private String interconnection; // 상호작용
+    private String interconnection;
 
-    private String quantity; // 수량
+    private String quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "concept_id")

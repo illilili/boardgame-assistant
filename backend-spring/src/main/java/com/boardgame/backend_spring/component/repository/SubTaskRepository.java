@@ -1,3 +1,4 @@
+// 파일: component/repository/SubTaskRepository.java
 package com.boardgame.backend_spring.component.repository;
 
 import com.boardgame.backend_spring.component.entity.SubTask;
