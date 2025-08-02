@@ -27,7 +27,6 @@ const GameConceptCreator = () => {
           const response = await fetch('http://localhost:8080/api/plans/concepts');
           if (!response.ok) throw new Error('컨셉 목록 로딩 실패');
           const data = await response.json();
-          // [수정] 최신순으로 정렬
           data.sort((a, b) => b.conceptId - a.conceptId);
           setRegenerateConceptList(data);
         } catch (err) {
@@ -53,8 +52,10 @@ const GameConceptCreator = () => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || '요청 처리에 실패했습니다.');
+        // 백엔드에서 받은 에러 메시지를 최대한 자세히 보여주도록 수정
+        const errorData = await response.json();
+        console.error("Backend Error:", errorData);
+        throw new Error(errorData.detail || errorData.message || '요청 처리에 실패했습니다.');
       }
 
       const data = await response.json();
@@ -76,22 +77,34 @@ const GameConceptCreator = () => {
     });
   };
 
+  // ########## 🚨 여기가 핵심 수정 포인트! 🚨 ##########
   const handleRegenerateSubmit = (e) => {
     e.preventDefault();
     if (!selectedConceptInfo || !feedback) {
       setError('재생성할 컨셉과 피드백을 모두 입력해주세요.');
       return;
     }
-    const [conceptId, planId] = selectedConceptInfo.split(',').map(Number);
+    
+    // 1. 선택된 conceptId를 숫자로 변환
+    const selectedConceptId = parseInt(selectedConceptInfo.split(',')[0], 10);
+    
+    // 2. 전체 목록에서 선택된 컨셉의 모든 정보를 찾음
+    const originalConceptData = regenerateConceptList.find(c => c.conceptId === selectedConceptId);
 
-    fetchConcept('http://localhost:8080/api/plans/regenerate-concept', {
-      conceptId,
-      planId,
-      feedback,
-    });
+    if (!originalConceptData) {
+        setError('선택된 컨셉 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 3. 백엔드(Spring)가 요구하는 정확한 JSON 구조로 요청 본문을 구성
+    const body = {
+      originalConcept: originalConceptData, // 원본 컨셉 객체를 통째로 넣음
+      feedback: feedback
+    };
+
+    fetchConcept('http://localhost:8080/api/plans/regenerate-concept', body);
   };
 
-  // [추가] 드롭다운에서 컨셉을 선택했을 때 실행되는 핸들러
   const handleConceptSelectionChange = (e) => {
     const selectedValue = e.target.value;
     setSelectedConceptInfo(selectedValue);
@@ -108,9 +121,9 @@ const GameConceptCreator = () => {
     );
 
     if (conceptToPreview) {
-      setConcept(conceptToPreview); // 오른쪽 결과 창에 선택한 컨셉 표시
-      setIsInitialState(false);     // 초기 메시지 숨김
-      setError(null);               // 에러 메시지 초기화
+      setConcept(conceptToPreview); 
+      setIsInitialState(false);     
+      setError(null);              
     }
   };
 
@@ -135,26 +148,25 @@ const GameConceptCreator = () => {
 
         {activeTab === 'generate' && (
           <div className="form-content">
-            {/* 새로 만들기 폼 (변경 없음) */}
             <h2 className="form-title">새로운 게임 컨셉 만들기</h2>
-             <p className="form-description">게임의 기본 요소를 입력하여 AI에게 새로운 아이디어를 얻어보세요.</p>
-             <form onSubmit={handleGenerateSubmit}>
-               <div className="form-group">
-                 <label htmlFor="theme">게임 테마</label>
-                 <input id="theme" type="text" value={theme} onChange={(e) => setTheme(e.target.value)} placeholder="예: 우주 탐험, 사이버펑크" required />
-               </div>
-               <div className="form-group">
-                 <label htmlFor="playerCount">플레이어 수</label>
-                 <input id="playerCount" type="text" value={playerCount} onChange={(e) => setPlayerCount(e.target.value)} placeholder="예: 2-4명" required />
-               </div>
-               <div className="form-group">
-                 <label htmlFor="averageWeight">난이도: {averageWeight}</label>
-                 <input id="averageWeight" type="range" value={averageWeight} onChange={(e) => setAverageWeight(e.target.value)} min="1.0" max="5.0" step="0.1" required />
-               </div>
-               <button type="submit" className="submit-button" disabled={loading}>
-                 {loading ? '생성 중...' : '컨셉 생성하기'}
-               </button>
-             </form>
+              <p className="form-description">게임의 기본 요소를 입력하여 AI에게 새로운 아이디어를 얻어보세요.</p>
+              <form onSubmit={handleGenerateSubmit}>
+                <div className="form-group">
+                  <label htmlFor="theme">게임 테마</label>
+                  <input id="theme" type="text" value={theme} onChange={(e) => setTheme(e.target.value)} placeholder="예: 우주 탐험, 사이버펑크" required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="playerCount">플레이어 수</label>
+                  <input id="playerCount" type="text" value={playerCount} onChange={(e) => setPlayerCount(e.target.value)} placeholder="예: 2-4명" required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="averageWeight">난이도: {averageWeight}</label>
+                  <input id="averageWeight" type="range" value={averageWeight} onChange={(e) => setAverageWeight(e.target.value)} min="1.0" max="5.0" step="0.1" required />
+                </div>
+                <button type="submit" className="submit-button" disabled={loading}>
+                  {loading ? '생성 중...' : '컨셉 생성하기'}
+                </button>
+              </form>
           </div>
         )}
 
@@ -168,7 +180,6 @@ const GameConceptCreator = () => {
                 <select
                   id="regenerateConcept"
                   value={selectedConceptInfo}
-                  // [수정] onChange 이벤트에 새로운 핸들러 연결
                   onChange={handleConceptSelectionChange}
                   required
                 >
@@ -206,7 +217,6 @@ const GameConceptCreator = () => {
           </div>
         )}
 
-        {/* [수정] 초기 상태 또는 선택된 컨셉이 없을 때만 초기 메시지 표시 */}
         {!loading && !error && isInitialState && !concept && (
           <div className="initial-state">
             <h3>AI 컨셉 결과</h3>
