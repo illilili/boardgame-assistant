@@ -15,9 +15,6 @@ public class SummaryController {
 
     private final SummaryService summaryService;
 
-    /**
-     * [신규 추가] 프론트엔드에서 사용할 컨셉 목록을 제공하는 API
-     */
     @GetMapping("/concepts-for-summary")
     public ResponseEntity<List<SummaryDto.ConceptListInfo>> getConceptListForSummary() {
         return ResponseEntity.ok(summaryService.getConceptList());

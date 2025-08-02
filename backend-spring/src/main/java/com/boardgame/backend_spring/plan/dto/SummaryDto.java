@@ -13,7 +13,7 @@ public class SummaryDto {
         private Long conceptId;
     }
 
-    // [신규 추가] React에 컨셉 목록을 보내주기 위한 DTO
+    // React에 컨셉 목록을 보내주기 위한 DTO
     @Getter
     @Builder
     public static class ConceptListInfo {
@@ -21,17 +21,18 @@ public class SummaryDto {
         private String theme;
     }
 
-    // Spring -> FastAPI 요청 DTO (기존과 동일)
+    // [수정] Spring -> FastAPI 요청 DTO
     @Builder
     @Getter
     public static class FastApiRequest {
-        private ConceptInfo conceptInfo;
-        private GoalInfo goalInfo;
-        private RuleInfo ruleInfo;
-        private List<ComponentInfo> componentInfo;
+        private String gameName; // gameName 필드 추가
+        private ConceptInfo concept; // conceptInfo -> concept
+        private GoalInfo goal;       // goalInfo -> goal
+        private RuleInfo rule;       // ruleInfo -> rule
+        private List<ComponentInfo> components; // componentInfo -> components
     }
 
-    // --- FastAPI 요청에 포함될 세부 정보 DTO들 (기존과 동일) ---
+    // --- FastAPI 요청에 포함될 세부 정보 DTO들 ---
     @Builder
     @Getter
     public static class ConceptInfo {
@@ -56,16 +57,14 @@ public class SummaryDto {
     public static class RuleInfo {
         private String turnStructure;
         private List<String> actionRules;
-        private List<String> penaltyRules;
+        private String victoryCondition; // penaltyRules 대신 victoryCondition 포함
     }
 
     @Builder
     @Getter
     public static class ComponentInfo {
-        private String type;
+        // [수정] FastAPI의 ComponentItemSummary 모델과 필드명 일치
         private String title;
-        private String quantity;
-        private String roleAndEffect;
-        private String artConcept;
+        private String role_and_effect;
     }
 }
