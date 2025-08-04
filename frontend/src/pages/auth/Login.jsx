@@ -24,10 +24,11 @@ const Login = () => {
 
             alert('로그인 성공');
             navigate('/'); // 로그인 후 메인 페이지 등으로 이동
-            } catch (err){
-                alert('로그인에 실패했습니다.');
-                console.error(err);
-            }
+            } catch (err) {
+            const message = err.response?.data?.message;
+            alert(message || '로그인에 실패했습니다.');
+            console.error(err);
+          }
     };
 
   return (
