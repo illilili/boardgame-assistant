@@ -13,10 +13,18 @@ export const login = async (data)=>{
     return response.data
 }
 
-export const logout = async ()=>{
-    const response = await axios.post(`${BASE_URL}/api/auth/logout`)
-    return response.data
-}
+export const logout = async () => {
+  const token = localStorage.getItem('accessToken');
+
+  const response = await axios.post(`${BASE_URL}/api/auth/logout`, null, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.data;
+};
+
 
 //////////////////////// 더미데이터 확인용
 
