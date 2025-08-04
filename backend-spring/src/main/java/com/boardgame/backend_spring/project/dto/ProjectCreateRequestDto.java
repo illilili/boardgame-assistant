@@ -4,5 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class ProjectCreateRequestDto {
-    private String title;
+    private String name;
+    private String description;
+    private Long userId; // 생성자
 }

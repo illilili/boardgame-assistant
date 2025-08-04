@@ -1,10 +1,9 @@
 package com.boardgame.backend_spring.user.service;
 
-import com.boardgame.backend_spring.project.dto.ProjectSummaryDto;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.boardgame.backend_spring.global.error.CustomException;
-import com.boardgame.backend_spring.global.error.ErrorCode;
+
+import com.boardgame.backend_spring.project.dto.ProjectSummaryDto;
 import com.boardgame.backend_spring.user.dto.MyPageInfoResponseDto;
 import com.boardgame.backend_spring.user.dto.DeveloperSummaryDto;
 import com.boardgame.backend_spring.user.dto.UserCreateRequestDto;

@@ -1,6 +1,6 @@
 # Boardgame Assistant
 
-AI 기반 보드게임 기획 및 저작권 어시스턴트 프로젝트  
+AI 기반 보드게임 기획/개발 어시스턴트 
 - 백엔드: Java 17 / Gradle / Spring Boot 3.5.3
 - 프론트엔드: React (CRA 기반)
 - AI: GPT-4, LangChain, OpenAI API

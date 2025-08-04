@@ -1,7 +1,7 @@
 package com.boardgame.backend_spring.user.entity;
-import com.boardgame.backend_spring.project.entity.Project;
 import java.util.List;
 
+import com.boardgame.backend_spring.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
 
