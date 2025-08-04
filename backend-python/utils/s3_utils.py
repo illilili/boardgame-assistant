@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from botocore.client import Config
 import tempfile
 from pathlib import Path
+from uuid import uuid4
 
 # .env 로드
 load_dotenv()
@@ -70,3 +71,9 @@ def upload_image_bytes_to_s3(key: str, image_bytes: bytes) -> str:
 
     # 실제 업로드 (upload_file을 재사용)
     return upload_file_to_s3(local_path, s3_key=key, content_type="image/png")
+
+
+def upload_model3d_to_s3(local_path: str) -> str:
+    file_name = os.path.basename(local_path)
+    s3_key = f"model3d/{uuid4().hex}_{file_name}"
+    return upload_file_to_s3(local_path, s3_key=s3_key, content_type="model/gltf-binary")
