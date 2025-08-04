@@ -2,6 +2,8 @@ from utils.openai_utils import call_openai
 
 # 카드 정보와 게임 컨셉을 영어로 자연스럽게 번역하고,
 # 컨셉은 짧고 간결한 키워드 스타일로 요약
+from utils.openai_utils import call_openai
+
 def translate_prompt_kor_to_eng(title_ko: str, effect_ko: str, concept_ko: str) -> dict:
     prompt = (
         f"Translate the following Korean board game card information into natural and descriptive English.\n"
@@ -18,7 +20,7 @@ def translate_prompt_kor_to_eng(title_ko: str, effect_ko: str, concept_ko: str) 
     )
 
     response = call_openai(prompt, model="gpt-4")
-    
+
     lines = response.strip().split("\n")
     result = {}
     for line in lines:
@@ -27,6 +29,5 @@ def translate_prompt_kor_to_eng(title_ko: str, effect_ko: str, concept_ko: str) 
             key = key.strip().lstrip("-").strip().lower()
             result[key] = value.strip()
 
-    # key 이름을 generate_card_image()에 맞게 변환
     result["game_concept"] = result.pop("concept", "medieval fantasy")
     return result

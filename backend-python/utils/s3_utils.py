@@ -1,7 +1,10 @@
 import boto3
 import os
+import io
 from dotenv import load_dotenv
 from botocore.client import Config
+import tempfile
+from pathlib import Path
 
 # .env 로드
 load_dotenv()
@@ -58,3 +61,12 @@ def generate_presigned_url(key: str, expires_in: int = 3600) -> str:
         ExpiresIn=expires_in
     )
     return url
+
+def upload_image_bytes_to_s3(key: str, image_bytes: bytes) -> str:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
+        tmp.write(image_bytes)
+        tmp.flush()
+        local_path = tmp.name  # 실제 파일 경로
+
+    # 실제 업로드 (upload_file을 재사용)
+    return upload_file_to_s3(local_path, s3_key=key, content_type="image/png")

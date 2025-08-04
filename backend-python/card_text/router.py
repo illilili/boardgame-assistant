@@ -5,10 +5,11 @@ from .service import generate_card_text  # 수정된 서비스 함수 사용
 
 router = APIRouter()
 
-# 카드 요청용 모델
+# 카드 요청용 모델 (description 추가됨)
 class CardInfo(BaseModel):
     name: str
     effect: str
+    description: str  # 추가
 
 # 요청 바디 모델
 class CardTextGenerateRequest(BaseModel):
@@ -34,6 +35,7 @@ def generate_card_texts(request: CardTextGenerateRequest):
         text = generate_card_text(
             name=card.name,
             effect=card.effect,
+            description=card.description,  # 인자로 추가
             theme=request.theme,
             storyline=request.storyline
         )
