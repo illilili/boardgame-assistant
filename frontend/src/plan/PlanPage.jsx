@@ -6,159 +6,240 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 
-import './PlanPage.css'; 
+// CSS를 React 컴포넌트 내에 <style> 태그로 포함시켰습니다.
+// 이렇게 하면 별도의 CSS 파일 없이 이 파일 하나만으로 스타일이 적용됩니다.
+const PlanPageStyles = `
+/* PlanPage.css (Architect 스타일에 맞춤 - 최종 수정본) */
 
-// 사용자 친화적인 UI를 위한 기본 스타일을 추가합니다.
-const styles = `
+/* --- 전체 레이아웃 --- */
 .summary-page-container {
-    font-family: 'Pretendard', sans-serif;
-    max-width: 900px;
-    margin: 2rem auto;
-    padding: 1rem;
-    color: #333;
+  display: flex;
+  gap: 48px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  height: calc(100vh - 70px - 4rem);
+  box-sizing: border-box;
+}
+
+.form-column, .result-column {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  box-sizing: border-box;
+}
+
+.form-column {
+  flex: 1; /* 왼쪽 컬럼은 1의 비율 */
+  min-width: 350px;
+}
+
+.result-column {
+  flex: 2; /* 오른쪽 컬럼을 2의 비율로 설정해 더 넓게 만듭니다. */
+}
+
+
+/* --- 폼(왼쪽) 컬럼 --- */
+.summary-header {
+  margin-bottom: 32px;
 }
 
 .summary-header h1 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-    text-align: center;
-    margin-bottom: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c2825;
+  margin: 0 0 8px 0;
 }
 
 .summary-header p {
-    text-align: center;
-    color: #7f8c8d;
-    margin-bottom: 2rem;
-}
-
-.card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    padding: 2rem;
-    margin-bottom: 2rem;
+  font-size: 1rem;
+  color: #888888;
+  margin: 0;
 }
 
 .form-group {
-    margin-bottom: 1.5rem;
+  margin-bottom: 24px;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #34495e;
+  display: block;
+  font-weight: 600;
+  color: #2c2825;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
 }
 
 select {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 1px solid #bdc3c7;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-color: #F8F8F8;
+  color: #2c2825;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 select:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-.form-controls-grid {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1rem;
-    align-items: flex-end;
-}
-
-.button-group {
-    display: flex;
-    gap: 1rem;
-}
-
-.primary-button, .secondary-button {
-    flex-grow: 1;
-    padding: 1rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    white-space: nowrap;
+  outline: none;
+  border-color: #E58A4E;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
 }
 
 .primary-button {
-    color: #fff;
-    background: linear-gradient(45deg, #3498db, #2980b9);
-    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+  width: 100%;
+  padding: 14px 20px;
+  background-color: #E58A4E;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 16px;
+}
+
+.primary-button:hover:not(:disabled) {
+  background-color: #c06c38;
+}
+
+.primary-button:disabled {
+  background-color: #fbd6c0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* --- 결과(오른쪽) 컬럼 --- */
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-shrink: 0; /* 컬럼 크기가 줄어들 때 헤더는 줄어들지 않도록 설정 */
+}
+
+.result-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c2825;
+  margin: 0;
+}
+
+.download-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.download-controls select {
+  min-width: 150px;
+  background-color: #FFFFFF;
 }
 
 .secondary-button {
-    color: #fff;
-    background: linear-gradient(45deg, #2ecc71, #27ae60);
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+  padding: 12px 24px;
+  background-color: #4A5568;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
 }
 
-
-.primary-button:disabled, .secondary-button:disabled {
-    background: #bdc3c7;
-    cursor: not-allowed;
-    box-shadow: none;
+.secondary-button:hover:not(:disabled) {
+  background-color: #2D3748;
 }
 
-.primary-button:not(:disabled):hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
-}
-
-.secondary-button:not(:disabled):hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
-}
-
-.spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 2rem auto;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.error-message {
-    color: #e74c3c;
-    background-color: #fbeae5;
-    border: 1px solid #e74c3c;
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
+.secondary-button:disabled {
+  background-color: #A0AEC0;
+  cursor: not-allowed;
 }
 
 .document-editor {
-    width: 100%;
-    min-height: 500px;
-    padding: 1.5rem;
-    border: 1px solid #dfe4ea;
-    border-radius: 8px;
-    font-size: 1rem;
-    line-height: 1.8;
-    resize: vertical;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    background-color: #f8f9fa;
+  flex-grow: 1; 
+  width: 100%;
+  padding: 24px;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.7;
+  resize: none;
+  background-color: #F8F8F8;
+  color: #374151;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .document-editor:focus {
-    outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  outline: none;
+  border-color: #E58A4E;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+}
+
+/* --- 로딩 및 에러 상태 --- */
+.spinner-container {
+  flex-grow: 1; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(229, 138, 78, 0.2);
+  border-top-color: #E58A4E;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  padding: 16px;
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+/* --- 반응형 디자인 --- */
+@media (max-width: 992px) {
+  .summary-page-container {
+    flex-direction: column;
+    height: auto;
+    gap: 24px;
+  }
+  .form-column, .result-column {
+    max-height: none;
+  }
+  .result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .download-controls {
+    width: 100%;
+  }
+  .download-controls select {
+    flex-grow: 1;
+  }
 }
 `;
 
@@ -168,12 +249,10 @@ const PlanPage = () => {
     const [planContent, setPlanContent] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    // --- 다운로드 포맷 선택을 위한 상태 추가 ---
     const [downloadFormat, setDownloadFormat] = useState('md');
 
     useEffect(() => {
         const fetchConcepts = async () => {
-            setIsLoading(true);
             setError(null);
             try {
                 const response = await fetch('http://localhost:8080/api/plans/concepts-for-summary');
@@ -183,8 +262,6 @@ const PlanPage = () => {
                 if (data.length > 0) setConceptId(data[0].conceptId);
             } catch (err) {
                 setError('컨셉 목록을 가져올 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
-            } finally {
-                setIsLoading(false);
             }
         };
         fetchConcepts();
@@ -211,7 +288,35 @@ const PlanPage = () => {
                 throw new Error(errorText || '기획서 생성 중 서버에서 오류가 발생했습니다.');
             }
             const data = await response.json();
-            setPlanContent(data.summaryText);
+            
+            // ★★★ 수정된 부분: 마크다운 기호를 보고서 형식으로 변환 ★★★
+            const rawText = data.summaryText;
+            let processedText = rawText.replace(/\*\*/g, ''); // 굵은 글씨 제거
+
+            let sectionCounter = 1;
+            const lines = processedText.split('\n');
+            const formattedLines = lines.map(line => {
+                const trimmedLine = line.trim();
+                // '##'로 시작하는 소제목 처리
+                if (trimmedLine.startsWith('## ')) {
+                    // "## 1. 제목" 또는 "## 제목" 형태에서 '##' 및 앞의 숫자/공백 제거
+                    const content = trimmedLine.replace(/^##\s*\d*\.?\s*/, '');
+                    return `${sectionCounter++}. ${content}`;
+                }
+                // '*'로 시작하는 리스트 항목을 '  - ' 형식으로 변경
+                if (trimmedLine.startsWith('* ')) {
+                    return `  - ${trimmedLine.substring(2)}`;
+                }
+                // '#'로 시작하는 메인 제목을 '[ 제목 ]' 형식으로 변경
+                if (trimmedLine.startsWith('# ')) {
+                    return `[ ${trimmedLine.substring(2)} ]`;
+                }
+                return line;
+            });
+            
+            const finalText = formattedLines.join('\n');
+            setPlanContent(finalText);
+
         } catch (err) {
             setError(err.message);
         } finally {
@@ -219,32 +324,6 @@ const PlanPage = () => {
         }
     };
 
-    // --- 통합 다운로드 핸들러 함수 ---
-    const handleDownload = () => {
-        if (!planContent) {
-            alert('다운로드할 내용이 없습니다.');
-            return;
-        }
-
-        switch (downloadFormat) {
-            case 'md':
-                downloadAsMarkdown();
-                break;
-            case 'pdf':
-                downloadAsPdf();
-                break;
-            case 'docx':
-                downloadAsDocx();
-                break;
-            case 'hwp':
-                downloadAsHwp();
-                break;
-            default:
-                alert('지원하지 않는 형식입니다.');
-        }
-    };
-    
-    // --- 파일 다운로드를 위한 공통 함수 ---
     const triggerDownload = (blob, filename) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -256,79 +335,81 @@ const PlanPage = () => {
         URL.revokeObjectURL(url);
     };
 
-    // --- 포맷별 다운로드 함수 구현 ---
     const downloadAsMarkdown = () => {
         const blob = new Blob([planContent], { type: 'text/markdown;charset=utf-8' });
         triggerDownload(blob, 'boardgame-plan.md');
     };
 
     const downloadAsPdf = () => {
-        const input = document.getElementById('documentEditor'); // PDF로 변환할 DOM 요소
+        const input = document.getElementById('documentEditor');
         if (!input) return;
-        
-        // 로딩 상태를 표시하여 사용자에게 변환 중임을 알릴 수 있습니다.
         alert('PDF 변환을 시작합니다. 내용이 많을 경우 시간이 걸릴 수 있습니다.');
-
-        html2canvas(input, {
-            scale: 2, // 해상도를 높여 글자가 깨지는 현상을 방지
-            useCORS: true,
-        }).then(canvas => {
+        html2canvas(input, { scale: 2, useCORS: true }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
             const canvasWidth = canvas.width;
             const canvasHeight = canvas.height;
             const ratio = canvasWidth / canvasHeight;
             const height = pdfWidth / ratio;
-            
             pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, height);
             pdf.save('boardgame-plan.pdf');
         });
     };
 
     const downloadAsDocx = () => {
+        // 변환된 보고서 형식에 맞춰 Docx 생성 로직 수정
         const paragraphs = planContent.split('\n').map(line => {
-            if (line.startsWith('# ')) {
-                return new Paragraph({ text: line.substring(2), heading: HeadingLevel.HEADING_1 });
+            const trimmedLine = line.trim();
+            // H1: [ Title ]
+            if (trimmedLine.startsWith('[') && trimmedLine.endsWith(']')) {
+                return new Paragraph({ text: trimmedLine.slice(2, -2), heading: HeadingLevel.HEADING_1 });
             }
-            if (line.startsWith('## ')) {
-                return new Paragraph({ text: line.substring(3), heading: HeadingLevel.HEADING_2 });
+            // H2: 1. Title, 2. Title ...
+            if (/^\d+\.\s/.test(trimmedLine)) {
+                return new Paragraph({ text: trimmedLine.substring(trimmedLine.indexOf(' ') + 1), heading: HeadingLevel.HEADING_2 });
             }
-            if (line.startsWith('* ')) {
-                return new Paragraph({ text: line.substring(2), bullet: { level: 0 } });
+            // Bullet: - item
+            if (trimmedLine.startsWith('- ')) {
+                 return new Paragraph({ text: trimmedLine.substring(2), bullet: { level: 0 } });
             }
             return new Paragraph(line);
         });
-
-        const doc = new Document({
-            sections: [{
-                properties: {},
-                children: paragraphs,
-            }],
-        });
-
-        Packer.toBlob(doc).then(blob => {
-            triggerDownload(blob, 'boardgame-plan.docx');
-        });
+        const doc = new Document({ sections: [{ properties: {}, children: paragraphs }] });
+        Packer.toBlob(doc).then(blob => triggerDownload(blob, 'boardgame-plan.docx'));
     };
-
+    
     const downloadAsHwp = () => {
         alert('HWP 파일은 텍스트 형식으로 다운로드됩니다. 한컴오피스에서 "불러오기" 기능을 사용하여 파일을 열어주세요.');
         const blob = new Blob([planContent], { type: 'text/plain;charset=utf-8' });
         triggerDownload(blob, 'boardgame-plan.hwp');
     };
 
+    const handleDownload = () => {
+        if (!planContent) {
+            alert('다운로드할 내용이 없습니다.');
+            return;
+        }
+        switch (downloadFormat) {
+            case 'md': downloadAsMarkdown(); break;
+            case 'pdf': downloadAsPdf(); break;
+            case 'docx': downloadAsDocx(); break;
+            case 'hwp': downloadAsHwp(); break;
+            default: alert('지원하지 않는 형식입니다.');
+        }
+    };
+
     return (
         <>
-            <style>{styles}</style>
+            <style>{PlanPageStyles}</style>
             <div className="summary-page-container">
-                <header className="summary-header">
-                    <h1>AI 게임 기획서 생성</h1>
-                    <p>컨셉을 선택하고 버튼을 누르면, AI가 모든 기획 데이터를 종합하여 완성된 기획서를 작성합니다.</p>
-                </header>
+                {/* --- 왼쪽 폼 컬럼 --- */}
+                <div className="form-column">
+                    <header className="summary-header">
+                        <h1>AI 게임 기획서 생성</h1>
+                        <p>컨셉을 선택하고 버튼을 누르면, AI가 모든 기획 데이터를 종합하여 완성된 기획서를 작성합니다.</p>
+                    </header>
 
-                <div className="summary-controls card">
                     <form onSubmit={handleGenerateSummary}>
                         <div className="form-group">
                             <label htmlFor="conceptId">컨셉 선택</label>
@@ -336,7 +417,7 @@ const PlanPage = () => {
                                 id="conceptId"
                                 value={conceptId}
                                 onChange={(e) => setConceptId(e.target.value)}
-                                disabled={isLoading || conceptList.length === 0}
+                                disabled={conceptList.length === 0 || isLoading}
                                 required
                             >
                                 <option value="" disabled>-- 기획 컨셉을 선택하세요 --</option>
@@ -347,38 +428,44 @@ const PlanPage = () => {
                                 ))}
                             </select>
                         </div>
-                        <div className="button-group">
-                            <button type="submit" className="primary-button" disabled={isLoading}>
-                                {isLoading ? 'AI가 기획서 작성 중...' : '기획서 생성하기'}
-                            </button>
-                        </div>
+
+                        <button type="submit" className="primary-button" disabled={isLoading}>
+                            {isLoading ? 'AI가 기획서 작성 중...' : '기획서 생성하기'}
+                        </button>
+                        
+                        {error && <p className="error-message">{error}</p>}
                     </form>
                 </div>
 
-                <div className="summary-document-view card">
-                    <div className="form-controls-grid">
-                         <h2>생성된 기획서 (직접 수정 가능)</h2>
-                         <div className="button-group">
+                {/* --- 오른쪽 결과 컬럼 (수정된 구조) --- */}
+                <div className="result-column">
+                    <div className="result-header">
+                        <h2>생성된 기획서 (직접 수정 가능)</h2>
+                        <div className="download-controls">
                             <select value={downloadFormat} onChange={(e) => setDownloadFormat(e.target.value)}>
                                 <option value="md">Markdown (.md)</option>
-                                <option value="pdf">PDF (.pdf)</option>
                                 <option value="docx">Word (.docx)</option>
-                                <option value="hwp">한글 (.hwp)</option>
+        
                             </select>
-                            <button type="button" className="secondary-button" onClick={handleDownload} disabled={!planContent}>
+                            <button type="button" className="secondary-button" onClick={handleDownload} disabled={!planContent || isLoading}>
                                 다운로드
                             </button>
-                         </div>
+                        </div>
                     </div>
-                    
-                    <textarea
-                        id="documentEditor" // PDF 변환을 위해 ID 추가
-                        className="document-editor"
-                        value={planContent}
-                        onChange={(e) => setPlanContent(e.target.value)}
-                        placeholder="기획서를 생성하면 결과가 여기에 표시됩니다. 자유롭게 수정하세요."
-                        disabled={isLoading}
-                    />
+
+                    {isLoading ? (
+                        <div className="spinner-container">
+                            <div className="spinner"></div>
+                        </div>
+                    ) : (
+                        <textarea
+                            id="documentEditor"
+                            className="document-editor"
+                            value={planContent}
+                            onChange={(e) => setPlanContent(e.target.value)}
+                            placeholder="기획서를 생성하면 결과가 여기에 표시됩니다. 자유롭게 수정하세요."
+                        />
+                    )}
                 </div>
             </div>
         </>

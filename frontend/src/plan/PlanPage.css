@@ -1,161 +1,243 @@
-/* PlanPage.css */
+/* PlanPage.css (새로운 Architect 스타일에 맞춤) */
 
-/* --- 전체 페이지 레이아웃 --- */
+/* --- 전체 레이아웃 --- */
 .summary-page-container {
-    max-width: 1200px; /* 최대 너비 유지 */
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #f0f2f5; /* 배경색 통일 */
-    min-height: calc(100vh - 70px);
+  display: flex;
+  gap: 48px;
+  width: 100%;
+  max-width: 1400px; /* 더 넓은 레이아웃을 위해 최대 너비 조정 */
+  margin: 2rem auto;
+  padding: 0 2rem;
+  height: calc(100vh - 70px - 4rem); /* App.js 헤더, main 패딩 고려 */
+  box-sizing: border-box;
 }
 
-/* --- 헤더 스타일 --- */
+.form-column, .result-column {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  box-sizing: border-box;
+}
+
+.form-column {
+  flex: 1;
+  min-width: 350px;
+}
+
+.result-column {
+  flex: 1.5;
+}
+
+
+/* --- 폼(왼쪽) 컬럼 --- */
 .summary-header {
-    text-align: center;
-    margin-bottom: 3rem;
+  margin-bottom: 32px;
 }
 
 .summary-header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #2c2825;
-    margin: 0 0 0.5rem 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c2825;
+  margin: 0 0 8px 0;
 }
 
 .summary-header p {
-    font-size: 1rem;
-    color: #888888;
-    margin: 0;
-}
-
-/* --- 카드(Card) 스타일 --- */
-.card {
-    background-color: #FFFFFF;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* 그림자 효과 통일 */
-    padding: 32px; /* 패딩 통일 */
-    margin-bottom: 2rem;
-}
-
-/* --- 컨트롤(폼) 영역 --- */
-.summary-controls {
-    /* 기존 flex-direction: column;과 유사한 단일 컬럼 구조를 유지 */
-    display: block;
+  font-size: 1rem;
+  color: #888888;
+  margin: 0;
 }
 
 .form-group {
-    margin-bottom: 24px; /* 여백 통일 */
+  margin-bottom: 24px;
 }
 
 .form-group label {
-    display: block;
-    font-weight: 600;
-    color: #2c2825;
-    margin-bottom: 8px; /* 여백 통일 */
-    font-size: 0.875rem; /* 폰트 크기 통일 */
+  display: block;
+  font-weight: 600;
+  color: #2c2825;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
 }
 
-.form-group select {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #EAEAEA;
-    border-radius: 8px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    background-color: #F8F8F8;
-    color: #2c2825;
-    transition: border-color 0.2s, box-shadow 0.2s;
+select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-color: #F8F8F8;
+  color: #2c2825;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-group select:focus {
-    outline: none;
-    border-color: #E58A4E;
-    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+select:focus {
+  outline: none;
+  border-color: #E58A4E;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
 }
 
 .primary-button {
-    width: 100%;
-    padding: 14px 20px;
-    background-color: #E58A4E;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem; /* 폰트 크기 통일 */
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s;
-    margin-top: 16px; /* 여백 통일 */
+  width: 100%;
+  padding: 14px 20px;
+  background-color: #E58A4E;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 16px;
 }
 
 .primary-button:hover:not(:disabled) {
-    background-color: #c06c38;
+  background-color: #c06c38;
 }
 
 .primary-button:disabled {
-    background-color: #fbd6c0;
-    cursor: not-allowed;
-    transform: none;
+  background-color: #fbd6c0;
+  cursor: not-allowed;
+  transform: none;
 }
 
-/* --- 문서(Document) 뷰 영역 --- */
-.summary-document-view h2 {
-    font-size: 1.75rem; /* 폰트 크기 통일 */
-    font-weight: 700;
-    color: #2c2825;
-    border-bottom: 2px solid #EAEAEA; /* 테두리 색상 통일 */
-    padding-bottom: 1rem;
-    margin-top: 0;
-    margin-bottom: 1.5rem;
+/* --- 결과(오른쪽) 컬럼 --- */
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-shrink: 0;
 }
 
-.document-content {
-    white-space: pre-wrap;
-    background-color: #f8f8f8; /* 배경색 통일 */
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid #EAEAEA; /* 테두리 색상 통일 */
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #374151; /* 폰트 색상 통일 */
-    max-height: 70vh;
-    overflow-y: auto;
+.result-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c2825;
+  margin: 0;
 }
 
-/* --- 로딩 및 에러 메시지 --- */
+.download-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.download-controls select {
+  min-width: 150px;
+  background-color: #FFFFFF; /* 폼과 다른 배경색으로 구분 */
+}
+
+.secondary-button {
+  padding: 12px 24px;
+  background-color: #4A5568; /* Architect 스타일의 보조 버튼 색상 */
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background-color: #2D3748;
+}
+
+.secondary-button:disabled {
+  background-color: #A0AEC0;
+  cursor: not-allowed;
+}
+
+.document-editor-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto; /* 내용이 많을 경우 내부 스크롤 */
+  background-color: #F8F8F8;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+}
+
+.document-editor {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  padding: 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.7;
+  resize: none; /* 크기 조절 비활성화 */
+  background-color: transparent; /* 부모 배경색 사용 */
+  color: #374151;
+  box-sizing: border-box;
+}
+
+.document-editor:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2) inset; /* 포커스 효과를 내부로 */
+}
+
+
+/* --- 로딩 및 에러 상태 --- */
+.spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
 .spinner {
-    width: 48px;
-    height: 48px;
-    border: 5px solid rgba(229, 138, 78, 0.2);
-    border-top-color: #E58A4E;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 2rem auto;
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(229, 138, 78, 0.2);
+  border-top-color: #E58A4E;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
+
 @keyframes spin {
-    to { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
 .error-message {
-    padding: 16px; /* 패딩 통일 */
-    background-color: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 500;
-    margin-top: 1rem;
+  padding: 16px;
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 1rem;
 }
 
 /* --- 반응형 디자인 --- */
-@media (max-width: 768px) {
-    .summary-page-container {
-        padding: 1rem;
-    }
-    .summary-header h1 {
-        font-size: 2rem;
-    }
-    .card {
-        padding: 1.5rem;
-    }
+@media (max-width: 992px) { /* 태블릿 사이즈에 대한 분기점 */
+  .summary-page-container {
+    flex-direction: column;
+    height: auto;
+    gap: 24px;
+  }
+  .form-column, .result-column {
+    max-height: none;
+  }
+  .result-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .download-controls {
+    width: 100%;
+  }
+  .download-controls select {
+    flex-grow: 1;
+  }
 }
