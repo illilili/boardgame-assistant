@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 // 파일 생성을 위한 라이브러리입니다.
-// 터미널에 `npm install docx` 를 실행하여 설치해주세요.
+// 터미널에 `npm install docx file-saver` 를 실행하여 설치해주세요.
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
+import { saveAs } from 'file-saver';
 
 // CSS를 React 컴포넌트 내에 <style> 태그로 포함시켰습니다.
 // 이렇게 하면 별도의 CSS 파일 없이 이 파일 하나만으로 스타일이 적용됩니다.
 const PlanPageStyles = `
-/* --- 전체 레이아웃 (2단 구조로 수정) --- */
+/* --- 전체 레이아웃 (2단 구조) --- */
 .summary-page-container {
   display: flex;
   gap: 24px;
@@ -14,8 +15,8 @@ const PlanPageStyles = `
   max-width: 1800px;
   margin: 0 auto;
   padding: 0;
-  flex-grow: 1; /* ★★★ 수정된 부분: height: 100% 대신 flex-grow: 1을 사용합니다 ★★★ */
-  min-height: 0; /* flexbox 아이템이 부모를 넘어설 때를 대비한 설정 */
+  flex-grow: 1;
+  min-height: 0; 
   box-sizing: border-box;
 }
 
@@ -194,8 +195,8 @@ select:focus, input[type="text"]:focus {
     border-top: 1px solid #eaeaea;
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* 남은 공간을 모두 차지하도록 설정 */
-    min-height: 0; /* flex-grow가 올바르게 작동하기 위해 필요 */
+    flex-grow: 1; 
+    min-height: 0;
 }
 
 .version-header {
@@ -215,40 +216,7 @@ select:focus, input[type="text"]:focus {
   margin-bottom: 24px;
   flex-shrink: 0;
 }
-.version-list {
-  flex-grow: 1;
-  overflow-y: auto; /* 내용이 많아지면 스크롤 */
-  padding-right: 10px;
-  min-height: 150px;
-}
-.version-item {
-  border: 1px solid #eaeaea;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 12px;
-  transition: box-shadow 0.2s;
-}
-.version-item:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-}
-.version-item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-.version-item-header h3 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0;
-  color: #333;
-}
-.version-item p {
-  font-size: 0.9rem;
-  color: #888;
-  margin: 0 0 4px 0;
-  word-break: keep-all;
-}
+/* ★★★ 수정된 부분: version-list 관련 스타일 제거 ★★★ */
 
 /* --- 로딩 및 에러 --- */
 .spinner-container {
@@ -310,6 +278,8 @@ const PlanPage = () => {
     const [versionName, setVersionName] = useState('');
     const [versionMemo, setVersionMemo] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const [selectedVersionId, setSelectedVersionId] = useState('');
+
 
     // --- 데이터 Fetching 및 처리 ---
 
@@ -396,12 +366,12 @@ const PlanPage = () => {
             // AI 응답이 중첩된 JSON일 경우를 대비한 파싱 로직
             let finalSummaryText = data.summaryText;
             try {
-              const nestedData = JSON.parse(finalSummaryText);
-              if (nestedData && typeof nestedData.summaryText === 'string') {
-                finalSummaryText = nestedData.summaryText;
-              }
+                const nestedData = JSON.parse(finalSummaryText);
+                if (nestedData && typeof nestedData.summaryText === 'string') {
+                    finalSummaryText = nestedData.summaryText;
+                }
             } catch (e) {
-              // 파싱 실패 시, 일반 문자열로 간주
+                // 파싱 실패 시, 일반 문자열로 간주
             }
             
             setPlanId(data.planId);
@@ -447,9 +417,10 @@ const PlanPage = () => {
         }
     };
 
-    // 롤백 버튼 클릭
+    // 롤백 함수
     const handleRollback = async (versionId, versionName) => {
         if (!window.confirm(`'${versionName}' 버전으로 기획서를 되돌리시겠습니까? 현재 수정 중인 내용은 덮어씌워집니다.`)) {
+            setSelectedVersionId(''); // 사용자가 취소하면 선택 초기화
             return;
         }
         try {
@@ -466,24 +437,28 @@ const PlanPage = () => {
 
         } catch (err) {
             alert(err.message);
+        } finally {
+            setSelectedVersionId(''); // 작업 완료 후 선택 초기화
         }
     };
 
-    // --- 파일 다운로드 관련 함수 ---
-    const triggerDownload = (blob, filename) => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    };
+    // ★★★ 추가된 부분: 버전 선택 핸들러 ★★★
+    const handleVersionSelect = (e) => {
+        const selectedId = e.target.value;
+        if (!selectedId) return;
 
+        const selectedVersion = versions.find(v => v.versionId.toString() === selectedId);
+        if (selectedVersion) {
+            setSelectedVersionId(selectedId); // 롤백 전에 상태 업데이트
+            handleRollback(selectedVersion.versionId, selectedVersion.versionName);
+        }
+    };
+    // ★★★ 추가 끝 ★★★
+
+    // --- 파일 다운로드 관련 함수 ---
     const downloadAsMarkdown = () => {
         const blob = new Blob([planContent], { type: 'text/markdown;charset=utf-8' });
-        triggerDownload(blob, 'boardgame-plan.md');
+        saveAs(blob, 'boardgame-plan.md');
     };
 
     const downloadAsDocx = () => {
@@ -512,7 +487,7 @@ const PlanPage = () => {
                 ]
             }
         });
-        Packer.toBlob(doc).then(blob => triggerDownload(blob, 'boardgame-plan.docx'));
+        Packer.toBlob(doc).then(blob => saveAs(blob, 'boardgame-plan.docx'));
     };
     
     const handleDownload = () => {
@@ -590,18 +565,25 @@ const PlanPage = () => {
                                 </button>
                             </form>
                             
-                            <div className="version-list">
-                                {versions.length > 0 ? versions.map(v => (
-                                    <div key={v.versionId} className="version-item">
-                                        <div className="version-item-header">
-                                            <h3>{v.versionName}</h3>
-                                            <button className="secondary-button" onClick={() => handleRollback(v.versionId, v.versionName)}>롤백</button>
-                                        </div>
-                                        {v.memo && <p><strong>메모:</strong> {v.memo}</p>}
-                                        <p><strong>저장일:</strong> {new Date(v.createdAt).toLocaleString('ko-KR')}</p>
-                                    </div>
-                                )) : <p style={{textAlign: 'center', color: '#888', marginTop: '2rem'}}>저장된 버전이 없습니다.</p>}
-                            </div>
+                            {/* ★★★ 수정된 부분: 버전 목록을 Select로 변경 ★★★ */}
+                            {versions.length > 0 && (
+                                <div className="form-group" style={{marginTop: '24px'}}>
+                                    <label htmlFor="version-select">저장된 버전 불러오기 (롤백)</label>
+                                    <select
+                                        id="version-select"
+                                        value={selectedVersionId}
+                                        onChange={handleVersionSelect}
+                                    >
+                                        <option value="" disabled>-- 롤백할 버전을 선택하세요 --</option>
+                                        {versions.map(v => (
+                                            <option key={v.versionId} value={v.versionId}>
+                                                {v.versionName} ({new Date(v.createdAt).toLocaleDateString('ko-KR')})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                            {/* ★★★ 수정 끝 ★★★ */}
                         </div>
                     )}
                 </div>
