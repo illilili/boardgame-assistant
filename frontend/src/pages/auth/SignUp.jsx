@@ -99,22 +99,32 @@ const SignUp = () => {
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
 
-        {/* 약관 체크 */}
-        <label>
-          <input
-          type="checkbox"
-          checked={agreedToTerms}
-          onChange={(e) => setAgreedToTerms(e.target.checked)}
-        />
-        약관에 동의합니다.{' '}
-          <button
-            type="button"
-            className="text-blue-500 underline"
-            onClick={() => setShowTerms(true)}
-          >
-            보기
-          </button>
-        </label>
+        {/* 약관 체크 박스 */}
+        <label className="flex items-center space-x-2">
+          {/* 진짜 체크박스는 디자인이 안되서 hidden 처리(회색으로만 보여서 잘안보임) - 커스텀 체크박스가 보여주는 역할  */}
+        <input type="checkbox" disabled checked={agreedToTerms} className='hidden' />
+          {/* 커스텀 체크박스 */}
+        <div
+          className={`w-5 h-5 rounded border border-gray-300 flex items-center justify-center
+            ${agreedToTerms ? "bg-teal-400" : "bg-gray-200"}
+            ${!agreedToTerms ? "opacity-50" : ""}
+          `}
+        >
+          {agreedToTerms && (
+            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+        </div>
+        <span>약관에 동의합니다.</span>
+        <button
+          type="button"
+          className="text-blue-500 underline"
+          onClick={() => setShowTerms(true)}
+        >
+          보기
+        </button>
+      </label>
             
 
         <button
@@ -125,8 +135,15 @@ const SignUp = () => {
         </button>
       </form>
 
-      {/* 모달 컴포넌트 */}
-      <TermsPage isOpen={showTerms} onClose={() => setShowTerms(false)} />
+      {/* 약관 팝업*/}
+      <TermsPage
+      isOpen={showTerms}
+      onClose={() => setShowTerms(false)}
+      onAgree={() => {
+        setAgreedToTerms(true);
+        setShowTerms(false);
+      }}
+    />
     </div>
   );
 };
