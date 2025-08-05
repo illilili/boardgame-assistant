@@ -7,6 +7,7 @@ import Footer from './mainPage/Footer';
 import Plan from './plan/Plan';
 import PrivacyPolicy from './mainPage/PrivacyPolicy'; // 개인정보처리방침 컴포넌트 추가
 import TermsOfService from './mainPage/TermsOfService';
+import Development from './development/Development'; // 개발 컴포넌트 추가
 
 const router = createBrowserRouter([
     {
@@ -43,6 +44,11 @@ const router = createBrowserRouter([
         id: 6,
         path:'/terms',
         element: <TermsOfService/>
+    },
+    {
+        id: 7,
+        path: '/development',
+        element: <Development/>,
     }
 
 

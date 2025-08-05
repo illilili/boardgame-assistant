@@ -1,6 +1,6 @@
 // 파일: Components.js
 import React, { useState, useEffect } from 'react';
-import './Components.css'; 
+import './Components.css';
 
 const Components = () => {
     const [conceptList, setConceptList] = useState([]);
@@ -137,7 +137,7 @@ const Components = () => {
                                     <p className="item-detail"><strong>역할 및 효과:</strong> {item.roleAndEffect}</p>
                                     <p className="item-detail"><strong>아트 컨셉:</strong> {item.artConcept}</p>
                                     <p className="item-detail"><strong>상호작용:</strong> {item.interconnection}</p>
-                                    
+
                                     <div className="subtask-section">
                                         <strong>세부 제작 작업:</strong>
                                         <ul className="subtask-list">
@@ -172,7 +172,12 @@ const Components = () => {
                 )}
                 {!isLoading && !componentsData && !error && (
                     <div className="initial-state">
-                        <p>기획안을 선택하고 '구성요소 생성하기' 버튼을 누르면 AI가 설계한 결과가 여기에 표시됩니다.</p>
+                        <p>사용자께서는 먼저 원하는 기획안을 선택해 주시기 바랍니다.
+                            기획안을 선택하신 후, '구성요소 생성하기' 버튼을 눌러주세요.
+                            버튼을 클릭하면 인공지능이 선택된 기획안의 내용을 분석합니다.
+                            분석을 바탕으로 게임에 필요한 주요 구성요소들이 자동으로 설계됩니다.
+                            생성된 구성요소들은 아래 결과 창에 실시간으로 표시됩니다.
+                            이를 통해 사용자께서는 게임 제작에 필요한 핵심 요소들을 쉽게 확인하실 수 있습니다.</p>
                     </div>
                 )}
             </div>
