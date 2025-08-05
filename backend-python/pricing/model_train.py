@@ -8,77 +8,106 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, r2_score
 import joblib
 
-# 🔧 파일 경로
-csv_path = 'data/boardgame_detaildata_1-101_공백.csv'
+# ====== 파일 경로 및 인코딩 설정 ======
+csv_path = 'data/bgg_merged_type_components.csv'  # 실제 위치/파일명 맞게!
+df = pd.read_csv(csv_path, encoding='latin1')
+print("✅ 데이터 로드 완료")
+print(df.head())
+print(df.columns)
 
-# ✅ 데이터 로드 및 전처리
-df = pd.read_csv(csv_path)
+# ====== 데이터 전처리 ======
 df['amazon_price'] = df['amazon_price'].replace(r'[\$,]', '', regex=True)
 df['amazon_price'] = pd.to_numeric(df['amazon_price'], errors='coerce')
-df['최소나이'] = df['최소나이'].str.replace('+', '', regex=False)
-df['최소나이'] = pd.to_numeric(df['최소나이'], errors='coerce')
-df['난이도'] = pd.to_numeric(df['난이도'], errors='coerce')
+df['min_age'] = pd.to_numeric(df['min_age'], errors='coerce')
+df['average_weight'] = pd.to_numeric(df['average_weight'], errors='coerce')
 
-# ✅ 결측치 제거 및 이상치(>200달러) 제거
-df = df.dropna(subset=['amazon_price', '카테고리', '최소나이', '난이도'])
-df = df[df['amazon_price'] <= 200].copy()
-
-# ✅ 카테고리 리스트화
-def parse_category(x):
+# ====== 리스트형 컬럼 파싱 ======
+def parse_list(x):
     try:
-        return eval(x) if isinstance(x, str) and x.startswith("[") else []
+        if isinstance(x, str) and x.startswith("["):
+            return eval(x)
+        elif pd.isnull(x):
+            return []
+        else:
+            return [x]
     except:
         return []
 
-df['카테고리_리스트'] = df['카테고리'].apply(parse_category)
+for col in ['category', 'type', 'component']:
+    col_ = f"{col}_list"
+    if col in df.columns:
+        df[col_] = df[col].apply(parse_list)
+    else:
+        df[col_] = [[] for _ in range(len(df))]
 
-# ✅ 카테고리별 평균 가격 계산 (여러 카테고리에 모두 반영)
-category_price = {}
-category_count = {}
+# ====== 아마존 가격 없는 행 제거 (필수) ======
+df = df.dropna(subset=['amazon_price'])
+df = df[df['amazon_price'] <= 200]  # 이상치도 제거
 
-for _, row in df.iterrows():
-    price = row['amazon_price']
-    categories = row['카테고리_리스트']
-    for cat in categories:
-        category_price[cat] = category_price.get(cat, 0) + price
-        category_count[cat] = category_count.get(cat, 0) + 1
+# ====== 각 리스트 feature별 평균가격 계산 ======
+def get_mean_dict(df, key_col, target_col='amazon_price'):
+    mean_dict = {}
+    count_dict = {}
+    for _, row in df.iterrows():
+        keys = row[key_col]
+        val = row[target_col]
+        for k in keys:
+            mean_dict[k] = mean_dict.get(k, 0) + val
+            count_dict[k] = count_dict.get(k, 0) + 1
+    avg_dict = {k: mean_dict[k]/count_dict[k] for k in mean_dict}
+    return avg_dict
 
-category_avg = {cat: category_price[cat] / category_count[cat] for cat in category_price}
-category_avg_df = pd.DataFrame({'category': list(category_avg.keys()), 'avg_price': list(category_avg.values())})
-os.makedirs('models', exist_ok=True)
-category_avg_df.to_csv('models/category_avg_prices.csv', index=False)
+cat_avg = get_mean_dict(df, 'category_list')
+type_avg = get_mean_dict(df, 'type_list')
+comp_avg = get_mean_dict(df, 'component_list')
 
-# ✅ 입력용 feature 구성
-def compute_category_mean(row):
-    cats = row['카테고리_리스트']
-    prices = [category_avg[cat] for cat in cats if cat in category_avg]
-    return np.mean(prices) if prices else np.nan
+# ====== 각 row별로 평균값 feature 생성 ======
+def get_avg_feature(row, avg_dict, list_col):
+    vals = [avg_dict[k] for k in row[list_col] if k in avg_dict]
+    return np.mean(vals) if vals else np.nan
 
-df['카테고리_평균가격'] = df.apply(compute_category_mean, axis=1)
-df = df.dropna(subset=['카테고리_평균가격'])
+df['category_avg_price'] = df.apply(lambda r: get_avg_feature(r, cat_avg, 'category_list'), axis=1)
+df['type_avg_price'] = df.apply(lambda r: get_avg_feature(r, type_avg, 'type_list'), axis=1)
 
-X = df[['카테고리_평균가격', '최소나이', '난이도']]
+
+# ====== component 개수 feature 추가 ======
+df['component_count'] = df['component_list'].apply(len)
+
+# ====== 입력 feature 컬럼 정의 ======
+feature_cols = [
+    'category_avg_price',
+    'type_avg_price',
+    'min_age',
+    'average_weight',
+    'component_count'
+]
+
+# ====== 결측치 처리 ======
+df = df.dropna(subset=['min_age', 'average_weight'])  # 핵심 feature는 결측치 제거
+X = df[feature_cols].fillna(-1)
 y = df['amazon_price']
 
-# ✅ 학습/검증 분리
+# ====== 모델 학습/평가 ======
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# ✅ 모델 학습
 model = RandomForestRegressor(random_state=42)
 model.fit(X_train, y_train)
 
-# ✅ 성능 평가
 y_pred = model.predict(X_test)
 mae = mean_absolute_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
 
-print("✅ 모델 학습 완료")
-print(f"📊 평균 절대 오차 (MAE): ${mae:.2f}")
-print(f"📈 결정계수 (R² Score): {r2:.3f}")
+print(f"\nMAE: {mae:.2f}")
+print(f"R^2: {r2:.3f}")
 
-# ✅ 모델 저장
+# ====== feature importance ======
+importances = model.feature_importances_
+print("\nFeature Importances:")
+for name, val in zip(feature_cols, importances):
+    print(f"{name}: {val:.3f}")
+
+# ====== 모델/평균 저장 ======
 os.makedirs('models', exist_ok=True)
 joblib.dump(model, 'models/price_predictor.pkl')
-joblib.dump(category_avg, 'models/category_avg_dict.pkl')
+joblib.dump({'cat_avg': cat_avg, 'type_avg': type_avg,}, 'models/feature_avg_dicts.pkl')
 
-print("💾 모델 및 카테고리 평균 저장 완료")
+print("\n💾 모델 및 feature 평균 저장 완료")
