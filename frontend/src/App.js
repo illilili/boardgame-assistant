@@ -14,6 +14,8 @@ import PrivacyPolicy from './pages/auth/PrivacyPolicy';
 import AuthRoute from './pages/auth/AuthRoute';
 import LandingPage from './pages/auth/LandingPage';
 
+import AdminUserManagePage from './pages/admin/UserManagePage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -31,6 +33,7 @@ function App() {
         >
           <Route path="mypage" element={<MyPage />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="/admin/users" element={<AdminUserManagePage />} />
         </Route>
 
         {/* 독립적인 페이지들 */}
