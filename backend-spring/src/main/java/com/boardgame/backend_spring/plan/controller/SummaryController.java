@@ -1,8 +1,13 @@
 package com.boardgame.backend_spring.plan.controller;
 
+import com.boardgame.backend_spring.plan.dto.PlanDetailResponse;
 import com.boardgame.backend_spring.plan.dto.PlanVersionDto;
 import com.boardgame.backend_spring.plan.dto.SummaryDto;
+import com.boardgame.backend_spring.plan.entity.Plan;
+import com.boardgame.backend_spring.plan.entity.PlanStatus;
+import com.boardgame.backend_spring.plan.repository.PlanRepository;
 import com.boardgame.backend_spring.plan.service.SummaryService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -22,6 +22,7 @@ public class SummaryDto {
     public static class GenerateResponse {
         private Long planId;
         private String summaryText;
+        private String planDocUrl; // 기획안 문서 url 추가
     }
 
     // React에 컨셉 목록을 보내주기 위한 DTO

@@ -2,8 +2,10 @@ package com.boardgame.backend_spring.plan.repository;
 
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.plan.entity.Plan;
+import com.boardgame.backend_spring.plan.entity.PlanStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PlanRepository extends JpaRepository<Plan, Long> {
@@ -13,4 +15,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
      * @return Optional<Plan>
      */
     Optional<Plan> findByBoardgameConcept(BoardgameConcept boardgameConcept);
+    List<Plan> findByStatus(PlanStatus status);
+    Optional<Plan> findByProjectIdAndStatus(Long projectId, PlanStatus status);
 }

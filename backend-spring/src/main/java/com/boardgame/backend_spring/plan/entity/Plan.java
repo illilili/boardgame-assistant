@@ -37,6 +37,9 @@ public class Plan {
     @Column(columnDefinition = "TEXT")
     private String currentContent;
 
+    @Column(name = "plan_doc_url")
+    private String planDocUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PlanStatus status = PlanStatus.DRAFT;

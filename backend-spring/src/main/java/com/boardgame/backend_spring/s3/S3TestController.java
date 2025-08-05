@@ -1,4 +1,4 @@
-package com.boardgame.backend_spring.s3test;
+package com.boardgame.backend_spring.s3;
 
 
 import lombok.RequiredArgsConstructor;

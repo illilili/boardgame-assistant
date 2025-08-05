@@ -1,4 +1,4 @@
-package com.boardgame.backend_spring.s3test;
+package com.boardgame.backend_spring.s3;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

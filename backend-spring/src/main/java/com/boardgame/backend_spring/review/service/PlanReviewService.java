@@ -5,13 +5,31 @@ import com.boardgame.backend_spring.plan.entity.PlanStatus;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
 import com.boardgame.backend_spring.project.entity.Project;
 import com.boardgame.backend_spring.project.repository.ProjectRepository;
+import com.boardgame.backend_spring.review.dto.PendingPlanDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+
+
 @Service
 @RequiredArgsConstructor
 public class PlanReviewService {
+
+    public List<PendingPlanDto> getPendingPlans() {
+        return planRepository.findByStatus(PlanStatus.SUBMITTED).stream()
+                .map(plan -> PendingPlanDto.builder()
+                        .planId(plan.getPlanId())
+                        .projectTitle(plan.getProject().getName())
+                        .conceptTheme(plan.getBoardgameConcept().getTheme())
+                        .planDocUrl(plan.getPlanDocUrl())
+                        .status(plan.getStatus())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     private final PlanRepository planRepository;
     private final ProjectRepository projectRepository;
