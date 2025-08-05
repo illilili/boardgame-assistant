@@ -20,8 +20,9 @@ export const unlockUser = async (email) => {
 };
 
 //역할 부여
-export const assignRole = async (userId, newRole, token) => {
-  return axios.post(`${BASE_URL}/assign-role`, { userId, newRole }, {
+export const assignRole = async (userId, newRole) => {
+    const token = localStorage.getItem("accessToken");
+    return axios.post(`${BASE_URL}/assign-role`, { userId, newRole }, {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
