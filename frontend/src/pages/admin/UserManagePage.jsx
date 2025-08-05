@@ -79,14 +79,17 @@ const AdminUserManagePage = ({ token }) => {
                 {/* 유저권한 */}
                 <td>
                     <select
-                    defaultValue=""
+                    defaultValue={u.role} // 현재 유저의 역할이 기본값으로 보이도록 설정
                     onChange={(e) => handleAssignRole(u.userId, e.target.value)}
                     >
+                        {/* 관리자의 경우 표시는 하기 위해 이렇게 작성함(선택란에 admin이 없기때문에  disabled로 구성) */}
+                        {u.role === "ADMIN" && ( <option value="ADMIN" disabled> ADMIN </option>)}
+                        {/* 관리자는 선택에서 빼버림 */}
                         <option value="USER">USER</option>
                         <option value="PLANNER">PLANNER</option>
                         <option value="DEVELOPER">DEVELOPER</option>
                         <option value="PUBLISHER">PUBLISHER</option>
-                        {/* ADMIN은 제외 */}
+                        
                     </select>
                 </td>
               </tr>
