@@ -7,16 +7,14 @@
 - [ ] 가격 산정 기준 모델 설계
 - [ ] /api/pricing/estimate API 구현
 
-
-CREATE TABLE plan (
-    plan_id INT PRIMARY KEY AUTO_INCREMENT,      -- 고유 기획안 ID
-    title VARCHAR(255) NOT NULL,                 -- 보드게임 제목
-    category TEXT NOT NULL,                      -- 카테고리 (예: '["Card Game", "Fantasy"]')
-    min_age INT,                                 -- 최소 나이
-    difficulty FLOAT,                            -- 난이도 (예: 1.0 ~ 5.0)
-    description TEXT,                            -- 기획 설명 (선택)
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- 생성일자
-);
+feature_cols = [
+    'category_avg_price',   # 카테고리별 평균가격
+    'type_avg_price',       # 타입별 평균가격
+    'min_age',              # 최소 나이
+    'average_weight',       # 난이도
+    'component_count'       # 컴포넌트 종류 수
+]
+기획안-> plan   구성품 종류-> component
 
 python -m venv venv 
 가상환경 활성화 source venv/bin/activate
