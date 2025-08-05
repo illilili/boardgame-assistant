@@ -5,6 +5,8 @@ import MainContent from './mainPage/MainContent';
 import Header from './mainPage/Header';
 import Footer from './mainPage/Footer';
 import Plan from './plan/Plan';
+import PrivacyPolicy from './mainPage/PrivacyPolicy'; // 개인정보처리방침 컴포넌트 추가
+import TermsOfService from './mainPage/TermsOfService';
 
 const router = createBrowserRouter([
     {
@@ -31,6 +33,16 @@ const router = createBrowserRouter([
         id: 4,
         path:'/plan',
         element: <Plan/>
+    },
+    {
+        id: 5,
+        path:'/privacy',
+        element: <PrivacyPolicy />
+    },
+    {
+        id: 6,
+        path:'/terms',
+        element: <TermsOfService/>
     }
 
 
