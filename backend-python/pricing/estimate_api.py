@@ -21,7 +21,7 @@ DB_CONFIG = {
 
 # 모델 및 평균 가격 로드
 model_path = 'pricing/models/price_predictor.pkl'
-avg_path = 'pricing/models/feature_avg_dicts.pkl'  # <-- 최신 코드 기준 여러 평균 저장 파일로 수정
+avg_path = 'pricing/models/feature_avg_dicts.pkl'
 
 if not os.path.exists(model_path) or not os.path.exists(avg_path):
     raise RuntimeError("❌ 모델 또는 feature 평균 파일이 존재하지 않습니다. model_train.py 먼저 실행하세요.")
@@ -34,19 +34,19 @@ comp_avg = avg_dicts['comp_avg']
 
 # 요청 스키마
 class EstimateRequest(BaseModel):
-    plan_id: int
+    planId: int
 
 @router.post("/estimate")
 def estimate_price(req: EstimateRequest):
-    # DB에서 기획안 조회 (component 포함!)
+
     try:
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
         cursor.execute("""
             SELECT category, min_age, average_weight, component
             FROM plan
-            WHERE plan_id = %s
-        """, (req.plan_id,))
+            WHERE planId = %s
+        """, (req.planId,))
         row = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -54,7 +54,7 @@ def estimate_price(req: EstimateRequest):
         raise HTTPException(status_code=500, detail=f"DB 연결 실패: {str(e)}")
 
     if not row:
-        raise HTTPException(status_code=404, detail="해당 plan_id의 기획안이 존재하지 않습니다.")
+        raise HTTPException(status_code=404, detail="해당 planId의 기획안이 존재하지 않습니다.")
 
     try:
         categories = json.loads(row[0])  # 문자열 → 리스트
@@ -103,7 +103,7 @@ def estimate_price(req: EstimateRequest):
     predicted_price = model.predict(X_input)[0]
 
     return {
-        "plan_id": req.plan_id,
+        "planId": req.planId,
         "input_categories": categories,
         "min_age": min_age,
         "average_weight": average_weight,
