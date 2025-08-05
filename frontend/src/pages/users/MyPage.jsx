@@ -28,7 +28,7 @@ return (
         <div className="space-y-4 text-gray-700">
           <div className="flex justify-between border-b pb-2">
             <span className="font-semibold text-gray-600">이름</span>
-            <span>{userInfo.name}</span>
+            <span>{userInfo.userName}</span>
           </div>
           <div className="flex justify-between border-b pb-2">
             <span className="font-semibold text-gray-600">이메일</span>
@@ -38,13 +38,10 @@ return (
             <span className="font-semibold text-gray-600">역할</span>
             <span>{userInfo.role}</span>
           </div>
-          <div className="flex justify-between border-b pb-2">
-            <span className="font-semibold text-gray-600">기획 수</span>
-            <span>{userInfo.planCount}</span>
-          </div>
+
           <div className="flex justify-between">
-            <span className="font-semibold text-gray-600">콘텐츠 수</span>
-            <span>{userInfo.contentCount}</span>
+            <span className="font-semibold text-gray-600">참여 프로젝트</span>
+            <span>{(userInfo.participatingProjects?.length ?? 0)}</span> {/* 비어있을 경우 0 표시 */}
           </div>
         </div>
       ) : (

@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { AiFillHome } from 'react-icons/ai'; //홈 버튼
 import { FaUserCircle } from 'react-icons/fa';
 import { FiMoreHorizontal } from 'react-icons/fi';
+import { getMyPageInfo } from '../api/users'; //마이페이지 api 사용
+import React, { useEffect, useState } from 'react';
 
 // api import
 import { logout } from '../api/auth.js';
@@ -13,14 +15,22 @@ const navItems = [
   { label: '임시메뉴1', path: '/login' }, //해당페이지없어서 클릭시 당연히 오류발생함.
 ];
 
-// 예시: 유저 정보 가정
-const user = {
-  name: '김에이블',
-  avatar: '',
-};
-
 export default function Sidebar() {
   const location = useLocation();
+  const [userName, setUserName] = useState('');
+
+    useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const data = await getMyPageInfo();
+        setUserName(data.userName);
+      } catch (err) {
+        console.error('유저 이름 조회 실패', err);
+      }
+    };
+
+    fetchUserName();
+  }, []);
 
   //로그아웃 핸들러
   const handleLogout = async (e) => {
@@ -69,17 +79,17 @@ export default function Sidebar() {
         <div className="flex justify-between items-center px-4 py-2">
         {/* 프로필 + 환영문구 묶음 */}
         <div className="flex items-center gap-3">
-            {user.avatar ? (
+            {/* {user.avatar ? (
             <img
                 src={user.avatar}
                 alt="User Avatar"
                 className="w-10 h-10 rounded-full object-cover"
             />
-            ) : (
+            ) : ( */}
             <FaUserCircle size={40} className="text-gray-500" />
-            )}
+            {/* )} */}
             <div className="flex flex-col">
-            <span className="text-sm font-semibold">{user.name} 님</span>
+            <span className="text-sm font-semibold">{userName} 님</span>
             <span className="text-xs text-gray-500">환영합니다!</span>
             </div>
         </div>

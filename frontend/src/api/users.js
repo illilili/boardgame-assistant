@@ -3,24 +3,34 @@
 import axios from 'axios';
 const BASE_URL = 'http://localhost:8080';
 
+// 토큰 포함된 공통 헤더 생성 함수
+const authHeader = () => {
+  const token = localStorage.getItem("accessToken");
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  };
+};
+
 // 마이페이지 정보 조회
-export const getMyPageInfo = async () =>{
-    const response = await axios.get(`${BASE_URL}/api/users/mypage`)
-    return response.data
-}
+export const getMyPageInfo = async () => {
+  const response = await axios.get(`${BASE_URL}/api/users/mypage`, authHeader());
+  return response.data;
+};
 
 // 프로필 정보 수정
 export const editProfile = async (userId, data) => {
-  const response = await axios.put(`${BASE_URL}/api/users/${userId}/profile`, data);
+  const response = await axios.put(`${BASE_URL}/api/users/${userId}/profile`, data, authHeader());
   return response.data;
 };
+
 
 // 프로필 사진 업로드(삭제)
 export const uploadProfilePic = async (userId, data) => {
-  const response = await axios.post(`${BASE_URL}/api/users/${userId}/upload-profile-image`, data);
+  const response = await axios.post(`${BASE_URL}/api/users/${userId}/upload-profile-image`, data, authHeader());
   return response.data;
 };
-
 
 /////// 임시 데이터
 ////////// 임시 - 마이페이지 정보 조회
