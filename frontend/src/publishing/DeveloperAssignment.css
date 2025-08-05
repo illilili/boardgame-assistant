@@ -1,0 +1,531 @@
+/* DeveloperAssignment.css */
+
+.developer-assignment-workspace {
+  display: flex;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 사이드바는 기존 Publishing.css와 동일한 스타일 사용 */
+.workspace-sidebar {
+  width: 300px;
+  background-color: #2c3e50;
+  color: white;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #34495e;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+}
+
+.workspace-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  padding: 15px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid #34495e;
+  transition: background-color 0.2s ease;
+}
+
+.nav-item:hover {
+  background-color: #34495e;
+}
+
+.nav-header {
+  background-color: #34495e;
+  font-weight: bold;
+  cursor: default !important;
+}
+
+/* 메인 컨텐츠 레이아웃 - GameConceptCreator와 동일한 구조 */
+.workspace-main-content {
+  flex: 1;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.creator-container {
+  display: flex;
+  gap: 48px;
+  width: 100%;
+  height: calc(100vh - 70px - 4rem);
+  box-sizing: border-box;
+}
+
+.form-column, .result-column {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  box-sizing: border-box;
+}
+
+.form-column {
+  flex: 1;
+  min-width: 350px;
+  max-width: 500px;
+}
+
+.result-column {
+  flex: 2;
+  min-width: 600px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 40px);
+  overflow: hidden;
+}
+
+.form-column h4 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 18px;
+}
+
+.game-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.game-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.game-card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+.game-card.selected {
+  border-color: #3498db;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.game-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.game-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.status-badge {
+  background-color: #f39c12;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.game-card-content p {
+  margin: 6px 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.approval-date {
+  color: #95a5a6 !important;
+  font-size: 11px !important;
+}
+
+/* Welcome Screen */
+.welcome-screen {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.welcome-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.welcome-screen h2 {
+  font-size: 32px;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.welcome-screen p {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.game-card.selected {
+  border-color: #3498db;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.game-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.game-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.status-badge {
+  background-color: #f39c12;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.pending {
+  background-color: #f39c12;
+  color: white;
+}
+
+.status-badge.assigned {
+  background-color: #27ae60;
+  color: white;
+}
+
+.game-card-content p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.approval-date {
+  color: #95a5a6 !important;
+  font-size: 12px !important;
+}
+
+/* 메인 콘텐츠 */
+.workspace-main-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.welcome-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.welcome-screen h2 {
+  font-size: 32px;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.welcome-screen p {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+/* 배정 콘텐츠 */
+.assignment-content {
+  padding: 24px;
+  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+}
+
+.game-info-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.game-info-section h2 {
+  color: #2c3e50;
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.game-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.game-details p {
+  margin: 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.game-details strong {
+  color: #2c3e50;
+}
+
+.current-assignment {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 20px;
+}
+
+.current-assignment h3 {
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.assigned-developer {
+  background: #e8f5e8;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #27ae60;
+}
+
+.assigned-developer p {
+  margin: 8px 0;
+  color: #2c3e50;
+}
+
+.unassign-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.unassign-btn:hover {
+  background-color: #c0392b;
+}
+
+/* 개발자 섹션 */
+.developers-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.developers-section h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+/* 개발자 목록 */
+.developers-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  height: 85%;
+  overflow-y: auto;
+  padding: 0 16px;
+}
+
+.developer-item {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.developer-item:hover {
+  border-color: #3498db;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.developer-item.selected {
+  border-color: #3498db;
+  background-color: #e3f2fd;
+}
+
+.developer-item.unavailable {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+}
+
+.developer-item.unavailable:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #e0e0e0;
+}
+
+.developer-name-rating {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.developer-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.rating {
+  color: #f39c12;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.developer-details {
+  margin-bottom: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.detail-row .label {
+  color: #666;
+}
+
+.detail-row .value {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.availability-status {
+  text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.available-text {
+  color: #27ae60;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.unavailable-text {
+  color: #e74c3c;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* 배정 액션 */
+.assignment-action {
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.assign-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.assign-btn:hover {
+  background-color: #2980b9;
+}
+
+/* 로딩 */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #7f8c8d;
+}
+
+/* 서브미션 리스트 스타일 */
+.submissions-list {
+  padding: 20px;
+  border-top: 1px solid #34495e;
+}
+
+.submissions-list h4 {
+  color: #bdc3c7;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.submissions-list .submission-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.submissions-list .submission-item:hover {
+  background-color: #34495e;
+}
+
+.submissions-list .submission-item.selected {
+  background-color: #3498db;
+}

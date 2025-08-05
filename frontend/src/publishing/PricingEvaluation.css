@@ -1,0 +1,425 @@
+/* PricingEvaluation.css - 가격 책정 관리 */
+
+/* 워크스페이스 레이아웃 */
+.pricing-workspace {
+  display: flex;
+  height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* 사이드바 */
+.workspace-sidebar {
+  width: 250px;
+  background-color: #2c3e50;
+  color: white;
+  padding: 0;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #34495e;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #3498db;
+}
+
+.workspace-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #34495e;
+}
+
+.nav-item:hover {
+  background-color: #34495e;
+}
+
+.nav-item.nav-header {
+  background-color: #3498db;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 메인 콘텐츠 */
+.workspace-main-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* 크리에이터 컨테이너 */
+.creator-container {
+  display: flex;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: calc(100vh - 40px);
+}
+
+/* 폼 컬럼 (왼쪽) */
+.form-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 350px;
+  max-width: 800px;
+}
+
+.form-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.form-section h2 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 24px;
+}
+
+/* 게임 카드 그리드 */
+.game-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.game-card {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.game-card:hover {
+  border-color: #3498db;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.game-card.selected {
+  border-color: #3498db;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.game-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.game-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.status-badge {
+  background-color: #f39c12;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.pending {
+  background-color: #f39c12;
+  color: white;
+}
+
+.status-badge.evaluated {
+  background-color: #27ae60;
+  color: white;
+}
+
+.game-card-content p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.approval-date {
+  color: #95a5a6 !important;
+  font-size: 12px !important;
+}
+
+/* 결과 컬럼 (오른쪽) */
+.result-column {
+  width: 500px;
+  flex-shrink: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 40px);
+  overflow: hidden;
+}
+
+/* 웰컴 스크린 */
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.welcome-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+.welcome-screen h2 {
+  font-size: 32px;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.welcome-screen p {
+  font-size: 16px;
+  color: #7f8c8d;
+  line-height: 1.6;
+}
+
+/* 가격 책정 관리 */
+.pricing-management {
+  width: 100%;
+  padding: 24px;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.selected-game-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.selected-game-info h3 {
+  margin: 0 0 12px 0;
+  color: #2c3e50;
+  font-size: 20px;
+}
+
+.selected-game-info p {
+  margin: 8px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+/* 가격 책정 폼 */
+.pricing-form {
+  margin-bottom: 24px;
+}
+
+.pricing-form h4 {
+  color: #2c3e50;
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* 수익성 분석 */
+.pricing-calculations {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.pricing-calculations h4 {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.calculation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.calculation-item:last-child {
+  border-bottom: none;
+}
+
+.calculation-item .label {
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+}
+
+.calculation-item .value {
+  font-weight: 600;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.calculation-item .value.positive {
+  color: #27ae60;
+}
+
+.calculation-item .value.negative {
+  color: #e74c3c;
+}
+
+/* 메모 섹션 */
+.notes-section {
+  margin-bottom: 24px;
+}
+
+.notes-section label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.notes-section textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s ease;
+}
+
+.notes-section textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* 액션 버튼 */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.save-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.save-btn:hover {
+  background-color: #2980b9;
+}
+
+/* 로딩 */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #7f8c8d;
+}
+
+/* 반응형 */
+@media (max-width: 1200px) {
+  .creator-container {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .result-column {
+    width: 100%;
+    max-height: none;
+  }
+  
+  .game-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-workspace {
+    flex-direction: column;
+  }
+  
+  .workspace-sidebar {
+    width: 100%;
+    height: auto;
+  }
+  
+  .workspace-main-content {
+    padding: 12px;
+  }
+  
+  .game-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .pricing-management {
+    padding: 16px;
+  }
+}
