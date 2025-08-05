@@ -16,6 +16,9 @@ feature_cols = [
 ]
 기획안-> plan   구성품 종류-> component
 
+random_state 1~199 중 104가 성능이 가장 좋음
+
+
 python -m venv venv 
 가상환경 활성화 source venv/bin/activate
 
@@ -50,3 +53,7 @@ python model_train.py
 
 
 uvicorn app:app --reload
+
+
+
+모델 실행 python model_train.py

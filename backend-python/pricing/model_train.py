@@ -88,8 +88,8 @@ X = df[feature_cols].fillna(-1)
 y = df['amazon_price']
 
 # ====== 모델 학습/평가 ======
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=91)
-model = RandomForestRegressor(random_state=91)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=104)
+model = RandomForestRegressor(random_state=104)
 model.fit(X_train, y_train)
 
 y_pred = model.predict(X_test)
