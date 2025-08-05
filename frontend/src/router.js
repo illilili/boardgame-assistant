@@ -5,6 +5,12 @@ import MainContent from './mainPage/MainContent';
 import Header from './mainPage/Header';
 import Footer from './mainPage/Footer';
 import Plan from './plan/Plan';
+import Publishing from './publishing/Publishing';
+import DeveloperAssignment from './publishing/DeveloperAssignment';
+import Translation from './publishing/Translation';
+import TranslationReview from './publishing/TranslationReview';
+import PricingEvaluation from './publishing/PricingEvaluation';
+import FinalApproval from './publishing/FinalApproval';
 
 const router = createBrowserRouter([
     {
@@ -25,15 +31,42 @@ const router = createBrowserRouter([
     {
         id: 3,
         path:'/footer',
-        elment: <Footer/>
+        element: <Footer/>
     },
     {
         id: 4,
         path:'/plan',
         element: <Plan/>
+    },
+    {
+        id: 5,
+        path:'/publishing',
+        element: <Publishing/>
+    },
+    {
+        id: 6,
+        path:'/developer-assignment',
+        element: <DeveloperAssignment/>
+    },
+    {
+        id: 7,
+        path:'/translation',
+        element: <Translation/>
+    },
+    {
+        id: 8,
+        path:'/translation-review',
+        element: <TranslationReview/>
+    },
+    {
+        id: 9,
+        path:'/pricing-evaluation',
+        element: <PricingEvaluation/>
+    },
+    {
+        id: 10,
+        path:'/final-approval',
+        element: <FinalApproval/>
     }
-
-
-
 ]);
 export default router;
