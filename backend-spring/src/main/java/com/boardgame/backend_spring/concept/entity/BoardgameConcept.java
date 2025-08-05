@@ -1,6 +1,7 @@
 package com.boardgame.backend_spring.concept.entity;
 
 
+import com.boardgame.backend_spring.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,10 @@ public class BoardgameConcept {
 
     @Column(unique = true)
     private Long planId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
 
     private String theme;
     private String playerCount;

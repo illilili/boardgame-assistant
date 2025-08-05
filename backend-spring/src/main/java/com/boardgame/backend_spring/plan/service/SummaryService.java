@@ -12,6 +12,7 @@ import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.entity.PlanVersion;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
 import com.boardgame.backend_spring.plan.repository.PlanVersionRepository;
+import com.boardgame.backend_spring.project.entity.Project;
 import com.boardgame.backend_spring.rule.entity.GameRule;
 import com.boardgame.backend_spring.rule.repository.GameRuleRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -70,8 +71,10 @@ public class SummaryService {
         }
 
         // 해당 컨셉에 대한 Plan이 이미 있는지 확인하고, 없으면 새로 생성
+        Project project = concept.getProject();
+
         Plan plan = planRepository.findByBoardgameConcept(concept)
-                .orElseGet(() -> Plan.create(concept, generatedText));
+                .orElseGet(() -> Plan.create(project, concept, generatedText));
 
         // 생성된 내용으로 Plan의 현재 내용을 업데이트
         plan.setCurrentContent(generatedText);

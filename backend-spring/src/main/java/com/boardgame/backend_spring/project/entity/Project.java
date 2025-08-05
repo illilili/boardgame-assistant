@@ -1,11 +1,12 @@
 package com.boardgame.backend_spring.project.entity;
-import java.util.List;
 
+import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "projects")
@@ -28,4 +29,9 @@ public class Project {
 
     @ManyToMany(mappedBy = "projects")
     private List<User> participants;
+
+    // 승인된 기획안 1개 (nullable 가능)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "approved_plan_id")
+    private Plan approvedPlan;
 }
