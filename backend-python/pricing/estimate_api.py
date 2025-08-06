@@ -62,12 +62,13 @@ async def estimate_price_from_ai(req: PlanPriceRequest):
     # 2. GPT-3.5로 정보 추출 요청
     prompt = f"""
 너는 보드게임 기획서를 분석하는 도우미야.
+가격 산성 모델은 영어를 사용하여 학습되어있어. category는 한국어를 영어로 번역해서 사용해줘.
 아래 기획서에서 다음 정보를 추출해서 JSON으로 정리해줘, type은 기획서의 게임의 스토리, 진행방식 같은 정보를 기반으로 주어진 리스트중에서 1~2를 선정해줘:
 
-- category: 문자열 리스트 (ex: ["전략", "카드"])
+- category: 문자열 리스트 (ex: ["Engine Building", "Card Drafting"])
 - type: 문자열 리스트 (아래 중 최대 2개, 영어로)
-  ["Abstract Strategy Games", "Customizable Games", "Thematic Games", "Family Games", 
-   "Children's Games", "Party Games", "Strategy Games", "Wargames"]
+  ["Abstract", "Customizable", "Thematic", "Family", 
+   "Children's", "Party", "Strategy", "Wargames"]
 - min_age: 숫자 (최소 나이)
 - average_weight: 숫자 (1~5 사이 난이도)
 - component: 문자열 리스트 (ex: ["주사위", "말", "카드"])
@@ -134,23 +135,23 @@ async def estimate_price_from_ai(req: PlanPriceRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"모델 예측 실패: {str(e)}")
 
-#테스트 용 출력
-    # return {
-    #     "planId": req.planId,
-    #     "extracted_info": {
-    #         "category": categories,
-    #         "type": types,
-    #         "min_age": min_age,
-    #         "average_weight": avg_weight,
-    #         "component": components,
-    #         "component_count": component_count
-    #     },
-    #     "category_avg_price": round(category_avg_price, 2),
-    #     "type_avg_price": round(type_avg_price, 2),
-    #     "predicted_price": round(predicted_price, 2)
-    # }
-
+# 테스트 용 출력
     return {
-    "planId": req.planId,
-    "predicted_price": round(predicted_price, 2)
-}
+        "planId": req.planId,
+        "extracted_info": {
+            "category": categories,
+            "type": types,
+            "min_age": min_age,
+            "average_weight": avg_weight,
+            "component": components,
+            "component_count": component_count
+        },
+        "category_avg_price": round(category_avg_price, 2),
+        "type_avg_price": round(type_avg_price, 2),
+        "predicted_price": round(predicted_price, 2)
+    }
+
+#     return {
+#     "planId": req.planId,
+#     "predicted_price": round(predicted_price, 2)
+# }
