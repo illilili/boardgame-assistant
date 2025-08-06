@@ -18,7 +18,12 @@ feature_cols = [
 
 random_state 10~199 중 104가 성능이 가장 좋음
 
+
+pip install pandas numpy scikit-learn joblib
+
 모델 실행 python model_train.py
+python pricing/model_train.py
+
 
 MAE: 4.58
 R^2: 0.812
@@ -33,4 +38,7 @@ component_count: 0.010
 
 
 
+
+pip install fastapi uvicorn python-dotenv openai pymysql pandas scikit-learn joblib
+uvicorn pricing.api:app --reload
 
