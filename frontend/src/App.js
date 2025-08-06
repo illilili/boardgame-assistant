@@ -33,7 +33,7 @@ function App() {
           }
         >
           <Route path="mypage" element={<MyPage />} />
-          <Route path="profile" element={<Profile />} />
+          {/* <Route path="profile" element={<Profile />} /> */} 
           <Route path="/admin/users" element={<AdminUserManagePage />} />
           <Route path="/developerinfo" element={<DeveloperInfo />} />
         </Route>
