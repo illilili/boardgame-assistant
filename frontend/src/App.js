@@ -7,6 +7,7 @@ import MainLayout from './layout/MainLayout';
 
 import MyPage from './pages/users/MyPage'
 import Profile from './pages/users/Profile';
+import DeveloperInfo from './pages/users/DeveloperInfo';
 
 import SignUp from './pages/auth/SignUp';
 import Login from './pages/auth/Login';
@@ -34,12 +35,14 @@ function App() {
           <Route path="mypage" element={<MyPage />} />
           <Route path="profile" element={<Profile />} />
           <Route path="/admin/users" element={<AdminUserManagePage />} />
+          <Route path="/developerinfo" element={<DeveloperInfo />} />
         </Route>
 
         {/* 독립적인 페이지들 */}
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+        
       </Routes>
     </BrowserRouter>
   );

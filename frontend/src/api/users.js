@@ -19,18 +19,24 @@ export const getMyPageInfo = async () => {
   return response.data;
 };
 
-// 프로필 정보 수정
-export const editProfile = async (userId, data) => {
-  const response = await axios.put(`${BASE_URL}/api/users/${userId}/profile`, data, authHeader());
+// 개발자 목록 조회
+export const getDevelopInfo = async () => {
+  const response = await axios.get(`${BASE_URL}/api/users/developers`, authHeader());
   return response.data;
 };
 
+// // 프로필 정보 수정 - 백엔드 api 없음으로 주석처리
+// export const editProfile = async (userId, data) => {
+//   const response = await axios.put(`${BASE_URL}/api/users/${userId}/profile`, data, authHeader());
+//   return response.data;
+// };
 
-// 프로필 사진 업로드(삭제)
-export const uploadProfilePic = async (userId, data) => {
-  const response = await axios.post(`${BASE_URL}/api/users/${userId}/upload-profile-image`, data, authHeader());
-  return response.data;
-};
+
+// // 프로필 사진 업로드(삭제) - - 백엔드 api 없음으로 주석처리
+// export const uploadProfilePic = async (userId, data) => {
+//   const response = await axios.post(`${BASE_URL}/api/users/${userId}/upload-profile-image`, data, authHeader());
+//   return response.data;
+// };
 
 /////// 임시 데이터
 ////////// 임시 - 마이페이지 정보 조회
