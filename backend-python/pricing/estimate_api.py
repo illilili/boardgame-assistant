@@ -73,16 +73,36 @@ async def estimate_price_from_ai(req: PlanPriceRequest):
 - average_weight: 숫자 (1~5 사이 난이도)
 - component: 문자열 리스트 (ex: ["주사위", "말", "카드"])
 
+너는 보드게임 기획서를 분석하는 도우미야.
+가격 산정 모델은 영어를 기반으로 학습되어 있기 때문에,
+category는 아래 제공된 121개의 영어 카테고리 목록 중에서만 선택해서 출력해줘.
+
+아래 기획서를 읽고 다음 정보를 JSON 형식으로 추출해줘:
+
+- category: 문자열 리스트 (아래 카테고리 목록 중에서만 선택)
+- type: 문자열 리스트 (아래 type 목록 중 최대 2개 선택)
+- min_age: 숫자 (최소 나이)
+- average_weight: 숫자 (1~10 사이 난이도)
+- component: 문자열 리스트 (ex: ["주사위", "말", "카드"])
+
+※ category는 아래 121개의 카테고리 목록 중에서 의미가 가장 가까운 항목으로만 골라서 출력해. 목록에 없는 항목은 무시해.
+
+[카테고리 목록]
+Abstract Strategy, Action, Action Points, Action Queue, Adult, Adventure, Age of Reason, American Civil War, American Indian Wars, American Revolutionary War, American West, Ancient, Animals, Arabian, Area Majority, Aviation, Bias, Bluffing, Book, Card Game, Childrens Game, City Building, Civil War, Civilization, Collectible Components, Comic Book, Cooperative Game, Deduction, Dexterity, Dice, Dice Rolling, Economic, Educational, Electronic, Environmental, Expansion for Base-game, Exploration, Fan Expansion, Fantasy, Farming, Fighting, Flight, Game System, Grid Movement, Hidden Movement, Horror, Humor, Industry, Influence, Korean War, Mafia, Manufacturing, Math, Mature, Maze, Medical, Medieval, Memory, Miniatures, Modern Warfare, Modular Board, Movement Template, Movies, Murder, Music, Mystery, Mythology, Napoleonic, Nautical, Negotiation, Novel-based, Number, Open Drafting, Paper-and-Pencil, Party Game, Pattern Building, Pike and Shot, Pirates, Player Elimination, Point to Point Movement, Political, Post-Napoleonic, Prehistoric, Print & Play, Push Your Luck, Puzzle, Racing, Radio theme, Real-Time, Religious, Renaissance, Role Playing, Science Fiction, Secret Agents, Semi-Cooperative Game, Simulation, Simultaneous Action Selection, Solitaire Game, Solo, Space Exploration, Spies, Sports, Strip, TV, Team-Based Game, Territory Building, Trains, Transportation, Travel, Trivia, Variable Phase Order, Variable Player Powers, Video Game Theme, Vietnam War, Wargame, Word Game, Worker Placement, World War I, World War II, Zombies
+
+[type 목록]
+["Abstract", "Customizable", "Thematic", "Family", "Children's", "Party", "Strategy", "Wargames"]
+
 기획서:
 {plan_text}
 
-출력 형식 예시:
+출력 예시:
 {{
-  "category": ["전략", "카드"],
-  "type": ["Strategy Games", "Thematic Games"],
+  "category": ["Economic", "Card Game"],
+  "type": ["Strategy", "Thematic"],
   "min_age": 10,
   "average_weight": 2.3,
-  "component": ["주사위", "말", "카드"]
+  "component": ["주사위", "카드", "토큰"]
 }}
     """.strip()
 

@@ -8,7 +8,8 @@ import joblib
 
 # ====== 파일 경로 및 인코딩 설정 ======
 #csv_path = 'data/bgg_merged_type_components.csv'  # 파일 경로 확인 필요
-csv_path = 'backend-python/pricing/data/bgg_merged_type_components.csv'
+csv_path = 'pricing/data/bgg_merged_type_components.csv'
+
 
 df = pd.read_csv(csv_path, encoding='latin1')
 print("✅ 데이터 로드 완료")

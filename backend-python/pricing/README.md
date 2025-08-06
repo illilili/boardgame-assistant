@@ -21,7 +21,8 @@ random_state 10~199 중 104가 성능이 가장 좋음
 
 pip install pandas numpy scikit-learn joblib
 
-모델 실행 python model_train.py
+cd backend-python
+모델 실행 
 python pricing/model_train.py
 
 
@@ -42,3 +43,14 @@ component_count: 0.010
 pip install fastapi uvicorn python-dotenv openai pymysql pandas scikit-learn joblib
 uvicorn pricing.api:app --reload
 
+
+docker run -d --name mariadb -e MYSQL_ROOT_PASSWORD=123123d -e MYSQL_DATABASE=boardgame -p 3306:3306 mariadb
+docker exec -it mariadb bash
+mariadb -u root -p
+
+USE boardgame;
+CREATE TABLE plan (
+    planId INT PRIMARY KEY AUTO_INCREMENT,
+    planContent TEXT
+);
+SELECT * FROM plan;
