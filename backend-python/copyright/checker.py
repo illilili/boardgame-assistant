@@ -112,19 +112,19 @@ class FaissGameAnalyzer:
         
         return unique_queries[:3]  # 최대 3개만 사용
     
-    def enhance_search_with_openai(self, similar_games: List[Dict], game_elements: Dict[str, str]) -> List[Dict]:
-        """OpenAI를 사용한 검색 결과 정제 및 유사도 재평가"""
-        
-        if not similar_games:
-            return []
-        
-        # 상위 결과만 분석 (비용 절약)
-        top_games = similar_games[:5]
-        
-        # 게임 정보를 OpenAI가 분석할 수 있는 형태로 변환
-        games_info = []
-        for i, game in enumerate(top_games):
-            games_info.append(f"""
+def enhance_search_with_openai(self, similar_games: List[Dict], game_elements: Dict[str, str]) -> List[Dict]:
+    """OpenAI를 사용한 검색 결과 정제 및 유사도 재평가 - 4가지 기준"""
+    
+    if not similar_games:
+        return []
+    
+    # 상위 결과만 분석 (비용 절약)
+    top_games = similar_games[:5]
+    
+    # 게임 정보를 OpenAI가 분석할 수 있는 형태로 변환
+    games_info = []
+    for i, game in enumerate(top_games):
+        games_info.append(f"""
 게임 {i+1}: {game['name']}
 설명: {game['description']}
 카테고리: {', '.join(game['categories'][:3])}
@@ -132,24 +132,25 @@ class FaissGameAnalyzer:
 복잡도: {game['complexity']:.1f}
 평점: {game['geek_rating']:.1f}
 """)
-        
-        prompt = f"""
+    
+    prompt = f"""
 다음 새 게임과 검색된 기존 게임들의 실제 유사도를 전문적으로 분석해주세요.
 
 새 게임:
 제목: {game_elements['title']}
+설명: {game_elements['description']}
 테마: {game_elements['theme_keywords']}
 메커닉: {game_elements['mechanic_keywords']}
-설명: {game_elements['description']}
 
 검색된 기존 게임들:
 {''.join(games_info)}
 
-각 기존 게임과 새 게임의 실제 유사도를 다음 기준으로 재평가해주세요:
+각 기존 게임과 새 게임의 실제 유사도를 다음 4가지 기준으로 재평가해주세요:
 
-1. 핵심 메커닉 유사도 (60%) - 가장 중요
-2. 테마/설정 유사도 (25%)
-3. 게임 경험/복잡도 유사도 (15%)
+1. 핵심 메커닉 유사도 (45%) - 게임 규칙, 시스템, 플레이 방식
+2. 설명 유사도 (25%) - 게임 컨셉, 스토리, 전체적인 느낌  
+3. 테마/설정 유사도 (20%) - 배경, 세계관, 장르
+4. 게임 경험/복잡도 유사도 (10%) - 난이도, 플레이 시간, 타겟층
 
 결과를 JSON 배열로 반환:
 [
@@ -157,8 +158,8 @@ class FaissGameAnalyzer:
     "game_index": 0,
     "adjusted_similarity": 0.75,
     "risk_level": "medium",
-    "key_similarities": ["핵심 메커닉 A 유사", "테마 B 공통점"],
-    "differences": ["승리 조건 다름", "플레이어 상호작용 방식 상이"]
+    "key_similarities": ["핵심 메커닉 A 유사", "게임 설명 컨셉 유사", "테마 B 공통점", "복잡도 비슷"],
+    "differences": ["승리 조건 다름", "스토리 전개 방식", "플레이어 상호작용 상이", "특별 규칙 차이"]
   }},
   ...
 ]
@@ -169,40 +170,40 @@ class FaissGameAnalyzer:
 - 0.4-0.6: 부분적 유사 (일반적)
 - 0.4 미만: 낮은 유사도
 """
+    
+    try:
+        print(f"  ✓ OpenAI로 상위 {len(top_games)}개 게임 정밀 분석 중... (4가지 기준)")
+        response = call_openai(prompt, max_tokens=800, temperature=0.2)
         
-        try:
-            print(f"  ✓ OpenAI로 상위 {len(top_games)}개 게임 정밀 분석 중...")
-            response = call_openai(prompt, max_tokens=800, temperature=0.2)
-            
-            # JSON 파싱
-            json_start = response.find('[')
-            json_end = response.rfind(']') + 1
-            
-            if json_start != -1 and json_end > json_start:
-                json_text = response[json_start:json_end]
-                analysis_results = json.loads(json_text)
-                
-                # 결과를 원본 게임 정보와 결합
-                enhanced_games = []
-                for result in analysis_results:
-                    if result['game_index'] < len(top_games):
-                        game = top_games[result['game_index']].copy()
-                        game['adjusted_similarity'] = result['adjusted_similarity']
-                        game['risk_level'] = result['risk_level']
-                        game['key_similarities'] = result.get('key_similarities', [])
-                        game['differences'] = result.get('differences', [])
-                        enhanced_games.append(game)
-                
-                # 조정된 유사도로 정렬
-                enhanced_games.sort(key=lambda x: x['adjusted_similarity'], reverse=True)
-                
-                print(f"  ✓ OpenAI 정밀 분석 완료")
-                return enhanced_games
-            
-        except Exception as e:
-            print(f"  ✗ OpenAI 정밀 분석 실패: {e}")
+        # JSON 파싱
+        json_start = response.find('[')
+        json_end = response.rfind(']') + 1
         
-        # 실패 시 원본 결과 반환
-        return similar_games
+        if json_start != -1 and json_end > json_start:
+            json_text = response[json_start:json_end]
+            analysis_results = json.loads(json_text)
+            
+            # 결과를 원본 게임 정보와 결합
+            enhanced_games = []
+            for result in analysis_results:
+                if result['game_index'] < len(top_games):
+                    game = top_games[result['game_index']].copy()
+                    game['adjusted_similarity'] = result['adjusted_similarity']
+                    game['risk_level'] = result['risk_level']
+                    game['key_similarities'] = result.get('key_similarities', [])
+                    game['differences'] = result.get('differences', [])
+                    enhanced_games.append(game)
+            
+            # 조정된 유사도로 정렬
+            enhanced_games.sort(key=lambda x: x['adjusted_similarity'], reverse=True)
+            
+            print(f"  ✓ OpenAI 4가지 기준 정밀 분석 완료")
+            return enhanced_games
+        
+    except Exception as e:
+        print(f"  ✗ OpenAI 정밀 분석 실패: {e}")
+    
+    # 실패 시 원본 결과 반환
+    return similar_games
     
     print("Hello from checker!")

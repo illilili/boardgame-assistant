@@ -49,7 +49,7 @@ class CopyrightJudge:
         }
     
     def _analyze_similarity_details(self, most_similar_game: Dict) -> Dict:
-        """가장 유사한 게임과의 상세 비교 분석"""
+        """가장 유사한 게임과의 상세 비교 분석 - 4가지 기준"""
         similarity_score = most_similar_game.get('adjusted_similarity', most_similar_game['similarity'])
         
         # 실제 게임 정보로 상세 분석
@@ -60,17 +60,20 @@ class CopyrightJudge:
         game_complexity = most_similar_game.get('complexity', 0)
         game_rating = most_similar_game.get('geek_rating', 0)
         
-        # 유사도를 각 요소별로 분해 (추정치)
+        # 4가지 유사도 분해 (새로운 가중치)
         base_similarity = similarity_score
         
-        # 메커닉 유사도 (전체의 60%)
-        mechanic_similarity = base_similarity * 0.6
+        # 메커닉 유사도 (45% - 여전히 가장 높지만 조정)
+        mechanic_similarity = base_similarity * 0.45
         
-        # 테마/카테고리 유사도 (전체의 25%)
-        theme_similarity = base_similarity * 0.25
+        # 설명 유사도 (25% - 새로 추가)
+        description_similarity = base_similarity * 0.25
         
-        # 복잡도/경험 유사도 (전체의 15%)
-        complexity_similarity = base_similarity * 0.15
+        # 테마/카테고리 유사도 (20% - 기존 25%에서 조정)
+        theme_similarity = base_similarity * 0.20
+        
+        # 복잡도/경험 유사도 (10% - 기존 15%에서 조정)
+        complexity_similarity = base_similarity * 0.10
         
         return {
             'most_similar_game': game_name,
@@ -85,9 +88,10 @@ class CopyrightJudge:
             'total_similarity': f"{similarity_score:.1%}",
             'similarity_breakdown': {
                 'mechanic_similarity': f"{mechanic_similarity:.1%}",
+                'description_similarity': f"{description_similarity:.1%}",  # 새로 추가
                 'theme_similarity': f"{theme_similarity:.1%}",
                 'complexity_similarity': f"{complexity_similarity:.1%}"
             },
-            'key_similarities': most_similar_game.get('key_similarities', ['메커닉 유사성', '테마 공통점', '게임 경험 유사']),
-            'differences': most_similar_game.get('differences', ['승리 조건 차이', '플레이어 상호작용 방식', '게임 길이'])
+            'key_similarities': most_similar_game.get('key_similarities', ['메커닉 유사성', '설명 내용 유사', '테마 공통점', '게임 경험 유사']),
+            'differences': most_similar_game.get('differences', ['승리 조건 차이', '플레이어 상호작용 방식', '게임 길이', '특별 규칙'])
         }

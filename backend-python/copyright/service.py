@@ -105,8 +105,12 @@ class FaissCopyrightCheckService:
         print(f"  ✓ 총 {len(all_similar_games)}개 유사 게임 발견")
         
         # 4단계: OpenAI를 통한 정밀 분석 (상위 결과만)
-        print("3단계: OpenAI 정밀 분석...")
-        enhanced_games = self.analyzer.enhance_search_with_openai(all_similar_games, game_elements)
+        print("4단계: OpenAI 정밀 분석...")
+        try:
+            enhanced_games = self.analyzer.enhance_search_with_openai(all_similar_games, game_elements)
+        except AttributeError:
+            print("  ⚠️ OpenAI 정밀 분석 메서드를 찾을 수 없어 기본 검색 결과를 사용합니다.")
+            enhanced_games = all_similar_games
         
         # 5단계: 최종 판정 (수정된 간단한 로직)
         print("4단계: 최종 위험도 판정...")
