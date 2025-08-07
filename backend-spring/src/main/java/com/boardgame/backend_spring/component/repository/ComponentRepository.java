@@ -13,4 +13,6 @@ public interface ComponentRepository extends JpaRepository<Component, Long> {
     void deleteAllByBoardgameConcept(BoardgameConcept boardgameConcept);
 
     boolean existsByBoardgameConceptAndTitle(BoardgameConcept concept, String title);
+
+
 }

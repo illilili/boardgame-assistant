@@ -3,6 +3,7 @@ package com.boardgame.backend_spring.task.service;
 import com.boardgame.backend_spring.component.entity.Component;
 import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.ComponentRepository;
+import com.boardgame.backend_spring.component.repository.SubTaskRepository;
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.content.entity.Content;
 import com.boardgame.backend_spring.content.repository.ContentRepository;
@@ -31,6 +32,7 @@ public class TaskService {
     private final ComponentRepository componentRepository;
     private final ProjectRepository projectRepository;
     private final ContentRepository contentRepository;
+    private final SubTaskRepository subTaskRepository;
 
     /**
      * [1] 최초 개발 목록 초기화 - 고정 컴포넌트 3종 생성
@@ -44,26 +46,38 @@ public class TaskService {
 
         // 중복 방지: 룰북 하나라도 있으면 생략
         if (!componentRepository.existsByBoardgameConceptAndTitle(concept, "룰북 초안")) {
+            // 1. 룰북
             Component rulebook = new Component();
             rulebook.setBoardgameConcept(concept);
             rulebook.setType("Document");
             rulebook.setTitle("룰북 초안");
             rulebook = componentRepository.save(rulebook);
-            rulebook.setSubTasks(List.of(makeFixedSubTask("text", "룰북 초안", rulebook)));
 
+            SubTask rulebookTask = makeFixedSubTask("text", "룰북 초안", rulebook);
+            rulebookTask = subTaskRepository.save(rulebookTask);
+            rulebook.setSubTasks(List.of(rulebookTask));
+
+            // 2. 설명 스크립트
             Component script = new Component();
             script.setBoardgameConcept(concept);
             script.setType("Script");
             script.setTitle("영상 설명 스크립트");
             script = componentRepository.save(script);
-            script.setSubTasks(List.of(makeFixedSubTask("text", "영상 설명 스크립트", script)));
 
+            SubTask scriptTask = makeFixedSubTask("text", "영상 설명 스크립트", script);
+            scriptTask = subTaskRepository.save(scriptTask);
+            script.setSubTasks(List.of(scriptTask));
+
+            // 3. 썸네일 이미지
             Component thumbnail = new Component();
             thumbnail.setBoardgameConcept(concept);
             thumbnail.setType("Image");
             thumbnail.setTitle("썸네일 이미지");
             thumbnail = componentRepository.save(thumbnail);
-            thumbnail.setSubTasks(List.of(makeFixedSubTask("image", "썸네일 이미지", thumbnail)));
+
+            SubTask thumbnailTask = makeFixedSubTask("image", "썸네일 이미지", thumbnail);
+            thumbnailTask = subTaskRepository.save(thumbnailTask);
+            thumbnail.setSubTasks(List.of(thumbnailTask));
         }
     }
 
@@ -93,21 +107,7 @@ public class TaskService {
     }
 
     private TaskComponentDto toTaskComponentDto(Component component) {
-        // 서브태스크가 존재하지만 contentId가 없는 경우 → 자동 생성
-        List<SubTask> subTasks = component.getSubTasks().stream()
-                .map(subTask -> {
-                    if (subTask.getContentId() == null) {
-                        Content content = new Content();
-                        content.setContentType(mapContentType(subTask.getType(), component.getTitle()));
-                        content.setComponent(component);
-                        content.setCreatedAt(LocalDateTime.now());
-                        content = contentRepository.save(content);
-
-                        subTask.setContentId(content.getId());
-                    }
-                    return subTask;
-                })
-                .collect(Collectors.toList());
+        List<SubTask> subTasks = component.getSubTasks();
 
         String statusSummary = calculateStatusSummary(subTasks);
 

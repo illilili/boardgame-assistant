@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 @Builder
 public class SubTaskDto {
-    private Long id;
     private Long contentId;
     private String type; // text, image, 3d_model 등
     private String status;

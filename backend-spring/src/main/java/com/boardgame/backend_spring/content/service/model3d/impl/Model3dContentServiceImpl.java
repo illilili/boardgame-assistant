@@ -1,7 +1,9 @@
 package com.boardgame.backend_spring.content.service.model3d.impl;
 
 import com.boardgame.backend_spring.component.entity.Component;
+import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.ComponentRepository;
+import com.boardgame.backend_spring.component.repository.SubTaskRepository;
 import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelRequest;
 import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelResponse;
 import com.boardgame.backend_spring.content.dto.model3d.Model3DUserRequest;
@@ -26,12 +28,18 @@ public class Model3dContentServiceImpl implements Model3dContentService {
     private final ContentRepository contentRepository;
     private final ComponentRepository componentRepository;
     private final PlanRepository planRepository;
+    private final SubTaskRepository subTaskRepository;
 
     @Override
     public Generate3DModelResponse generate3DModel(Model3DUserRequest userRequest) {
         // 콘텐츠 조회
         Content content = contentRepository.findById(userRequest.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
+        // 상태 변경: IN_PROGRESS
+        SubTask subTask = subTaskRepository.findByContentId(userRequest.getContentId())
+                .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
+        subTask.setStatus("IN_PROGRESS");
+        subTaskRepository.save(subTask);
 
         // 구성요소 및 기획안 정보 추출
         Component component = content.getComponent();

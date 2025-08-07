@@ -1,5 +1,7 @@
 package com.boardgame.backend_spring.project.service;
 
+import com.boardgame.backend_spring.plan.entity.PlanStatus;
+import com.boardgame.backend_spring.plan.repository.PlanRepository;
 import com.boardgame.backend_spring.project.dto.*;
 import com.boardgame.backend_spring.project.entity.Project;
 import com.boardgame.backend_spring.project.entity.ProjectMember;
@@ -19,6 +21,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
+    private final PlanRepository planRepository;
 
     // 프로젝트 생성 - 로그인 사용자 기준 (PLANNER만)
     public ProjectCreateResponseDto createProject(ProjectCreateRequestDto dto, User user) {
@@ -81,6 +84,12 @@ public class ProjectService {
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("프로젝트를 찾을 수 없습니다."));
+
+        // 기획안 승인 여부 확인
+        boolean hasApprovedPlan = planRepository.findByProjectIdAndStatus(projectId, PlanStatus.APPROVED).isPresent();
+        if (!hasApprovedPlan) {
+            throw new RuntimeException("기획안이 승인되지 않은 상태에서는 개발자를 배정할 수 없습니다.");
+        }
 
         User developer = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));

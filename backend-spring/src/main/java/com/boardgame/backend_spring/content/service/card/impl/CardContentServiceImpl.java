@@ -1,7 +1,9 @@
 package com.boardgame.backend_spring.content.service.card.impl;
 
 import com.boardgame.backend_spring.component.entity.Component;
+import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.ComponentRepository;
+import com.boardgame.backend_spring.component.repository.SubTaskRepository;
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.content.dto.card.CardTextGenerateRequest;
 import com.boardgame.backend_spring.content.dto.card.CardTextRequest;
@@ -26,6 +28,7 @@ public class CardContentServiceImpl implements CardContentService {
     private final ContentRepository contentRepository;
     private final ComponentRepository componentRepository;
     private final PlanRepository planRepository;
+    private final SubTaskRepository subTaskRepository;
 
     // 공통 메서드: 콘텐츠, 플랜 정보 가져오기
     private Plan getPlanFromContentId(Long contentId) {
@@ -40,6 +43,12 @@ public class CardContentServiceImpl implements CardContentService {
     @Override
     public CardTextResponse generateText(CardTextGenerateRequest request) {
         Plan plan = getPlanFromContentId(request.getContentId());
+
+        // 상태 변경: IN_PROGRESS
+        SubTask subTask = subTaskRepository.findByContentId(request.getContentId())
+                .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
+        subTask.setStatus("IN_PROGRESS");
+        subTaskRepository.save(subTask);
 
         CardTextRequest.Card card = new CardTextRequest.Card();
         card.setContentId(request.getContentId());
@@ -69,6 +78,12 @@ public class CardContentServiceImpl implements CardContentService {
     @Override
     public CardImageResponse generateImage(CardTextGenerateRequest request) {
         Plan plan = getPlanFromContentId(request.getContentId());
+
+        // 상태 변경: IN_PROGRESS
+        SubTask subTask = subTaskRepository.findByContentId(request.getContentId())
+                .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
+        subTask.setStatus("IN_PROGRESS");
+        subTaskRepository.save(subTask);
 
         CardTextRequest.Card card = new CardTextRequest.Card();
         card.setContentId(request.getContentId());
