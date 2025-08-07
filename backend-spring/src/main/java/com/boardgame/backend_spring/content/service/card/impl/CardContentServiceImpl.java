@@ -5,16 +5,14 @@ import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.ComponentRepository;
 import com.boardgame.backend_spring.component.repository.SubTaskRepository;
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
-import com.boardgame.backend_spring.content.dto.card.CardTextGenerateRequest;
-import com.boardgame.backend_spring.content.dto.card.CardTextRequest;
-import com.boardgame.backend_spring.content.dto.card.CardTextResponse;
+import com.boardgame.backend_spring.content.dto.card.*;
 import com.boardgame.backend_spring.content.entity.Content;
 import com.boardgame.backend_spring.content.repository.ContentRepository;
 import com.boardgame.backend_spring.content.service.card.CardContentService;
 import com.boardgame.backend_spring.content.service.PythonApiService;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
-import com.boardgame.backend_spring.content.dto.card.CardImageResponse;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -108,5 +106,23 @@ public class CardContentServiceImpl implements CardContentService {
         contentRepository.save(content);  // DB 반영
 
         return response;
+    }
+    @Override
+    public CardPreviewDto getCardPreview(Long contentId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
+
+        Component component = content.getComponent();
+        BoardgameConcept concept = component.getBoardgameConcept();
+
+        CardPreviewDto dto = new CardPreviewDto();
+        dto.setContentId(contentId);
+        dto.setName(component.getTitle());
+        dto.setEffect(component.getRoleAndEffect());
+        dto.setDescription(component.getArtConcept());
+        dto.setTheme(concept.getTheme());
+        dto.setStoryline(concept.getStoryline());
+
+        return dto;
     }
 }

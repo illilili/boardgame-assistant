@@ -3,8 +3,10 @@ package com.boardgame.backend_spring.content.service.thumbnail.impl;
 import com.boardgame.backend_spring.component.entity.Component;
 import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.SubTaskRepository;
+import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailGenerateRequest;
 import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailGenerateResponse;
+import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailPreviewDto;
 import com.boardgame.backend_spring.content.entity.Content;
 import com.boardgame.backend_spring.content.repository.ContentRepository;
 import com.boardgame.backend_spring.content.service.PythonApiService;
@@ -53,5 +55,21 @@ public class ThumbnailContentServiceImpl implements ThumbnailContentService {
         contentRepository.save(content);
 
         return response;
+    }
+
+    @Override
+    public ThumbnailPreviewDto getThumbnailPreview(Long contentId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
+
+        Component component = content.getComponent();
+        BoardgameConcept concept = component.getBoardgameConcept();
+
+        ThumbnailPreviewDto dto = new ThumbnailPreviewDto();
+        dto.setContentId(contentId);
+        dto.setTheme(concept.getTheme());
+        dto.setStoryline(concept.getStoryline());
+
+        return dto;
     }
 }

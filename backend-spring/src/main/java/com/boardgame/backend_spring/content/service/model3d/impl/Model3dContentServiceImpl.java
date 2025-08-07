@@ -6,6 +6,7 @@ import com.boardgame.backend_spring.component.repository.ComponentRepository;
 import com.boardgame.backend_spring.component.repository.SubTaskRepository;
 import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelRequest;
 import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelResponse;
+import com.boardgame.backend_spring.content.dto.model3d.Model3DPreviewDto;
 import com.boardgame.backend_spring.content.dto.model3d.Model3DUserRequest;
 import com.boardgame.backend_spring.content.entity.Content;
 import com.boardgame.backend_spring.content.repository.ContentRepository;
@@ -70,5 +71,24 @@ public class Model3dContentServiceImpl implements Model3dContentService {
         contentRepository.save(content);
 
         return response;
+    }
+
+    @Override
+    public Model3DPreviewDto getModel3DPreview(Long contentId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
+
+        Component component = content.getComponent();
+        BoardgameConcept concept = component.getBoardgameConcept();
+
+        Model3DPreviewDto dto = new Model3DPreviewDto();
+        dto.setContentId(contentId);
+        dto.setName(component.getTitle());
+        dto.setDescription(component.getArtConcept());
+        dto.setArtConcept(component.getArtConcept());
+        dto.setTheme(concept.getTheme());
+        dto.setStoryline(concept.getStoryline());
+
+        return dto;
     }
 }
