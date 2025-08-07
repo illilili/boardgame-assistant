@@ -12,6 +12,7 @@ public class SubTask {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private Long contentId;
 
     private String type; // text, image, 3d_model 등

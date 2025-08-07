@@ -1,65 +1,42 @@
 package com.boardgame.backend_spring.content.controller;
 
-import com.boardgame.backend_spring.content.dto.*;
-import com.boardgame.backend_spring.content.service.ContentService;
+import com.boardgame.backend_spring.content.dto.card.CardImageResponse;
+import com.boardgame.backend_spring.content.dto.card.CardTextGenerateRequest;
+import com.boardgame.backend_spring.content.dto.card.CardTextResponse;
+import com.boardgame.backend_spring.content.dto.model3d.Model3DUserRequest;
+import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelResponse;
+import com.boardgame.backend_spring.content.service.card.CardContentService;
+
+import com.boardgame.backend_spring.content.service.model3d.Model3dContentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/content")
+@RequiredArgsConstructor
 public class ContentController {
-    private final ContentService contentService;
 
-    public ContentController(ContentService contentService) {
-        this.contentService = contentService;
-    }
-    @DeleteMapping("/{contentId}")
-    public String deleteContent(@PathVariable Long contentId) {
-        contentService.deleteContent(contentId);
-        return "콘텐츠가 삭제되었습니다.";
-    }
+    private final CardContentService contentService;
+    private final Model3dContentService model3dContentService;
 
-    @GetMapping("/{contentId}")
-    public ContentDetailResponse getContentDetail(@PathVariable Long contentId) {
-        return contentService.getContentDetail(contentId);
-    }
-
-    @PostMapping("/save")
-    public ContentSaveResponse saveContent(@RequestBody ContentSaveRequest request) {
-    return contentService.saveContent(request);
-    }
-
-    @PostMapping("/submit")
-    public ContentSubmitResponse submitContent(@RequestBody ContentSubmitRequest request) {
-        return contentService.submitContent(request);
-    }
+    /**
+     * 단일 카드 텍스트 자동 생성 요청
+     * @param request CardTextGenerateRequest
+     * @return 생성된 카드 텍스트
+     */
     @PostMapping("/generate-text")
-    public TextGenerateResponse generateText(@RequestBody TextGenerateRequest request) {
-        return contentService.generateText(request);
+    public ResponseEntity<CardTextResponse> generateCardText(@RequestBody CardTextGenerateRequest request) {
+        return ResponseEntity.ok(contentService.generateText(request));
     }
 
     @PostMapping("/generate-image")
-    public ImageGenerateResponse generateImage(@RequestBody ImageGenerateRequest request) {
-        return contentService.generateImage(request);
-    }
-
-    @PostMapping("/generate-rulebook")
-    public RulebookGenerateResponse generateRulebook(@RequestBody RulebookGenerateRequest request) {
-        return contentService.generateRulebook(request);
-    }
-
-    @PostMapping("/generate-description-script")
-    public DescriptionScriptResponse generateDescriptionScript(@RequestBody DescriptionScriptRequest request) {
-        return contentService.generateDescriptionScript(request);
+    public ResponseEntity<CardImageResponse> generateCardImage(@RequestBody CardTextGenerateRequest request) {
+        return ResponseEntity.ok(contentService.generateImage(request));
     }
 
     @PostMapping("/generate-3d")
-    public Generate3DModelResponse generate3DModel(@RequestBody Generate3DModelRequest request) {
-        return contentService.generate3DModel(request);
-    }
-
-    @PostMapping("/generate-thumbnail")
-    public ThumbnailGenerationResponse generateThumbnail(@RequestBody ThumbnailGenerationRequest request) {
-        return contentService.generateThumbnail(request);
+    public ResponseEntity<Generate3DModelResponse> generate3DModel(@RequestBody Model3DUserRequest request) {
+        return ResponseEntity.ok(model3dContentService.generate3DModel(request));
     }
 }
-

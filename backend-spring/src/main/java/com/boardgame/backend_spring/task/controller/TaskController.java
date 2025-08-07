@@ -13,6 +13,12 @@ public class TaskController {
 
     private final TaskService taskService;
 
+    @PostMapping("/{projectId}/tasks/init")
+    public ResponseEntity<Void> initializeTasks(@PathVariable Long projectId) {
+        taskService.initializeDeveloperTaskList(projectId);
+        return ResponseEntity.ok().build();
+    }
+
     // [개발자] 개발 목록 조회 API
     @GetMapping("/{projectId}/tasks")
     public ResponseEntity<TaskListResponseDto> getTaskList(@PathVariable Long projectId) {

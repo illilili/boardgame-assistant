@@ -22,7 +22,13 @@ openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 # --- 2. OpenAI 프롬프트 생성 기능 ---
-def create_visual_prompt(item_name: str, item_description: str, art_style: str) -> Optional[str]:
+def create_visual_prompt(
+    item_name: str,
+    description: str,
+    theme: Optional[str],
+    component_info: Optional[str],
+    art_style: str
+) -> Optional[str]:
     """OpenAI를 사용해 3D 모델링을 위한 시각적 묘사 프롬프트를 생성합니다."""
     logging.info(f"[OpenAI] '{item_name}' 의 시각적 프롬프트 생성을 시작합니다.")
     try:
@@ -30,19 +36,21 @@ def create_visual_prompt(item_name: str, item_description: str, art_style: str) 
             "You are an expert board game component designer, crafting prompts for a text-to-3D generator. "
             "Your goal is to translate a game item's concept into a vivid and plausible 3D model description in English. "
             "The 'Game Item Name' you receive will often include the component type (e.g., 'Dark Knight Player Marker', 'Crystal Resource Token'). "
-            
             "**You MUST identify the component type from the name and adapt the 3D model's structure accordingly:** "
             "- If the name includes **'Player Marker'** or **'Unit Miniature'**, the model must have a **flat circular base** to stand on the board. "
             "- If the name includes **'Resource Token'**, it should be a **small, easy-to-handle, and possibly stackable object.** "
-            
             "Focus on a clear silhouette suitable for a tabletop game. The entire description must be under 500 characters."
         )
-        user_prompt = (
 
+        # 핵심 정보만 포함
+        full_description = f"{description}. Theme: {theme or 'None'}. Component Info: {component_info or 'N/A'}"
+
+        user_prompt = (
             f"Game Item Name: {item_name}\n"
-            f"Item's Role/Description: {item_description}\n"
+            f"Item's Role/Description: {full_description}\n"
             f"Art Style: {art_style}"
         )
+
         response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -56,6 +64,7 @@ def create_visual_prompt(item_name: str, item_description: str, art_style: str) 
     except Exception as e:
         logging.error(f"[OpenAI] 프롬프트 생성 실패: {e}")
         return None
+    
 # --- 3. Meshy AI 클라이언트 클래스  ---
 class MeshyClient:
     """Meshy AI API와의 통신을 담당하는 최적화된 클라이언트 클래스."""
@@ -89,7 +98,7 @@ class MeshyClient:
                 return None
 
 
-    # 👇 generate_model 함수를 다시 추가합니다.
+    # generate_model 함수를 다시 추가합니다.
     def generate_model(self, prompt: str, art_style: str = "realistic") -> Optional[Dict[str, Any]]:
         """[통합 기능] Preview와 Refine을 모두 실행하고 최종 결과 딕셔너리를 반환합니다."""
         # 1단계: Preview Task 생성
@@ -127,34 +136,3 @@ class MeshyClient:
             "preview_url": preview_result.get("model_urls", {}).get("glb"),
             "refined_url": refine_result.get("model_urls", {}).get("glb")
         }
-
-# --- 4. 메인 테스트 로직 ---
-if __name__ == '__main__':
-    meshy_client = MeshyClient(api_key=os.getenv("MESHY_API_KEY"))
-    
-    # 1. 'componentType'을 포함한 테스트 데이터 정의
-    test_component = {
-        "name": "암살자의 단검",
-        "description": "공격 시 상대방의 방어력을 1 무시합니다.",
-        "style": "realistic",
-        "componentType": "Player Marker" # <-- '플레이어 말' 유형이라고 명시
-    }
-    
-    # 2. 함수 호출 시 componentType 전달
-    visual_prompt = create_visual_prompt(
-        item_name=test_component["name"],
-        item_description=test_component["description"],
-        art_style=test_component["style"],
-    )
-
-
-    if visual_prompt:
-        # 이 부분에서 generate_model을 정상적으로 호출할 수 있습니다.
-        final_result = meshy_client.generate_model(prompt=visual_prompt, art_style=test_component["style"])
-        
-        if final_result:
-            logging.info("--- ✅ 최종 작업 성공 ---")
-            logging.info(f"  - 초안 모델 링크: {final_result.get('preview_url')}")
-            logging.info(f"  - 최종 모델 링크: {final_result.get('refined_url')}")
-        else:
-            logging.error("--- ❌ 최종 작업 실패 ---")
