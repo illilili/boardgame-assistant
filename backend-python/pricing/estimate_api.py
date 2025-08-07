@@ -35,6 +35,7 @@ def create_price_table_if_not_exists():
             CREATE TABLE IF NOT EXISTS price (
                 plan_id BIGINT PRIMARY KEY,
                 predicted_price FLOAT NOT NULL,
+                kor_price INT NOT NULL,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (plan_id) REFERENCES plan(plan_id) ON DELETE CASCADE
             ) ENGINE=InnoDB
@@ -43,6 +44,8 @@ def create_price_table_if_not_exists():
         cursor.close()
         conn.close()
         print("✅ price 테이블 확인/생성 완료")
+    except Exception as e:
+        print(f"❌ price 테이블 생성 실패: {str(e)}")
     except Exception as e:
         print(f"❌ price 테이블 생성 실패: {str(e)}")
 
@@ -155,17 +158,21 @@ Abstract Strategy, Action, Action Points, Action Queue, Adult, Adventure, Age of
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"모델 예측 실패: {str(e)}")
 
-    # 7. DB 저장 (수정된 컬럼명으로 upsert)
+    # 원화 가격 계산
+    kor_price = int(round(predicted_price * 1350))
+
+    # DB 저장
     try:
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO price (plan_id, predicted_price)
-            VALUES (%s, %s)
+            INSERT INTO price (plan_id, predicted_price, kor_price)
+            VALUES (%s, %s, %s)
             ON DUPLICATE KEY UPDATE
                 predicted_price = VALUES(predicted_price),
+                kor_price = VALUES(kor_price),
                 updated_at = CURRENT_TIMESTAMP
-        """, (req.planId, round(predicted_price, 2)))
+        """, (req.planId, round(predicted_price, 2), kor_price))
         conn.commit()
         cursor.close()
         conn.close()
@@ -175,5 +182,6 @@ Abstract Strategy, Action, Action Points, Action Queue, Adult, Adventure, Age of
     # 8. 결과 반환
     return {
         "planId": req.planId,
-        "predicted_price": round(predicted_price, 2)
+        "predicted_price": f"${round(predicted_price, 2):.2f}",
+        "kor_price": f"{kor_price:,}원"
     }
