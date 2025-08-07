@@ -8,16 +8,15 @@ import pandas as pd
 import numpy as np
 import json
 from dotenv import load_dotenv
-import pickle
 from openai import OpenAI
 
-# ENV 로딩 및 OpenAI 키 설정
+# ✅ ENV 로딩 및 OpenAI 키 설정
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 router = APIRouter(prefix="/api/ai-pricing", tags=["AI Pricing"])
 
-# DB 설정
+# ✅ DB 설정
 DB_CONFIG = {
     "host": "localhost",
     "port": 3306,
@@ -27,9 +26,32 @@ DB_CONFIG = {
     "charset": "utf8mb4"
 }
 
-# 모델 로딩
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "models", "price_predictor.pkl")
-DICT_PATH = os.path.join(os.path.dirname(__file__), "models", "feature_avg_dicts.pkl")
+# ✅ 테이블 자동 생성 함수
+def create_price_table_if_not_exists():
+    try:
+        conn = pymysql.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS price (
+                planId INT PRIMARY KEY,
+                predicted_price FLOAT NOT NULL,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (planId) REFERENCES plan(planId) ON DELETE CASCADE
+            )
+        """)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        print("✅ price 테이블 확인/생성 완료")
+    except Exception as e:
+        print(f"❌ price 테이블 생성 실패: {str(e)}")
+
+# ✅ 테이블 확인 실행
+create_price_table_if_not_exists()
+
+# ✅ 모델 로딩
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "price_predictor.pkl")
+DICT_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "feature_avg_dicts.pkl")
 
 if not os.path.exists(MODEL_PATH) or not os.path.exists(DICT_PATH):
     raise RuntimeError("❌ 모델 또는 평균값 파일이 없습니다.")
@@ -37,13 +59,14 @@ if not os.path.exists(MODEL_PATH) or not os.path.exists(DICT_PATH):
 model = joblib.load(MODEL_PATH)
 feature_avg_dicts = joblib.load(DICT_PATH)
 
-# 요청 스키마
+# ✅ 요청 스키마
 class PlanPriceRequest(BaseModel):
     planId: int
 
+# ✅ 가격 예측 API
 @router.post("/estimate")
 async def estimate_price_from_ai(req: PlanPriceRequest):
-    # 1. DB에서 기획서 텍스트(planContent) 가져오기
+    # 1. DB에서 기획서 가져오기
     try:
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
@@ -59,9 +82,8 @@ async def estimate_price_from_ai(req: PlanPriceRequest):
     
     plan_text = row[0]
 
-    # 2. GPT-3.5로 정보 추출 요청
+    # 2. GPT 프롬프트 구성
     prompt = f"""
-
 너는 보드게임 기획서를 분석하는 도우미야.
 가격 산정 모델은 영어를 기반으로 학습되어 있기 때문에,
 category는 아래 제공된 121개의 영어 카테고리 목록 중에서만 선택해서 출력해줘.
@@ -94,24 +116,20 @@ Abstract Strategy, Action, Action Points, Action Queue, Adult, Adventure, Age of
 }}
     """.strip()
 
+    # 3. GPT 요청
     try:
-        from openai import OpenAI
-
         client = OpenAI()
-
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2
         )
-
-        gpt_output = response.choices[0].message.content
         gpt_output = response.choices[0].message.content
         info = json.loads(gpt_output)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenAI 요청 실패: {str(e)}")
 
-    # 3. 추출된 정보 파싱
+    # 4. 정보 파싱
     try:
         categories = info.get("category", [])
         types = info.get("type", [])
@@ -122,44 +140,56 @@ Abstract Strategy, Action, Action Points, Action Queue, Adult, Adventure, Age of
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"GPT 응답 파싱 실패: {str(e)}")
 
-    # 4. 평균값 계산
+    # 5. 평균값 계산
     cat_avg = feature_avg_dicts['cat_avg']
     type_avg = feature_avg_dicts['type_avg']
+    category_avg_price = np.mean([cat_avg[c] for c in categories if c in cat_avg]) if categories else 0
+    type_avg_price = np.mean([type_avg[t] for t in types if t in type_avg]) if types else 0
 
-    cat_prices = [cat_avg[c] for c in categories if c in cat_avg]
-    category_avg_price = np.mean(cat_prices) if cat_prices else 0
-
-    type_prices = [type_avg[t] for t in types if t in type_avg]
-    type_avg_price = np.mean(type_prices) if type_prices else 0
-
-    # 5. 모델 입력 생성
+    # 6. 모델 입력 및 예측
     X_input = pd.DataFrame([[category_avg_price, type_avg_price, min_age, avg_weight, component_count]],
-                           columns=['category_avg_price', 'type_avg_price', 'min_age', 'average_weight', 'component_count']
-    ).fillna(-1)
+        columns=['category_avg_price', 'type_avg_price', 'min_age', 'average_weight', 'component_count']).fillna(-1)
 
-    # 6. 예측
     try:
         predicted_price = model.predict(X_input)[0]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"모델 예측 실패: {str(e)}")
 
-# 테스트 용 출력
+    # 7. DB 저장 (price 테이블에 upsert)
+    try:
+        conn = pymysql.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO price (planId, predicted_price)
+            VALUES (%s, %s)
+            ON DUPLICATE KEY UPDATE
+                predicted_price = VALUES(predicted_price),
+                updated_at = CURRENT_TIMESTAMP
+        """, (req.planId, round(predicted_price, 2)))
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"예측 가격 저장 실패: {str(e)}")
+
+    # 8. 응답 반환
+    #테스트용
+    # return {
+    #     "planId": req.planId,
+    #     "extracted_info": {
+    #         "category": categories,
+    #         "type": types,
+    #         "min_age": min_age,
+    #         "average_weight": avg_weight,
+    #         "component": components,
+    #         "component_count": component_count
+    #     },
+    #     "category_avg_price": round(category_avg_price, 2),
+    #     "type_avg_price": round(type_avg_price, 2),
+    #     "predicted_price": round(predicted_price, 2)
+    # }
+
     return {
         "planId": req.planId,
-        "extracted_info": {
-            "category": categories,
-            "type": types,
-            "min_age": min_age,
-            "average_weight": avg_weight,
-            "component": components,
-            "component_count": component_count
-        },
-        "category_avg_price": round(category_avg_price, 2),
-        "type_avg_price": round(type_avg_price, 2),
         "predicted_price": round(predicted_price, 2)
     }
-
-#     return {
-#     "planId": req.planId,
-#     "predicted_price": round(predicted_price, 2)
-# }

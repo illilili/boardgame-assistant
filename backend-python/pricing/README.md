@@ -38,10 +38,19 @@ component_count: 0.010
 
 
 
-
+python -m venv venv
+source venv/bin/activate
 
 pip install fastapi uvicorn python-dotenv openai pymysql pandas scikit-learn joblib
-uvicorn pricing.api:app --reload
+pip install fastapi uvicorn
+pip install pymysql
+pip install openai
+pip install sqlalchemy pymysql 
+pip install python-dotenv 
+pip install fastapi[all] 
+pip install openai 
+pip install sqlalchemy 
+pip install sqlalchemy openai python-dotenv pymysql
 
 
 docker run -d --name mariadb -e MYSQL_ROOT_PASSWORD=123123d -e MYSQL_DATABASE=boardgame -p 3306:3306 mariadb
@@ -54,3 +63,5 @@ CREATE TABLE plan (
     planContent TEXT
 );
 SELECT * FROM plan;
+
+uvicorn pricing.api:app --reload
