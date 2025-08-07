@@ -26,18 +26,18 @@ DB_CONFIG = {
     "charset": "utf8mb4"
 }
 
-# ✅ 테이블 자동 생성 함수
+# ✅ 테이블 자동 생성 함수 (수정된 외래키 컬럼명 포함)
 def create_price_table_if_not_exists():
     try:
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS price (
-                planId INT PRIMARY KEY,
+                plan_id BIGINT PRIMARY KEY,
                 predicted_price FLOAT NOT NULL,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                FOREIGN KEY (planId) REFERENCES plan(planId) ON DELETE CASCADE
-            )
+                FOREIGN KEY (plan_id) REFERENCES plan(plan_id) ON DELETE CASCADE
+            ) ENGINE=InnoDB
         """)
         conn.commit()
         cursor.close()
@@ -70,7 +70,7 @@ async def estimate_price_from_ai(req: PlanPriceRequest):
     try:
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
-        cursor.execute("SELECT planContent FROM plan WHERE planId = %s", (req.planId,))
+        cursor.execute("SELECT current_content FROM plan WHERE plan_id = %s", (req.planId,))
         row = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -155,12 +155,12 @@ Abstract Strategy, Action, Action Points, Action Queue, Adult, Adventure, Age of
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"모델 예측 실패: {str(e)}")
 
-    # 7. DB 저장 (price 테이블에 upsert)
+    # 7. DB 저장 (수정된 컬럼명으로 upsert)
     try:
         conn = pymysql.connect(**DB_CONFIG)
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO price (planId, predicted_price)
+            INSERT INTO price (plan_id, predicted_price)
             VALUES (%s, %s)
             ON DUPLICATE KEY UPDATE
                 predicted_price = VALUES(predicted_price),
@@ -172,23 +172,7 @@ Abstract Strategy, Action, Action Points, Action Queue, Adult, Adventure, Age of
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"예측 가격 저장 실패: {str(e)}")
 
-    # 8. 응답 반환
-    #테스트용
-    # return {
-    #     "planId": req.planId,
-    #     "extracted_info": {
-    #         "category": categories,
-    #         "type": types,
-    #         "min_age": min_age,
-    #         "average_weight": avg_weight,
-    #         "component": components,
-    #         "component_count": component_count
-    #     },
-    #     "category_avg_price": round(category_avg_price, 2),
-    #     "type_avg_price": round(type_avg_price, 2),
-    #     "predicted_price": round(predicted_price, 2)
-    # }
-
+    # 8. 결과 반환
     return {
         "planId": req.planId,
         "predicted_price": round(predicted_price, 2)

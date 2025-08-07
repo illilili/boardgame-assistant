@@ -20,14 +20,17 @@ public class S3Uploader {
 
     private final S3Client s3Client;
     private final String bucket;
-    private final String region; // ← ★ 요걸 선언 안 했던 거야!
+    private final String region; 
 
     public S3Uploader() {
-        Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+            Dotenv dotenv = Dotenv.configure()
+            .directory("/workspace/boardgame-assistant/backend-spring") // 정확한 경로 입력
+            .ignoreIfMissing()
+            .load();
 
         String accessKey = dotenv.get("AWS_ACCESS_KEY_ID");
         String secretKey = dotenv.get("AWS_SECRET_ACCESS_KEY");
-        this.region = dotenv.get("AWS_REGION"); // ← ★ 초기화도 해줘야 해
+        this.region = dotenv.get("AWS_REGION");
         this.bucket = dotenv.get("AWS_S3_BUCKET");
 
         this.s3Client = S3Client.builder()
