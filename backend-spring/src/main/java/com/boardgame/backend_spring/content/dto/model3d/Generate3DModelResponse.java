@@ -1,4 +1,6 @@
 package com.boardgame.backend_spring.content.dto.model3d;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,9 +11,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Generate3DModelResponse {
+    @JsonProperty("contentId")
     private Long contentId;
+
     private String name;
+
+    @JsonProperty("preview_url")
     private String previewUrl;
+
+    @JsonProperty("refined_url")
     private String refinedUrl;
+
     private String status;
 }

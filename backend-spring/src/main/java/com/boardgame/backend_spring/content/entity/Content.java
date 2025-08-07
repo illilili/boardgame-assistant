@@ -32,6 +32,8 @@ public class Content {
     private String name;         // 콘텐츠 이름 (예: 카드 이름)
     private String effect;       // 카드 효과 등
     private String description;  // 콘텐츠 설명
+    @Lob
+    @Column(name = "content_data", columnDefinition = "LONGTEXT")
     private String contentData;        // AI 생성 텍스트 등
 
     @Column(name = "created_at")
