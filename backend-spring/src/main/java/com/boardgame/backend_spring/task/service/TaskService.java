@@ -67,17 +67,6 @@ public class TaskService {
             SubTask scriptTask = makeFixedSubTask("text", "영상 설명 스크립트", script);
             scriptTask = subTaskRepository.save(scriptTask);
             script.setSubTasks(List.of(scriptTask));
-
-            // 3. 썸네일 이미지
-            Component thumbnail = new Component();
-            thumbnail.setBoardgameConcept(concept);
-            thumbnail.setType("Image");
-            thumbnail.setTitle("썸네일 이미지");
-            thumbnail = componentRepository.save(thumbnail);
-
-            SubTask thumbnailTask = makeFixedSubTask("image", "썸네일 이미지", thumbnail);
-            thumbnailTask = subTaskRepository.save(thumbnailTask);
-            thumbnail.setSubTasks(List.of(thumbnailTask));
         }
     }
 
