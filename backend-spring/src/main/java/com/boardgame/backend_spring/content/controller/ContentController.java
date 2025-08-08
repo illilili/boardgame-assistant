@@ -3,6 +3,7 @@ package com.boardgame.backend_spring.content.controller;
 import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.SubTaskRepository;
 import com.boardgame.backend_spring.component.service.ComponentStatusService; // ★ 추가
+import com.boardgame.backend_spring.content.dto.ContentDetailResponse;
 import com.boardgame.backend_spring.content.dto.card.CardImageResponse;
 import com.boardgame.backend_spring.content.dto.card.CardTextGenerateRequest;
 import com.boardgame.backend_spring.content.dto.card.CardTextResponse;
@@ -40,6 +41,13 @@ public class ContentController {
     private final S3Uploader s3Uploader;
 
     private final ComponentStatusService componentStatusService;
+
+    @GetMapping("/{contentId}")
+    public ResponseEntity<ContentDetailResponse> getContent(@PathVariable Long contentId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 콘텐츠입니다."));
+        return ResponseEntity.ok(ContentDetailResponse.from(content));
+    }
 
     /**
      * 파일 업로드(룰북/이미지/썸네일 등) → 콘텐츠 저장 + SubTask=COMPLETED → 컴포넌트 상태 재계산
