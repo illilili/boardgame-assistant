@@ -12,6 +12,7 @@ import com.boardgame.backend_spring.content.service.card.CardContentService;
 import com.boardgame.backend_spring.content.service.PythonApiService;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
+import com.boardgame.backend_spring.component.service.ComponentStatusService;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class CardContentServiceImpl implements CardContentService {
     private final ComponentRepository componentRepository;
     private final PlanRepository planRepository;
     private final SubTaskRepository subTaskRepository;
+    private final ComponentStatusService componentStatusService;
 
     // 공통 메서드: 콘텐츠, 플랜 정보 가져오기
     private Plan getPlanFromContentId(Long contentId) {
@@ -47,6 +49,7 @@ public class CardContentServiceImpl implements CardContentService {
                 .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
         subTask.setStatus("IN_PROGRESS");
         subTaskRepository.save(subTask);
+        componentStatusService.recalcAndSave(subTask.getComponent());
 
         CardTextRequest.Card card = new CardTextRequest.Card();
         card.setContentId(request.getContentId());
@@ -82,6 +85,7 @@ public class CardContentServiceImpl implements CardContentService {
                 .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
         subTask.setStatus("IN_PROGRESS");
         subTaskRepository.save(subTask);
+        componentStatusService.recalcAndSave(subTask.getComponent());
 
         CardTextRequest.Card card = new CardTextRequest.Card();
         card.setContentId(request.getContentId());

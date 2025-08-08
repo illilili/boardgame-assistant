@@ -15,6 +15,7 @@ import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import com.boardgame.backend_spring.task.dto.SubTaskDto;
 import com.boardgame.backend_spring.task.dto.TaskComponentDto;
 import com.boardgame.backend_spring.task.dto.TaskListResponseDto;
+import com.boardgame.backend_spring.component.enumtype.ComponentStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -97,8 +98,7 @@ public class TaskService {
 
     private TaskComponentDto toTaskComponentDto(Component component) {
         List<SubTask> subTasks = component.getSubTasks();
-
-        String statusSummary = calculateStatusSummary(subTasks);
+        String statusSummary = calculateStatusSummary(component);
 
         return TaskComponentDto.builder()
                 .componentId(component.getComponentId())
@@ -132,7 +132,7 @@ public class TaskService {
         content = contentRepository.save(content);
 
         SubTask task = new SubTask();
-        task.setContentId(content.getId());
+        task.setContentId(content.getContentId());
         task.setType(type);
         task.setStatus("NOT_STARTED");
         task.setComponent(component);
@@ -154,14 +154,19 @@ public class TaskService {
         };
     }
 
-    private String calculateStatusSummary(List<SubTask> subTasks) {
-        boolean anyInProgress = subTasks.stream().anyMatch(t -> t.getStatus().equals("IN_PROGRESS"));
-        boolean allSubmitted = subTasks.stream().allMatch(t -> t.getStatus().equals("SUBMITTED") || t.getStatus().equals("APPROVED"));
-        boolean allNotStarted = subTasks.stream().allMatch(t -> t.getStatus().equals("NOT_STARTED"));
+    private String calculateStatusSummary(Component component) {
+        ComponentStatus status = component.getStatus();
+        if (status == null) {
+            return "작업 대기"; // 기본값
+        }
 
-        if (anyInProgress) return "작업 중";
-        if (allSubmitted) return "제출 완료";
-        if (allNotStarted) return "작업 대기";
-        return "진행 중";
+        return switch (status) {
+            case WAITING -> "작업 대기";
+            case IN_PROGRESS -> "작업 중";
+            case READY_TO_SUBMIT -> "작업 완료";   // 제출 대기
+            case PENDING_REVIEW -> "제출 완료";    // 승인 대기
+            case APPROVED -> "승인";
+            case REJECTED -> "반려";
+        };
     }
 }

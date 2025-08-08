@@ -9,6 +9,7 @@ import com.boardgame.backend_spring.content.entity.Content;
 import com.boardgame.backend_spring.content.repository.ContentRepository;
 import com.boardgame.backend_spring.content.service.PythonApiService;
 import com.boardgame.backend_spring.content.service.rulebook.RulebookContentService;
+import com.boardgame.backend_spring.component.service.ComponentStatusService;
 import com.boardgame.backend_spring.component.repository.ComponentRepository;
 import com.boardgame.backend_spring.content.dto.rulebook.ComponentDto;
 import com.boardgame.backend_spring.plan.entity.Plan;
@@ -32,6 +33,7 @@ public class RulebookContentServiceImpl implements RulebookContentService {
     private final GameRuleRepository gameRuleRepository;
     private final ComponentRepository componentRepository;
     private final SubTaskRepository subTaskRepository;
+    private final ComponentStatusService componentStatusService;
 
     @Override
     public RulebookGenerateResponse generateRulebook(RulebookGenerateRequest request) {
@@ -39,10 +41,11 @@ public class RulebookContentServiceImpl implements RulebookContentService {
         Content content = contentRepository.findById(request.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
 
-        SubTask subTask = subTaskRepository.findByContentId(content.getId())
+        SubTask subTask = subTaskRepository.findByContentId(content.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 콘텐츠에 대한 SubTask가 존재하지 않습니다."));
         subTask.setStatus("IN_PROGRESS");
         subTaskRepository.save(subTask);
+        componentStatusService.recalcAndSave(subTask.getComponent());
 
         Component component = content.getComponent();
         BoardgameConcept concept = component.getBoardgameConcept();
@@ -62,7 +65,7 @@ public class RulebookContentServiceImpl implements RulebookContentService {
         // 3. FastAPI로 보낼 DTO 구성
         RulebookRequest pythonRequest = new RulebookRequest();
         pythonRequest.setPlanId(plan.getPlanId());
-        pythonRequest.setContentId(content.getId());
+        pythonRequest.setContentId(content.getContentId());
         pythonRequest.setTitle(concept.getProject().getName());
         pythonRequest.setTheme(concept.getTheme());
         pythonRequest.setStoryline(concept.getStoryline());

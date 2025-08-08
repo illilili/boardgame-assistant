@@ -20,7 +20,8 @@ public class Content {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "content_id") // 컬럼명 명시
+    private Long contentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "component_id")
