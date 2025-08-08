@@ -12,5 +12,4 @@ import lombok.Setter;
 public class ContentSaveRequest {
     private Long contentId;
     private String note;    // optional
-    private String savedBy; // optional
 }

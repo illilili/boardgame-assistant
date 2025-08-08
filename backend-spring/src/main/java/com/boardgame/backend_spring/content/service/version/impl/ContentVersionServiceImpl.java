@@ -35,7 +35,6 @@ public class ContentVersionServiceImpl implements ContentVersionService {
         v.setContent(content);                       // ← setContent 사용 가능
         v.setVersionNo(nextNo);
         v.setNote(request.getNote());
-        v.setSavedBy(request.getSavedBy());
         v.setCreatedAt(LocalDateTime.now());
         v.setData(content.getContentData());         // 현재 콘텐츠 내용을 스냅샷으로
 
@@ -47,7 +46,6 @@ public class ContentVersionServiceImpl implements ContentVersionService {
                 .contentId(content.getContentId())          // ← getId()로 변경
                 .versionNo(saved.getVersionNo())
                 .note(saved.getNote())
-                .savedBy(saved.getSavedBy())
                 .createdAt(saved.getCreatedAt())
                 .build();
     }
@@ -64,7 +62,6 @@ public class ContentVersionServiceImpl implements ContentVersionService {
                         .versionId(v.getVersionId())
                         .versionNo(v.getVersionNo())
                         .note(v.getNote())
-                        .savedBy(v.getSavedBy())
                         .createdAt(v.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());

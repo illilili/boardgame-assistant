@@ -12,6 +12,5 @@ public class ContentVersionSummary {
     private Long versionId;
     private Integer versionNo;
     private String note;
-    private String savedBy;
     private LocalDateTime createdAt;
 }

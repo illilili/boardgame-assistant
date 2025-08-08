@@ -13,6 +13,5 @@ public class ContentSaveResponse {
     private Long contentId;
     private Integer versionNo;
     private String note;
-    private String savedBy;
     private LocalDateTime createdAt;
 }

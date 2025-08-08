@@ -42,7 +42,6 @@ public class ContentVersion {
 
     /** 메타데이터(옵션) */
     private String note;        // 저장 사유/메모
-    private String savedBy;     // 저장한 유저 식별자(옵션)
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
