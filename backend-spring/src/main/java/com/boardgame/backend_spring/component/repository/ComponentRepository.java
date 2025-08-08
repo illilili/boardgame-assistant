@@ -11,4 +11,8 @@ public interface ComponentRepository extends JpaRepository<Component, Long> {
     List<Component> findByBoardgameConcept(BoardgameConcept boardgameConcept);
 
     void deleteAllByBoardgameConcept(BoardgameConcept boardgameConcept);
+
+    boolean existsByBoardgameConceptAndTitle(BoardgameConcept concept, String title);
+
+
 }

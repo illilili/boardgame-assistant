@@ -27,7 +27,7 @@ public class User {
     private String company;
 
     public enum Role {
-        PLANNER, DEVELOPER, PUBLISHER, ADMIN
+        USER, PLANNER, DEVELOPER, PUBLISHER, ADMIN
     }
 
     @ManyToMany

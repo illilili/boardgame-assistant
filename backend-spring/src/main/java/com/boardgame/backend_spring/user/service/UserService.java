@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.boardgame.backend_spring.project.dto.ProjectSummaryDto;
 import com.boardgame.backend_spring.user.dto.MyPageInfoResponseDto;
+import com.boardgame.backend_spring.user.dto.DeveloperSummaryDto;
 import com.boardgame.backend_spring.user.dto.UserCreateRequestDto;
 import com.boardgame.backend_spring.user.dto.UserResponseDto;
 import com.boardgame.backend_spring.user.entity.User;
@@ -50,8 +51,14 @@ public class UserService {
                 .userName(user.getName())
                 .email(user.getEmail())
                 .company(user.getCompany())
-                .role(user.getRole() != null ? user.getRole().name() : "UNKNOWN")
+                .role(user.getRole() != null ? user.getRole().name() : "USER")
                 .participatingProjects(projects)
                 .build();
+    }
+    // 개발자 목록 조회
+    public List<DeveloperSummaryDto> getAllDevelopers() {
+        return userRepository.findAllByRole(User.Role.DEVELOPER).stream()
+                .map(DeveloperSummaryDto::from)
+                .collect(Collectors.toList());
     }
 }
