@@ -1,5 +1,7 @@
 package com.boardgame.backend_spring.global.error;
 
+import org.springframework.http.HttpStatus;
+
 public class CustomException extends RuntimeException {
     private final ErrorCode errorCode;
 
@@ -10,5 +12,10 @@ public class CustomException extends RuntimeException {
 
     public ErrorCode getErrorCode() {
         return errorCode;
+    }
+
+    // 에러 상태 코드도 반환하도록 추가
+    public HttpStatus getStatus() {
+        return errorCode.getStatus();
     }
 }

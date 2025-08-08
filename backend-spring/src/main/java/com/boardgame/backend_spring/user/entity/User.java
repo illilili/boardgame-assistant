@@ -37,4 +37,17 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "project_id")
     )
     private List<Project> projects;
+
+    // 로그인 시도 횟수
+    @Builder.Default
+    @Column(name = "failed_login_count")
+    private Integer failedLoginCount = 0;
+
+    @Builder.Default
+    @Column(name = "account_locked")
+    private Boolean accountLocked = false;
+
+    public boolean isAccountLocked() {
+        return Boolean.TRUE.equals(accountLocked);
+    }
 }

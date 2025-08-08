@@ -20,6 +20,10 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public SignupResponse signup(SignupRequest request) {
+        if (!request.isAgreedToTerms()) {
+            throw new CustomException(ErrorCode.TERMS_NOT_AGREED);
+        }
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
@@ -40,13 +44,28 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        if (user.isAccountLocked()) {
+            throw new CustomException(ErrorCode.ACCOUNT_LOCKED);
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            Integer failedCount = user.getFailedLoginCount();  // null일 수 있음
+            user.setFailedLoginCount((failedCount != null ? failedCount : 0) + 1);  // null-safe 증가
+
+            if (user.getFailedLoginCount() >= 5) {
+                user.setAccountLocked(true);
+            }
+
+            userRepository.save(user);
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        // JWT 생성
+        // 로그인 성공 시 실패 횟수 초기화
+        user.setFailedLoginCount(0);
+        userRepository.save(user);
+
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().name());
-        String refreshToken = "not-implemented"; // refresh는 나중에
+        String refreshToken = "not-implemented";
 
         return new LoginResponse(accessToken, refreshToken);
     }
