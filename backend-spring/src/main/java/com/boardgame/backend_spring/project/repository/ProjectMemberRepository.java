@@ -1,3 +1,4 @@
+// `ProjectMemberRepository.java`
 package com.boardgame.backend_spring.project.repository;
 
 import com.boardgame.backend_spring.project.entity.Project;
@@ -12,5 +13,4 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Lo
     boolean existsByProjectAndUser(Project project, User user);
 
     List<ProjectMember> findAllByUser(User user);
-
 }

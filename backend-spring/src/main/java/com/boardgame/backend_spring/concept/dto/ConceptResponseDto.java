@@ -1,3 +1,4 @@
+// `ConceptResponseDto.java`
 package com.boardgame.backend_spring.concept.dto;
 
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
@@ -5,7 +6,6 @@ import lombok.Data;
 
 @Data
 public class ConceptResponseDto {
-    // [수정] int -> long 으로 변경
     private long conceptId;
     private long planId;
     private String theme;
@@ -16,7 +16,6 @@ public class ConceptResponseDto {
     private String storyline;
     private String createdAt;
 
-    // 목록 조회를 위한 Simple DTO는 변경할 필요 없습니다.
     @Data
     public static class Simple {
         private Long conceptId;

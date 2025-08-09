@@ -1,9 +1,11 @@
+// `ConceptRequestDto.java`
 package com.boardgame.backend_spring.concept.dto;
 
 import lombok.Data;
 
-@Data // Getter, Setter, toString 등을 자동 생성
+@Data
 public class ConceptRequestDto {
+    private Long projectId; // 🚨 projectId 필드 추가
     private String theme;
     private String playerCount;
     private double averageWeight;

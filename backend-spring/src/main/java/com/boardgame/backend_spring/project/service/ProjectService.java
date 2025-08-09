@@ -1,3 +1,4 @@
+// `ProjectService.java`
 package com.boardgame.backend_spring.project.service;
 
 import com.boardgame.backend_spring.plan.entity.PlanStatus;
@@ -11,8 +12,11 @@ import com.boardgame.backend_spring.user.entity.User;
 import com.boardgame.backend_spring.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +27,19 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final PlanRepository planRepository;
 
+    // 🚨 [신규] 로그인 사용자가 참여한 프로젝트 목록 조회
+    @Transactional(readOnly = true)
+    public List<ProjectSummaryDto> getProjectsByCreator(User user) {
+        List<ProjectMember> members = projectMemberRepository.findAllByUser(user);
+
+        return members.stream()
+                .map(ProjectMember::getProject)
+                .map(ProjectSummaryDto::from)
+                .collect(Collectors.toList());
+    }
+
     // 프로젝트 생성 - 로그인 사용자 기준 (PLANNER만)
+    @Transactional
     public ProjectCreateResponseDto createProject(ProjectCreateRequestDto dto, User user) {
         if (user.getRole() != User.Role.PLANNER) {
             throw new RuntimeException("기획자만 프로젝트를 생성할 수 있습니다.");

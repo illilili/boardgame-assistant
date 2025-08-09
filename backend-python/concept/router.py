@@ -15,57 +15,43 @@ from pydantic import BaseModel, Field
 from typing import Dict, Any
 
 # --- 1. 초기 설정 및 환경 변수 로드 ---
-# .env 파일에서 환경 변수를 로드합니다.
 load_dotenv()
-
-# OpenAI API 키를 환경 변수에 설정합니다.
-# 이 코드는 서버가 시작될 때 한 번만 실행됩니다.
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise ValueError("OPENAI_API_KEY 환경 변수를 찾을 수 없습니다. .env 파일을 확인해주세요.")
 os.environ["OPENAI_API_KEY"] = api_key
 
-# FastAPI 라우터를 생성합니다.
 router = APIRouter(
     prefix="/api/plans",
     tags=["Concept API"]
 )
 
-# 상수 정의
 FAISS_INDEX_PATH = "faiss_boardgame_index"
 RAG_DATA_PATH = "./boardgame_detaildata_1-101.json"
-
 
 # --- 2. RAG 데이터 및 FAISS 인덱스 설정 ---
 def setup_rag_retriever():
     """
     서버 시작 시 RAG 검색기(Retriever)를 설정하는 함수입니다.
-    - 미리 저장된 FAISS 인덱스가 있으면 로드합니다.
-    - 없으면, JSON 데이터로부터 인덱스를 생성하고 저장합니다.
     """
     try:
         embeddings = OpenAIEmbeddings()
-        # 저장된 인덱스가 있는지 확인하고 로드
         if os.path.exists(FAISS_INDEX_PATH):
             print(f"'{FAISS_INDEX_PATH}'에서 기존 FAISS 인덱스를 로드합니다.")
             vectorstore = FAISS.load_local(FAISS_INDEX_PATH, embeddings, allow_dangerous_deserialization=True)
             return vectorstore.as_retriever(search_kwargs={"k": 5})
 
-        # 인덱스가 없으면 데이터 파일 로드
         print(f"'{FAISS_INDEX_PATH}'를 찾을 수 없습니다. '{RAG_DATA_PATH}'에서 새 인덱스를 생성합니다.")
         df = pd.read_json(RAG_DATA_PATH)
         if df.empty:
             print("Warning: RAG 데이터 파일이 비어있습니다.")
             return None
 
-        # 데이터 전처리
         df_processed = df[['게임ID', '이름', '설명', '최소인원', '최대인원', '난이도', '카테고리', '메커니즘']].copy()
         df_processed.rename(columns={'카테고리': '테마', '최소인원': 'min_players', '최대인원': 'max_players', '난이도': 'difficulty_weight', '메커니즘': 'mechanics_list'}, inplace=True)
-        # NaN 값을 빈 문자열로 대체하여 오류 방지
         for col in ['테마', 'mechanics_list', '설명']:
             df_processed[col] = df_processed[col].fillna('')
 
-        # FAISS 인덱스 생성을 위한 문서 포맷팅
         documents = [
             (f"게임 이름: {row['이름']}\n설명: {row['설명']}\n테마: {row['테마']}\n"
              f"플레이 인원: {row['min_players']}~{row['max_players']}명\n난이도: {row.get('difficulty_weight', 0.0):.2f}\n"
@@ -73,7 +59,6 @@ def setup_rag_retriever():
             for index, row in df_processed.iterrows()
         ]
 
-        # 벡터 스토어 생성 및 로컬에 저장
         vectorstore = FAISS.from_texts(documents, embeddings)
         vectorstore.save_local(FAISS_INDEX_PATH)
         print(f"새로운 FAISS 인덱스를 생성하여 '{FAISS_INDEX_PATH}'에 저장했습니다.")
@@ -87,16 +72,11 @@ def setup_rag_retriever():
         print(f"Warning: RAG 설정 중 오류 발생. RAG 기능이 비활성화됩니다. 오류: {e}")
         return None
 
-# 서버 시작 시 RAG 검색기 설정
 retriever = setup_rag_retriever()
 
-
 # --- 3. LLM 및 프롬프트 정의 ---
-
-# 공통 LLM 인스턴스
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0.8)
 
-# 컨셉 생성 프롬프트
 generate_concept_prompt = PromptTemplate(
     input_variables=["theme", "playerCount", "averageWeight", "retrieved_games"],
     template=(
@@ -129,7 +109,6 @@ generate_concept_prompt = PromptTemplate(
 )
 concept_generation_chain = LLMChain(llm=llm, prompt=generate_concept_prompt)
 
-# 컨셉 재생성 프롬프트
 regenerate_concept_prompt = PromptTemplate(
     input_variables=["original_concept_json", "feedback"],
     template=(
@@ -161,11 +140,9 @@ regenerate_concept_prompt = PromptTemplate(
 )
 regenerate_concept_chain = LLMChain(llm=llm, prompt=regenerate_concept_prompt)
 
-
 # --- 4. Pydantic 모델 정의 ---
-# API의 요청 및 응답 데이터 형식을 정의합니다.
-
 class GenerateConceptRequest(BaseModel):
+    projectId: int = Field(..., example=1)
     theme: str = Field(..., example="우주 탐험")
     playerCount: str = Field(..., example="2~4명")
     averageWeight: float = Field(..., example=3.2, description="1.0(가벼움) ~ 5.0(무거움)")
@@ -196,16 +173,12 @@ class ConceptResponse(BaseModel):
     storyline: str
     createdAt: str
 
-
 # --- 5. 헬퍼 함수 ---
 def _parse_concept_from_llm(response_text: str) -> Dict[str, Any]:
-    """LLM의 응답 텍스트에서 JSON 객체를 파싱하는 헬퍼 함수."""
-    # ```json ... ``` 코드 블록 패턴을 찾습니다.
     match = re.search(r"```json\s*(\{.*?\})\s*```", response_text, re.DOTALL)
     if match:
         json_str = match.group(1)
     else:
-        # 코드 블록이 없으면, 텍스트 전체가 JSON이라고 가정합니다.
         json_str = response_text
 
     try:
@@ -214,15 +187,9 @@ def _parse_concept_from_llm(response_text: str) -> Dict[str, Any]:
         print(f"JSON 파싱 실패. 원본 텍스트: {response_text}")
         raise ValueError("LLM 응답에서 유효한 JSON을 찾을 수 없습니다.")
 
-
 # --- 6. API 엔드포인트 정의 ---
-
 @router.post("/generate-concept", response_model=ConceptResponse, summary="새로운 보드게임 컨셉 생성")
 async def generate_concept_api(request: GenerateConceptRequest):
-    """
-    사용자 입력(테마, 인원, 난이도)과 유사 게임 데이터를 바탕으로
-    완전히 새로운 보드게임 컨셉을 생성합니다.
-    """
     retrieved_games_info = "유사 게임 정보를 찾을 수 없음."
     if retriever:
         try:
@@ -243,11 +210,10 @@ async def generate_concept_api(request: GenerateConceptRequest):
         response = concept_generation_chain.invoke(llm_input)
         concept_data = _parse_concept_from_llm(response['text'])
 
-        # Python 코드에서 ID와 생성 시간을 부여 (데이터 무결성 보장)
         concept_data["conceptId"] = np.random.randint(1000, 9999)
-        concept_data["planId"] = np.random.randint(1000, 9999) # 실제 서비스에서는 DB 시퀀스 사용
+        concept_data["planId"] = np.random.randint(1000, 9999)
         concept_data["createdAt"] = datetime.datetime.now().isoformat(timespec='seconds')
-
+        
         return concept_data
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
@@ -255,15 +221,9 @@ async def generate_concept_api(request: GenerateConceptRequest):
         print(f"컨셉 생성 중 서버 오류: {e}")
         raise HTTPException(status_code=500, detail=f"LLM 체인 실행 중 오류 발생: {str(e)}")
 
-
 @router.post("/regenerate-concept", response_model=ConceptResponse, summary="기존 보드게임 컨셉 재생성")
 async def regenerate_concept_api(request: RegenerateConceptRequest):
-    """
-    기존 컨셉과 사용자 피드백을 바탕으로 컨셉을 수정 및 발전시켜
-    새로운 버전의 컨셉을 생성합니다.
-    """
     try:
-        # Pydantic 모델을 JSON 문자열로 변환 (ensure_ascii=False로 한글 유지)
         original_concept_json_str = request.originalConcept.model_dump_json(indent=2)
         
         llm_input = {
@@ -273,10 +233,8 @@ async def regenerate_concept_api(request: RegenerateConceptRequest):
         response = regenerate_concept_chain.invoke(llm_input)
         concept_data = _parse_concept_from_llm(response['text'])
 
-        # Python 코드에서 새 ID와 생성 시간을 부여
-        # planId는 기존 값을 그대로 유지합니다.
         concept_data["planId"] = request.originalConcept.planId
-        concept_data["conceptId"] = np.random.randint(10000, 99999) # 새 컨셉이므로 새 ID 부여
+        concept_data["conceptId"] = np.random.randint(10000, 99999)
         concept_data["createdAt"] = datetime.datetime.now().isoformat(timespec='seconds')
         
         return concept_data

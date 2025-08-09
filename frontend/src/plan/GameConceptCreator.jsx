@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './GameConceptCreator.css'; 
+// 🚨 새로 만든 API 함수들을 한 번에 임포트
+import { getMyProjects, generateConcept, regenerateConcept, getAllConcepts } from '../api/auth'; 
 
 const GameConceptCreator = () => {
   const [activeTab, setActiveTab] = useState('generate');
@@ -8,6 +10,8 @@ const GameConceptCreator = () => {
   const [theme, setTheme] = useState('');
   const [playerCount, setPlayerCount] = useState('');
   const [averageWeight, setAverageWeight] = useState(2.5);
+  const [projectList, setProjectList] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState('');
 
   // 컨셉 재생성 상태
   const [regenerateConceptList, setRegenerateConceptList] = useState([]);
@@ -19,14 +23,28 @@ const GameConceptCreator = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isInitialState, setIsInitialState] = useState(true);
+  
+  useEffect(() => {
+    const fetchProjects = async () => {
+        try {
+            const data = await getMyProjects(); // 🚨 getMyProjects 함수 사용
+            setProjectList(data);
+            if (data.length > 0) {
+                setSelectedProjectId(data[0].projectId);
+            }
+        } catch (err) {
+            console.error(err);
+            setError('프로젝트 목록을 불러올 수 없습니다. 로그인이 유효한지 확인해주세요.');
+        }
+    };
+    fetchProjects();
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'regenerate') {
       const fetchListForDropdown = async () => {
         try {
-          const response = await fetch('http://localhost:8080/api/plans/concepts');
-          if (!response.ok) throw new Error('컨셉 목록 로딩 실패');
-          const data = await response.json();
+          const data = await getAllConcepts(); // 🚨 getAllConcepts 함수 사용
           data.sort((a, b) => b.conceptId - a.conceptId);
           setRegenerateConceptList(data);
         } catch (err) {
@@ -38,27 +56,15 @@ const GameConceptCreator = () => {
   }, [activeTab]);
 
 
-  const fetchConcept = async (url, body) => {
+  const fetchConcept = async (apiFunc, body) => {
     setLoading(true);
     setError(null);
     setConcept(null);
     setIsInitialState(false);
 
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        // 백엔드에서 받은 에러 메시지를 최대한 자세히 보여주도록 수정
-        const errorData = await response.json();
-        console.error("Backend Error:", errorData);
-        throw new Error(errorData.detail || errorData.message || '요청 처리에 실패했습니다.');
-      }
-
-      const data = await response.json();
+      // 🚨 공통화된 API 함수를 호출
+      const data = await apiFunc(body);
       setConcept(data);
     } catch (err) {
       console.error("API 호출 오류:", err);
@@ -70,14 +76,14 @@ const GameConceptCreator = () => {
 
   const handleGenerateSubmit = (e) => {
     e.preventDefault();
-    fetchConcept('http://localhost:8080/api/plans/generate-concept', {
+    fetchConcept(generateConcept, {
+      projectId: selectedProjectId,
       theme,
       playerCount,
       averageWeight: parseFloat(averageWeight),
     });
   };
 
-  // ########## 🚨 여기가 핵심 수정 포인트! 🚨 ##########
   const handleRegenerateSubmit = (e) => {
     e.preventDefault();
     if (!selectedConceptInfo || !feedback) {
@@ -85,10 +91,7 @@ const GameConceptCreator = () => {
       return;
     }
     
-    // 1. 선택된 conceptId를 숫자로 변환
     const selectedConceptId = parseInt(selectedConceptInfo.split(',')[0], 10);
-    
-    // 2. 전체 목록에서 선택된 컨셉의 모든 정보를 찾음
     const originalConceptData = regenerateConceptList.find(c => c.conceptId === selectedConceptId);
 
     if (!originalConceptData) {
@@ -96,13 +99,12 @@ const GameConceptCreator = () => {
         return;
     }
 
-    // 3. 백엔드(Spring)가 요구하는 정확한 JSON 구조로 요청 본문을 구성
     const body = {
-      originalConcept: originalConceptData, // 원본 컨셉 객체를 통째로 넣음
+      originalConcept: originalConceptData,
       feedback: feedback
     };
 
-    fetchConcept('http://localhost:8080/api/plans/regenerate-concept', body);
+    fetchConcept(regenerateConcept, body);
   };
 
   const handleConceptSelectionChange = (e) => {
@@ -110,9 +112,9 @@ const GameConceptCreator = () => {
     setSelectedConceptInfo(selectedValue);
 
     if (!selectedValue) {
-        setConcept(null);
-        setIsInitialState(true);
-        return;
+      setConcept(null);
+      setIsInitialState(true);
+      return;
     }
 
     const selectedConceptId = parseInt(selectedValue.split(',')[0], 10);
@@ -122,8 +124,8 @@ const GameConceptCreator = () => {
 
     if (conceptToPreview) {
       setConcept(conceptToPreview); 
-      setIsInitialState(false);     
-      setError(null);              
+      setIsInitialState(false);      
+      setError(null);             
     }
   };
 
@@ -152,6 +154,25 @@ const GameConceptCreator = () => {
               <p className="form-description">게임의 기본 요소를 입력하여 AI에게 새로운 아이디어를 얻어보세요.</p>
               <form onSubmit={handleGenerateSubmit}>
                 <div className="form-group">
+                    <label htmlFor="projectId">프로젝트 선택</label>
+                    <select
+                        id="projectId"
+                        value={selectedProjectId}
+                        onChange={(e) => setSelectedProjectId(e.target.value)}
+                        required
+                    >
+                        {projectList.length > 0 ? (
+                            projectList.map((project) => (
+                                <option key={project.projectId} value={project.projectId}>
+                                    {project.projectName}
+                                </option>
+                            ))
+                        ) : (
+                            <option value="" disabled>프로젝트를 먼저 생성해주세요.</option>
+                        )}
+                    </select>
+                </div>
+                <div className="form-group">
                   <label htmlFor="theme">게임 테마</label>
                   <input id="theme" type="text" value={theme} onChange={(e) => setTheme(e.target.value)} placeholder="예: 우주 탐험, 사이버펑크" required />
                 </div>
@@ -163,7 +184,7 @@ const GameConceptCreator = () => {
                   <label htmlFor="averageWeight">난이도: {averageWeight}</label>
                   <input id="averageWeight" type="range" value={averageWeight} onChange={(e) => setAverageWeight(e.target.value)} min="1.0" max="5.0" step="0.1" required />
                 </div>
-                <button type="submit" className="submit-button" disabled={loading}>
+                <button type="submit" className="submit-button" disabled={loading || !selectedProjectId}>
                   {loading ? '생성 중...' : '컨셉 생성하기'}
                 </button>
               </form>
@@ -241,7 +262,7 @@ const GameConceptCreator = () => {
             </div>
             <div className="concept-section">
               <h4>주요 메커니즘</h4>
-              <p>{concept.mechanics}</p>
+            <p>{concept.mechanics}</p>
             </div>
             <div className="concept-section">
               <h4>배경 스토리</h4>

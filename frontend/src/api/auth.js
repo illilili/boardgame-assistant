@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://localhost:8080'; // Spring Boot 서버 주소
+// 파일 위치: src/api/auth.js (기존 파일에 추가)
+
+const API_BASE_URL = 'http://localhost:8080';
 
 const request = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -38,16 +40,18 @@ export const logout = () => {
 };
 export const getMyPageInfo = () => request('/api/users/mypage');
 export const createProject = (projectData) => request('/api/projects', { method: 'POST', body: JSON.stringify(projectData) });
-
-/**
- * [수정] 프로젝트 이름 수정 API 호출
- * @param {string | number} projectId - 수정할 프로젝트의 ID
- * @param {string} newTitle - 새로운 프로젝트 제목
- */
 export const renameProject = (projectId, newTitle) => {
-    // URL에 projectId를 포함하여 PUT 요청을 보냅니다.
     return request(`/api/projects/${projectId}/rename`, {
         method: 'PUT',
         body: JSON.stringify({ newTitle: newTitle }),
     });
 };
+
+// 🚨 [신규] 로그인한 사용자의 프로젝트 목록을 가져오는 API 함수
+export const getMyProjects = () => request('/api/projects/my');
+// 🚨 [신규] 컨셉 생성 요청을 보내는 API 함수
+export const generateConcept = (conceptData) => request('/api/plans/generate-concept', { method: 'POST', body: JSON.stringify(conceptData) });
+// 🚨 [신규] 컨셉 재생성 요청을 보내는 API 함수
+export const regenerateConcept = (regenerateData) => request('/api/plans/regenerate-concept', { method: 'POST', body: JSON.stringify(regenerateData) });
+// 🚨 [신규] 모든 컨셉 목록을 가져오는 API 함수
+export const getAllConcepts = () => request('/api/plans/concepts');
