@@ -76,3 +76,7 @@ export const generateComponents = (componentsData) => request('/api/plans/genera
 
 // 🚨 [신규] 컴포넌트 재생성 API 함수 추가
 export const regenerateComponents = (regenerateData) => request('/api/plans/regenerate-components', { method: 'POST', body: JSON.stringify(regenerateData) });
+export const getMyRules = () => request('/api/balance/rules');
+export const runSimulation = (simulationData) => request('/api/balance/simulate', { method: 'POST', body: JSON.stringify(simulationData) });
+export const analyzeBalance = (analysisData) => request('/api/balance/analyze', { method: 'POST', body: JSON.stringify(analysisData) });
+export const getMyRulesByProject = (projectId) => request(`/api/balance/rules/${projectId}`);

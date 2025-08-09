@@ -1,7 +1,13 @@
+// 파일 위치: src/plan/Review.jsx
+
 import React, { useState, useEffect } from 'react';
 import './Review.css';
+// 🚨 getMyRulesByProject 함수를 임포트
+import { getMyProjects, getMyRulesByProject, runSimulation, analyzeBalance } from '../api/auth';
 
 const Review = () => {
+    const [projectList, setProjectList] = useState([]);
+    const [selectedProjectId, setSelectedProjectId] = useState('');
     const [ruleList, setRuleList] = useState([]);
     const [ruleId, setRuleId] = useState('');
     const [playerNames, setPlayerNames] = useState('탐험가 A, 공학자 B');
@@ -12,28 +18,51 @@ const Review = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    // 프로젝트 목록을 불러오는 useEffect
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const data = await getMyProjects();
+                setProjectList(data);
+                if (data.length > 0) {
+                    setSelectedProjectId(data[0].projectId.toString());
+                }
+            } catch (err) {
+                console.error(err);
+                setError('프로젝트 목록을 불러올 수 없습니다. 로그인이 유효한지 확인해주세요.');
+            }
+        };
+        fetchProjects();
+    }, []);
+
+    // 🚨 [수정] 선택된 프로젝트에 따라 규칙 목록을 불러오는 useEffect
     useEffect(() => {
         const fetchRules = async () => {
+            if (!selectedProjectId) {
+                setRuleList([]);
+                setRuleId('');
+                return;
+            }
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8080/api/balance/rules');
-                if (!response.ok) {
-                    throw new Error('규칙 목록을 불러오는 데 실패했습니다.');
-                }
-                const data = await response.json();
+                const data = await getMyRulesByProject(selectedProjectId); // 🚨 getMyRulesByProject 함수 사용
                 setRuleList(data);
                 if (data.length > 0) {
                     setRuleId(data[0].ruleId);
+                } else {
+                    setRuleId('');
                 }
             } catch (err) {
-                setError('규칙 목록을 가져올 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.');
+                console.error(err);
+                setError('규칙 목록을 가져올 수 없습니다. 백엔드 서버가 실행 중이거나 로그인 상태를 확인해주세요.');
             } finally {
                 setIsLoading(false);
             }
         };
         fetchRules();
-    }, []);
+    }, [selectedProjectId]);
 
+    // 시뮬레이션 실행 핸들러
     const handleRunSimulation = async (e) => {
         e.preventDefault();
         if (!ruleId) {
@@ -45,21 +74,13 @@ const Review = () => {
         setSimulationResult(null);
 
         try {
-            const response = await fetch('http://localhost:8080/api/balance/simulate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ruleId: parseInt(ruleId),
-                    playerNames: playerNames.split(',').map(name => name.trim()),
-                    maxTurns: parseInt(maxTurns),
-                    enablePenalty,
-                }),
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || '시뮬레이션 서버에서 오류가 발생했습니다.');
-            }
-            const data = await response.json();
+            const requestBody = {
+                ruleId: parseInt(ruleId),
+                playerNames: playerNames.split(',').map(name => name.trim()),
+                maxTurns: parseInt(maxTurns),
+                enablePenalty,
+            };
+            const data = await runSimulation(requestBody);
             setSimulationResult(data);
         } catch (err) {
             setError(err.message);
@@ -68,6 +89,7 @@ const Review = () => {
         }
     };
 
+    // 밸런스 분석 핸들러
     const handleGetBalanceFeedback = async () => {
         if (!ruleId) {
             setError('먼저 규칙을 선택해주세요.');
@@ -78,16 +100,8 @@ const Review = () => {
         setBalanceFeedback(null);
 
         try {
-            const response = await fetch('http://localhost:8080/api/balance/analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ruleId: parseInt(ruleId) }),
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || '밸런스 분석 서버에서 오류가 발생했습니다.');
-            }
-            const data = await response.json();
+            const requestBody = { ruleId: parseInt(ruleId) };
+            const data = await analyzeBalance(requestBody);
             setBalanceFeedback(data);
         } catch (err) {
             setError(err.message);
@@ -108,6 +122,25 @@ const Review = () => {
                     <div className="card">
                         <h2>규칙 시뮬레이션</h2>
                         <form onSubmit={handleRunSimulation}>
+                            <div className="form-group">
+                                <label htmlFor="project-select">프로젝트 선택</label>
+                                <select
+                                    id="project-select"
+                                    value={selectedProjectId}
+                                    onChange={(e) => setSelectedProjectId(e.target.value)}
+                                    required
+                                >
+                                    {projectList.length > 0 ? (
+                                        projectList.map((project) => (
+                                            <option key={project.projectId} value={project.projectId}>
+                                                {project.projectName}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option value="" disabled>프로젝트를 먼저 생성해주세요.</option>
+                                    )}
+                                </select>
+                            </div>
                             <div className="form-group">
                                 <label htmlFor="ruleId">규칙 선택</label>
                                 <select
@@ -155,7 +188,7 @@ const Review = () => {
                                 />
                                 <label htmlFor="enablePenalty">페널티 규칙 적용</label>
                             </div>
-                            <button type="submit" className="primary-button" disabled={isLoading}>
+                            <button type="submit" className="primary-button" disabled={isLoading || !ruleId}>
                                 {isLoading ? '처리 중...' : '시뮬레이션 실행'}
                             </button>
                         </form>
@@ -164,7 +197,7 @@ const Review = () => {
                     <div className="card">
                         <h2>AI 밸런스 분석</h2>
                         <p>선택된 규칙에 대한 AI의 전문적인 밸런스 분석 리포트를 받아봅니다.</p>
-                        <button onClick={handleGetBalanceFeedback} className="secondary-button" disabled={isLoading}>
+                        <button onClick={handleGetBalanceFeedback} className="secondary-button" disabled={isLoading || !ruleId}>
                             {isLoading ? '처리 중...' : '밸런스 분석 요청'}
                         </button>
                     </div>
@@ -200,7 +233,6 @@ const Review = () => {
                         <div className="results-section">
                             <h3>밸런스 분석 리포트</h3>
                             {isLoading && <div className="spinner"></div>}
-                            {/* [수정] balanceFeedback과 balanceFeedback.balanceAnalysis가 모두 존재하는지 확인 */}
                             {balanceFeedback && balanceFeedback.balanceAnalysis && !isLoading && (
                                 <div>
                                     <p><strong>종합 평가:</strong> {balanceFeedback.balanceAnalysis.simulationSummary}</p>
