@@ -1,30 +1,68 @@
+// src/components/RuleCreator.js
+
 import React, { useState, useEffect } from 'react';
 import './RuleCreator.css';
+import { getMyProjects, getAllConcepts, generateRule, regenerateRule } from '../api/auth.js';
 
 const RuleCreator = () => {
-    const [concepts, setConcepts] = useState([]);
+    const [projectList, setProjectList] = useState([]);
+    const [selectedProjectId, setSelectedProjectId] = useState('');
+    const [conceptList, setConceptList] = useState([]);
+    const [filteredConceptList, setFilteredConceptList] = useState([]);
     const [selectedConceptId, setSelectedConceptId] = useState('');
     const [generatedRules, setGeneratedRules] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    
-    // [추가] 재생성을 위한 피드백 상태
     const [feedback, setFeedback] = useState('');
 
+    // 프로젝트 목록을 불러오는 useEffect
     useEffect(() => {
-        const fetchConcepts = async () => {
+        const fetchProjects = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/plans/concepts');
-                if (!response.ok) throw new Error('컨셉 목록을 불러오는 데 실패했습니다.');
-                const data = await response.json();
-                setConcepts(data);
+                const data = await getMyProjects();
+                setProjectList(data);
+                if (data.length > 0) {
+                    setSelectedProjectId(data[0].projectId.toString());
+                }
             } catch (err) {
-                setError(err.message);
+                console.error(err);
+                setError('프로젝트 목록을 불러올 수 없습니다. 로그인이 유효한지 확인해주세요.');
             }
         };
-        fetchConcepts();
+        fetchProjects();
     }, []);
 
+    // 모든 컨셉 목록을 불러오는 useEffect
+    useEffect(() => {
+        const fetchAllConcepts = async () => {
+            try {
+                const data = await getAllConcepts();
+                setConceptList(data);
+            } catch (err) {
+                setError(err.message || '컨셉 목록 로딩 실패');
+            }
+        };
+        fetchAllConcepts();
+    }, []);
+
+    // 선택된 프로젝트에 따라 컨셉 목록을 필터링하는 useEffect
+    useEffect(() => {
+        if (!selectedProjectId || conceptList.length === 0) {
+            setFilteredConceptList([]);
+            setSelectedConceptId('');
+            return;
+        }
+        
+        const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(selectedProjectId));
+        setFilteredConceptList(conceptsForProject.sort((a, b) => b.conceptId - a.conceptId));
+        if (conceptsForProject.length > 0) {
+            setSelectedConceptId(conceptsForProject[0].conceptId.toString());
+        } else {
+            setSelectedConceptId('');
+        }
+    }, [selectedProjectId, conceptList]);
+
+    // 규칙 생성 핸들러
     const handleGenerateRules = async () => {
         if (!selectedConceptId) {
             setError('먼저 규칙을 생성할 기획안을 선택해주세요.');
@@ -33,19 +71,10 @@ const RuleCreator = () => {
         setIsLoading(true);
         setError('');
         setGeneratedRules(null);
-        setFeedback(''); // 피드백 초기화
+        setFeedback('');
 
         try {
-            const response = await fetch('http://localhost:8080/api/plans/generate-rule', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ conceptId: parseInt(selectedConceptId, 10) }),
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || '규칙 생성에 실패했습니다.');
-            }
-            const data = await response.json();
+            const data = await generateRule({ conceptId: parseInt(selectedConceptId, 10) });
             setGeneratedRules(data);
         } catch (err) {
             setError(err.message);
@@ -54,7 +83,7 @@ const RuleCreator = () => {
         }
     };
 
-    // [추가] 규칙 재생성 버튼 클릭 핸들러
+    // 규칙 재생성 핸들러
     const handleRegenerateRules = async () => {
         if (!generatedRules || !feedback) {
             setError('피드백을 입력해주세요.');
@@ -64,21 +93,13 @@ const RuleCreator = () => {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8080/api/plans/regenerate-rule', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ruleId: generatedRules.ruleId,
-                    feedback: feedback
-                }),
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || '규칙 재생성에 실패했습니다.');
-            }
-            const data = await response.json();
-            setGeneratedRules(data); // 상태를 새로운 규칙으로 업데이트
-            setFeedback(''); // 피드백 초기화
+            const requestBody = {
+                ruleId: generatedRules.ruleId,
+                feedback: feedback
+            };
+            const data = await regenerateRule(requestBody);
+            setGeneratedRules(data);
+            setFeedback('');
         } catch (err) {
             setError(err.message);
         } finally {
@@ -94,6 +115,25 @@ const RuleCreator = () => {
                 
                 <form className="rule-form" onSubmit={(e) => e.preventDefault()}>
                     <div className="form-group">
+                        <label htmlFor="project-select">프로젝트 선택</label>
+                        <select
+                            id="project-select"
+                            value={selectedProjectId}
+                            onChange={(e) => setSelectedProjectId(e.target.value)}
+                            required
+                        >
+                            {projectList.length > 0 ? (
+                                projectList.map((project) => (
+                                    <option key={project.projectId} value={project.projectId}>
+                                        {project.projectName}
+                                    </option>
+                                ))
+                            ) : (
+                                <option value="" disabled>프로젝트를 먼저 생성해주세요.</option>
+                            )}
+                        </select>
+                    </div>
+                    <div className="form-group">
                         <label htmlFor="concept-select">기획안 선택</label>
                         <select
                             id="concept-select"
@@ -102,7 +142,7 @@ const RuleCreator = () => {
                             required
                         >
                             <option value="" disabled>-- 기획안 선택 --</option>
-                            {concepts.map(c => (
+                            {filteredConceptList.map(c => (
                                 <option key={c.conceptId} value={c.conceptId}>
                                     ID: {c.conceptId} - {c.theme}
                                 </option>
@@ -110,12 +150,11 @@ const RuleCreator = () => {
                         </select>
                     </div>
                     
-                    <button onClick={handleGenerateRules} disabled={isLoading} className="submit-button">
+                    <button onClick={handleGenerateRules} disabled={isLoading || !selectedConceptId} className="submit-button">
                         {isLoading ? 'AI 설계 중...' : '게임 규칙 생성하기'}
                     </button>
                 </form>
 
-                {/* [추가] 규칙 생성 후 나타나는 재생성 UI */}
                 {generatedRules && !isLoading && (
                     <div className="regenerate-section">
                         <h4>규칙 개선하기</h4>

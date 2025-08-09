@@ -1,4 +1,4 @@
-// src/main/java/com/boardgame/backend_spring/rule/service/GameRuleService.java
+// GameRuleService.java
 package com.boardgame.backend_spring.rule.service;
 
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class GameRuleService {
     private final BoardgameConceptRepository conceptRepository;
     private final GameObjectiveRepository objectiveRepository;
     private final GameRuleRepository ruleRepository;
-    private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 처리를 위해 추가
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${fastapi.service.url}/api/plans/generate-rule")
     private String ruleApiUrl;
@@ -50,7 +51,6 @@ public class GameRuleService {
                 .orElseThrow(() -> new EntityNotFoundException("게임 목표가 먼저 생성되어야 합니다. Concept ID: " + request.conceptId()));
 
         // 3. FastAPI에 보낼 요청 객체 생성
-        // 현재 World 데이터가 없으므로 임시 값으로 채웁니다.
         FastApiRuleRequest fastApiRequest = new FastApiRuleRequest(
                 concept.getTheme(),
                 concept.getPlayerCount(),
@@ -58,10 +58,10 @@ public class GameRuleService {
                 concept.getIdeaText(),
                 concept.getMechanics(),
                 concept.getStoryline(),
-                "{}", // world_setting 임시 값
-                "",   // world_tone 임시 값
+                "{}",
+                "",
                 objective.getMainGoal(),
-                convertListToJson(objective.getSubGoals()), // subGoals를 JSON 문자열로 변환
+                convertListToJson(objective.getSubGoals()),
                 objective.getWinConditionType(),
                 objective.getDesignNote()
         );
@@ -73,8 +73,14 @@ public class GameRuleService {
         }
 
         // 5. 받은 응답을 GameRule 엔티티로 변환 및 저장
-        GameRule gameRule = ruleRepository.findById(concept.getConceptId()).orElse(new GameRule());
-        gameRule.setBoardgameConcept(concept);
+        Optional<GameRule> existingRule = ruleRepository.findById(concept.getConceptId());
+        GameRule gameRule = existingRule.orElse(new GameRule());
+
+        if (gameRule.getConceptId() == null) {
+            gameRule.setConceptId(concept.getConceptId());
+            gameRule.setBoardgameConcept(concept);
+        }
+
         gameRule.setRuleId(responseFromAI.ruleId());
         gameRule.setTurnStructure(responseFromAI.turnStructure());
         gameRule.setActionRules(responseFromAI.actionRules());

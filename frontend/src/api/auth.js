@@ -66,3 +66,8 @@ export const regenerateConcept = (regenerateData) => request('/api/plans/regener
 export const getAllConcepts = () => request('/api/plans/concepts');
 
 export const generateGoal = (goalData) => request('/api/plans/generate-goal', { method: 'POST', body: JSON.stringify(goalData) });
+
+// 🚨 [신규] 게임 규칙 생성 API 함수 추가
+export const generateRule = (ruleData) => request('/api/plans/generate-rule', { method: 'POST', body: JSON.stringify(ruleData) });
+// 🚨 [신규] 게임 규칙 재생성 API 함수 추가
+export const regenerateRule = (regenerateData) => request('/api/plans/regenerate-rule', { method: 'POST', body: JSON.stringify(regenerateData) });

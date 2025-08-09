@@ -1,3 +1,4 @@
+// RegenerateRuleController.java
 package com.boardgame.backend_spring.rule.controller;
 
 import com.boardgame.backend_spring.rule.dto.RegenerateRuleDto;
