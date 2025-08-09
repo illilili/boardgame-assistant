@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import './Plan.css'; 
 
 // 분리된 컴포넌트들을 import 합니다.
+import ProjectCreationPage from './ProjectCreationPage';
 import GameConceptCreator from './GameConceptCreator';
 import Goal from './Goal';
 import Components from './Components';
@@ -16,6 +17,7 @@ import PlanPage from './PlanPage';
 
 // --- 데이터 및 메인 컴포넌트 ---
 const workspaceNavItems = [
+  { id: 'project', title: '프로젝트 생성', component: <ProjectCreationPage /> },
   { id: 'concept', title: '게임 컨셉 제작', component: <GameConceptCreator /> },
   { id: 'goal', title: '게임 목표 설계', component: <Goal/>},  
   { id: 'rules', title: '규칙 생성', component: <RuleCreator /> },
