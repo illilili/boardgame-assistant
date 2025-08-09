@@ -104,6 +104,7 @@ public class ConceptService {
         ConceptResponseDto dto = new ConceptResponseDto();
         dto.setConceptId(entity.getConceptId());
         dto.setPlanId(entity.getPlanId());
+        dto.setProjectId(entity.getProject().getId());
         dto.setTheme(entity.getTheme());
         dto.setPlayerCount(entity.getPlayerCount());
         dto.setAverageWeight(entity.getAverageWeight());

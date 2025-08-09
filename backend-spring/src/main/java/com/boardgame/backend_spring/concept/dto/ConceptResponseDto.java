@@ -8,6 +8,7 @@ import lombok.Data;
 public class ConceptResponseDto {
     private long conceptId;
     private long planId;
+    private long projectId;
     private String theme;
     private String playerCount;
     private double averageWeight;

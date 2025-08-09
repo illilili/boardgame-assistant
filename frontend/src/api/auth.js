@@ -1,4 +1,4 @@
-// 파일 위치: src/api/auth.js (기존 파일에 추가)
+// 파일 위치: src/api/auth.js
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -16,10 +16,23 @@ const request = async (endpoint, options = {}) => {
 
     try {
         const response = await fetch(url, config);
-        const text = await response.text();
-        const data = text ? JSON.parse(text) : {};
+        
+        // 🚨 응답이 JSON인지 확인하는 로직 추가
+        const contentType = response.headers.get('content-type');
+        let data;
+
+        if (contentType && contentType.startsWith('application/json')) {
+            const text = await response.text();
+            data = text ? JSON.parse(text) : {};
+        } else {
+            // JSON이 아니면 텍스트로 처리
+            data = await response.text();
+        }
+
         if (!response.ok) {
-            throw new Error(data.message || `서버 에러: ${response.status}`);
+            // 에러 메시지를 data 객체에서 가져오거나, 일반 텍스트 그대로 사용
+            const errorMessage = (typeof data === 'object' && data.message) ? data.message : data;
+            throw new Error(errorMessage || `서버 에러: ${response.status}`);
         }
         return data;
     } catch (error) {
@@ -47,11 +60,9 @@ export const renameProject = (projectId, newTitle) => {
     });
 };
 
-// 🚨 [신규] 로그인한 사용자의 프로젝트 목록을 가져오는 API 함수
 export const getMyProjects = () => request('/api/projects/my');
-// 🚨 [신규] 컨셉 생성 요청을 보내는 API 함수
 export const generateConcept = (conceptData) => request('/api/plans/generate-concept', { method: 'POST', body: JSON.stringify(conceptData) });
-// 🚨 [신규] 컨셉 재생성 요청을 보내는 API 함수
 export const regenerateConcept = (regenerateData) => request('/api/plans/regenerate-concept', { method: 'POST', body: JSON.stringify(regenerateData) });
-// 🚨 [신규] 모든 컨셉 목록을 가져오는 API 함수
 export const getAllConcepts = () => request('/api/plans/concepts');
+
+export const generateGoal = (goalData) => request('/api/plans/generate-goal', { method: 'POST', body: JSON.stringify(goalData) });
