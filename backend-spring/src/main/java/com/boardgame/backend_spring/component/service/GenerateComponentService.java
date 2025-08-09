@@ -34,7 +34,8 @@ public class GenerateComponentService {
     private final GameObjectiveRepository objectiveRepository;
     private final GameRuleRepository ruleRepository;
     private final ComponentRepository componentRepository;
-    private final ObjectMapper objectMapper; // JSON 변환을 위해 주입
+    private final ObjectMapper objectMapper;
+    private final ComponentStatusService componentStatusService;
 
     @Value("${fastapi.service.url}/api/plans/generate-components")
     private String fastapiGenerateComponentsUrl;
@@ -51,6 +52,10 @@ public class GenerateComponentService {
                 .orElseThrow(() -> new EntityNotFoundException("게임 목표가 먼저 생성되어야 합니다."));
         GameRule rule = ruleRepository.findByBoardgameConcept(concept)
                 .orElseThrow(() -> new EntityNotFoundException("게임 규칙이 먼저 생성되어야 합니다."));
+
+        // 🚨 기존 컴포넌트가 있다면 모두 삭제
+        componentRepository.deleteAllByBoardgameConcept(concept);
+        componentRepository.flush();
 
         // 2. FastAPI 요청 DTO 생성
         GenerateComponentDto.FastApiRequest fastApiRequest = GenerateComponentDto.FastApiRequest.builder()
@@ -71,26 +76,11 @@ public class GenerateComponentService {
         }
 
         // 4. 받은 상세 데이터를 DB에 저장
-        List<Component> savedComponents = new ArrayList<>();
-        for (GenerateComponentDto.FastApiComponentItem item : responseFromAI.components()) {
-            Component newComponent = new Component();
-            newComponent.setBoardgameConcept(concept);
-            newComponent.setTitle(item.getTitle());
-            newComponent.setType(item.getType());
-            newComponent.setQuantity(item.getQuantity());
-            newComponent.setRoleAndEffect(item.getRoleAndEffect());
-            newComponent.setArtConcept(item.getArtConcept());
-            newComponent.setInterconnection(item.getInterconnection());
-
-            List<SubTask> subTasks = createSubTasksForComponent(newComponent);
-            newComponent.setSubTasks(subTasks);
-
-            savedComponents.add(componentRepository.save(newComponent));
-        }
+        List<Component> savedComponents = saveComponents(concept, responseFromAI.components());
 
         // 5. 최종 응답 DTO로 변환
         List<GenerateComponentDto.ComponentDetail> componentDetails = savedComponents.stream()
-                .map(this::mapToComponentDetail)
+                .map(GenerateComponentDto.ComponentDetail::fromEntity)
                 .collect(Collectors.toList());
 
         return new GenerateComponentDto.Response(componentDetails);
@@ -125,6 +115,8 @@ public class GenerateComponentService {
                 .mechanics(concept.getMechanics())
                 .mainGoal(objective.getMainGoal())
                 .winConditionType(objective.getWinConditionType())
+                .worldSetting("임시 세계관 설정") // TODO: 추후 World 엔티티에서 가져오도록 확장
+                .worldTone("임시 세계관 톤")      // TODO: 추후 World 엔티티에서 가져오도록 확장
                 .build();
 
         // 4. FastAPI 호출
@@ -140,8 +132,20 @@ public class GenerateComponentService {
         componentRepository.flush();
 
         // 6. 새로 받은 데이터로 DB에 저장
+        List<Component> savedComponents = saveComponents(concept, responseFromAI.components());
+
+        // 7. 최종 응답 DTO로 변환하여 반환
+        return new GenerateComponentDto.Response(
+                savedComponents.stream()
+                        .map(GenerateComponentDto.ComponentDetail::fromEntity)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    // 재사용 가능한 컴포넌트 저장 로직
+    private List<Component> saveComponents(BoardgameConcept concept, List<GenerateComponentDto.FastApiComponentItem> items) {
         List<Component> savedComponents = new ArrayList<>();
-        for (GenerateComponentDto.FastApiComponentItem item : responseFromAI.components()) {
+        for (GenerateComponentDto.FastApiComponentItem item : items) {
             Component newComponent = new Component();
             newComponent.setBoardgameConcept(concept);
             newComponent.setTitle(item.getTitle());
@@ -156,13 +160,7 @@ public class GenerateComponentService {
 
             savedComponents.add(componentRepository.save(newComponent));
         }
-
-        // 7. 최종 응답 DTO로 변환하여 반환
-        return new GenerateComponentDto.Response(
-                savedComponents.stream()
-                        .map(this::mapToComponentDetail)
-                        .collect(Collectors.toList())
-        );
+        return savedComponents;
     }
 
     private String convertComponentsToJson(List<Component> components) {
@@ -206,24 +204,5 @@ public class GenerateComponentService {
         task.setType(type);
         task.setStatus(status);
         return task;
-    }
-
-    private GenerateComponentDto.ComponentDetail mapToComponentDetail(Component component) {
-        return GenerateComponentDto.ComponentDetail.builder()
-                .componentId(component.getComponentId())
-                .title(component.getTitle())
-                .type(component.getType())
-                .quantity(component.getQuantity())
-                .roleAndEffect(component.getRoleAndEffect())
-                .artConcept(component.getArtConcept())
-                .interconnection(component.getInterconnection())
-                .subTasks(component.getSubTasks().stream().map(subTask ->
-                        GenerateComponentDto.SubTaskDetail.builder()
-                                .contentId(subTask.getContentId())
-                                .type(subTask.getType())
-                                .status(subTask.getStatus())
-                                .build()
-                ).collect(Collectors.toList()))
-                .build();
     }
 }

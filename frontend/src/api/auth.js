@@ -71,3 +71,8 @@ export const generateGoal = (goalData) => request('/api/plans/generate-goal', { 
 export const generateRule = (ruleData) => request('/api/plans/generate-rule', { method: 'POST', body: JSON.stringify(ruleData) });
 // 🚨 [신규] 게임 규칙 재생성 API 함수 추가
 export const regenerateRule = (regenerateData) => request('/api/plans/regenerate-rule', { method: 'POST', body: JSON.stringify(regenerateData) });
+// 🚨 [신규] 컴포넌트 생성 API 함수 추가
+export const generateComponents = (componentsData) => request('/api/plans/generate-components', { method: 'POST', body: JSON.stringify(componentsData) });
+
+// 🚨 [신규] 컴포넌트 재생성 API 함수 추가
+export const regenerateComponents = (regenerateData) => request('/api/plans/regenerate-components', { method: 'POST', body: JSON.stringify(regenerateData) });
