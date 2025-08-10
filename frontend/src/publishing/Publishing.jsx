@@ -2,11 +2,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Publishing.css'; 
+
 import SubmissionDetail from './SubmissionDetail';
 import WelcomeScreen from './WelcomeScreen';
 
+// --- 데이터 및 메인 컴포넌트 --- 수정 필
+const workspaceNavItems = [
+  { id: 'header', title: '기획안 제출 목록', isHeader: true },
+  { id: 'developer', title: '개발자 배정', path: '/developer-assignment' },
+  { id: 'translation', title: '번역', path: '/translation' },
+  { id: 'translationReview', title: '번역 검토', path: '/translation-review' },
+  { id: 'pricing', title: '가격 평가', path: '/pricing-evaluation' },
+  { id: 'finalApproval', title: '최종 승인', path: '/final-approval' },
+  { id: ''}
+];
+
 function Publishing() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
+  const [activeViewId, setActiveViewId] = useState(null);
+  
   const [submissions, setSubmissions] = useState([]);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -122,12 +136,15 @@ function Publishing() {
           <div className="logo">BOARD.CO</div>
         </div>
         <ul className="workspace-nav-list">
-          <li className="nav-item nav-header">기획안 제출 목록</li>
-          <li className="nav-item" onClick={() => navigate('/developer-assignment')}>개발자 배정</li>
-          <li className="nav-item" onClick={() => navigate('/translation')}>번역</li>
-          <li className="nav-item" onClick={() => navigate('/translation-review')}>번역 검토</li>
-          <li className="nav-item" onClick={() => navigate('/pricing-evaluation')}>가격 평가</li>
-          <li className="nav-item" onClick={() => navigate('/final-approval')}>최종 승인</li>
+          {workspaceNavItems.map((item) => (
+            <li 
+              key={item.id} 
+              className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
+              onClick={() => setActiveViewId(item.id)}
+            >
+              {item.title}
+            </li>
+          ))}
         </ul>
       </aside>
 

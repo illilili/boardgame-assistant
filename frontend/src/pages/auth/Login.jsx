@@ -55,6 +55,10 @@ const Login = () => {
        type="submit"
        className="w-full bg-teal-400 text-white py-2 rounded-md hover:bg-teal-500 transition-colors">로그인</button>
     </form>
+    
+    <a href="/signup" className="block w-full text-center mt-3 bg-teal-400 text-white py-2 rounded-md hover:bg-teal-500 transition-colors">
+      회원가입
+    </a>    
     </div>
   )
 }
