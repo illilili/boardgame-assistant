@@ -16,6 +16,8 @@
     import SignUp from './pages/auth/SignUp';
     import MyPage from './pages/users/MyPage';
 
+    import AdminUserManagePage from './pages/admin/UserManagePage';
+
     const router = createBrowserRouter([
         {
             id: 0,
@@ -86,6 +88,11 @@
             id: 13,
             path:'/mypage',
             element: <MyPage/>
-        }
+        },
+        {
+            id: 14,
+            path:'/admin-assign',
+            element: <AdminUserManagePage/>
+        },
     ]);
     export default router;

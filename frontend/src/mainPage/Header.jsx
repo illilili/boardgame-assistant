@@ -5,7 +5,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 // api import
 import { logout } from '../api/auth.js';
 
-
 const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -45,7 +44,7 @@ return (
       <a href="/development">개발</a>
       <a href="/publishing">출판</a>
       <a href="/team">팀</a>
-      
+      <a href="/admin-assign">관리자권한</a> {/* 임시로 생성함 userManagePage로 이동. */}
       {isLoggedIn ? (
         // 로그인 상태일 때만 '로그아웃' 버튼을 보여줌
         <a onClick={handleLogout}> 로그아웃 </a>
