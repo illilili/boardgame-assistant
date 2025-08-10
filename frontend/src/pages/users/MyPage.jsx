@@ -20,7 +20,7 @@ const MyPage = () => {
   }, []);
 
 return (
-    <div className="max-w-3xl mx-auto p-8 bg-white ">
+    <div className="mx-auto p-8 bg-white ">
       <h2 className="text-3xl font-bold text-gray-800 text-center mb-20">마이페이지</h2>
 
       <div className="max-w-2xl space-y-4 p-6 bg-gray-50 rounded-lg shadow-sm">

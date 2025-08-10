@@ -11,6 +11,7 @@ import RuleCreator from './RuleCreator';
 import Review from './Review';
 import WelcomeScreen from './WelcomeScreen';
 import PlanPage from './PlanPage';
+import MyPage from '../pages/users/MyPage';
 
 import { AiFillHome } from 'react-icons/ai'; //홈 버튼
 import { FaUserCircle } from 'react-icons/fa'; //프로필
@@ -29,8 +30,8 @@ const workspaceNavItems = [
   { id: 'rules', title: '규칙 생성', component: <RuleCreator /> },
   { id: 'components', title: '게임 구성요소 생성', component: <Components/>},
   { id: 'review', title: '밸런스 테스트', component: <Review /> },
-  { id: 'planPage', title: '기획안 관리', component: <PlanPage/>}
-
+  { id: 'planPage', title: '기획안 관리', component: <PlanPage/>},
+  { id: 'mypage', title: '마이페이지', component: <MyPage /> }
 ];
 
 function Plan() {
@@ -82,14 +83,16 @@ function Plan() {
           <div className="logo">BOARD.CO</div>
         </div>
         <ul className="workspace-nav-list">
-          {workspaceNavItems.map((item) => (
-            <li 
-              key={item.id} 
-              className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
-              onClick={() => setActiveViewId(item.id)}
-            >
-              {item.title}
-            </li>
+          {workspaceNavItems
+            .filter(item => item.id !== 'mypage')  // 마이페이지 메뉴만 제외
+            .map(item => (
+              <li
+                key={item.id}
+                className={`nav-item ${activeViewId === item.id ? 'active' : ''}`} //네비바에서 마이페이지는 안보이게 처리 - 액츄얼뷰 이용하게
+                onClick={() => setActiveViewId(item.id)}
+              >
+                {item.title}
+              </li>
           ))}
         </ul>
 
@@ -100,14 +103,14 @@ function Plan() {
             <div className="flex items-center gap-3">
               <FaUserCircle size={40} className="text-gray-500" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold">{userName} 님</span>
+                <span className="text-white text-sm font-semibold">{userName} 님</span>
                 <span className="text-xs text-gray-500">환영합니다!</span>
               </div>
             </div>
-
-            <Link to="/mypage" className="text-gray-600 hover:text-teal-500">
+            {/* 마이페이지 점세개 */}
+            <button onClick={() => setActiveViewId('mypage')} className="text-white hover:text-teal-500">
               <FiMoreHorizontal size={18} />
-            </Link>
+            </button>
           </div>
 
           <button

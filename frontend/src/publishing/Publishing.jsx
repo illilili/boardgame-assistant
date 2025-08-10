@@ -6,6 +6,9 @@ import './Publishing.css';
 import SubmissionDetail from './SubmissionDetail';
 import WelcomeScreen from './WelcomeScreen';
 
+import MyPage from '../pages/users/MyPage';
+import DeveloperInfo from '../pages/users/DeveloperInfo';
+
 import { AiFillHome } from 'react-icons/ai'; //홈 버튼
 import { FaUserCircle } from 'react-icons/fa'; //프로필
 import { FiMoreHorizontal } from 'react-icons/fi';
@@ -15,18 +18,22 @@ import { logout } from '../api/auth';
 // --- 데이터 및 메인 컴포넌트 --- 수정 필
 const workspaceNavItems = [
   { id: 'header', title: '기획안 제출 목록', isHeader: true },
-  { id: 'developer', title: '개발자 배정', path: '/developer-assignment' },
+  { id: 'deveoloper-info', title: '개발자 조회', component: <DeveloperInfo/>},
+  { id: 'developer', title: '개발자 배정', path: '/developer-assignment' },  
   { id: 'translation', title: '번역', path: '/translation' },
   { id: 'translationReview', title: '번역 검토', path: '/translation-review' },
   { id: 'pricing', title: '가격 평가', path: '/pricing-evaluation' },
   { id: 'finalApproval', title: '최종 승인', path: '/final-approval' },
-  { id: ''}
+  { id: 'mypage', title: '마이페이지', component: <MyPage /> }
 ];
 
 function Publishing() {
   // const navigate = useNavigate();
   const [activeViewId, setActiveViewId] = useState(null);
   
+  // 선택된 뷰를 찾는 로직 변경
+  const activeView = activeViewId ? workspaceNavItems.find(item => item.id === activeViewId) : null;
+
   const [submissions, setSubmissions] = useState([]);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -176,18 +183,19 @@ function Publishing() {
         <AiFillHome size={20} /></Link>
         <div className="logo">BOARD.CO</div>
       </div>
-
       <ul className="workspace-nav-list">
-        {workspaceNavItems.map((item) => (
-          <li
-            key={item.id}
-            className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
-            onClick={() => setActiveViewId(item.id)}
-          >
-            {item.title}
-          </li>
-        ))}
-      </ul>
+          {workspaceNavItems
+            .filter(item => item.id !== 'mypage')  // 마이페이지 메뉴만 제외
+            .map(item => (
+              <li
+                key={item.id}
+                className={`nav-item ${activeViewId === item.id ? 'active' : ''}`} //네비바에서 마이페이지는 안보이게 처리 - 액츄얼뷰 이용하게
+                onClick={() => setActiveViewId(item.id)}
+              >
+                {item.title}
+              </li>
+          ))}
+        </ul>
 
       {/* 하단 유저 메뉴 */}
       <div className="mt-auto flex flex-col gap-2 pt-4 border-t border-gray-300">
@@ -196,14 +204,14 @@ function Publishing() {
           <div className="flex items-center gap-3">
             <FaUserCircle size={40} className="text-gray-500" />
             <div className="flex flex-col">
-              <span className="text-sm font-semibold">{userName} 님</span>
+              <span className="text-white text-sm font-semibold">{userName} 님</span>
               <span className="text-xs text-gray-500">환영합니다!</span>
             </div>
           </div>
-
-          <Link to="/mypage" className="text-gray-600 hover:text-teal-500">
+          {/* 마이페이지 점세개 */}
+          <button onClick={() => setActiveViewId('mypage')} className="text-white hover:text-teal-500">
             <FiMoreHorizontal size={18} />
-          </Link>
+          </button>
         </div>
 
         <button
@@ -215,7 +223,13 @@ function Publishing() {
       </div>
     </aside>
 
-      <main className="workspace-main-content">
+    <main className="workspace-main-content">
+    {/* activeView가 있을 때만 해당 컴포넌트를, 없으면 WelcomeScreen을 렌더링 */}
+    {activeView ? activeView.component : <WelcomeScreen onStart={() => setActiveViewId('concept')} />}
+    </main>
+
+     {/* 기존에있던 코드 액티브뷰 사용 위해서 주석처리 */}
+      {/* <main className="workspace-main-content">
         {!selectedSubmission ? (
           <div className="submissions-main-list">
             <h2>기획안 제출 목록</h2>
@@ -252,7 +266,7 @@ function Publishing() {
             <p>팝업에서 {selectedSubmission.gameTitle}의 상세 내용을 확인하세요.</p>
           </div>
         )}
-      </main>
+      </main> */}
 
       {/* 팝업 모달 - 게임 클릭 시 표시 */}
       {selectedSubmission && (
