@@ -6,6 +6,7 @@ import './Publishing.css';
 import SubmissionDetail from './SubmissionDetail';
 import WelcomeScreen from './WelcomeScreen';
 
+import { AiFillHome } from 'react-icons/ai'; //홈 버튼
 import { FaUserCircle } from 'react-icons/fa'; //프로필
 import { FiMoreHorizontal } from 'react-icons/fi';
 import { getMyPageInfo } from '../api/users'; //마이페이지 api 사용
@@ -171,6 +172,8 @@ function Publishing() {
     <div className="publishing-workspace">
       <aside className="workspace-sidebar">
       <div className="sidebar-header">
+        <Link to="/" className="flex items-center gap-2 mb-4 px-4 py-2 rounded hover:text-teal-500 font-semibold" >
+        <AiFillHome size={20} /></Link>
         <div className="logo">BOARD.CO</div>
       </div>
 

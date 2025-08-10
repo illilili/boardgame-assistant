@@ -14,6 +14,7 @@
 
     import Login from './pages/auth/Login';
     import SignUp from './pages/auth/SignUp';
+    import MyPage from './pages/users/MyPage';
 
     const router = createBrowserRouter([
         {
@@ -80,6 +81,11 @@
             id: 12,
             path:'/signup',
             element: <SignUp/>
+        },
+        {
+            id: 13,
+            path:'/mypage',
+            element: <MyPage/>
         }
     ]);
     export default router;
