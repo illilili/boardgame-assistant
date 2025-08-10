@@ -1,10 +1,15 @@
 // Publishing.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './Publishing.css'; 
 
 import SubmissionDetail from './SubmissionDetail';
 import WelcomeScreen from './WelcomeScreen';
+
+import { FaUserCircle } from 'react-icons/fa'; //프로필
+import { FiMoreHorizontal } from 'react-icons/fi';
+import { getMyPageInfo } from '../api/users'; //마이페이지 api 사용
+import { logout } from '../api/auth';
 
 // --- 데이터 및 메인 컴포넌트 --- 수정 필
 const workspaceNavItems = [
@@ -24,6 +29,20 @@ function Publishing() {
   const [submissions, setSubmissions] = useState([]);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [userName, setUserName] = useState(''); //사이드바 하단 프로필 이름
+  useEffect(() => {
+      const fetchUserName = async () => {
+        try {
+          const data = await getMyPageInfo();
+          setUserName(data.userName);
+        } catch (err) {
+          console.error('유저 이름 조회 실패', err);
+        }
+      };
+  
+      fetchUserName();
+    }, []);
 
   // 더미 데이터 (실제로는 API에서 가져와야 함)
   useEffect(() => {
@@ -125,6 +144,25 @@ function Publishing() {
     }
   };
 
+  //로그아웃 핸들러
+      const handleLogout = async (e) => {
+        e.preventDefault();
+        try {
+          const result = await logout();
+          alert(result.message); // "로그아웃 되었습니다."
+          // 토큰 및 권한 정보 제거 - 추후 보고 삭제하거나 조정필요할듯
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('role');
+          // 리디렉션 - 메인으로 이동
+          window.location.href = '/';
+        } catch (error) {
+          console.error('로그아웃 실패:', error);
+          alert('로그아웃 중 오류가 발생했습니다.');
+        }
+      };
+
+
   if (loading) {
     return <div className="loading">로딩 중...</div>;
   }
@@ -132,21 +170,47 @@ function Publishing() {
   return (
     <div className="publishing-workspace">
       <aside className="workspace-sidebar">
-        <div className="sidebar-header">
-          <div className="logo">BOARD.CO</div>
+      <div className="sidebar-header">
+        <div className="logo">BOARD.CO</div>
+      </div>
+
+      <ul className="workspace-nav-list">
+        {workspaceNavItems.map((item) => (
+          <li
+            key={item.id}
+            className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
+            onClick={() => setActiveViewId(item.id)}
+          >
+            {item.title}
+          </li>
+        ))}
+      </ul>
+
+      {/* 하단 유저 메뉴 */}
+      <div className="mt-auto flex flex-col gap-2 pt-4 border-t border-gray-300">
+        {/* 프로필 + 환영문구 묶음 */}
+        <div className="flex justify-between items-center px-4 py-2">
+          <div className="flex items-center gap-3">
+            <FaUserCircle size={40} className="text-gray-500" />
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold">{userName} 님</span>
+              <span className="text-xs text-gray-500">환영합니다!</span>
+            </div>
+          </div>
+
+          <Link to="/mypage" className="text-gray-600 hover:text-teal-500">
+            <FiMoreHorizontal size={18} />
+          </Link>
         </div>
-        <ul className="workspace-nav-list">
-          {workspaceNavItems.map((item) => (
-            <li 
-              key={item.id} 
-              className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
-              onClick={() => setActiveViewId(item.id)}
-            >
-              {item.title}
-            </li>
-          ))}
-        </ul>
-      </aside>
+
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 rounded hover:bg-red-100 text-red-500 font-semibold"
+        >
+          로그아웃
+        </button>
+      </div>
+    </aside>
 
       <main className="workspace-main-content">
         {!selectedSubmission ? (
