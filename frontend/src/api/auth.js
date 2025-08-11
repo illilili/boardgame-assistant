@@ -12,6 +12,12 @@ const request = async (endpoint, options = {}) => {
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
+
+    // 파일 업로드(FormData)의 경우 Content-Type을 브라우저가 자동으로 설정하도록 삭제
+    if (options.body instanceof FormData) {
+        delete headers['Content-Type'];
+    }
+
     const config = { ...options, headers };
 
     try {
@@ -20,14 +26,16 @@ const request = async (endpoint, options = {}) => {
         const contentType = response.headers.get('content-type');
         let data;
 
+        // 응답이 비어있는 경우를 대비하여 text()로 먼저 받고, 내용이 있을 때만 JSON 파싱
+        const text = await response.text();
         if (contentType && contentType.startsWith('application/json')) {
-            const text = await response.text();
             data = text ? JSON.parse(text) : {};
         } else {
-            data = await response.text();
+            data = text;
         }
 
         if (!response.ok) {
+            // 에러 메시지를 좀 더 명확하게 추출
             const errorMessage = (typeof data === 'object' && data.message) ? data.message : data;
             throw new Error(errorMessage || `서버 에러: ${response.status}`);
         }
@@ -38,6 +46,7 @@ const request = async (endpoint, options = {}) => {
     }
 };
 
+// --- 기존 함수들 (변경 없음) ---
 export const signup = (signupData) => request('/api/auth/signup', { method: 'POST', body: JSON.stringify(signupData) });
 export const login = (loginData) => request('/api/auth/login', { method: 'POST', body: JSON.stringify(loginData) });
 export const logout = () => {
@@ -56,7 +65,6 @@ export const renameProject = (projectId, newTitle) => {
         body: JSON.stringify({ newTitle: newTitle }),
     });
 };
-
 export const getMyProjects = () => request('/api/projects/my');
 export const generateConcept = (conceptData) => request('/api/plans/generate-concept', { method: 'POST', body: JSON.stringify(conceptData) });
 export const regenerateConcept = (regenerateData) => request('/api/plans/regenerate-concept', { method: 'POST', body: JSON.stringify(regenerateData) });
@@ -67,7 +75,12 @@ export const regenerateRule = (regenerateData) => request('/api/plans/regenerate
 export const getMyRulesByProject = (projectId) => request(`/api/balance/rules/${projectId}`);
 export const runSimulation = (simulationData) => request('/api/balance/simulate', { method: 'POST', body: JSON.stringify(simulationData) });
 export const analyzeBalance = (analysisData) => request('/api/balance/analyze', { method: 'POST', body: JSON.stringify(analysisData) });
-export const getConceptsForSummary = (projectId) => request(`/api/plans/concepts-for-summary/${projectId}`);
+
+// --- ✨ [수정된 함수] ---
+// projectId 인자를 제거하고 고정된 URL을 호출하도록 변경했습니다.
+export const getConceptsForSummary = () => request('/api/plans/concepts-for-summary');
+
+// --- 나머지 기존 함수들 (변경 없음) ---
 export const generateSummary = (conceptId) => request('/api/plans/generate-summary', { method: 'POST', body: JSON.stringify({ conceptId }) });
 export const savePlanVersion = (versionData) => request('/api/plans/version/save', { method: 'POST', body: JSON.stringify(versionData) });
 export const getPlanVersions = (planId) => request(`/api/plans/${planId}/versions`);

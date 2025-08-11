@@ -47,6 +47,7 @@ public class SummaryService {
                 .map(concept -> SummaryDto.ConceptListInfo.builder()
                         .conceptId(concept.getConceptId())
                         .theme(concept.getTheme())
+                        .projectId(concept.getProject().getId())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -56,10 +57,8 @@ public class SummaryService {
         BoardgameConcept concept = conceptRepository.findById(conceptId)
                 .orElseThrow(() -> new EntityNotFoundException("Concept not found with id: " + conceptId));
 
-        // FastAPI 요청 데이터 준비
         SummaryDto.FastApiRequest fastApiRequest = buildFastApiRequest(concept);
 
-        // FastAPI 호출하여 기획서 텍스트 생성
         String generatedText;
         try {
             generatedText = restTemplate.postForObject(summaryApiUrl, fastApiRequest, String.class);
@@ -70,35 +69,28 @@ public class SummaryService {
             throw new RuntimeException("AI 기획서 생성 서비스 호출에 실패했습니다: " + e.getMessage());
         }
 
-        // 해당 컨셉에 대한 Plan이 이미 있는지 확인하고, 없으면 새로 생성
         Project project = concept.getProject();
 
         Plan plan = planRepository.findByBoardgameConcept(concept)
                 .orElseGet(() -> Plan.create(project, concept, generatedText));
 
-        // 생성된 내용으로 Plan의 현재 내용을 업데이트
         plan.setCurrentContent(generatedText);
         planRepository.save(plan);
 
-        // 프론트엔드에 planId와 생성된 텍스트를 반환
         return SummaryDto.GenerateResponse.builder()
                 .planId(plan.getPlanId())
                 .summaryText(generatedText)
                 .build();
     }
 
-    // --- 버전 관리 서비스 메소드 ---
-
     @Transactional
     public PlanVersionDto.SaveResponse saveVersion(PlanVersionDto.SaveRequest request) {
         Plan plan = planRepository.findById(request.getPlanId())
                 .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + request.getPlanId()));
 
-        // [중요] 사용자가 수정한 최신 내용을 Plan 엔티티에 먼저 반영
         plan.setCurrentContent(request.getPlanContent());
         planRepository.save(plan);
 
-        // 업데이트된 Plan을 기반으로 새로운 버전 생성
         PlanVersion version = PlanVersion.create(plan, request.getVersionName(), request.getMemo());
         planVersionRepository.save(version);
 
@@ -137,23 +129,21 @@ public class SummaryService {
         PlanVersion versionToRollback = planVersionRepository.findById(versionId)
                 .orElseThrow(() -> new EntityNotFoundException("Version not found with id: " + versionId));
 
-        // Plan의 현재 내용을 롤백하려는 버전의 내용으로 덮어쓰기
         plan.setCurrentContent(versionToRollback.getPlanContent());
         planRepository.save(plan);
 
         return PlanVersionDto.RollbackResponse.builder()
                 .planId(plan.getPlanId())
                 .versionId(versionToRollback.getVersionId())
-                .rolledBackContent(plan.getCurrentContent()) // 롤백된 최신 내용을 응답에 포함
+                .rolledBackContent(plan.getCurrentContent())
                 .rolledBackAt(LocalDateTime.now())
                 .message("'" + versionToRollback.getVersionName() + "' 버전으로 기획안이 성공적으로 롤백되었습니다.")
                 .build();
     }
 
-    // FastAPI 요청 객체를 생성하는 private 헬퍼 메소드
     private SummaryDto.FastApiRequest buildFastApiRequest(BoardgameConcept concept) {
-        GameObjective objective = objectiveRepository.findByBoardgameConcept(concept).orElse(new GameObjective());
-        GameRule rule = ruleRepository.findByBoardgameConcept(concept).orElse(new GameRule());
+        GameObjective objective = objectiveRepository.findByBoardgameConcept(concept).orElseThrow(() -> new EntityNotFoundException("Goal not found for concept: " + concept.getConceptId()));
+        GameRule rule = ruleRepository.findByBoardgameConcept(concept).orElseThrow(() -> new EntityNotFoundException("Rule not found for concept: " + concept.getConceptId()));
         List<Component> components = componentRepository.findByBoardgameConcept(concept);
 
         SummaryDto.ConceptInfo conceptInfo = SummaryDto.ConceptInfo.builder()
