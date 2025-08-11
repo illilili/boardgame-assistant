@@ -23,7 +23,7 @@ public class ConceptService {
 
     private final RestTemplate restTemplate;
     private final BoardgameConceptRepository boardgameConceptRepository;
-    private final ProjectRepository projectRepository; // 🚨 ProjectRepository 주입
+    private final ProjectRepository projectRepository;
 
     @Value("${fastapi.service.url}/api/plans/generate-concept")
     private String generateConceptUrl;
@@ -44,7 +44,6 @@ public class ConceptService {
             throw new RuntimeException("AI 서비스로부터 유효한 응답을 받지 못했습니다.");
         }
 
-        // 🚨 project 엔티티 조회
         Project project = projectRepository.findById(requestDto.getProjectId())
                 .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + requestDto.getProjectId()));
 
@@ -57,7 +56,7 @@ public class ConceptService {
         newConcept.setMechanics(responseFromFastAPI.getMechanics());
         newConcept.setStoryline(responseFromFastAPI.getStoryline());
         newConcept.setCreatedAt(responseFromFastAPI.getCreatedAt());
-        newConcept.setProject(project); // 🚨 조회한 project 엔티티를 설정
+        newConcept.setProject(project);
 
         BoardgameConcept savedConcept = boardgameConceptRepository.save(newConcept);
 
@@ -77,9 +76,13 @@ public class ConceptService {
             throw new RuntimeException("AI 재생성 서비스로부터 유효한 응답을 받지 못했습니다.");
         }
 
+        // 🚨 재생성된 컨셉의 projectId를 가져와서 사용
         Long planId = regeneratedConceptDto.getPlanId();
         BoardgameConcept existingConcept = boardgameConceptRepository.findByPlanId(planId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 planId를 가진 컨셉을 찾을 수 없습니다: " + planId));
+
+        Project project = projectRepository.findById(requestDto.getOriginalConcept().getProjectId())
+                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + requestDto.getOriginalConcept().getProjectId()));
 
         existingConcept.setTheme(regeneratedConceptDto.getTheme());
         existingConcept.setPlayerCount(regeneratedConceptDto.getPlayerCount());
@@ -88,6 +91,7 @@ public class ConceptService {
         existingConcept.setMechanics(regeneratedConceptDto.getMechanics());
         existingConcept.setStoryline(regeneratedConceptDto.getStoryline());
         existingConcept.setCreatedAt(regeneratedConceptDto.getCreatedAt());
+        existingConcept.setProject(project); // 🚨 업데이트 시에도 project를 다시 설정
 
         BoardgameConcept updatedConcept = boardgameConceptRepository.save(existingConcept);
 

@@ -1,25 +1,26 @@
-import pandas as pd
-from langchain_community.vectorstores import FAISS
-from langchain_openai import OpenAIEmbeddings
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from langchain_openai import ChatOpenAI
-import numpy as np
 import datetime
 import json
 import re
 import os
+import numpy as np
 from dotenv import load_dotenv
+from typing import List, Dict, Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import Dict, Any
+from langchain_openai import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
+import pandas as pd
+from langchain_community.vectorstores import FAISS
+from faker import Faker
 
-# --- 1. 초기 설정 및 환경 변수 로드 ---
+# --- 초기 설정 ---
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise ValueError("OPENAI_API_KEY 환경 변수를 찾을 수 없습니다. .env 파일을 확인해주세요.")
 os.environ["OPENAI_API_KEY"] = api_key
+fake = Faker()
 
 router = APIRouter(
     prefix="/api/plans",
@@ -29,7 +30,6 @@ router = APIRouter(
 FAISS_INDEX_PATH = "faiss_boardgame_index"
 RAG_DATA_PATH = "./boardgame_detaildata_1-101.json"
 
-# --- 2. RAG 데이터 및 FAISS 인덱스 설정 ---
 def setup_rag_retriever():
     """
     서버 시작 시 RAG 검색기(Retriever)를 설정하는 함수입니다.
@@ -74,7 +74,6 @@ def setup_rag_retriever():
 
 retriever = setup_rag_retriever()
 
-# --- 3. LLM 및 프롬프트 정의 ---
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0.8)
 
 generate_concept_prompt = PromptTemplate(
@@ -140,7 +139,6 @@ regenerate_concept_prompt = PromptTemplate(
 )
 regenerate_concept_chain = LLMChain(llm=llm, prompt=regenerate_concept_prompt)
 
-# --- 4. Pydantic 모델 정의 ---
 class GenerateConceptRequest(BaseModel):
     projectId: int = Field(..., example=1)
     theme: str = Field(..., example="우주 탐험")
@@ -150,6 +148,7 @@ class GenerateConceptRequest(BaseModel):
 class OriginalConcept(BaseModel):
     conceptId: int
     planId: int
+    projectId: int
     theme: str
     playerCount: str
     averageWeight: float
@@ -165,6 +164,7 @@ class RegenerateConceptRequest(BaseModel):
 class ConceptResponse(BaseModel):
     conceptId: int
     planId: int
+    projectId: int
     theme: str
     playerCount: str
     averageWeight: float
@@ -173,7 +173,6 @@ class ConceptResponse(BaseModel):
     storyline: str
     createdAt: str
 
-# --- 5. 헬퍼 함수 ---
 def _parse_concept_from_llm(response_text: str) -> Dict[str, Any]:
     match = re.search(r"```json\s*(\{.*?\})\s*```", response_text, re.DOTALL)
     if match:
@@ -187,7 +186,6 @@ def _parse_concept_from_llm(response_text: str) -> Dict[str, Any]:
         print(f"JSON 파싱 실패. 원본 텍스트: {response_text}")
         raise ValueError("LLM 응답에서 유효한 JSON을 찾을 수 없습니다.")
 
-# --- 6. API 엔드포인트 정의 ---
 @router.post("/generate-concept", response_model=ConceptResponse, summary="새로운 보드게임 컨셉 생성")
 async def generate_concept_api(request: GenerateConceptRequest):
     retrieved_games_info = "유사 게임 정보를 찾을 수 없음."
@@ -212,6 +210,7 @@ async def generate_concept_api(request: GenerateConceptRequest):
 
         concept_data["conceptId"] = np.random.randint(1000, 9999)
         concept_data["planId"] = np.random.randint(1000, 9999)
+        concept_data["projectId"] = request.projectId
         concept_data["createdAt"] = datetime.datetime.now().isoformat(timespec='seconds')
         
         return concept_data
@@ -235,6 +234,7 @@ async def regenerate_concept_api(request: RegenerateConceptRequest):
 
         concept_data["planId"] = request.originalConcept.planId
         concept_data["conceptId"] = np.random.randint(10000, 99999)
+        concept_data["projectId"] = request.originalConcept.projectId
         concept_data["createdAt"] = datetime.datetime.now().isoformat(timespec='seconds')
         
         return concept_data

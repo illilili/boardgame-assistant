@@ -12,6 +12,7 @@ public class RegenerateConceptRequestDto {
     public static class OriginalConcept {
         private long conceptId;
         private long planId;
+        private long projectId; // 🚨 projectId 필드 추가
         private String theme;
         private String playerCount;
         private double averageWeight;

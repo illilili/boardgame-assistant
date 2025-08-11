@@ -17,7 +17,6 @@ const request = async (endpoint, options = {}) => {
     try {
         const response = await fetch(url, config);
         
-        // 🚨 응답이 JSON인지 확인하는 로직 추가
         const contentType = response.headers.get('content-type');
         let data;
 
@@ -25,12 +24,10 @@ const request = async (endpoint, options = {}) => {
             const text = await response.text();
             data = text ? JSON.parse(text) : {};
         } else {
-            // JSON이 아니면 텍스트로 처리
             data = await response.text();
         }
 
         if (!response.ok) {
-            // 에러 메시지를 data 객체에서 가져오거나, 일반 텍스트 그대로 사용
             const errorMessage = (typeof data === 'object' && data.message) ? data.message : data;
             throw new Error(errorMessage || `서버 에러: ${response.status}`);
         }
@@ -64,19 +61,18 @@ export const getMyProjects = () => request('/api/projects/my');
 export const generateConcept = (conceptData) => request('/api/plans/generate-concept', { method: 'POST', body: JSON.stringify(conceptData) });
 export const regenerateConcept = (regenerateData) => request('/api/plans/regenerate-concept', { method: 'POST', body: JSON.stringify(regenerateData) });
 export const getAllConcepts = () => request('/api/plans/concepts');
-
 export const generateGoal = (goalData) => request('/api/plans/generate-goal', { method: 'POST', body: JSON.stringify(goalData) });
-
-// 🚨 [신규] 게임 규칙 생성 API 함수 추가
 export const generateRule = (ruleData) => request('/api/plans/generate-rule', { method: 'POST', body: JSON.stringify(ruleData) });
-// 🚨 [신규] 게임 규칙 재생성 API 함수 추가
 export const regenerateRule = (regenerateData) => request('/api/plans/regenerate-rule', { method: 'POST', body: JSON.stringify(regenerateData) });
-// 🚨 [신규] 컴포넌트 생성 API 함수 추가
-export const generateComponents = (componentsData) => request('/api/plans/generate-components', { method: 'POST', body: JSON.stringify(componentsData) });
-
-// 🚨 [신규] 컴포넌트 재생성 API 함수 추가
-export const regenerateComponents = (regenerateData) => request('/api/plans/regenerate-components', { method: 'POST', body: JSON.stringify(regenerateData) });
-export const getMyRules = () => request('/api/balance/rules');
+export const getMyRulesByProject = (projectId) => request(`/api/balance/rules/${projectId}`);
 export const runSimulation = (simulationData) => request('/api/balance/simulate', { method: 'POST', body: JSON.stringify(simulationData) });
 export const analyzeBalance = (analysisData) => request('/api/balance/analyze', { method: 'POST', body: JSON.stringify(analysisData) });
-export const getMyRulesByProject = (projectId) => request(`/api/balance/rules/${projectId}`);
+export const getConceptsForSummary = (projectId) => request(`/api/plans/concepts-for-summary/${projectId}`);
+export const generateSummary = (conceptId) => request('/api/plans/generate-summary', { method: 'POST', body: JSON.stringify({ conceptId }) });
+export const savePlanVersion = (versionData) => request('/api/plans/version/save', { method: 'POST', body: JSON.stringify(versionData) });
+export const getPlanVersions = (planId) => request(`/api/plans/${planId}/versions`);
+export const rollbackPlanVersion = (planId, rollbackData) => request(`/api/plans/${planId}/rollback`, { method: 'POST', body: JSON.stringify(rollbackData) });
+export const getAllUsers = () => request('/api/users/all');
+export const assignRole = (roleData) => request('/api/admin/assign-role', { method: 'POST', body: JSON.stringify(roleData) });
+export const generateComponents = (componentData) => request('/api/plans/generate-components', { method: 'POST', body: JSON.stringify(componentData) });
+export const regenerateComponents = (regenerateData) => request('/api/plans/regenerate-components', { method: 'POST', body: JSON.stringify(regenerateData) });

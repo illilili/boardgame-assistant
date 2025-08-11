@@ -1,4 +1,3 @@
-// GameRuleService.java
 package com.boardgame.backend_spring.rule.service;
 
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
@@ -34,7 +33,6 @@ public class GameRuleService {
     @Value("${fastapi.service.url}/api/plans/generate-rule")
     private String ruleApiUrl;
 
-    // FastAPI에 보낼 요청 DTO (내부용)
     private record FastApiRuleRequest(String theme, String playerCount, double averageWeight, String ideaText,
                                       String mechanics, String storyline, String world_setting, String world_tone,
                                       String mainGoal, String subGoals, String winConditionType,
@@ -42,15 +40,12 @@ public class GameRuleService {
 
     @Transactional
     public GameRuleResponse generateRules(GameRuleRequest request) {
-        // 1. DB에서 원본 컨셉 조회
         BoardgameConcept concept = conceptRepository.findById((long) request.conceptId())
                 .orElseThrow(() -> new EntityNotFoundException("컨셉을 찾을 수 없습니다: " + request.conceptId()));
 
-        // 2. 컨셉에 연결된 목표(Goal) 정보 조회
         GameObjective objective = objectiveRepository.findById((long) request.conceptId())
                 .orElseThrow(() -> new EntityNotFoundException("게임 목표가 먼저 생성되어야 합니다. Concept ID: " + request.conceptId()));
 
-        // 3. FastAPI에 보낼 요청 객체 생성
         FastApiRuleRequest fastApiRequest = new FastApiRuleRequest(
                 concept.getTheme(),
                 concept.getPlayerCount(),
@@ -66,26 +61,32 @@ public class GameRuleService {
                 objective.getDesignNote()
         );
 
-        // 4. FastAPI 호출
         GameRuleResponse responseFromAI = restTemplate.postForObject(ruleApiUrl, fastApiRequest, GameRuleResponse.class);
         if (responseFromAI == null) {
             throw new RuntimeException("AI 서비스로부터 유효한 규칙 데이터를 받지 못했습니다.");
         }
 
-        // 5. 받은 응답을 GameRule 엔티티로 변환 및 저장
         Optional<GameRule> existingRule = ruleRepository.findById(concept.getConceptId());
-        GameRule gameRule = existingRule.orElse(new GameRule());
+        GameRule gameRule;
 
-        if (gameRule.getConceptId() == null) {
+        if (existingRule.isPresent()) {
+            gameRule = existingRule.get();
+            // 🚨 [수정] 기존 컬렉션을 명시적으로 비우고 새 데이터로 채웁니다.
+            gameRule.getActionRules().clear();
+            gameRule.getActionRules().addAll(responseFromAI.actionRules());
+            gameRule.getPenaltyRules().clear();
+            gameRule.getPenaltyRules().addAll(responseFromAI.penaltyRules());
+        } else {
+            gameRule = new GameRule();
             gameRule.setConceptId(concept.getConceptId());
             gameRule.setBoardgameConcept(concept);
+            gameRule.setActionRules(responseFromAI.actionRules());
+            gameRule.setPenaltyRules(responseFromAI.penaltyRules());
         }
 
         gameRule.setRuleId(responseFromAI.ruleId());
         gameRule.setTurnStructure(responseFromAI.turnStructure());
-        gameRule.setActionRules(responseFromAI.actionRules());
         gameRule.setVictoryCondition(responseFromAI.victoryCondition());
-        gameRule.setPenaltyRules(responseFromAI.penaltyRules());
         gameRule.setDesignNote(responseFromAI.designNote());
 
         ruleRepository.save(gameRule);
@@ -93,7 +94,6 @@ public class GameRuleService {
         return responseFromAI;
     }
 
-    // List<String>을 JSON 배열 형태의 문자열로 변환하는 헬퍼 메소드
     private String convertListToJson(List<String> list) {
         try {
             return objectMapper.writeValueAsString(list);

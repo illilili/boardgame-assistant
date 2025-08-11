@@ -93,7 +93,9 @@ const RuleCreator = () => {
         setError('');
 
         try {
+            // API 요청 시 conceptId를 함께 전송하여 안정적인 조회를 보장합니다.
             const requestBody = {
+                conceptId: parseInt(selectedConceptId, 10),
                 ruleId: generatedRules.ruleId,
                 feedback: feedback
             };
