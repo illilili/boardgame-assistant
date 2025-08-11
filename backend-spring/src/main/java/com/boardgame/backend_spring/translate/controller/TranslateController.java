@@ -1,5 +1,7 @@
 package com.boardgame.backend_spring.translate.controller;
 
+import com.boardgame.backend_spring.project.enumtype.ProjectStatus;
+import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import com.boardgame.backend_spring.translate.dto.*;
 import com.boardgame.backend_spring.translate.service.TranslateService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.List;
 public class TranslateController {
 
     private final TranslateService translateService;
+    private final ProjectRepository projectRepository;
 
     /**
      * [퍼블리셔] 다국어 번역 요청
@@ -28,8 +31,18 @@ public class TranslateController {
     public ResponseEntity<TranslationResponse> requestTranslation(
             @RequestBody TranslationRequest dto
     ) {
-        // JWT 없이 테스트 시 publisherId를 null로 전달
-        return ResponseEntity.ok(translateService.requestTranslations(null, dto));
+        // 1) 번역 요청 처리 (기존 로직)
+        TranslationResponse res = translateService.requestTranslations(null, dto);
+
+        // 2) 프로젝트 상태 전환: DEVELOPMENT -> PUBLISHING (최초 요청 시)
+        projectRepository.findProjectByContentId(dto.getContentId()).ifPresent(project -> {
+            if (project.getStatus() == ProjectStatus.DEVELOPMENT) {
+                project.setStatus(ProjectStatus.PUBLISHING);
+                projectRepository.save(project);
+            }
+        });
+
+        return ResponseEntity.ok(res);
     }
 
 
@@ -61,7 +74,7 @@ public class TranslateController {
     }
 
 
-    // 완료 처리
+    // 완료 처리(수동)
     @PutMapping("/{translationId}/complete")
     public ResponseEntity<TranslationItemDto> complete(
             @PathVariable Long translationId

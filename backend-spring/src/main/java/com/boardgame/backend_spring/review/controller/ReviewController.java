@@ -5,6 +5,12 @@ import com.boardgame.backend_spring.review.service.PlanReviewService;
 import com.boardgame.backend_spring.review.service.ComponentReviewService;
 import com.boardgame.backend_spring.review.dto.ComponentReviewDetailDto;
 import com.boardgame.backend_spring.review.service.ComponentReviewQueryService;
+import com.boardgame.backend_spring.plan.entity.Plan;
+import com.boardgame.backend_spring.plan.repository.PlanRepository;
+import com.boardgame.backend_spring.project.entity.Project;
+import com.boardgame.backend_spring.project.enumtype.ProjectStatus;
+import com.boardgame.backend_spring.project.repository.ProjectRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +25,8 @@ public class ReviewController {
     private final PlanReviewService planReviewService;
     private final ComponentReviewService componentReviewService;
     private final ComponentReviewQueryService componentReviewQueryService;
+    private final PlanRepository planRepository;
+    private final ProjectRepository projectRepository;
 
     // ===== 기획안 승인/반려 =====
     @PostMapping("/approve")
@@ -28,6 +36,19 @@ public class ReviewController {
                 request.isApprove(),
                 request.getReason()
         );
+
+        if (request.isApprove()) {
+            Plan plan = planRepository.findById(request.getPlanId())
+                    .orElseThrow(() -> new EntityNotFoundException("Plan not found"));
+
+            Project project = plan.getProject();
+            if (project == null) {
+                throw new EntityNotFoundException("Plan에 연결된 Project가 없습니다.");
+            }
+            project.setStatus(ProjectStatus.DEVELOPMENT);
+            projectRepository.save(project);
+        }
+
         return ResponseEntity.ok(message);
     }
 

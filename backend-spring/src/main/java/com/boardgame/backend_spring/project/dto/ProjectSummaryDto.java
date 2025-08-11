@@ -17,7 +17,7 @@ public class ProjectSummaryDto {
         return ProjectSummaryDto.builder()
                 .projectId(project.getId())
                 .projectName(project.getName())
-                .status(project.getStatus())
+                .status(project.getStatus().name()) // enum → String 변환
                 .build();
     }
 }
