@@ -19,6 +19,8 @@ import com.boardgame.backend_spring.content.service.card.CardContentService;
 import com.boardgame.backend_spring.content.service.model3d.Model3dContentService;
 import com.boardgame.backend_spring.content.service.rulebook.RulebookContentService;
 import com.boardgame.backend_spring.content.service.thumbnail.ThumbnailContentService;
+import com.boardgame.backend_spring.content.service.version.ContentVersionService;
+import com.boardgame.backend_spring.content.dto.version.ContentSaveRequest;
 import com.boardgame.backend_spring.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +40,7 @@ public class ContentController {
     private final ContentRepository contentRepository;
     private final SubTaskRepository subTaskRepository;
     private final ThumbnailContentService thumbnailContentService;
+    private final ContentVersionService contentVersionService;
     private final S3Uploader s3Uploader;
 
     private final ComponentStatusService componentStatusService;
@@ -62,6 +65,13 @@ public class ContentController {
 
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 콘텐츠입니다."));
+
+        // 덮어쓰기 직전 자동 스냅샷
+        ContentSaveRequest req = new ContentSaveRequest();
+        req.setContentId(contentId);
+        req.setNote("before file upload overwrite");
+        contentVersionService.saveVersion(req);
+
         content.setContentData(s3Url);
         contentRepository.save(content);
 

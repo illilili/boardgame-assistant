@@ -1,16 +1,17 @@
 package com.boardgame.backend_spring.translate.dto;
 
-public class TranslationResponse {
-    private Long translatedContentId;
-    private String status;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    public TranslationResponse() {}
-    public TranslationResponse(Long translatedContentId, String status) {
-        this.translatedContentId = translatedContentId;
-        this.status = status;
-    }
-    public Long getTranslatedContentId() { return translatedContentId; }
-    public void setTranslatedContentId(Long translatedContentId) { this.translatedContentId = translatedContentId; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+import java.util.List;
+
+/**
+ * 번역 요청 응답 DTO
+ * - contentId 기준으로 생성(또는 요청)된 번역 행들의 요약 리스트
+ */
+@Getter
+@AllArgsConstructor
+public class TranslationResponse {
+    private Long contentId;
+    private List<TranslationItemDto> items;
 }

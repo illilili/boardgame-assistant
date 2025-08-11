@@ -11,7 +11,7 @@ import java.util.List;
 public interface ContentVersionRepository extends JpaRepository<ContentVersion, Long> {
 
     /** 해당 콘텐츠의 최대 버전 번호(없으면 0) */
-    @Query("select coalesce(max(v.versionNo), 0) from ContentVersion v where v.content.id = :contentId")
+    @Query("select coalesce(max(v.versionNo), 0) from ContentVersion v where v.content.contentId  = :contentId")
     int findMaxVersionNo(@Param("contentId") Long contentId);
 
     /** 최신순 버전 목록 */
