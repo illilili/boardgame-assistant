@@ -11,6 +11,7 @@ import SignUp from './auth/SignUp';
 import MyPage from './auth/Mypage';
 import ProjectRenamePage from './plan/ProjectRenamePage';
 import Development from './development/Development';
+import PlanReview from './plan/PlanReview';
 
 const router = createBrowserRouter([
     {
@@ -67,6 +68,11 @@ const router = createBrowserRouter([
         id:10,
         path:'/development',
         element: <Development/>
+    },
+    {
+        id:11,
+        path: 'plan-review',
+        element: <PlanReview/>
     }
 
 

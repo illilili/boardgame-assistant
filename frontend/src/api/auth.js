@@ -3,64 +3,64 @@
 const API_BASE_URL = 'http://localhost:8080';
 
 const request = async (endpoint, options = {}) => {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const token = localStorage.getItem('accessToken');
-    const headers = {
-        // FormData의 경우 Content-Type을 설정하지 않아야 브라우저가 자동으로 올바른 값을 설정합니다.
-        ...options.headers,
-    };
-    if (!(options.body instanceof FormData)) {
-        headers['Content-Type'] = 'application/json';
-    }
+    const url = `${API_BASE_URL}${endpoint}`;
+    const token = localStorage.getItem('accessToken');
+    const headers = {
+        // FormData의 경우 Content-Type을 설정하지 않아야 브라우저가 자동으로 올바른 값을 설정합니다.
+        ...options.headers,
+    };
+    if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+    }
 
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
 
-    const config = { ...options, headers };
+    const config = { ...options, headers };
 
-    try {
-        const response = await fetch(url, config);
-        
-        const contentType = response.headers.get('content-type');
-        let data;
+    try {
+        const response = await fetch(url, config);
 
-        const text = await response.text();
-        if (contentType && contentType.startsWith('application/json')) {
-            data = text ? JSON.parse(text) : {};
-        } else {
-            data = text;
-        }
+        const contentType = response.headers.get('content-type');
+        let data;
 
-        if (!response.ok) {
-            const errorMessage = (typeof data === 'object' && data.message) ? data.message : data;
-            throw new Error(errorMessage || `서버 에러: ${response.status}`);
-        }
-        return data;
-    } catch (error) {
-        console.error(`API 요청 실패: ${endpoint}`, error);
-        throw error;
-    }
+        const text = await response.text();
+        if (contentType && contentType.startsWith('application/json')) {
+            data = text ? JSON.parse(text) : {};
+        } else {
+            data = text;
+        }
+
+        if (!response.ok) {
+            const errorMessage = (typeof data === 'object' && data.message) ? data.message : data;
+            throw new Error(errorMessage || `서버 에러: ${response.status}`);
+        }
+        return data;
+    } catch (error) {
+        console.error(`API 요청 실패: ${endpoint}`, error);
+        throw error;
+    }
 };
 
 // --- 기존 함수들 ---
 export const signup = (signupData) => request('/api/auth/signup', { method: 'POST', body: JSON.stringify(signupData) });
 export const login = (loginData) => request('/api/auth/login', { method: 'POST', body: JSON.stringify(loginData) });
 export const logout = () => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-        request('/api/auth/logout', { method: 'POST' }).catch(err => console.error("로그아웃 API 호출 실패:", err));
-    }
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+        request('/api/auth/logout', { method: 'POST' }).catch(err => console.error("로그아웃 API 호출 실패:", err));
+    }
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
 };
 export const getMyPageInfo = () => request('/api/users/mypage');
 export const createProject = (projectData) => request('/api/projects', { method: 'POST', body: JSON.stringify(projectData) });
 export const renameProject = (projectId, newTitle) => {
-    return request(`/api/projects/${projectId}/rename`, {
-        method: 'PUT',
-        body: JSON.stringify({ newTitle: newTitle }),
-    });
+    return request(`/api/projects/${projectId}/rename`, {
+        method: 'PUT',
+        body: JSON.stringify({ newTitle: newTitle }),
+    });
 };
 export const getMyProjects = () => request('/api/projects/my');
 export const generateConcept = (conceptData) => request('/api/plans/generate-concept', { method: 'POST', body: JSON.stringify(conceptData) });
@@ -84,24 +84,24 @@ export const regenerateComponents = (regenerateData) => request('/api/plans/rege
 
 // ✨ 1. 기획안 제출 API 함수 추가
 export const submitPlan = (planId, file) => {
-    const formData = new FormData();
-    formData.append('file', file);
+    const formData = new FormData();
+    formData.append('file', file);
 
-    return request(`/api/plans/${planId}/submit`, {
-        method: 'POST',
-        body: formData,
-    });
+    return request(`/api/plans/${planId}/submit`, {
+        method: 'POST',
+        body: formData,
+    });
 };
 
 // ✨ (참고) 임시 문서 업로드 함수도 필요하다면 아래와 같이 만듭니다.
 export const uploadPlanDoc = (planId, file) => {
-    const formData = new FormData();
-    formData.append('file', file);
+    const formData = new FormData();
+    formData.append('file', file);
 
-    return request(`/api/plans/${planId}/upload-doc`, {
-        method: 'POST',
-        body: formData,
-    });
+    return request(`/api/plans/${planId}/upload-doc`, {
+        method: 'POST',
+        body: formData,
+    });
 };
 
 // --- 추가된 API 함수들 ---
@@ -122,26 +122,29 @@ export const deletePlan = (planId) => request(`/api/plans/${planId}`, { method: 
  * @returns {Promise<object>} - 저장 결과 데이터
  */
 export const savePlan = async (planData) => {
-  // 로컬 스토리지에서 인증 토큰을 가져옵니다.
-  const token = localStorage.getItem('token');
+    // 로컬 스토리지에서 인증 토큰을 가져옵니다.
+    const token = localStorage.getItem('token');
 
-  const response = await fetch('/api/plans/save', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // 토큰이 있다면 Authorization 헤더에 추가합니다.
-      'Authorization': `Bearer ${token}`
-    },
-    // 백엔드로 보낼 데이터를 JSON 문자열 형태로 변환합니다.
-    body: JSON.stringify(planData),
-  });
+    const response = await fetch('/api/plans/save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // 토큰이 있다면 Authorization 헤더에 추가합니다.
+            'Authorization': `Bearer ${token}`
+        },
+        // 백엔드로 보낼 데이터를 JSON 문자열 형태로 변환합니다.
+        body: JSON.stringify(planData),
+    });
 
-  // 응답이 성공적이지 않으면 에러를 발생시킵니다.
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || '기획안 저장에 실패했습니다.');
-  }
+    // 응답이 성공적이지 않으면 에러를 발생시킵니다.
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '기획안 저장에 실패했습니다.');
+    }
 
-  // 성공적인 응답 데이터를 JSON 형태로 반환합니다.
-  return response.json();
+    // 성공적인 응답 데이터를 JSON 형태로 반환합니다.
+    return response.json();
 };
+
+export const getPendingPlans = () => request('/api/review/pending');
+export const reviewPlan = (reviewData) => request('/api/review/approve', { method: 'POST', body: JSON.stringify(reviewData) });

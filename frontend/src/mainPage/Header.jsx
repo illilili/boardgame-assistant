@@ -10,6 +10,7 @@ const Header = () => (
       <a href="/development">개발</a>
       <a href="/publishing">출판</a>
       <a href="/team">팀</a>
+      <a href='/plan-review'>기획안 리뷰</a>
     </nav>
     <div className="hamburger-icon">
       <span></span>
