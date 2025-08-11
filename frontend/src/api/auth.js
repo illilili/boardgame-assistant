@@ -82,7 +82,7 @@ export const assignRole = (roleData) => request('/api/admin/assign-role', { meth
 export const generateComponents = (componentData) => request('/api/plans/generate-components', { method: 'POST', body: JSON.stringify(componentData) });
 export const regenerateComponents = (regenerateData) => request('/api/plans/regenerate-components', { method: 'POST', body: JSON.stringify(regenerateData) });
 
-// ✨ 1. 기획안 제출 API 함수 추가
+// ✨ 기획안 제출 API 함수
 export const submitPlan = (planId, file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -93,7 +93,7 @@ export const submitPlan = (planId, file) => {
     });
 };
 
-// ✨ (참고) 임시 문서 업로드 함수도 필요하다면 아래와 같이 만듭니다.
+// ✨ (참고) 임시 문서 업로드 함수
 export const uploadPlanDoc = (planId, file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -113,38 +113,18 @@ export const getPlanDetail = (planId) => request(`/api/plans/${planId}`);
 export const deletePlan = (planId) => request(`/api/plans/${planId}`, { method: 'DELETE' });
 
 // 기획안 저장 API (POST /api/plans/save)
-// 백엔드에는 save 엔드포인트가 없으므로 이 요청은 기획안 버전을 저장하는 savePlanVersion 함수를 사용해야 합니다.
-// '기획안 저장'이 '버전 저장'을 의미한다고 가정하고 아래 함수를 사용합니다.
-
-/**
- * 기획안 내용을 저장(수정)하는 API
- * @param {object} planData - { planId: number, planContent: string }
- * @returns {Promise<object>} - 저장 결과 데이터
- */
-export const savePlan = async (planData) => {
-    // 로컬 스토리지에서 인증 토큰을 가져옵니다.
-    const token = localStorage.getItem('token');
-
-    const response = await fetch('/api/plans/save', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // 토큰이 있다면 Authorization 헤더에 추가합니다.
-            'Authorization': `Bearer ${token}`
-        },
-        // 백엔드로 보낼 데이터를 JSON 문자열 형태로 변환합니다.
-        body: JSON.stringify(planData),
-    });
-
-    // 응답이 성공적이지 않으면 에러를 발생시킵니다.
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '기획안 저장에 실패했습니다.');
-    }
-
-    // 성공적인 응답 데이터를 JSON 형태로 반환합니다.
-    return response.json();
-};
+export const savePlan = (planData) => request('/api/plans/save', { method: 'POST', body: JSON.stringify(planData) });
 
 export const getPendingPlans = () => request('/api/review/pending');
 export const reviewPlan = (reviewData) => request('/api/review/approve', { method: 'POST', body: JSON.stringify(reviewData) });
+
+// 🚨🚨🚨 수정된 부분: API 엔드포인트를 백엔드와 일치하도록 수정합니다.
+export const getApprovedPlan = (projectId) => request(`/api/plans/approved/project/${projectId}`);
+
+// 🚨 [신규] 모든 개발자 목록 조회 API 함수
+export const getAllDevelopers = () => request('/api/users/developers');
+
+// 🚨 [신규] 개발자 배정 API 함수
+export const assignDeveloper = (projectId, assignData) => request(`/api/projects/${projectId}/assign-developer`, { method: 'PUT', body: JSON.stringify(assignData) });
+// 🚨 다른 함수들과 동일하게 request 함수를 사용하도록 수정
+export const getTasksForProject = (projectId) => request(`/api/projects/${projectId}/tasks`);

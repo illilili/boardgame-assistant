@@ -89,11 +89,9 @@ public class SummaryService {
     public PlanSaveResponse savePlanContent(PlanSaveRequest request) {
         Plan plan;
         if (request.getPlanId() != null) {
-            // 기존 기획안이 있다면 ID로 찾아서 업데이트
             plan = planRepository.findById(request.getPlanId())
                     .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + request.getPlanId()));
         } else {
-            // 기획안이 없다면 컨셉 ID로 새로운 기획안 생성
             BoardgameConcept concept = conceptRepository.findById(request.getConceptId())
                     .orElseThrow(() -> new EntityNotFoundException("Concept not found with id: " + request.getConceptId()));
             Project project = concept.getProject();
@@ -186,7 +184,7 @@ public class SummaryService {
         List<SummaryDto.ComponentInfo> componentInfoList = components.stream()
                 .map(c -> SummaryDto.ComponentInfo.builder()
                         .title(c.getTitle())
-                        .role_and_effect(c.getRoleAndEffect())
+                        .role_and_effect(c.getRoleAndEffect() != null ? c.getRoleAndEffect() : "")
                         .build())
                 .collect(Collectors.toList());
 

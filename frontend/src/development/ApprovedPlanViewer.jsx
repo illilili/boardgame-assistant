@@ -1,74 +1,102 @@
-import React from 'react';
-import './ApprovedPlanViewer.css'; // 기존 CSS 재사용
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { getApprovedPlan } from '../api/auth.js';
+import './ApprovedPlanViewer.css';
 
-// --- 변경된 구조의 더미 데이터 ---
-// 실제로는 API로 planId와 planDocUrl을 받아옵니다.
-// UI 표시를 위해 title, author 등 추가 정보를 함께 받아온다고 가정하겠습니다.
-const dummyDocumentPlans = [
-  {
-    planId: 101,
-    title: '프로젝트: 크리스탈 가디언즈',
-    author: '김기획',
-    approvedDate: '2024-07-15',
-    planDocUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', // 예시 PDF 링크
-  },
-  {
-    planId: 102,
-    title: '우주 대탐험: 안드로메다',
-    author: '박개발',
-    approvedDate: '2024-07-28',
-    planDocUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', // 예시 PDF 링크
-  },
-  {
-    planId: 103,
-    title: '미스터리 맨션 살인사건',
-    author: '이탐정',
-    approvedDate: '2024-08-02',
-    planDocUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf', // 예시 PDF 링크
-  },
-];
+function ApprovedPlanViewer() {
+    const { projectId } = useParams();
+    const [plan, setPlan] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    // 🚨 모달의 열림/닫힘 상태를 관리하는 state 추가
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
+    useEffect(() => {
+        const fetchApprovedPlan = async () => {
+            try {
+                if (projectId) {
+                    const data = await getApprovedPlan(projectId);
+                    setPlan(data);
+                }
+            } catch (err) {
+                console.error('승인된 기획안 불러오기 실패:', err);
+                setError(err.message || '승인된 기획안을 불러오는 데 실패했습니다.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchApprovedPlan();
+    }, [projectId]);
 
-// onPrivacyClick과 onTermsClick prop은 기획안 조회와 별개로 배치될 수 있으므로 유지합니다.
-function ApprovedPlanViewer({ onPrivacyClick, onTermsClick }) {
+    // 🚨 모달을 여는 함수
+    const openModal = () => {
+        if (plan) {
+            setIsModalOpen(true);
+        }
+    };
+    
+    // 🚨 모달을 닫는 함수
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
-  // 기획안 문서를 새 탭에서 여는 함수
-  const openPlanDocument = (url) => {
-    // 유효한 URL이 있을 때만 새 탭을 엽니다.
-    if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } else {
-      alert('문서 URL이 유효하지 않습니다.');
+    if (isLoading) {
+        return <div className="loading">로딩 중...</div>;
     }
-  };
 
-  return (
-    // 기존 component-placeholder 클래스를 그대로 사용합니다.
-    <div className="component-placeholder">
-      <h2>[개발] 승인된 기획안 문서조회</h2>
-      <p>개발이 승인된 기획안 목록입니다. 항목을 클릭하면 새 탭에서 기획안 문서를 엽니다.</p>
+    if (error) {
+        return <div className="error-message">{error}</div>;
+    }
 
-      {/* 기획안 목록 */}
-      <div className="plan-list-container">
-        <ul className="plan-list">
-          {dummyDocumentPlans.map(plan => (
-            <li 
-              key={plan.planId} 
-              onClick={() => openPlanDocument(plan.planDocUrl)} 
-              className="plan-list-item"
-              title={`${plan.title} 문서 열기`} // 마우스를 올렸을 때 팁 표시
-            >
-              <span className="plan-title">{plan.title} (ID: {plan.planId})</span>
-              <span className="plan-author">{plan.author}</span>
-              <span className="plan-date">{plan.approvedDate}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+    return (
+        <div className="component-placeholder">
+            <h2>[개발] 승인된 기획안 문서조회</h2>
+            <p>프로젝트 ID {projectId}의 승인된 기획안 문서입니다.</p>
 
-     
-    </div>
-  );
+            {plan && (
+                <div className="plan-list-container">
+                    <ul className="plan-list">
+                        <li
+                            key={plan.planId}
+                            // 🚨 클릭 시 새 탭 대신 모달을 열도록 수정
+                            onClick={openModal}
+                            className="plan-list-item"
+                            title={`${plan.planId}번 기획안 상세 정보 보기`}
+                        >
+                            <span className="plan-title">기획안 ID: {plan.planId}</span>
+                            <span className="plan-status">{plan.status}</span>
+                        </li>
+                    </ul>
+                </div>
+            )}
+            {!plan && !isLoading && <div className="no-plan">승인된 기획안이 없습니다.</div>}
+            
+            {/* 🚨 모달 UI 추가 */}
+            {isModalOpen && plan && (
+                <div className="modal-backdrop" onClick={closeModal}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>기획안 상세 정보 (ID: {plan.planId})</h3>
+                            <button onClick={closeModal} className="modal-close-button">&times;</button>
+                        </div>
+                        <div className="modal-body">
+                            <h4>기획안 내용</h4>
+                            <pre className="plan-content-box">{plan.currentContent}</pre>
+                            <h4>기획안 문서</h4>
+                            {plan.planDocUrl ? (
+                                <a href={plan.planDocUrl} target="_blank" rel="noopener noreferrer" className="plan-doc-link">
+                                    문서 열기 ({plan.planDocUrl.split('/').pop()})
+                                </a>
+                            ) : (
+                                <p>업로드된 문서가 없습니다.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }
 
 export default ApprovedPlanViewer;

@@ -11,7 +11,8 @@ import SignUp from './auth/SignUp';
 import MyPage from './auth/Mypage';
 import ProjectRenamePage from './plan/ProjectRenamePage';
 import Development from './development/Development';
-import PlanReview from './plan/PlanReview';
+import PlanReview from './publish/PlanReview';
+import Publish from './publish/Publish';
 
 const router = createBrowserRouter([
     {
@@ -71,8 +72,13 @@ const router = createBrowserRouter([
     },
     {
         id:11,
-        path: 'plan-review',
+        path: '/plan-review',
         element: <PlanReview/>
+    },
+    {
+        id:12,
+        path: '/publish',
+        element: <Publish/>
     }
 
 

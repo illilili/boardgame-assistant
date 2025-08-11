@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
-import { 
-    getMyProjects, getConceptsForSummary, generateSummary, 
-    savePlanVersion, getPlanVersions, rollbackPlanVersion, 
-    submitPlan 
+import {
+    getMyProjects, getConceptsForSummary, generateSummary,
+    savePlanVersion, getPlanVersions, rollbackPlanVersion,
+    submitPlan
 } from '../api/auth';
-import PlanReport from './PlanReport'; 
+import PlanReport from './PlanReport';
 
 const PlanPageStyles = `
 /* --- 전체 레이아웃 (2단 구조) --- */
@@ -18,7 +18,7 @@ const PlanPageStyles = `
     margin: 0 auto;
     padding: 0;
     flex-grow: 1;
-    min-height: 0; 
+    min-height: 0;
     box-sizing: border-box;
 }
 
@@ -167,7 +167,7 @@ select:focus, input[type="text"]:focus {
 }
 
 .document-editor {
-    flex-grow: 1; 
+    flex-grow: 1;
     width: 100%;
     padding: 24px;
     border: 1px solid #EAEAEA;
@@ -197,7 +197,7 @@ select:focus, input[type="text"]:focus {
     border-top: 1px solid #eaeaea;
     display: flex;
     flex-direction: column;
-    flex-grow: 1; 
+    flex-grow: 1;
     min-height: 0;
 }
 
@@ -220,7 +220,7 @@ select:focus, input[type="text"]:focus {
 }
 
 .spinner-container {
-    flex-grow: 1; 
+    flex-grow: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -259,6 +259,17 @@ select:focus, input[type="text"]:focus {
         flex-basis: auto;
     }
 }
+.success-message {
+    padding: 16px;
+    background-color: #f0fff4; /* Light green background */
+    color: #065f46; /* Dark green text */
+    border: 1px solid #6ee7b7; /* Green border */
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
 `;
 
 
@@ -269,7 +280,7 @@ const PlanPage = () => {
     const [conceptList, setConceptList] = useState([]);
     const [filteredConceptList, setFilteredConceptList] = useState([]);
     const [conceptId, setConceptId] = useState('');
-    
+
     // 기획안 본문 및 버전 관리 상태
     const [planId, setPlanId] = useState(null);
     const [planContent, setPlanContent] = useState('');
@@ -277,7 +288,7 @@ const PlanPage = () => {
     const [versionName, setVersionName] = useState('');
     const [versionMemo, setVersionMemo] = useState('');
     const [selectedVersionId, setSelectedVersionId] = useState('');
-    
+
     // 로딩 및 에러 상태
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -288,7 +299,7 @@ const PlanPage = () => {
     // UI 상태
     const [isEditMode, setIsEditMode] = useState(false);
     const [downloadFormat, setDownloadFormat] = useState('md');
-    
+
     // 제출 관련 상태
     const [submissionFile, setSubmissionFile] = useState(null);
 
@@ -327,9 +338,12 @@ const PlanPage = () => {
         if (!selectedProjectId || conceptList.length === 0) {
             setFilteredConceptList([]);
             setConceptId('');
+            setPlanContent(''); // 프로젝트/컨셉 변경 시 기획서 내용 초기화
+            setVersions([]);
+            setPlanId(null);
             return;
         }
-        
+
         const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(selectedProjectId));
         setFilteredConceptList(conceptsForProject.sort((a, b) => b.conceptId - a.conceptId));
         if (conceptsForProject.length > 0) {
@@ -339,39 +353,34 @@ const PlanPage = () => {
         }
     }, [selectedProjectId, conceptList]);
 
-    // 컨셉 변경 시 기획서 자동 생성 및 불러오기
-    useEffect(() => {
-        if (conceptId) {
-            fetchSummaryForConcept(conceptId);
-        } else {
-            setPlanContent('');
-            setVersions([]);
-            setPlanId(null);
+    const handleGenerateSummary = async (e) => {
+        e.preventDefault();
+        if (!conceptId) {
+            setError('먼저 컨셉을 선택해야 합니다.');
+            return;
         }
-    }, [conceptId]);
 
-    const fetchSummaryForConcept = async (id) => {
         setIsLoading(true);
         setError(null);
         setIsEditMode(false);
         setPlanContent('');
         setVersions([]);
         setPlanId(null);
-        
+
         try {
-            const data = await generateSummary(id);
-            
+            const data = await generateSummary(conceptId);
+
             let finalSummaryText = data.summaryText;
             try {
                 const nestedData = JSON.parse(finalSummaryText);
                 if (nestedData && typeof nestedData.summaryText === 'string') {
                     finalSummaryText = nestedData.summaryText;
                 }
-            } catch (e) {}
-            
+            } catch (e) { }
+
             setPlanId(data.planId);
             setPlanContent(finalSummaryText);
-            
+
             // 기획서 생성 후 바로 버전 저장
             const autoSaveData = {
                 planId: data.planId,
@@ -389,7 +398,8 @@ const PlanPage = () => {
             setIsLoading(false);
         }
     };
-    
+
+
     // 버전 목록 가져오기
     const fetchVersions = async (currentPlanId) => {
         if (!currentPlanId) return;
@@ -400,7 +410,7 @@ const PlanPage = () => {
             alert(err.message);
         }
     };
-    
+
     // 버전 저장
     const handleSaveVersion = async (e) => {
         e.preventDefault();
@@ -421,7 +431,7 @@ const PlanPage = () => {
                 planContent,
             };
             const result = await savePlanVersion(requestBody);
-            
+
             alert(result.message);
             setVersionName('');
             setVersionMemo('');
@@ -444,7 +454,7 @@ const PlanPage = () => {
         try {
             const requestBody = { versionId };
             const result = await rollbackPlanVersion(planId, requestBody);
-            
+
             alert(result.message);
             setPlanContent(result.rolledBackContent);
             setIsEditMode(false);
@@ -466,7 +476,7 @@ const PlanPage = () => {
             handleRollback(selectedVersion.versionId, selectedVersion.versionName);
         }
     };
-    
+
     // 다운로드 관련 함수
     const formatToReport = (rawText) => {
         if (!rawText) return '';
@@ -480,7 +490,7 @@ const PlanPage = () => {
                 return `${sectionCounter++}. ${content}`;
             }
             if (trimmedLine.startsWith('* ')) {
-                return `  - ${trimmedLine.substring(2)}`;
+                return `   - ${trimmedLine.substring(2)}`;
             }
             if (trimmedLine.startsWith('# ')) {
                 return `[ ${trimmedLine.substring(2)} ]`;
@@ -489,12 +499,12 @@ const PlanPage = () => {
         });
         return formattedLines.join('\n');
     };
-    
+
     const downloadAsMarkdown = () => {
         const blob = new Blob([planContent], { type: 'text/markdown;charset=utf-8' });
         saveAs(blob, 'boardgame-plan.md');
     };
-    
+
     const downloadAsDocx = () => {
         const reportText = formatToReport(planContent);
 
@@ -507,15 +517,15 @@ const PlanPage = () => {
                 return new Paragraph({ text: trimmedLine.substring(trimmedLine.indexOf(' ') + 1), heading: HeadingLevel.HEADING_2, style: "Heading2" });
             }
             if (trimmedLine.startsWith('- ')) {
-                    return new Paragraph({ text: trimmedLine.substring(2), bullet: { level: 0 } });
+                return new Paragraph({ text: trimmedLine.substring(2), bullet: { level: 0 } });
             }
             return new Paragraph(line);
         });
 
-        const doc = new Document({ 
-            sections: [{ 
-                properties: {}, 
-                children: paragraphs 
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: paragraphs
             }],
             styles: {
                 paragraphStyles: [
@@ -527,7 +537,7 @@ const PlanPage = () => {
 
         Packer.toBlob(doc).then(blob => saveAs(blob, 'boardgame-plan.docx'));
     };
-    
+
     const handleDownload = () => {
         if (!planContent) {
             alert('다운로드할 내용이 없습니다.');
@@ -539,7 +549,7 @@ const PlanPage = () => {
             default: alert('지원하지 않는 형식입니다.');
         }
     };
-    
+
     // 제출 관련 핸들러
     const handleFileChange = (e) => {
         if (e.target.files.length > 0) {
@@ -584,7 +594,7 @@ const PlanPage = () => {
                             <h1>AI 게임 기획서 생성</h1>
                             <p>컨셉을 선택하면, AI가 데이터를 종합하여 기획서를 작성합니다.</p>
                         </header>
-                        <div>
+                        <form onSubmit={handleGenerateSummary}>
                             <div className="form-group">
                                 <label htmlFor="project-select">프로젝트 선택</label>
                                 <select
@@ -626,9 +636,15 @@ const PlanPage = () => {
                                     )}
                                 </select>
                             </div>
-                            {/* 이전 form의 버튼을 제거하고, 자동 생성 로직이 useEffect로 처리되도록 함 */}
+                            <button
+                                type="submit"
+                                className="primary-button"
+                                disabled={isLoading || !conceptId}
+                            >
+                                {isLoading ? '생성 중...' : 'AI 기획서 생성'}
+                            </button>
                             {error && <p className="error-message">{error}</p>}
-                        </div>
+                        </form>
                     </div>
 
                     {planId && (
@@ -639,19 +655,19 @@ const PlanPage = () => {
                             <form className="save-version-form" onSubmit={handleSaveVersion}>
                                 <div className="form-group">
                                     <label htmlFor="versionName">버전 이름</label>
-                                    <input type="text" id="versionName" value={versionName} onChange={e => setVersionName(e.target.value)} placeholder="예: v1.1 - 밸런스 수정" required/>
+                                    <input type="text" id="versionName" value={versionName} onChange={e => setVersionName(e.target.value)} placeholder="예: v1.1 - 밸런스 수정" required />
                                 </div>
-                                <div className="form-group" style={{marginBottom: 0}}>
+                                <div className="form-group" style={{ marginBottom: 0 }}>
                                     <label htmlFor="versionMemo">메모 (선택)</label>
-                                    <input type="text" id="versionMemo" value={versionMemo} onChange={e => setVersionMemo(e.target.value)} placeholder="수정 내용 요약"/>
+                                    <input type="text" id="versionMemo" value={versionMemo} onChange={e => setVersionMemo(e.target.value)} placeholder="수정 내용 요약" />
                                 </div>
                                 <button type="submit" className="primary-button" disabled={isSaving}>
                                     {isSaving ? "저장 중..." : "현재 내용 버전으로 저장"}
                                 </button>
                             </form>
-                            
+
                             {versions.length > 0 && (
-                                <div className="form-group" style={{marginTop: '24px'}}>
+                                <div className="form-group" style={{ marginTop: '24px' }}>
                                     <label htmlFor="version-select">저장된 버전 불러오기 (롤백)</label>
                                     <select
                                         id="version-select"
@@ -692,9 +708,9 @@ const PlanPage = () => {
                     <div className="result-header">
                         <h2>생성된 기획서</h2>
                         <div className="download-controls">
-                            <button 
-                                type="button" 
-                                className="secondary-button" 
+                            <button
+                                type="button"
+                                className="secondary-button"
                                 onClick={() => setIsEditMode(!isEditMode)}
                                 disabled={!planContent}
                             >
