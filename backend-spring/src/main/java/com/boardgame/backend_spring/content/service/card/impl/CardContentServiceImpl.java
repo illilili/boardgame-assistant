@@ -30,7 +30,6 @@ public class CardContentServiceImpl implements CardContentService {
     private final SubTaskRepository subTaskRepository;
     private final ComponentStatusService componentStatusService;
 
-    // 공통 메서드: 콘텐츠, 플랜 정보 가져오기
     private Plan getPlanFromContentId(Long contentId) {
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
@@ -44,7 +43,6 @@ public class CardContentServiceImpl implements CardContentService {
     public CardTextResponse generateText(CardTextGenerateRequest request) {
         Plan plan = getPlanFromContentId(request.getContentId());
 
-        // 상태 변경: IN_PROGRESS
         SubTask subTask = subTaskRepository.findByContentId(request.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
         subTask.setStatus("IN_PROGRESS");
@@ -63,15 +61,13 @@ public class CardContentServiceImpl implements CardContentService {
         aiRequest.setStoryline(plan.getBoardgameConcept().getStoryline());
         aiRequest.setCards(List.of(card));
 
-        // 생성 결과 받기
         CardTextResponse response = pythonApiService.generateText(aiRequest);
         String generatedText = response.getGeneratedTexts().get(0).getText();
 
-        // 콘텐츠 업데이트 및 저장
         Content content = contentRepository.findById(request.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
-        content.setContentData(generatedText); // 저장
-        contentRepository.save(content);       // 반영
+        content.setContentData(generatedText);
+        contentRepository.save(content);
 
         return response;
     }
@@ -80,7 +76,6 @@ public class CardContentServiceImpl implements CardContentService {
     public CardImageResponse generateImage(CardTextGenerateRequest request) {
         Plan plan = getPlanFromContentId(request.getContentId());
 
-        // 상태 변경: IN_PROGRESS
         SubTask subTask = subTaskRepository.findByContentId(request.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
         subTask.setStatus("IN_PROGRESS");
@@ -99,18 +94,17 @@ public class CardContentServiceImpl implements CardContentService {
         aiRequest.setStoryline(plan.getBoardgameConcept().getStoryline());
         aiRequest.setCards(List.of(card));
 
-        // FastAPI 호출
         CardImageResponse response = pythonApiService.generateImage(aiRequest);
         String imageUrl = response.getGeneratedImages().get(0).getImageUrl();
 
-        // DB 저장
         Content content = contentRepository.findById(request.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
-        content.setContentData(imageUrl); // 이미지 URL 저장
-        contentRepository.save(content);  // DB 반영
+        content.setContentData(imageUrl);
+        contentRepository.save(content);
 
         return response;
     }
+
     @Override
     public CardPreviewDto getCardPreview(Long contentId) {
         Content content = contentRepository.findById(contentId)
@@ -121,9 +115,21 @@ public class CardContentServiceImpl implements CardContentService {
 
         CardPreviewDto dto = new CardPreviewDto();
         dto.setContentId(contentId);
-        dto.setName(component.getTitle());
-        dto.setEffect(component.getRoleAndEffect());
-        dto.setDescription(component.getArtConcept());
+
+        // 🚨 [수정 완료] 개별 카드(Content)의 정보가 있으면 우선적으로 사용하고, 없으면 상위 Component의 정보를 사용
+        dto.setName(
+                content.getName() != null && !content.getName().isEmpty()
+                        ? content.getName() : component.getTitle()
+        );
+        dto.setEffect(
+                content.getEffect() != null && !content.getEffect().isEmpty()
+                        ? content.getEffect() : component.getRoleAndEffect()
+        );
+        dto.setDescription(
+                content.getDescription() != null && !content.getDescription().isEmpty()
+                        ? content.getDescription() : component.getArtConcept()
+        );
+
         dto.setTheme(concept.getTheme());
         dto.setStoryline(concept.getStoryline());
 

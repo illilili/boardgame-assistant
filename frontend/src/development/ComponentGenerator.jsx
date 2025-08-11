@@ -1,11 +1,14 @@
+// 파일 위치: src/ComponentGenerator.jsx
+
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; 
+import { useParams } from 'react-router-dom';
+// auth.js 파일에서 API 함수들을 import 합니다.
 import { getCardPreview, generateCardText, generateCardImage } from '../api/auth';
 import './ComponentGenerator.css';
 
-function ComponentGenerator() { 
-    const { contentId } = useParams(); 
-    
+function ComponentGenerator() {
+    const { contentId } = useParams();
+
     const [previewData, setPreviewData] = useState(null);
     const [formData, setFormData] = useState({ name: '', effect: '', description: '' });
     const [generatedText, setGeneratedText] = useState('');
@@ -17,7 +20,6 @@ function ComponentGenerator() {
     useEffect(() => {
         if (!contentId) return;
 
-        // contentId가 바뀔 때마다 상태 초기화
         setPreviewData(null);
         setFormData({ name: '', effect: '', description: '' });
         setGeneratedText('');
@@ -26,6 +28,7 @@ function ComponentGenerator() {
 
         const fetchPreview = async () => {
             try {
+                // API 호출: 카드 미리보기 데이터 가져오기
                 const data = await getCardPreview(contentId);
                 setPreviewData(data);
                 setFormData({
@@ -50,9 +53,10 @@ function ComponentGenerator() {
         setIsLoadingText(true);
         setError('');
         try {
-            const requestData = { contentId, ...formData };
+            // API 호출: 카드 문구 생성
+            const requestData = { contentId: Number(contentId), ...formData };
             const response = await generateCardText(requestData);
-            const resultText = response.generated_texts[0]?.text || '생성된 텍스트가 없습니다.';
+            const resultText = response.generatedTexts[0]?.text || '생성된 텍스트가 없습니다.';
             setGeneratedText(resultText);
         } catch (err) {
             setError(`텍스트 생성 실패: ${err.message}`);
@@ -65,9 +69,10 @@ function ComponentGenerator() {
         setIsLoadingImage(true);
         setError('');
         try {
-            const requestData = { contentId, ...formData };
+            // API 호출: 카드 이미지 생성
+            const requestData = { contentId: Number(contentId), ...formData };
             const response = await generateCardImage(requestData);
-            const resultUrl = response.generated_images[0]?.imageUrl || '';
+            const resultUrl = response.generatedImages[0]?.imageUrl || '';
             setGeneratedImageUrl(resultUrl);
         } catch (err) {
             setError(`이미지 생성 실패: ${err.message}`);
@@ -79,7 +84,7 @@ function ComponentGenerator() {
     return (
         <div className="card-generator-container">
             <h2>카드 콘텐츠 생성 (ID: {contentId})</h2>
-            
+
             {previewData && (
                 <div className="preview-section">
                     <p><strong>테마:</strong> {previewData.theme}</p>

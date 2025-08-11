@@ -3,7 +3,7 @@ import json
 import re
 import os
 from dotenv import load_dotenv
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
@@ -21,10 +21,12 @@ router = APIRouter(
     tags=["Component"]
 )
 
-# --- LLM 및 프롬프트 정의 ---
+# --- LLM 정의 ---
 llm_components = ChatOpenAI(model_name="gpt-4o", temperature=0.8)
+llm_regenerate_components = ChatOpenAI(model_name="gpt-4o", temperature=0.7)
 
 # --- Pydantic 모델 정의 ---
+
 class ComponentGenerationRequest(BaseModel):
     theme: str
     ideaText: str
@@ -33,6 +35,12 @@ class ComponentGenerationRequest(BaseModel):
     turnStructure: str
     actionRules: List[str]
 
+# 🚨 [신규] AI가 생성할 개별 카드/구성요소 예시를 받을 모델
+class ExampleItem(BaseModel):
+    title: str = Field(description="예시 항목의 고유한 이름 (예: 카드 이름)")
+    effect: str = Field(description="예시 항목의 구체적인 효과 설명")
+
+# 🚨 [수정] ComponentItem이 examples 리스트를 포함하도록 변경
 class ComponentItem(BaseModel):
     type: str
     title: str
@@ -40,13 +48,14 @@ class ComponentItem(BaseModel):
     role_and_effect: str = Field(alias="role_and_effect")
     art_concept: str = Field(alias="art_concept")
     interconnection: str
+    examples: List[ExampleItem] = Field(default_factory=list, description="구성요소 세트에 포함된 개별 아이템 예시 목록")
 
 class ComponentGenerationResponse(BaseModel):
     components: List[ComponentItem]
 
 class RegenerateComponentsRequest(BaseModel):
-    current_components_json: str = Field(description="재생성 대상이 되는 현재 구성요소 목록의 JSON 문자열")
-    feedback: str = Field(description="구성요소 재생성을 위한 사용자 피드백")
+    current_components_json: str
+    feedback: str
     theme: str
     playerCount: str
     averageWeight: float
@@ -58,6 +67,8 @@ class RegenerateComponentsRequest(BaseModel):
 class RegenerateComponentsResponse(BaseModel):
     components: List[ComponentItem]
 
+
+# --- 프롬프트 템플릿 정의 ---
 
 component_generation_prompt = PromptTemplate(
     input_variables=["theme", "ideaText", "mechanics", "mainGoal", "turnStructure", "actionRules"],
@@ -100,40 +111,6 @@ component_generation_prompt = PromptTemplate(
             "examples": []
         }},
         {{
-            "type": "Rulebook",
-            "title": "아스트랄 연대기 기록서",
-            "quantity": "1권",
-            "role_and_effect": "게임의 모든 규칙을 담고 있습니다. '빠른 시작 가이드' 섹션과 상세 규칙 섹션으로 나뉘어 초보자와 숙련자 모두를 만족시킵니다.",
-            "art_concept": "사양: 280x280mm, 24페이지, 중철제본, 120g 아트지, 풀컬러 인쇄. 배경은 고서 양피지 질감이며, 명확한 다이어그램과 플레이 예시가 풍부하게 포함됩니다.",
-            "interconnection": "게임의 모든 규칙과 구성요소의 사용법을 설명하는 메타 가이드입니다.",
-            "examples": []
-        }},
-        {{
-            "type": "Player Figure",
-            "title": "시간 여행자 피규어 세트",
-            "quantity": "총 4종 (플레이어별 1개)",
-            "role_and_effect": "플레이어를 게임 세계에서 대변하는 아바타입니다. 게임 보드 위에서 플레이어의 위치를 나타내며, 각 캐릭터는 고유한 시작 능력을 가집니다.",
-            "art_concept": "사양: 높이 40mm, PVC 재질, 고유한 포즈의 3D 모델링 기반, 회색으로 사출 후 어두운 색으로 워싱 처리하여 디테일 강조.",
-            "interconnection": "플레이어 매트의 능력치와 연결되며, 게임 보드 위에서 다른 피규어/토큰과 상호작용합니다.",
-            "examples": [
-                {{"title": "성기사 알렉토르", "effect": "고유 능력 '철벽 방어': 라운드당 한 번, 전투 시 '운명의 주사위' 결과로 나온 '피해 1' 아이콘 하나를 무시합니다."}},
-                {{"title": "시간술사 리아나", "effect": "고유 능력 '시간 되감기': 게임 중 한 번, '자원 토큰'을 지불하고 방금 사용한 '계략 카드' 1장을 손으로 되돌려 받습니다."}}
-            ]
-        }},
-        {{
-            "type": "Custom Dice Set",
-            "title": "운명의 주사위",
-            "quantity": "총 3개",
-            "role_and_effect": "전투나 탐험 같은 특정 행동의 결과를 결정합니다. 아이콘 기반으로 결과를 표시하여 직관성을 높이고 테마 몰입감을 더합니다.",
-            "art_concept": "사양: 16mm, 6면체, 아크릴 재질, 음각 아이콘 후 금색 페인팅, 반투명한 보라색 우주 마블 패턴.",
-            "interconnection": "전투 시 플레이어 피규어의 능력치에 보너스를 받거나, 특정 카드 효과로 다시 굴리거나 결과 값을 조작할 수 있습니다.",
-            "examples": [
-                {{"title": "1-3면: 단검 아이콘", "effect": "기본 성공을 의미합니다. '피해 1'을 주거나, '자원 1'을 획득합니다."}},
-                {{"title": "4-5면: 쌍검 아이콘", "effect": "강한 성공을 의미합니다. '피해 2'를 주거나, '자원 2'를 획득합니다."}},
-                {{"title": "6면: 별 아이콘", "effect": "치명적 성공(크리티컬)을 의미합니다. '피해 2'와 함께 추가 행동 1개를 즉시 수행할 수 있습니다."}}
-            ]
-        }},
-        {{
             "type": "Card Set",
             "title": "계략 카드",
             "quantity": "총 60장",
@@ -142,9 +119,7 @@ component_generation_prompt = PromptTemplate(
             "interconnection": "사용 시 '자원 토큰'을 소모하며, '유물 카드'와 강력한 콤보를 만들 수 있습니다.",
             "examples": [
                 {{"title": "매복", "effect": "비용: 없음. 효과: 다른 플레이어가 이 지역에 들어왔을 때 이 카드를 공개할 수 있습니다. 그 플레이어는 '자원 토큰' 2개를 당신에게 지불해야 합니다."}},
-                {{"title": "자원 증폭", "effect": "비용: '수정' 토큰 1개. 효과: 이번 라운드 동안, 당신이 자원을 얻을 때마다 같은 자원을 1개 더 얻습니다."}},
-                {{"title": "미래 예지", "effect": "비용: 없음. 효과: 즉시 '계략 카드' 덱에서 3장을 보고, 1장은 손으로 가져오고 1장은 덱 맨 위, 1장은 덱 맨 아래에 놓습니다."}},
-                {{"title": "고대의 계약", "effect": "비용: '명성' 점수 2점. 효과: '유물 카드' 덱에서 카드 1장을 즉시 뽑습니다. 이 카드는 강력하지만 게임 중 단 한 번만 사용할 수 있습니다."}}
+                {{"title": "자원 증폭", "effect": "비용: '수정' 토큰 1개. 효과: 이번 라운드 동안, 당신이 자원을 얻을 때마다 같은 자원을 1개 더 얻습니다."}}
             ]
         }}
     ]
@@ -152,105 +127,74 @@ component_generation_prompt = PromptTemplate(
 """
 )
 
-component_generation_chain = LLMChain(llm=llm_components, prompt=component_generation_prompt)
-
-llm_regenerate_components = ChatOpenAI(model_name="gpt-4o", temperature=0.7)
-
 component_regeneration_prompt_template = PromptTemplate(
     input_variables=["current_components_json", "feedback", "theme", "playerCount", "averageWeight", "ideaText", "mechanics", "mainGoal", "winConditionType"],
-    template=(
-        "# Mission: 당신은 보드게임의 '리드 컴포넌트 전략가'로서, 기존에 설계된 게임 구성요소에 대한 피드백을 받아, 이를 반영하여 더욱 완벽한 구성요소 목록을 재생성하는 임무를 맡았습니다. 피드백의 의도를 정확히 파악하고, 기존 구성요소의 장점은 유지하되, 필요한 부분을 추가, 수정 또는 제거하여 최적의 목록을 도출해야 합니다.\n\n"
-        "# Component Design Philosophy:\n"
-        "1.  **피드백 반영 (Feedback Integration):** 주어진 피드백을 최우선으로 고려하여 구성요소 목록을 수정합니다.\n"
-        "2.  **기능성 (Functionality):** 모든 구성요소는 반드시 게임의 핵심 메커니즘이나 목표 달성과 직접적으로 연결되어야 합니다.\n"
-        "3.  **테마성 (Thematic Resonance):** 구성요소의 이름과 역할(effect)은 게임의 세계관과 스토리에 깊이 몰입하게 만드는 장치입니다.\n"
-        "4.  **직관성 (Intuitive UX):** 플레이어가 구성요소를 보고 그 역할과 사용법을 쉽게 이해할 수 있어야 합니다. 'effect' 설명 시, 플레이어의 행동 관점에서 구체적으로 서술해주세요.\n"
-        "5.  **기존 구성요소 유지/개선:** 기존에 존재하는 구성요소가 여전히 유효하다면 유지하고, 피드백에 따라 개선하거나 새로운 요소를 추가합니다. 불필요하다고 판단되면 제거할 수도 있습니다.\n\n"
-        "# Input Data Analysis:\n"
-        "---\n"
-        "**기존 보드게임 구성요소:**\n"
-        "{current_components_json}\n\n"
-        "**새로운 피드백:**\n"
-        "{feedback}\n\n"
-        "**보드게임 종합 정보 (참고용):**\n"
-        "- 테마: {theme}\n"
-        "- 컨셉: {ideaText}\n"
-        "- 메커니즘: {mechanics}\n"
-        "- 주요 목표: {mainGoal}\n"
-        "- 승리 조건: {winConditionType}\n"
-        "---\n\n"
-        "# Final Output Instruction:\n"
-        "이제, 위의 모든 지침과 철학, 그리고 피드백을 반영하여 아래 JSON 형식에 맞춰 최종 결과물만을 생성해주세요.\n"
-        "최소 5개 이상의 '핵심' 구성요소를 제안하되, 게임에 필요한 다양한 종류(보드, 카드, 토큰 등)를 균형 있게 포함해주세요.\n"
-        "**JSON 코드 블록 외에 어떤 인사, 설명, 추가 텍스트도 절대 포함해서는 안 됩니다.**\n\n"
-        "```json\n"
-        "{{\n"
-        '    "components": [\n'
-        "        {{\n"
-        '            "type": "[구성요소의 종류 (예: Game Board, Player Mat, Card Set, Token Set 등)]",\n'
-        '            "title": "[세계관에 몰입감을 더하는 고유한 이름 (한국어)]",\n'
-        '            "quantity": "[구성요소의 전체 수량 (예: 1개, 총 4개, 총 50장)]",\n'
-        '            "role_and_effect": "[이 구성요소의 \'게임플레이 기능\'을 설명. 플레이어는 이걸로 무엇을 할 수 있고, 게임 목표 달성에 어떤 영향을 미치는지 구체적으로 서술 (한국어)]",\n'
-        '            "art_concept": "[실제 제작을 고려한 시각적 컨셉 (재질, 스타일, 특징 등)]",\n'
-        '            "interconnection": "[다른 구성요소와의 상호작용 방식 설명]"\n'
-        "        }}\n"
-        "    ]\n"
-        "}}\n"
-        "```"
-    )
+    template="# Mission: 당신은 보드게임의 '리드 컴포넌트 전략가'로서, 기존에 설계된 게임 구성요소에 대한 피드백을 받아, 이를 반영하여 더욱 완벽한 구성요소 목록을 재생성하는 임무를 맡았습니다. 피드백의 의도를 정확히 파악하고, 기존 구성요소의 장점은 유지하되, 필요한 부분을 추가, 수정 또는 제거하여 최적의 목록을 도출해야 합니다.\n\n"
+             "# Component Design Philosophy:\n"
+             "1.  **피드백 반영 (Feedback Integration):** 주어진 피드백을 최우선으로 고려하여 구성요소 목록을 수정합니다.\n"
+             "2.  **기능성 (Functionality):** 모든 구성요소는 반드시 게임의 핵심 메커니즘이나 목표 달성과 직접적으로 연결되어야 합니다.\n"
+             "3.  **테마성 (Thematic Resonance):** 구성요소의 이름과 역할(effect)은 게임의 세계관과 스토리에 깊이 몰입하게 만드는 장치입니다.\n"
+             "4.  **직관성 (Intuitive UX):** 플레이어가 구성요소를 보고 그 역할과 사용법을 쉽게 이해할 수 있어야 합니다. 'effect' 설명 시, 플레이어의 행동 관점에서 구체적으로 서술해주세요.\n"
+             "5.  **기존 구성요소 유지/개선:** 기존에 존재하는 구성요소가 여전히 유효하다면 유지하고, 피드백에 따라 개선하거나 새로운 요소를 추가합니다. 불필요하다고 판단되면 제거할 수도 있습니다.\n\n"
+             "# Input Data Analysis:\n"
+             "---\n"
+             "**기존 보드게임 구성요소:**\n"
+             "{current_components_json}\n\n"
+             "**새로운 피드백:**\n"
+             "{feedback}\n\n"
+             "**보드게임 종합 정보 (참고용):**\n"
+             "- 테마: {theme}\n"
+             "- 컨셉: {ideaText}\n"
+             "- 메커니즘: {mechanics}\n"
+             "- 주요 목표: {mainGoal}\n"
+             "- 승리 조건: {winConditionType}\n"
+             "---\n\n"
+             "# Final Output Instruction:\n"
+             "이제, 위의 모든 지침과 철학, 그리고 피드백을 반영하여 아래 JSON 형식에 맞춰 최종 결과물만을 생성해주세요.\n"
+             "최소 5개 이상의 '핵심' 구성요소를 제안하되, 게임에 필요한 다양한 종류(보드, 카드, 토큰 등)를 균형 있게 포함해주세요.\n"
+             "**JSON 코드 블록 외에 어떤 인사, 설명, 추가 텍스트도 절대 포함해서는 안 됩니다.**\n\n"
+             "```json\n"
+             "{{\n"
+             '    "components": [\n'
+             "        {{\n"
+             '            "type": "[구성요소의 종류 (예: Game Board, Player Mat, Card Set, Token Set 등)]",\n'
+             '            "title": "[세계관에 몰입감을 더하는 고유한 이름 (한국어)]",\n'
+             '            "quantity": "[구성요소의 전체 수량 (예: 1개, 총 4개, 총 50장)]",\n'
+             '            "role_and_effect": "[이 구성요소의 \'게임플레이 기능\'을 설명. 플레이어는 이걸로 무엇을 할 수 있고, 게임 목표 달성에 어떤 영향을 미치는지 구체적으로 서술 (한국어)]",\n'
+             '            "art_concept": "[실제 제작을 고려한 시각적 컨셉 (재질, 스타일, 특징 등)]",\n'
+             '            "interconnection": "[다른 구성요소와의 상호작용 방식 설명]"\n'
+             "        }}\n"
+             "    ]\n"
+             "}}\n"
+             "```"
 )
+
+# --- LLM 체인 정의 ---
+component_generation_chain = LLMChain(llm=llm_components, prompt=component_generation_prompt)
 component_regeneration_chain = LLMChain(llm=llm_regenerate_components, prompt=component_regeneration_prompt_template)
 
 
-# --- Pydantic 모델 정의 ---
-class ComponentGenerationRequest(BaseModel):
-    theme: str
-    ideaText: str
-    mechanics: str
-    mainGoal: str
-    turnStructure: str
-    actionRules: List[str]
-
-class ComponentItem(BaseModel):
-    type: str
-    title: str
-    quantity: str
-    role_and_effect: str = Field(alias="role_and_effect")
-    art_concept: str = Field(alias="art_concept")
-    interconnection: str
-
-class ComponentGenerationResponse(BaseModel):
-    components: List[ComponentItem]
-
-class RegenerateComponentsRequest(BaseModel):
-    current_components_json: str = Field(description="재생성 대상이 되는 현재 구성요소 목록의 JSON 문자열")
-    feedback: str = Field(description="구성요소 재생성을 위한 사용자 피드백")
-    theme: str
-    playerCount: str
-    averageWeight: float
-    ideaText: str
-    mechanics: str
-    mainGoal: str
-    winConditionType: str
-
-class RegenerateComponentsResponse(BaseModel):
-    components: List[ComponentItem]
-
-
 # --- API 엔드포인트 ---
-@router.post("/generate-components")
+@router.post("/generate-components", response_model=ComponentGenerationResponse)
 def generate_components_api(request: ComponentGenerationRequest):
+    response_text = ""
     try:
         response = component_generation_chain.invoke(request.dict())
         response_text = response.get('text', '')
+        
         json_match = re.search(r"```json\s*(\{.*?\})\s*```", response_text, re.DOTALL)
-
         if not json_match:
-            raise ValueError("LLM 응답에서 유효한 JSON 블록을 찾을 수 없습니다.")
-
-        json_str = json_match.group(1)
+            json_str = response_text
+        else:
+            json_str = json_match.group(1)
+            
         components_data = json.loads(json_str)
-        return components_data
+        validated_data = ComponentGenerationResponse.model_validate(components_data)
+        return validated_data
+    except json.JSONDecodeError as e:
+        print(f"JSON 파싱 오류: {e}")
+        print(f"LLM 원본 응답: {response_text}")
+        raise HTTPException(status_code=500, detail="LLM 응답을 JSON으로 파싱하는 데 실패했습니다.")
     except Exception as e:
         print(f"구성요소 생성 중 오류 발생: {e}")
         raise HTTPException(status_code=500, detail=f"서버 내부 오류 발생: {e}")
@@ -258,32 +202,28 @@ def generate_components_api(request: ComponentGenerationRequest):
 def regenerate_game_components_logic(request: RegenerateComponentsRequest) -> dict:
     try:
         response = component_regeneration_chain.invoke(request.dict())
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"LLM 체인 실행 중 오류 발생: {e}")
-
-    try:
-        json_match = re.search(r"```json\s*(\{.*?\})\s*```", response['text'], re.DOTALL)
+        response_text = response.get('text', '')
+        json_match = re.search(r"```json\s*(\{.*?\})\s*```", response_text, re.DOTALL)
         if json_match:
             json_str = json_match.group(1)
-            components_data = json.loads(json_str)
-            return components_data
+            return json.loads(json_str)
         else:
             raise ValueError("LLM 응답에서 유효한 JSON 블록을 찾을 수 없습니다.")
-    except json.JSONDecodeError as e:
-        print(f"JSON 파싱 오류: {e}")
-        print(f"LLM 응답 텍스트: {response['text']}")
-        raise HTTPException(status_code=500, detail=f"LLM 응답을 JSON 형식으로 파싱할 수 없습니다.")
-    except (ValueError, KeyError) as e:
-        print(f"오류 발생: {e}")
-        print(f"LLM 응답 텍스트: {response['text']}")
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"재생성 중 오류 발생: {e}")
+        if 'response' in locals() and 'text' in response:
+            print(f"LLM 원본 응답: {response['text']}")
+        raise HTTPException(status_code=500, detail=f"LLM 응답 처리 중 오류 발생: {e}")
+
 
 @router.post("/regenerate-components", response_model=RegenerateComponentsResponse, summary="기존 구성요소 재생성 (피드백 반영)")
 async def regenerate_components_api(request: RegenerateComponentsRequest):
     try:
         regenerated_data = regenerate_game_components_logic(request)
-        return regenerated_data
+        validated_data = RegenerateComponentsResponse.model_validate(regenerated_data)
+        return validated_data
     except HTTPException as e:
         raise e
     except Exception as e:
+        print(f"API 엔드포인트 오류: {e}")
         raise HTTPException(status_code=500, detail=f"서버 오류 발생: {e}")

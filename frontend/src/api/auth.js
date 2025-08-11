@@ -6,7 +6,6 @@ const request = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = localStorage.getItem('accessToken');
     const headers = {
-        // FormData의 경우 Content-Type을 설정하지 않아야 브라우저가 자동으로 올바른 값을 설정합니다.
         ...options.headers,
     };
     if (!(options.body instanceof FormData)) {
@@ -129,7 +128,8 @@ export const assignDeveloper = (projectId, assignData) => request(`/api/projects
 // 🚨 다른 함수들과 동일하게 request 함수를 사용하도록 수정
 export const getTasksForProject = (projectId) => request(`/api/projects/${projectId}/tasks`);
 
-// src/api/auth.js 파일에 아래 함수들을 추가하세요.
+
+// --- 아래에 신규 카드 콘텐츠 관련 API 함수 추가 ---
 
 /**
  * [신규] 카드 입력 폼에 필요한 미리보기 데이터를 가져옵니다.
