@@ -8,6 +8,8 @@ import com.boardgame.backend_spring.goal.entity.GameObjective;
 import com.boardgame.backend_spring.goal.repository.GameObjectiveRepository;
 import com.boardgame.backend_spring.plan.dto.PlanVersionDto;
 import com.boardgame.backend_spring.plan.dto.SummaryDto;
+import com.boardgame.backend_spring.plan.dto.PlanSaveRequest;
+import com.boardgame.backend_spring.plan.dto.PlanSaveResponse;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.entity.PlanVersion;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
@@ -80,6 +82,31 @@ public class SummaryService {
         return SummaryDto.GenerateResponse.builder()
                 .planId(plan.getPlanId())
                 .summaryText(generatedText)
+                .build();
+    }
+
+    @Transactional
+    public PlanSaveResponse savePlanContent(PlanSaveRequest request) {
+        Plan plan;
+        if (request.getPlanId() != null) {
+            // 기존 기획안이 있다면 ID로 찾아서 업데이트
+            plan = planRepository.findById(request.getPlanId())
+                    .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + request.getPlanId()));
+        } else {
+            // 기획안이 없다면 컨셉 ID로 새로운 기획안 생성
+            BoardgameConcept concept = conceptRepository.findById(request.getConceptId())
+                    .orElseThrow(() -> new EntityNotFoundException("Concept not found with id: " + request.getConceptId()));
+            Project project = concept.getProject();
+            plan = Plan.create(project, concept, request.getPlanContent());
+        }
+
+        plan.setCurrentContent(request.getPlanContent());
+        planRepository.save(plan);
+
+        return PlanSaveResponse.builder()
+                .planId(plan.getPlanId())
+                .message("기획안 내용이 성공적으로 저장되었습니다.")
+                .planContent(plan.getCurrentContent())
                 .build();
     }
 

@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
-import { getMyProjects, getConceptsForSummary, generateSummary, savePlanVersion, getPlanVersions, rollbackPlanVersion } from '../api/auth';
+import { 
+    getMyProjects, getConceptsForSummary, generateSummary, 
+    savePlanVersion, getPlanVersions, rollbackPlanVersion, 
+    submitPlan 
+} from '../api/auth';
 import PlanReport from './PlanReport'; 
 
 const PlanPageStyles = `
@@ -259,26 +263,36 @@ select:focus, input[type="text"]:focus {
 
 
 const PlanPage = () => {
+    // 프로젝트 및 컨셉 상태
     const [projectList, setProjectList] = useState([]);
     const [selectedProjectId, setSelectedProjectId] = useState('');
     const [conceptList, setConceptList] = useState([]);
     const [filteredConceptList, setFilteredConceptList] = useState([]);
     const [conceptId, setConceptId] = useState('');
+    
+    // 기획안 본문 및 버전 관리 상태
     const [planId, setPlanId] = useState(null);
     const [planContent, setPlanContent] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [downloadFormat, setDownloadFormat] = useState('md');
-    
     const [versions, setVersions] = useState([]);
     const [versionName, setVersionName] = useState('');
     const [versionMemo, setVersionMemo] = useState('');
-    const [isSaving, setIsSaving] = useState(false);
     const [selectedVersionId, setSelectedVersionId] = useState('');
+    
+    // 로딩 및 에러 상태
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState('');
 
-    // ✨ 1. 수정 모드를 위한 state 추가 (false는 보기 모드, true는 수정 모드)
+    // UI 상태
     const [isEditMode, setIsEditMode] = useState(false);
+    const [downloadFormat, setDownloadFormat] = useState('md');
+    
+    // 제출 관련 상태
+    const [submissionFile, setSubmissionFile] = useState(null);
 
+    // 프로젝트 목록 불러오기
     useEffect(() => {
         const fetchProjects = async () => {
             try {
@@ -295,6 +309,7 @@ const PlanPage = () => {
         fetchProjects();
     }, []);
 
+    // 모든 컨셉 목록 불러오기
     useEffect(() => {
         const fetchAllConcepts = async () => {
             try {
@@ -307,6 +322,7 @@ const PlanPage = () => {
         fetchAllConcepts();
     }, []);
 
+    // 선택된 프로젝트에 따라 컨셉 목록 필터링
     useEffect(() => {
         if (!selectedProjectId || conceptList.length === 0) {
             setFilteredConceptList([]);
@@ -323,54 +339,27 @@ const PlanPage = () => {
         }
     }, [selectedProjectId, conceptList]);
 
-
-    const fetchVersions = async (currentPlanId) => {
-        if (!currentPlanId) return;
-        try {
-            const data = await getPlanVersions(currentPlanId);
-            setVersions(data.versions);
-        } catch (err) {
-            alert(err.message);
+    // 컨셉 변경 시 기획서 자동 생성 및 불러오기
+    useEffect(() => {
+        if (conceptId) {
+            fetchSummaryForConcept(conceptId);
+        } else {
+            setPlanContent('');
+            setVersions([]);
+            setPlanId(null);
         }
-    };
-    
-    const formatToReport = (rawText) => {
-        if (!rawText) return '';
-        let processedText = rawText.replace(/\*\*/g, '');
-        let sectionCounter = 1;
-        const lines = processedText.split('\n');
-        const formattedLines = lines.map(line => {
-            const trimmedLine = line.trim();
-            if (trimmedLine.startsWith('## ')) {
-                const content = trimmedLine.replace(/^##\s*\d*\.?\s*/, '');
-                return `${sectionCounter++}. ${content}`;
-            }
-            if (trimmedLine.startsWith('* ')) {
-                return `  - ${trimmedLine.substring(2)}`;
-            }
-            if (trimmedLine.startsWith('# ')) {
-                return `[ ${trimmedLine.substring(2)} ]`;
-            }
-            return line;
-        });
-        return formattedLines.join('\n');
-    };
+    }, [conceptId]);
 
-    const handleGenerateSummary = async (e) => {
-        e.preventDefault();
-        if (!conceptId) {
-            setError('먼저 기획 컨셉을 선택해주세요.');
-            return;
-        }
+    const fetchSummaryForConcept = async (id) => {
         setIsLoading(true);
         setError(null);
+        setIsEditMode(false);
         setPlanContent('');
         setVersions([]);
         setPlanId(null);
-        setIsEditMode(false); // ✨ 새 기획서 생성 시 보기 모드로 초기화
-
+        
         try {
-            const data = await generateSummary(conceptId);
+            const data = await generateSummary(id);
             
             let finalSummaryText = data.summaryText;
             try {
@@ -382,7 +371,18 @@ const PlanPage = () => {
             
             setPlanId(data.planId);
             setPlanContent(finalSummaryText);
+            
+            // 기획서 생성 후 바로 버전 저장
+            const autoSaveData = {
+                planId: data.planId,
+                versionName: "AI 기획서 초안",
+                memo: "AI가 생성한 기획서 초안입니다.",
+                planContent: finalSummaryText
+            };
+            await savePlanVersion(autoSaveData);
             fetchVersions(data.planId);
+            setSuccessMessage('새로운 기획서가 생성되고 초안이 저장되었습니다.');
+
         } catch (err) {
             setError(err.message);
         } finally {
@@ -390,6 +390,18 @@ const PlanPage = () => {
         }
     };
     
+    // 버전 목록 가져오기
+    const fetchVersions = async (currentPlanId) => {
+        if (!currentPlanId) return;
+        try {
+            const data = await getPlanVersions(currentPlanId);
+            setVersions(data.versions);
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+    
+    // 버전 저장
     const handleSaveVersion = async (e) => {
         e.preventDefault();
         if (!planId) {
@@ -414,7 +426,8 @@ const PlanPage = () => {
             setVersionName('');
             setVersionMemo('');
             fetchVersions(planId);
-            setIsEditMode(false); // 버전 저장 후 보기 모드로 전환
+            setIsEditMode(false);
+            setSuccessMessage(result.message);
         } catch (err) {
             alert(err.message);
         } finally {
@@ -422,8 +435,9 @@ const PlanPage = () => {
         }
     };
 
+    // 롤백
     const handleRollback = async (versionId, versionName) => {
-        if (!window.confirm(`'${versionName}' 버전으로 기획서를 되돌리시겠습니까? 현재 수정 중인 내용은 덮어씌워집니다.`)) {
+        if (!window.confirm(`'${versionName}' 버전으로 기획서를 되돌리시겠습니까?`)) {
             setSelectedVersionId('');
             return;
         }
@@ -433,7 +447,8 @@ const PlanPage = () => {
             
             alert(result.message);
             setPlanContent(result.rolledBackContent);
-            setIsEditMode(false); // ✨ 롤백 후 보기 모드로 초기화
+            setIsEditMode(false);
+            setSuccessMessage(result.message);
         } catch (err) {
             alert(err.message);
         } finally {
@@ -450,6 +465,29 @@ const PlanPage = () => {
             setSelectedVersionId(selectedId);
             handleRollback(selectedVersion.versionId, selectedVersion.versionName);
         }
+    };
+    
+    // 다운로드 관련 함수
+    const formatToReport = (rawText) => {
+        if (!rawText) return '';
+        let processedText = rawText.replace(/\*\*/g, '');
+        let sectionCounter = 1;
+        const lines = processedText.split('\n');
+        const formattedLines = lines.map(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith('## ')) {
+                const content = trimmedLine.replace(/^##\s*\d*\.?\s*/, '');
+                return `${sectionCounter++}. ${content}`;
+            }
+            if (trimmedLine.startsWith('* ')) {
+                return `  - ${trimmedLine.substring(2)}`;
+            }
+            if (trimmedLine.startsWith('# ')) {
+                return `[ ${trimmedLine.substring(2)} ]`;
+            }
+            return line;
+        });
+        return formattedLines.join('\n');
     };
     
     const downloadAsMarkdown = () => {
@@ -469,7 +507,7 @@ const PlanPage = () => {
                 return new Paragraph({ text: trimmedLine.substring(trimmedLine.indexOf(' ') + 1), heading: HeadingLevel.HEADING_2, style: "Heading2" });
             }
             if (trimmedLine.startsWith('- ')) {
-                 return new Paragraph({ text: trimmedLine.substring(2), bullet: { level: 0 } });
+                    return new Paragraph({ text: trimmedLine.substring(2), bullet: { level: 0 } });
             }
             return new Paragraph(line);
         });
@@ -501,20 +539,52 @@ const PlanPage = () => {
             default: alert('지원하지 않는 형식입니다.');
         }
     };
+    
+    // 제출 관련 핸들러
+    const handleFileChange = (e) => {
+        if (e.target.files.length > 0) {
+            setSubmissionFile(e.target.files[0]);
+            setSuccessMessage('');
+        }
+    };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!planId) {
+            setError('제출할 기획안을 먼저 생성해야 합니다.');
+            return;
+        }
+        if (!submissionFile) {
+            setError('제출할 파일을 선택해야 합니다.');
+            return;
+        }
+        setIsSubmitting(true);
+        setError(null);
+        setSuccessMessage('');
+
+        try {
+            const result = await submitPlan(planId, submissionFile);
+            console.log("제출 결과:", result);
+            setSuccessMessage(`기획안 ID ${result.planId}이 성공적으로 제출되었습니다!`);
+        } catch (err) {
+            setError(`제출 실패: ${err.message}`);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <>
             <style>{PlanPageStyles}</style>
             <div className="summary-page-container">
-                {/* --- 왼쪽 컬럼 (생성 + 버전 관리) --- */}
+                {/* --- 왼쪽 컬럼 (생성 + 버전 관리 + 제출) --- */}
                 <div className="form-column">
                     <div>
                         <header className="summary-header">
                             <h1>AI 게임 기획서 생성</h1>
                             <p>컨셉을 선택하면, AI가 데이터를 종합하여 기획서를 작성합니다.</p>
                         </header>
-                        <form onSubmit={handleGenerateSummary}>
+                        <div>
                             <div className="form-group">
                                 <label htmlFor="project-select">프로젝트 선택</label>
                                 <select
@@ -556,11 +626,9 @@ const PlanPage = () => {
                                     )}
                                 </select>
                             </div>
-                            <button type="submit" className="primary-button" disabled={isLoading || !conceptId}>
-                                {isLoading ? 'AI가 기획서 작성 중...' : '기획서 생성 및 업데이트'}
-                            </button>
+                            {/* 이전 form의 버튼을 제거하고, 자동 생성 로직이 useEffect로 처리되도록 함 */}
                             {error && <p className="error-message">{error}</p>}
-                        </form>
+                        </div>
                     </div>
 
                     {planId && (
@@ -601,14 +669,29 @@ const PlanPage = () => {
                             )}
                         </div>
                     )}
+                    {/* 기획안 제출 섹션 추가 */}
+                    <div className="version-management-section">
+                        <div className="version-header">
+                            <h2>기획안 최종 제출</h2>
+                        </div>
+                        <form className="save-version-form" onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label htmlFor="submissionFile">제출할 기획서 파일</label>
+                                <input type="file" id="submissionFile" onChange={handleFileChange} required />
+                            </div>
+                            <button type="submit" className="primary-button" disabled={isSubmitting || !planId || !submissionFile}>
+                                {isSubmitting ? "제출 중..." : "최종 제출하기"}
+                            </button>
+                            {successMessage && <p className="success-message">{successMessage}</p>}
+                            {error && <p className="error-message">{error}</p>}
+                        </form>
+                    </div>
                 </div>
-
-                {/* --- 오른쪽 결과 컬럼 --- */}
+                {/* --- 오른쪽 컬럼 (기획서 내용) --- */}
                 <div className="result-column">
                     <div className="result-header">
                         <h2>생성된 기획서</h2>
                         <div className="download-controls">
-                            {/* ✨ 2. 수정/완료 토글 버튼 추가 */}
                             <button 
                                 type="button" 
                                 className="secondary-button" 
@@ -629,7 +712,6 @@ const PlanPage = () => {
                     {isLoading ? (
                         <div className="spinner-container"><div className="spinner"></div></div>
                     ) : (
-                        // ✨ 3. isEditMode 상태에 따라 조건부 렌더링
                         isEditMode ? (
                             <textarea
                                 id="documentEditor"

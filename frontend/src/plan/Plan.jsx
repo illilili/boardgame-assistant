@@ -11,6 +11,9 @@ import RuleCreator from './RuleCreator';
 import Review from './Review';
 import WelcomeScreen from './WelcomeScreen';
 import PlanPage from './PlanPage';
+import SubmissionPage from './SubmissionPage';
+import PlanManager from './PlanManager';
+
 
 // Header 컴포넌트는 현재 사용되지 않으므로 import에서 제거했습니다.
 // import Header from '../mainPage/Header'; 
@@ -23,7 +26,9 @@ const workspaceNavItems = [
   { id: 'rules', title: '규칙 생성', component: <RuleCreator /> },
   { id: 'components', title: '게임 구성요소 생성', component: <Components/>},
   { id: 'review', title: '밸런스 테스트', component: <Review /> },
-  { id: 'planPage', title: '기획안 관리', component: <PlanPage/>}
+  { id: 'planPage', title: '기획안 관리', component: <PlanPage/>},
+  { id: 'submission', title: '기획안 제출', component: <SubmissionPage/>},
+  { id: 'planmanger', title: '기획안 관리자', component: <PlanManager/>},
 ];
 
 function Plan() {
