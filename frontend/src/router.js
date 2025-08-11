@@ -10,6 +10,7 @@ import Login from './auth/Login';
 import SignUp from './auth/SignUp';
 import MyPage from './auth/Mypage';
 import ProjectRenamePage from './plan/ProjectRenamePage';
+import Development from './development/Development';
 
 const router = createBrowserRouter([
     {
@@ -61,6 +62,11 @@ const router = createBrowserRouter([
         id: 9,
         path:'/myPage',
         element: <MyPage/>
+    },
+    {
+        id:10,
+        path:'/development',
+        element: <Development/>
     }
 
 

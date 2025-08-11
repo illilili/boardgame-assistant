@@ -1,0 +1,93 @@
+/* DevelopmentListViewer.css */
+
+.dev-list-container {
+  margin-top: 2rem;
+}
+
+/* --- 목록 헤더 스타일 --- */
+.dev-list-header {
+  display: flex;
+  padding: 0.75rem 1.5rem;
+  background-color: #f9fafb;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* --- 목록(ul) 및 항목(li) 스타일 --- */
+.dev-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.dev-list-item {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+
+.dev-list-item:first-child {
+  border-top: none;
+}
+
+.dev-list-item:hover {
+  background-color: #f9fafb;
+}
+
+/* --- 컬럼(Header & Item) 공통 스타일 --- */
+.header-category, .item-category { width: 15%; }
+.header-task, .item-task-group { width: 40%; }
+.header-assignee, .item-assignee { width: 15%; text-align: center; }
+.header-due-date, .item-due-date { width: 15%; text-align: center; }
+.header-status, .item-status { width: 15%; text-align: center; }
+
+/* --- 개별 아이템 스타일 --- */
+.item-category {
+  font-weight: 500;
+  color: var(--accent-primary); /* 테마 색상 적용 */
+}
+
+.item-task-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-task-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.item-related-plan {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.item-assignee, .item-due-date {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+/* --- 상태(Status) 뱃지 스타일 --- */
+.status-badge {
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px; /* 둥근 모서리 */
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--white);
+}
+
+.status-in-progress { background-color: #2563eb; } /* 진행중: 파랑 */
+.status-completed { background-color: #16a34a; } /* 완료: 초록 */
+.status-waiting { background-color: #9ca3af; } /* 대기중: 회색 */
+.status-on-hold { background-color: #f97316; } /* 보류: 주황 */
