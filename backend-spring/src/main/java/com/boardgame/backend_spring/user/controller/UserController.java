@@ -34,7 +34,7 @@ public class UserController {
     }
 
     /**
-     * 사용자 단건 조회 API
+     * 사용자 단건 조회 API(임시)
      * userId 사용자 ID
      * 사용자 정보
      */
@@ -48,7 +48,7 @@ public class UserController {
     /**
      * 마이페이지 정보 조회 API
      * userId 사용자 ID
-     * 사용자 마이페이지 정보 (기획안 수, 프로젝트 수 등 포함 가능)
+     * 사용자 마이페이지 정보 (안에 뭐뭐 넣을지 아직 미정)
      */
     @GetMapping("/mypage")
     public ResponseEntity<MyPageInfoResponseDto> getMyPage(@AuthenticationPrincipal User user) {

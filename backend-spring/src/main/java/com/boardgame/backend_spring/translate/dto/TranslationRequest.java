@@ -1,16 +1,22 @@
 package com.boardgame.backend_spring.translate.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+/**
+ * 다국어 번역 요청 DTO
+ * - contentId: 번역할 콘텐츠 ID
+ * - targetLanguages: 번역 언어 목록
+ * - feedback: 재요청 가이드/사유 (선택)
+ */
+@Getter
+@Setter
+@NoArgsConstructor
 public class TranslationRequest {
     private Long contentId;
-    private String targetLanguage;
-
-    public TranslationRequest() {}
-    public TranslationRequest(Long contentId, String targetLanguage) {
-        this.contentId = contentId;
-        this.targetLanguage = targetLanguage;
-    }
-    public Long getContentId() { return contentId; }
-    public void setContentId(Long contentId) { this.contentId = contentId; }
-    public String getTargetLanguage() { return targetLanguage; }
-    public void setTargetLanguage(String targetLanguage) { this.targetLanguage = targetLanguage; }
+    private List<String> targetLanguages; // ["en","ja","zh-Hant-TW"]
+    private String feedback;              // 선택
 }

@@ -32,9 +32,7 @@ public class ProjectService {
         Project project = Project.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
-                .status("DRAFT")
-                .createdAt(LocalDateTime.now())
-                .build();
+                .build(); // status는 @PrePersist에서 자동으로 PLANNING 지정
 
         Project saved = projectRepository.save(project);
 

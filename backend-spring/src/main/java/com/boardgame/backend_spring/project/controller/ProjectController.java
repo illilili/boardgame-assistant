@@ -1,14 +1,19 @@
 package com.boardgame.backend_spring.project.controller;
 
 import com.boardgame.backend_spring.project.dto.*;
+import com.boardgame.backend_spring.project.entity.Project;
+import com.boardgame.backend_spring.project.enumtype.ProjectStatus;
 import com.boardgame.backend_spring.project.service.ProjectService;
 import com.boardgame.backend_spring.task.service.TaskService;
+import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import com.boardgame.backend_spring.user.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -17,6 +22,8 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final TaskService taskService;
+    private final ProjectRepository projectRepository;
+
 
     // 프로젝트 생성 (로그인 사용자 연동)
     @PostMapping
@@ -61,5 +68,17 @@ public class ProjectController {
         }
 
         return ResponseEntity.ok("개발자 배정 완료");
+    }
+
+    @PutMapping("/{projectId}/complete")
+    public ResponseEntity<ProjectStatusResponseDto> completeProject(@PathVariable Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+
+        project.setStatus(ProjectStatus.COMPLETED);
+        project.setCompletedAt(LocalDateTime.now());
+        projectRepository.save(project);
+
+        return ResponseEntity.ok(new ProjectStatusResponseDto(project.getStatus()));
     }
 }

@@ -1,11 +1,13 @@
 package com.boardgame.backend_spring.plan.controller;
 
 import com.boardgame.backend_spring.plan.dto.PlanDetailResponse;
-import com.boardgame.backend_spring.plan.dto.PlanSubmitRequest;
 import com.boardgame.backend_spring.plan.dto.PlanSubmitResponse;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
 import com.boardgame.backend_spring.plan.service.PlanSubmissionService;
+import com.boardgame.backend_spring.project.entity.Project;
+import com.boardgame.backend_spring.project.enumtype.ProjectStatus;
+import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -22,14 +24,29 @@ public class PlanSubmissionController {
 
     private final PlanSubmissionService submissionService;
     private final PlanRepository planRepository;
+    private final ProjectRepository projectRepository; // ★ 추가
 
+    /**
+     * 기획안 제출: 프로젝트 상태를 REVIEW_PENDING으로 전환
+     */
     @PostMapping(value = "/{planId}/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PlanSubmitResponse> submitPlan(
             @PathVariable Long planId,
             @RequestPart("file") MultipartFile file) throws IOException {
 
+        // 1) 기획안 제출 처리 (파일 업로드 등)
         Plan plan = submissionService.submitPlan(planId, file);
 
+        // 2) 프로젝트 상태 전환 (PLANNING → REVIEW_PENDING)
+        //    Plan ↔ Project 연관관계가 있어야 함 (plan.getProject())
+        Project project = plan.getProject();
+        if (project == null) {
+            throw new EntityNotFoundException("Plan(" + planId + ")에 연결된 Project가 없습니다.");
+        }
+        project.setStatus(ProjectStatus.REVIEW_PENDING);
+        projectRepository.save(project);
+
+        // 3) 응답
         PlanSubmitResponse response = PlanSubmitResponse.builder()
                 .planId(plan.getPlanId())
                 .planDocUrl(plan.getPlanDocUrl())
