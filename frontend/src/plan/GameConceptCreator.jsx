@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './GameConceptCreator.css'; 
+import './GameConceptCreator.css';
 
 const GameConceptCreator = () => {
   const [activeTab, setActiveTab] = useState('generate');
@@ -84,16 +84,16 @@ const GameConceptCreator = () => {
       setError('재생성할 컨셉과 피드백을 모두 입력해주세요.');
       return;
     }
-    
+
     // 1. 선택된 conceptId를 숫자로 변환
     const selectedConceptId = parseInt(selectedConceptInfo.split(',')[0], 10);
-    
+
     // 2. 전체 목록에서 선택된 컨셉의 모든 정보를 찾음
     const originalConceptData = regenerateConceptList.find(c => c.conceptId === selectedConceptId);
 
     if (!originalConceptData) {
-        setError('선택된 컨셉 정보를 찾을 수 없습니다.');
-        return;
+      setError('선택된 컨셉 정보를 찾을 수 없습니다.');
+      return;
     }
 
     // 3. 백엔드(Spring)가 요구하는 정확한 JSON 구조로 요청 본문을 구성
@@ -110,9 +110,9 @@ const GameConceptCreator = () => {
     setSelectedConceptInfo(selectedValue);
 
     if (!selectedValue) {
-        setConcept(null);
-        setIsInitialState(true);
-        return;
+      setConcept(null);
+      setIsInitialState(true);
+      return;
     }
 
     const selectedConceptId = parseInt(selectedValue.split(',')[0], 10);
@@ -121,9 +121,9 @@ const GameConceptCreator = () => {
     );
 
     if (conceptToPreview) {
-      setConcept(conceptToPreview); 
-      setIsInitialState(false);     
-      setError(null);              
+      setConcept(conceptToPreview);
+      setIsInitialState(false);
+      setError(null);
     }
   };
 
@@ -149,24 +149,24 @@ const GameConceptCreator = () => {
         {activeTab === 'generate' && (
           <div className="form-content">
             <h2 className="form-title">새로운 게임 컨셉 만들기</h2>
-              <p className="form-description">게임의 기본 요소를 입력하여 AI에게 새로운 아이디어를 얻어보세요.</p>
-              <form onSubmit={handleGenerateSubmit}>
-                <div className="form-group">
-                  <label htmlFor="theme">게임 테마</label>
-                  <input id="theme" type="text" value={theme} onChange={(e) => setTheme(e.target.value)} placeholder="예: 우주 탐험, 사이버펑크" required />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="playerCount">플레이어 수</label>
-                  <input id="playerCount" type="text" value={playerCount} onChange={(e) => setPlayerCount(e.target.value)} placeholder="예: 2-4명" required />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="averageWeight">난이도: {averageWeight}</label>
-                  <input id="averageWeight" type="range" value={averageWeight} onChange={(e) => setAverageWeight(e.target.value)} min="1.0" max="5.0" step="0.1" required />
-                </div>
-                <button type="submit" className="submit-button" disabled={loading}>
-                  {loading ? '생성 중...' : '컨셉 생성하기'}
-                </button>
-              </form>
+            <p className="form-description">게임의 기본 요소를 입력하여 AI에게 새로운 아이디어를 얻어보세요.</p>
+            <form onSubmit={handleGenerateSubmit}>
+              <div className="form-group">
+                <label htmlFor="theme">게임 테마</label>
+                <input id="theme" type="text" value={theme} onChange={(e) => setTheme(e.target.value)} placeholder="예: 우주 탐험, 사이버펑크" required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="playerCount">플레이어 수</label>
+                <input id="playerCount" type="text" value={playerCount} onChange={(e) => setPlayerCount(e.target.value)} placeholder="예: 2-4명" required />
+              </div>
+              <div className="form-group">
+                <label htmlFor="averageWeight">난이도: {averageWeight}</label>
+                <input id="averageWeight" type="range" value={averageWeight} onChange={(e) => setAverageWeight(e.target.value)} min="1.0" max="5.0" step="0.1" required />
+              </div>
+              <button type="submit" className="submit-button" disabled={loading}>
+                {loading ? '생성 중...' : '컨셉 생성하기'}
+              </button>
+            </form>
           </div>
         )}
 
@@ -219,8 +219,9 @@ const GameConceptCreator = () => {
 
         {!loading && !error && isInitialState && !concept && (
           <div className="initial-state">
-            <h3>AI 컨셉 결과</h3>
-            <p>왼쪽 양식을 작성하거나, '다시 만들기'에서 컨셉을 선택하면 상세 내용이 여기에 표시됩니다.</p>
+            <p>
+              보드게임 기획의 첫걸음은 매력적인 컨셉을 잡는 것입니다. 이 컨셉은 앞으로 만들 게임의 목표, 규칙, 구성 요소의 뼈대가 됩니다. 새로운 아이디어를 얻고 싶다면 왼쪽 '새로 만들기' 탭에서 테마, 인원, 난이도를 입력해 AI의 제안을 받아보세요. 기존 아이디어를 발전시키려면 '다시 만들기' 탭에서 컨셉을 선택하고 피드백을 추가하여 AI와 함께 아이디어를 구체화할 수 있습니다. 선택하거나 생성한 컨셉의 상세 내용이 바로 이곳에 표시됩니다.
+            </p>
           </div>
         )}
 

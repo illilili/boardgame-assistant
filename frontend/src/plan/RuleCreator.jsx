@@ -7,7 +7,7 @@ const RuleCreator = () => {
     const [generatedRules, setGeneratedRules] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    
+
     // [추가] 재생성을 위한 피드백 상태
     const [feedback, setFeedback] = useState('');
 
@@ -91,7 +91,7 @@ const RuleCreator = () => {
             <div className="rule-form-section">
                 <h2>게임 규칙 설계</h2>
                 <p>규칙을 설계할 기획안을 선택하고 AI에게 생성을 요청하세요.</p>
-                
+
                 <form className="rule-form" onSubmit={(e) => e.preventDefault()}>
                     <div className="form-group">
                         <label htmlFor="concept-select">기획안 선택</label>
@@ -109,7 +109,7 @@ const RuleCreator = () => {
                             ))}
                         </select>
                     </div>
-                    
+
                     <button onClick={handleGenerateRules} disabled={isLoading} className="submit-button">
                         {isLoading ? 'AI 설계 중...' : '게임 규칙 생성하기'}
                     </button>
@@ -135,7 +135,7 @@ const RuleCreator = () => {
             <div className="rule-result-section">
                 {isLoading && <div className="spinner"></div>}
                 {error && <div className="error-message">{error}</div>}
-                
+
                 {generatedRules ? (
                     <div className="rule-card">
                         <h3>AI가 설계한 게임 규칙 (Rule ID: {generatedRules.ruleId})</h3>
@@ -148,7 +148,12 @@ const RuleCreator = () => {
                 ) : (
                     !isLoading && !error && (
                         <div className="initial-state">
-                            <p>기획안을 선택하고 '게임 규칙 생성하기' 버튼을 누르면 AI가 설계한 결과가 여기에 표시됩니다.</p>
+                            <p>사용자께서는 먼저 원하는 기획안을 선택해 주시기 바랍니다.
+                                기획안을 선택하신 후, '게임 규칙 생성하기' 버튼을 눌러주세요.
+                                버튼을 클릭하면 인공지능이 선택된 기획안을 바탕으로 분석을 시작합니다.
+                                분석 결과에 따라 해당 기획안에 적합한 게임 규칙이 자동으로 설계됩니다.
+                                설계된 게임 규칙은 아래 결과 창에 실시간으로 표시됩니다.
+                                이를 통해 사용자께서는 게임의 구체적인 진행 방식과 규칙을 확인하실 수 있습니다.</p>
                         </div>
                     )
                 )}

@@ -18,6 +18,10 @@
 
     import AdminUserManagePage from './pages/admin/UserManagePage';
 
+    import PrivacyPolicy from './mainPage/PrivacyPolicy'; // 개인정보처리방침 컴포넌트 추가
+    import TermsOfService from './mainPage/TermsOfService';
+    import Development from './development/Development'; // 개발 컴포넌트 추가
+
     const router = createBrowserRouter([
         {
             id: 0,
@@ -94,5 +98,20 @@
             path:'/admin-assign',
             element: <AdminUserManagePage/>
         },
+            {
+        id: 15,
+        path:'/privacy',
+        element: <PrivacyPolicy />
+    },
+    {
+        id: 16,
+        path:'/terms',
+        element: <TermsOfService/>
+    },
+    {
+        id: 7,
+        path: '/development',
+        element: <Development/>,
+    }
     ]);
     export default router;

@@ -1,17 +1,48 @@
 // Home.js
 
-import React from 'react';
+import React, { useState } from 'react';
 import './Home.css';
-import boardgameImage from '../assets/boardgame.png'; 
+import boardgameImage from '../assets/boardgame.png'; // 이 경로는 프로젝트 구조에 따라 조정해야 합니다.
 import Header from './Header';
+import Footer from './Footer';
+import Modal from './Modal'; // Modal 컴포넌트 임포트
+import PrivacyPolicy from './PrivacyPolicy'; // 개인정보처리방침 컴포넌트 임포트
+import TermsOfService from './TermsOfService'; // 이용약관 컴포넌트 임포트
 
 function Home() {
+  // 개인정보처리방침 모달의 열림/닫힘 상태를 관리합니다.
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  // 이용약관 모달의 열림/닫힘 상태를 관리합니다.
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+
+  // 개인정보처리방침 모달을 여는 함수입니다.
+  const handleOpenPrivacyModal = (e) => {
+    e.preventDefault(); // 기본 링크 이동을 막습니다.
+    setIsPrivacyModalOpen(true);
+  };
+
+  // 개인정보처리방침 모달을 닫는 함수입니다.
+  const handleClosePrivacyModal = () => {
+    setIsPrivacyModalOpen(false);
+  };
+
+  // 이용약관 모달을 여는 함수입니다.
+  const handleOpenTermsModal = (e) => {
+    e.preventDefault(); // 기본 링크 이동을 막습니다.
+    setIsTermsModalOpen(true);
+  };
+
+  // 이용약관 모달을 닫는 함수입니다.
+  const handleCloseTermsModal = () => {
+    setIsTermsModalOpen(false);
+  };
+
   return (
     <div className="architect-style-wrapper">
-      <Header />
+      <Header /> {/* 헤더 컴포넌트 */}
       <main className="grid-container">
         
-        {/* [수정] 왼쪽 컨텐츠를 하나의 div로 묶어줍니다. */}
+        {/* 왼쪽 컨텐츠 섹션 */}
         <div className="left-column">
           {/* 텍스트 섹션 */}
           <section className="text-content">
@@ -55,6 +86,27 @@ function Home() {
         </section>
 
       </main>
+
+      {/* 푸터 컴포넌트에 모달을 여는 함수들을 props로 전달합니다. */}
+      {/* onPrivacyClick과 onTermsClick은 푸터에서 각 링크 클릭 시 호출됩니다. */}
+      <Footer 
+        onPrivacyClick={handleOpenPrivacyModal} 
+        onTermsClick={handleOpenTermsModal} 
+      />
+
+      {/* isPrivacyModalOpen 상태가 true일 때만 개인정보처리방침 모달을 렌더링합니다. */}
+      {isPrivacyModalOpen && (
+        <Modal onClose={handleClosePrivacyModal}>
+          <PrivacyPolicy />
+        </Modal>
+      )}
+
+      {/* isTermsModalOpen 상태가 true일 때만 이용약관 모달을 렌더링합니다. */}
+      {isTermsModalOpen && (
+        <Modal onClose={handleCloseTermsModal}>
+          <TermsOfService />
+        </Modal>
+      )}
     </div>
   );
 }
