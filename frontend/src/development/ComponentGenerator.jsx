@@ -1,146 +1,136 @@
-import React, { useState } from 'react';
-import './ComponentGenerator.css'; // CSS 파일 이름도 통일성을 위해 변경합니다.
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom'; 
+import { getCardPreview, generateCardText, generateCardImage } from '../api/auth';
+import './ComponentGenerator.css';
 
-// --- 생성 가능한 구성 요소 종류 ---
-const componentTypes = [
-    { id: 'card', name: '카드', icon: '🃏' },
-    { id: 'pawn', name: '말', icon: '♟️' },
-    { id: 'figurine', name: '피규어', icon: '🤖' },
-    { id: 'dice', name: '주사위', icon: '🎲' },
-    { id: 'box', name: '박스', icon: '📦' },
-    { id: 'rulebook', name: '룰북', icon: '📜' },
-    { id: 'hourglass', name: '모래시계', icon: '⏳' },
-    { id: 'etc', name: '기타 재료', icon: '💎' },
-];
+function ComponentGenerator() { 
+    const { contentId } = useParams(); 
+    
+    const [previewData, setPreviewData] = useState(null);
+    const [formData, setFormData] = useState({ name: '', effect: '', description: '' });
+    const [generatedText, setGeneratedText] = useState('');
+    const [generatedImageUrl, setGeneratedImageUrl] = useState('');
+    const [isLoadingText, setIsLoadingText] = useState(false);
+    const [isLoadingImage, setIsLoadingImage] = useState(false);
+    const [error, setError] = useState('');
 
-// --- 데모용 데이터 (기존 데이터 재활용) ---
-const textOutputData = {
-  generatedTexts: [
-    { textId: 501, title: "차원의 균열", text: "이 카드를 사용하면 다음 턴에 상대의 자원을 1개 훔칠 수 있습니다. 단, 당신의 시간 에너지 -1" },
-    { textId: 502, title: "고대의 망치", text: "공격 시 주사위 2개를 굴리고 높은 수를 선택하세요. 단, 한 번 사용 후 파괴됩니다." },
-    { textId: 503, title: "지혜의 샘물", text: "이 카드를 사용하면 덱에서 카드 2장을 뽑습니다." },
-  ]
-};
-const imageOutputData = { imageUrl: "https://i.pinimg.com/564x/ac/25/49/ac2549352613b19888f4c728770b553e.jpg" };
-const imageOutputData2 = { imageUrl: "https://i.pinimg.com/564x/41/d3/18/41d318465e94080e75525979207a7605.jpg" };
+    useEffect(() => {
+        if (!contentId) return;
 
+        // contentId가 바뀔 때마다 상태 초기화
+        setPreviewData(null);
+        setFormData({ name: '', effect: '', description: '' });
+        setGeneratedText('');
+        setGeneratedImageUrl('');
+        setError('');
 
-function ComponentGenerator() {
-    const [selectedType, setSelectedType] = useState(null); // 선택된 구성 요소 타입
-    const [isTextLoading, setIsTextLoading] = useState(false);
-    const [imageLoadingId, setImageLoadingId] = useState(null);
-    const [generatedContent, setGeneratedContent] = useState(null);
+        const fetchPreview = async () => {
+            try {
+                const data = await getCardPreview(contentId);
+                setPreviewData(data);
+                setFormData({
+                    name: data.name || '',
+                    effect: data.effect || '',
+                    description: data.description || '',
+                });
+            } catch (err) {
+                setError('카드 미리보기 정보를 불러오는 데 실패했습니다.');
+                console.error(err);
+            }
+        };
+        fetchPreview();
+    }, [contentId]);
 
-    // 0단계: 생성할 구성 요소 타입을 선택
-    const handleTypeSelect = (type) => {
-        setSelectedType(type);
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // 1단계: 텍스트(콘텐츠) 생성
-    const handleGenerateContent = () => {
-        setIsTextLoading(true);
-        setTimeout(() => {
-            const initialContent = textOutputData.generatedTexts.map(item => ({ ...item, imageUrl: null }));
-            setGeneratedContent(initialContent);
-            setIsTextLoading(false);
-        }, 1500);
-    };
-
-    // 2단계: 이미지 생성
-    const handleGenerateImage = (textId) => {
-        setImageLoadingId(textId);
-        setTimeout(() => {
-            const newImageUrl = textId === 502 ? imageOutputData2.imageUrl : imageOutputData.imageUrl;
-            setGeneratedContent(currentContent =>
-                currentContent.map(item =>
-                    item.textId === textId ? { ...item, imageUrl: newImageUrl } : item
-                )
-            );
-            setImageLoadingId(null);
-        }, 2000);
-    };
-
-    // 초기화 또는 뒤로가기
-    const handleReset = (step = 'all') => {
-        if (step === 'content') {
-            setGeneratedContent(null);
-        } else {
-            setSelectedType(null);
-            setGeneratedContent(null);
+    const handleTextGenerate = async () => {
+        setIsLoadingText(true);
+        setError('');
+        try {
+            const requestData = { contentId, ...formData };
+            const response = await generateCardText(requestData);
+            const resultText = response.generated_texts[0]?.text || '생성된 텍스트가 없습니다.';
+            setGeneratedText(resultText);
+        } catch (err) {
+            setError(`텍스트 생성 실패: ${err.message}`);
+        } finally {
+            setIsLoadingText(false);
         }
     };
 
+    const handleImageGenerate = async () => {
+        setIsLoadingImage(true);
+        setError('');
+        try {
+            const requestData = { contentId, ...formData };
+            const response = await generateCardImage(requestData);
+            const resultUrl = response.generated_images[0]?.imageUrl || '';
+            setGeneratedImageUrl(resultUrl);
+        } catch (err) {
+            setError(`이미지 생성 실패: ${err.message}`);
+        } finally {
+            setIsLoadingImage(false);
+        }
+    };
 
-    // --- 렌더링 로직 ---
-
-    // 텍스트/이미지 생성 완료 후 화면
-    if (selectedType && generatedContent) {
-        return (
-            <div className="component-placeholder">
-                <div className="generation-success-header">
-                    <h3>🎉 {selectedType.name} 콘텐츠가 생성되었습니다. 이미지를 생성해 보세요.</h3>
-                    <button className="reset-button" onClick={() => handleReset('content')}>뒤로가기</button>
-                </div>
-                <div className="content-grid">
-                    {generatedContent.map(item => (
-                        <div key={item.textId} className="content-card">
-                            <div className="card-image-section">
-                                {item.imageUrl ? <img src={item.imageUrl} alt={item.title} className="card-image" /> :
-                                    <div className="card-image-placeholder">
-                                        {imageLoadingId === item.textId ? <div className="loader"></div> : <span>이미지 생성 대기중</span>}
-                                    </div>
-                                }
-                            </div>
-                            <div className="card-text-section">
-                                <h4 className="card-title">{item.title}</h4>
-                                <p className="card-text">{item.text}</p>
-                                {!item.imageUrl &&
-                                    <button className="generate-image-button" disabled={imageLoadingId !== null} onClick={() => handleGenerateImage(item.textId)}>
-                                        {imageLoadingId === item.textId ? '생성 중...' : '✨ 이미지 생성'}
-                                    </button>
-                                }
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    }
-    
-    // 타입 선택 후 텍스트 생성 전 화면
-    if (selectedType) {
-        return (
-            <div className="component-placeholder">
-                <button className="back-button" onClick={handleReset}>&larr; 종류 다시 선택</button>
-                <h2>[개발] {selectedType.name} 문구/컨셉 생성</h2>
-                <p>게임의 컨셉과 스타일에 맞는 {selectedType.name}의 이름과 효과를 생성합니다.</p>
-                <div className="source-data-preview">
-                    <h3>{selectedType.name} 생성 옵션</h3>
-                    <p><strong>콘텐츠 타입:</strong> {selectedType.id}</p>
-                    <p><strong>스타일:</strong> fantasy_illustration</p>
-                </div>
-                <div className="generate-button-container">
-                    <button onClick={handleGenerateContent} disabled={isTextLoading} className="generate-button">
-                        {isTextLoading ? '생성 중...' : `${selectedType.name} 생성하기`}
-                    </button>
-                </div>
-            </div>
-        )
-    }
-
-    // 맨 처음, 생성할 타입을 선택하는 화면
     return (
-        <div className="component-placeholder">
-            <h2>[개발] 카드/아이템 생성</h2>
-            <p>생성하고 싶은 보드게임 구성 요소의 종류를 선택해 주세요.</p>
-            <div className="type-selection-grid">
-                {componentTypes.map(type => (
-                    <div key={type.id} className="type-card" onClick={() => handleTypeSelect(type)}>
-                        <div className="type-icon">{type.icon}</div>
-                        <div className="type-name">{type.name}</div>
+        <div className="card-generator-container">
+            <h2>카드 콘텐츠 생성 (ID: {contentId})</h2>
+            
+            {previewData && (
+                <div className="preview-section">
+                    <p><strong>테마:</strong> {previewData.theme}</p>
+                    <p><strong>스토리:</strong> {previewData.storyline}</p>
+                </div>
+            )}
+
+            <div className="generator-layout">
+                <div className="form-column">
+                    <h3>카드 정보 입력</h3>
+                    <div className="form-group">
+                        <label htmlFor="name">카드 이름</label>
+                        <input type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} />
                     </div>
-                ))}
+                    <div className="form-group">
+                        <label htmlFor="effect">효과</label>
+                        <textarea id="effect" name="effect" value={formData.effect} onChange={handleInputChange} rows="4"></textarea>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="description">설명 또는 아트 컨셉</label>
+                        <textarea id="description" name="description" value={formData.description} onChange={handleInputChange} rows="4"></textarea>
+                    </div>
+                    <div className="button-group">
+                        <button onClick={handleTextGenerate} disabled={isLoadingText || isLoadingImage}>
+                            {isLoadingText ? '텍스트 생성 중...' : 'AI 문구 생성'}
+                        </button>
+                        <button onClick={handleImageGenerate} disabled={isLoadingText || isLoadingImage}>
+                            {isLoadingImage ? '이미지 생성 중...' : 'AI 이미지 생성'}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="result-column">
+                    <h3>생성 결과</h3>
+                    <div className="result-box">
+                        <h4>생성된 문구</h4>
+                        <pre className="text-result">{generatedText || '아직 생성된 문구가 없습니다.'}</pre>
+                    </div>
+                    <div className="result-box">
+                        <h4>생성된 이미지</h4>
+                        <div className="image-result">
+                            {generatedImageUrl ? (
+                                <img src={generatedImageUrl} alt="Generated Card" />
+                            ) : (
+                                <p>아직 생성된 이미지가 없습니다.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
+            {error && <p className="error-message">{error}</p>}
         </div>
     );
 }

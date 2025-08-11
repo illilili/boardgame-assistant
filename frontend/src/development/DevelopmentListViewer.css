@@ -91,3 +91,80 @@
 .status-completed { background-color: #16a34a; } /* 완료: 초록 */
 .status-waiting { background-color: #9ca3af; } /* 대기중: 회색 */
 .status-on-hold { background-color: #f97316; } /* 보류: 주황 */
+
+/* DevelopmentListViewer.css 파일 맨 아래에 추가 */
+
+.item-details {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 8px 0 0 0;
+    line-height: 1.5;
+    white-space: pre-wrap; /* 텍스트의 줄바꿈과 공백을 유지합니다. */
+    word-break: break-word; /* 긴 단어가 영역을 벗어나지 않도록 합니다. */
+}
+
+.item-details strong {
+    color: #333;
+    margin-right: 4px;
+}
+
+/* DevelopmentListViewer.css 파일의 기존 sub-task 관련 스타일을 아래 코드로 교체 */
+
+.sub-task-container {
+    padding: 0px 20px 10px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px dashed #ddd; /* 상위 항목과 구분선 */
+}
+
+.sub-task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.sub-task-item {
+    display: flex; /* 가로 정렬을 위해 flex 사용 */
+    justify-content: space-between; /* 요소들을 양 끝으로 분산 */
+    align-items: center; /* 세로 중앙 정렬 */
+    padding: 12px 16px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 0.9rem;
+}
+
+.sub-task-item:last-child {
+    border-bottom: none;
+}
+
+.sub-task-id {
+    color: #333;
+    font-weight: 500;
+}
+
+.sub-task-status {
+    color: #555;
+}
+
+.sub-task-link {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 6px 12px;
+    border-radius: 20px; /* 타원형 버튼 */
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sub-task-link:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.no-sub-task {
+    color: #888;
+    font-style: italic;
+    justify-content: center; /* 텍스트 중앙 정렬 */
+}

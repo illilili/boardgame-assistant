@@ -128,3 +128,29 @@ export const getAllDevelopers = () => request('/api/users/developers');
 export const assignDeveloper = (projectId, assignData) => request(`/api/projects/${projectId}/assign-developer`, { method: 'PUT', body: JSON.stringify(assignData) });
 // 🚨 다른 함수들과 동일하게 request 함수를 사용하도록 수정
 export const getTasksForProject = (projectId) => request(`/api/projects/${projectId}/tasks`);
+
+// src/api/auth.js 파일에 아래 함수들을 추가하세요.
+
+/**
+ * [신규] 카드 입력 폼에 필요한 미리보기 데이터를 가져옵니다.
+ * @param {number} contentId - 콘텐츠 ID
+ */
+export const getCardPreview = (contentId) => request(`/api/content/${contentId}/preview/card`);
+
+/**
+ * [신규] AI를 통해 카드 문구를 생성합니다.
+ * @param {object} cardData - { contentId, name, effect, description }
+ */
+export const generateCardText = (cardData) => request('/api/content/generate-text', {
+    method: 'POST',
+    body: JSON.stringify(cardData),
+});
+
+/**
+ * [신규] AI를 통해 카드 이미지를 생성합니다.
+ * @param {object} cardData - { contentId, name, effect, description }
+ */
+export const generateCardImage = (cardData) => request('/api/content/generate-image', {
+    method: 'POST',
+    body: JSON.stringify(cardData),
+});

@@ -38,9 +38,9 @@ function WelcomeScreen({ onStart }) {
 const workspaceNavItems = [
     { id: 'approved-plan', title: '승인된 기획안 조회', component: <ApprovedPlanViewer /> },
     { id: 'dev-list', title: '개발 목록 조회', component: <DevelopmentListViewer /> },
+    { id: 'card-gen', title: '카드/아이템 생성', component: <ComponentGenerator />},
     { id: 'rulebook-gen', title: '룰북 초안 생성', component: <RulebookGenerator /> },
     { id: 'script-gen', title: '설명 스크립트 자동생성', component: <ScriptGenerator />},
-    { id: 'card-gen', title: '카드/아이템 생성', component: <ComponentGenerator />},
     { id: 'model-gen', title: '3D 모델 생성', component: <ModelGenerator /> },
     { id: 'thumbnail-gen', title: '썸네일 이미지 생성', component: <ThumbnailGenerator /> },
     { id: 'content-view', title: '콘텐츠 상세 조회', component: <ContentViewer /> },
