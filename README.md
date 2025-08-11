@@ -53,5 +53,6 @@ cd backend-spring
 cd frontend
 npm install
 npm start
+c
 ```
 

@@ -54,7 +54,8 @@ return (
           <Link to="/login" >
             로그인
           </Link>
-          <Link to="/register" >
+          {/* <Link to="/register" > */}
+          <Link to="/signup" >
             회원가입
           </Link>
         </>
