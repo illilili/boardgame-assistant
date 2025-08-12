@@ -8,6 +8,7 @@ from typing import List, Dict, Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import pandas as pd
