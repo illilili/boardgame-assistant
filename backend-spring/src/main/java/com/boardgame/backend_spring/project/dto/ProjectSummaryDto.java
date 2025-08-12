@@ -1,3 +1,4 @@
+// `ProjectSummaryDto.java`
 package com.boardgame.backend_spring.project.dto;
 
 import com.boardgame.backend_spring.project.entity.Project;

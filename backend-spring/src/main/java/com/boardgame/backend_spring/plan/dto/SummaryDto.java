@@ -31,6 +31,7 @@ public class SummaryDto {
     public static class ConceptListInfo {
         private Long conceptId;
         private String theme;
+        private Long projectId; // 🚨 projectId 추가
     }
 
     // Spring -> FastAPI 요청 DTO

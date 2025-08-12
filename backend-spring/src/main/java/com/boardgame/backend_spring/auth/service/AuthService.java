@@ -33,7 +33,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .company(request.getCompany())
-                .role(User.Role.USER) // 기본 역할 부여
+                .role(User.Role.valueOf(request.getRole().toUpperCase()))
                 .build();
 
         User saved = userRepository.save(user);

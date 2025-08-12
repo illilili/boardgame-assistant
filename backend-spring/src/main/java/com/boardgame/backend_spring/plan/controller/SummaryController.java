@@ -3,6 +3,8 @@ package com.boardgame.backend_spring.plan.controller;
 import com.boardgame.backend_spring.plan.dto.PlanDetailResponse;
 import com.boardgame.backend_spring.plan.dto.PlanVersionDto;
 import com.boardgame.backend_spring.plan.dto.SummaryDto;
+import com.boardgame.backend_spring.plan.dto.PlanSaveRequest;
+import com.boardgame.backend_spring.plan.dto.PlanSaveResponse;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.entity.PlanStatus;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
@@ -31,6 +33,13 @@ public class SummaryController {
     @PostMapping("/generate-summary")
     public ResponseEntity<SummaryDto.GenerateResponse> generateSummary(@RequestBody SummaryDto.Request request) {
         SummaryDto.GenerateResponse response = summaryService.generateSummaryDocument(request.getConceptId());
+        return ResponseEntity.ok(response);
+    }
+
+    // 기획안 내용 저장 API (신규 추가)
+    @PostMapping("/save")
+    public ResponseEntity<PlanSaveResponse> savePlan(@RequestBody PlanSaveRequest request) {
+        PlanSaveResponse response = summaryService.savePlanContent(request);
         return ResponseEntity.ok(response);
     }
 

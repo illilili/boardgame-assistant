@@ -9,16 +9,19 @@ import com.boardgame.backend_spring.review.dto.PendingPlanDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-
 
 @Service
 @RequiredArgsConstructor
 public class PlanReviewService {
 
+    private final PlanRepository planRepository;
+    private final ProjectRepository projectRepository;
+
+    @Transactional(readOnly = true)
     public List<PendingPlanDto> getPendingPlans() {
         return planRepository.findByStatus(PlanStatus.SUBMITTED).stream()
                 .map(plan -> PendingPlanDto.builder()
@@ -31,9 +34,7 @@ public class PlanReviewService {
                 .collect(Collectors.toList());
     }
 
-    private final PlanRepository planRepository;
-    private final ProjectRepository projectRepository;
-
+    @Transactional
     public String reviewPlan(Long planId, boolean approve, String reason) {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new EntityNotFoundException("Plan not found"));
@@ -53,5 +54,4 @@ public class PlanReviewService {
             return "기획안이 반려되었습니다. 사유: " + reason;
         }
     }
-
 }

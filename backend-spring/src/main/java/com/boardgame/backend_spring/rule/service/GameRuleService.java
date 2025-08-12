@@ -1,4 +1,3 @@
-// src/main/java/com/boardgame/backend_spring/rule/service/GameRuleService.java
 package com.boardgame.backend_spring.rule.service;
 
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
@@ -28,12 +27,12 @@ public class GameRuleService {
     private final BoardgameConceptRepository conceptRepository;
     private final GameObjectiveRepository objectiveRepository;
     private final GameRuleRepository ruleRepository;
-    private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 처리를 위해 추가
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${fastapi.service.url}/api/plans/generate-rule")
     private String ruleApiUrl;
 
-    // FastAPI에 보낼 요청 DTO (내부용)
+    // FastAPI 요청 DTO는 그대로 유지
     private record FastApiRuleRequest(String theme, String playerCount, double averageWeight, String ideaText,
                                       String mechanics, String storyline, String world_setting, String world_tone,
                                       String mainGoal, String subGoals, String winConditionType,
@@ -41,16 +40,15 @@ public class GameRuleService {
 
     @Transactional
     public GameRuleResponse generateRules(GameRuleRequest request) {
-        // 1. DB에서 원본 컨셉 조회
-        BoardgameConcept concept = conceptRepository.findById((long) request.conceptId())
-                .orElseThrow(() -> new EntityNotFoundException("컨셉을 찾을 수 없습니다: " + request.conceptId()));
+        // 1. 필수 엔티티 조회
+        Long conceptId = (long) request.conceptId();
+        BoardgameConcept concept = conceptRepository.findById(conceptId)
+                .orElseThrow(() -> new EntityNotFoundException("컨셉을 찾을 수 없습니다: " + conceptId));
 
-        // 2. 컨셉에 연결된 목표(Goal) 정보 조회
-        GameObjective objective = objectiveRepository.findById((long) request.conceptId())
-                .orElseThrow(() -> new EntityNotFoundException("게임 목표가 먼저 생성되어야 합니다. Concept ID: " + request.conceptId()));
+        GameObjective objective = objectiveRepository.findById(conceptId)
+                .orElseThrow(() -> new EntityNotFoundException("게임 목표가 먼저 생성되어야 합니다. Concept ID: " + conceptId));
 
-        // 3. FastAPI에 보낼 요청 객체 생성
-        // 현재 World 데이터가 없으므로 임시 값으로 채웁니다.
+        // 2. FastAPI 요청 객체 생성 및 API 호출
         FastApiRuleRequest fastApiRequest = new FastApiRuleRequest(
                 concept.getTheme(),
                 concept.getPlayerCount(),
@@ -58,23 +56,30 @@ public class GameRuleService {
                 concept.getIdeaText(),
                 concept.getMechanics(),
                 concept.getStoryline(),
-                "{}", // world_setting 임시 값
-                "",   // world_tone 임시 값
+                "{}", // 임시 데이터
+                "",   // 임시 데이터
                 objective.getMainGoal(),
-                convertListToJson(objective.getSubGoals()), // subGoals를 JSON 문자열로 변환
+                convertListToJson(objective.getSubGoals()),
                 objective.getWinConditionType(),
                 objective.getDesignNote()
         );
 
-        // 4. FastAPI 호출
         GameRuleResponse responseFromAI = restTemplate.postForObject(ruleApiUrl, fastApiRequest, GameRuleResponse.class);
         if (responseFromAI == null) {
             throw new RuntimeException("AI 서비스로부터 유효한 규칙 데이터를 받지 못했습니다.");
         }
 
-        // 5. 받은 응답을 GameRule 엔티티로 변환 및 저장
-        GameRule gameRule = ruleRepository.findById(concept.getConceptId()).orElse(new GameRule());
-        gameRule.setBoardgameConcept(concept);
+        // 3. ✨ [수정된 로직] 기존 GameRule을 찾아서 업데이트하거나, 없으면 새로 생성 (Upsert)
+        GameRule gameRule = ruleRepository.findById(conceptId)
+                .orElseGet(() -> {
+                    GameRule newRule = new GameRule();
+                    // @MapsId 관계이므로, 연관 엔티티만 설정하면 JPA가 ID를 자동으로 관리합니다.
+                    // newRule.setConceptId(conceptId)를 직접 호출하면 안 됩니다.
+                    newRule.setBoardgameConcept(concept);
+                    return newRule;
+                });
+
+        // 4. AI로부터 받은 데이터로 필드 업데이트
         gameRule.setRuleId(responseFromAI.ruleId());
         gameRule.setTurnStructure(responseFromAI.turnStructure());
         gameRule.setActionRules(responseFromAI.actionRules());
@@ -82,16 +87,17 @@ public class GameRuleService {
         gameRule.setPenaltyRules(responseFromAI.penaltyRules());
         gameRule.setDesignNote(responseFromAI.designNote());
 
+        // 5. 저장 (JPA가 알아서 INSERT 또는 UPDATE 수행)
         ruleRepository.save(gameRule);
 
         return responseFromAI;
     }
 
-    // List<String>을 JSON 배열 형태의 문자열로 변환하는 헬퍼 메소드
     private String convertListToJson(List<String> list) {
         try {
             return objectMapper.writeValueAsString(list);
         } catch (JsonProcessingException e) {
+            // 실제 운영 코드에서는 로깅을 추가하는 것이 좋습니다.
             return "[]";
         }
     }

@@ -1,3 +1,4 @@
+// `ProjectMember.java`
 package com.boardgame.backend_spring.project.entity;
 
 import com.boardgame.backend_spring.user.entity.User;

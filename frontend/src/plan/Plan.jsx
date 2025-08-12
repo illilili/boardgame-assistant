@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import './Plan.css'; 
 
 // 분리된 컴포넌트들을 import 합니다.
+import ProjectCreationPage from './ProjectCreationPage';
 import GameConceptCreator from './GameConceptCreator';
 import Goal from './Goal';
 import Components from './Components';
@@ -11,17 +12,21 @@ import Review from './Review';
 import WelcomeScreen from './WelcomeScreen';
 import PlanPage from './PlanPage';
 
+
+
 // Header 컴포넌트는 현재 사용되지 않으므로 import에서 제거했습니다.
 // import Header from '../mainPage/Header'; 
 
 // --- 데이터 및 메인 컴포넌트 ---
 const workspaceNavItems = [
+  { id: 'project', title: '프로젝트 생성', component: <ProjectCreationPage /> },
   { id: 'concept', title: '게임 컨셉 제작', component: <GameConceptCreator /> },
   { id: 'goal', title: '게임 목표 설계', component: <Goal/>},  
   { id: 'rules', title: '규칙 생성', component: <RuleCreator /> },
   { id: 'components', title: '게임 구성요소 생성', component: <Components/>},
   { id: 'review', title: '밸런스 테스트', component: <Review /> },
-  { id: 'planPage', title: '기획안 관리', component: <PlanPage/>}
+  { id: 'planPage', title: '기획안 관리', component: <PlanPage/>},
+  
 ];
 
 function Plan() {

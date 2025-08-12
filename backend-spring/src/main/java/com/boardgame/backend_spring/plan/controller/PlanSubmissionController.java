@@ -70,4 +70,14 @@ public class PlanSubmissionController {
 
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{planId}")
+    public ResponseEntity<String> deletePlan(@PathVariable Long planId) {
+        try {
+            submissionService.deletePlan(planId);
+            return ResponseEntity.ok("기획안이 성공적으로 삭제되었습니다.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
 }

@@ -1,0 +1,157 @@
+/* Plan.css */
+
+/* --- 기본 설정 및 변수 (Creative Focus 테마) --- */
+:root {
+  --bg-dark: #1f2937; /* 사이드바 배경 (깊은 네이비) */
+  --bg-light: #f9fafb; /* 메인 컨텐츠 배경 (아주 밝은 회색) */
+  --accent-primary: #4f46e5; /* 메인 강조 색상 (인디고) */
+  --accent-secondary: #db2777; /* 보조 강조 색상 (핑크) */
+  --text-primary: #111827; /* 메인 텍스트 (거의 검정) */
+  --text-secondary: #6b7280; /* 보조 텍스트 (회색) */
+  --border-color: #e5e7eb; /* 테두리 색상 */
+  --white: #ffffff;
+  --font-main: 'Inter', sans-serif;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+body {
+  font-family: var(--font-main);
+  margin: 0;
+  background-color: var(--bg-light);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- 전체 레이아웃 --- */
+.workspace-container.new-design {
+  display: flex;
+  height: 100vh;
+}
+
+/* --- 사이드바 --- */
+.workspace-sidebar {
+  width: 280px;
+  background-color: var(--bg-dark);
+  color: var(--text-secondary);
+  padding: 32px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  margin-bottom: 40px;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--white);
+  letter-spacing: 1px;
+}
+
+.workspace-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-item {
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  color: #d1d5db; /* 밝은 회색 텍스트 */
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.nav-item:hover {
+  color: var(--white);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.nav-item.active {
+  color: var(--white);
+  font-weight: 600;
+  background-color: var(--accent-primary);
+}
+
+/* --- 메인 컨텐츠 영역 --- */
+.workspace-main-content {
+  flex-grow: 1;
+  background-color: var(--bg-light);
+  padding: 40px 60px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- 시작 화면 스타일 (Plan.js에서 사용) --- */
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.welcome-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  line-height: 1;
+  color: var(--accent-primary);
+}
+
+.welcome-screen h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+}
+
+.welcome-screen p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 450px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+/* --- 반응형 --- */
+@media (max-width: 1024px) {
+  .workspace-container.new-design {
+    flex-direction: column;
+  }
+  .workspace-sidebar {
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color);
+    box-sizing: border-box;
+  }
+  .sidebar-header {
+    margin: 0;
+  }
+  .workspace-nav-list {
+    flex-direction: row;
+    gap: 16px;
+    margin-left: auto;
+  }
+  .nav-item.active {
+    background-color: transparent;
+    color: var(--accent-primary);
+  }
+  .workspace-main-content {
+    padding: 32px 24px;
+  }
+}

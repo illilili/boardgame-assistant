@@ -6,7 +6,8 @@ public class RegenerateRuleDto {
 
     /** 클라이언트(React) -> 서버 요청 DTO */
     public record Request(
-            int ruleId, // AI가 생성한 고유 규칙 ID
+            int conceptId,
+            int ruleId,
             String feedback
     ) {}
 
@@ -22,17 +23,14 @@ public class RegenerateRuleDto {
 
     /** 서버 -> FastAPI 요청에 사용할 내부 DTO */
     public record FastApiRequest(
-            // 게임 컨셉 정보
             String theme,
             String mechanics,
             String mainGoal,
-            // 개선할 원본 규칙 정보
             int original_ruleId,
             String original_turnStructure,
             List<String> original_actionRules,
             String original_victoryCondition,
             List<String> original_penaltyRules,
-            // 사용자 피업
             String feedback
     ) {}
 }
