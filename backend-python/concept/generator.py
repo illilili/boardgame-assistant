@@ -36,4 +36,3 @@ def expand_concept(base_concept: str) -> dict:
         messages=[{"role": "user", "content": prompt}]
     )
     return {"type": "expansion", "result": res.choices[0].message.content.strip()}
-
