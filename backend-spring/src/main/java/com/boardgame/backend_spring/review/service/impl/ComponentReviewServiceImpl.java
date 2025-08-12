@@ -3,6 +3,8 @@ package com.boardgame.backend_spring.review.service.impl;
 import com.boardgame.backend_spring.component.entity.Component;
 import com.boardgame.backend_spring.component.enumtype.ComponentStatus;
 import com.boardgame.backend_spring.component.repository.ComponentRepository;
+import com.boardgame.backend_spring.log.entity.ActivityLog;
+import com.boardgame.backend_spring.log.repository.ActivityLogRepository;
 import com.boardgame.backend_spring.review.dto.PendingComponentDto;
 import com.boardgame.backend_spring.review.dto.PendingComponentGroupDto;
 import com.boardgame.backend_spring.review.service.ComponentReviewService;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class ComponentReviewServiceImpl implements ComponentReviewService {
 
     private final ComponentRepository componentRepository;
+    private final ActivityLogRepository activityLogRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -49,7 +52,7 @@ public class ComponentReviewServiceImpl implements ComponentReviewService {
                     if (c.getBoardgameConcept() != null && c.getBoardgameConcept().getProject() != null) {
                         return c.getBoardgameConcept().getProject().getId();
                     }
-                    return null; // 프로젝트 없는 경우
+                    return null;
                 }))
                 .entrySet().stream()
                 .map(entry -> {
@@ -62,10 +65,36 @@ public class ComponentReviewServiceImpl implements ComponentReviewService {
                     return PendingComponentGroupDto.builder()
                             .projectId(entry.getKey())
                             .projectTitle(projectTitle)
-                            .items(comps.stream().map(this::mapToPendingDto).collect(Collectors.toList()))
+                            .items(
+                                    comps.stream()
+                                            .map(this::mapToPendingDtoWithSubmitter) // ★ 변경
+                                            .collect(Collectors.toList())
+                            )
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    private PendingComponentDto mapToPendingDtoWithSubmitter(Component c) {
+        String submittedBy = activityLogRepository
+                .findTopByActionAndTargetTypeAndTargetIdOrderByTimestampDesc(
+                        "COMPONENT_SUBMIT", "CONTENT", c.getComponentId()
+                )
+                .map(ActivityLog::getUsername)
+                .orElse(null);
+
+        return PendingComponentDto.builder()
+                .componentId(c.getComponentId())
+                .componentTitle(c.getTitle())
+                .componentType(c.getType())
+                .status(c.getStatus())
+                .projectTitle(
+                        c.getBoardgameConcept() != null && c.getBoardgameConcept().getProject() != null
+                                ? c.getBoardgameConcept().getProject().getName()
+                                : null
+                )
+                .submittedBy(submittedBy) // ★ 추가
+                .build();
     }
 
     private PendingComponentDto mapToPendingDto(Component c) {

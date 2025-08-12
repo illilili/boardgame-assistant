@@ -1,6 +1,7 @@
 // `ProjectController.java`
 package com.boardgame.backend_spring.project.controller;
 
+import com.boardgame.backend_spring.log.service.ActionLogger;
 import com.boardgame.backend_spring.project.dto.*;
 import com.boardgame.backend_spring.project.entity.Project;
 import com.boardgame.backend_spring.project.enumtype.ProjectStatus;
@@ -25,6 +26,7 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final TaskService taskService;
+    private final ActionLogger actionLogger;
 
     // 🚨 [신규] 로그인 사용자의 프로젝트 목록 조회
     @GetMapping("/my")
@@ -40,7 +42,11 @@ public class ProjectController {
             @RequestBody ProjectCreateRequestDto dto,
             @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(projectService.createProject(dto, user));
+        ProjectCreateResponseDto response = projectService.createProject(dto, user);
+
+        // 로그 기록
+        actionLogger.log("PROJECT_CREATE", "PROJECT", response.getProjectId());
+        return ResponseEntity.ok(response);
     }
 
     // 프로젝트 상태 조회

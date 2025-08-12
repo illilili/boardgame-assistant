@@ -12,4 +12,6 @@ public class PendingComponentDto {
     private String componentTitle;
     private String componentType;
     private ComponentStatus status; // PENDING_REVIEW 고정
+    // 제출자 이름(풀네임)
+    private String submittedBy;
 }
