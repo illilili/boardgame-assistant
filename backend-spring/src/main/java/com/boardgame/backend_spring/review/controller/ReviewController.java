@@ -13,6 +13,7 @@ import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class ReviewController {
 
     // ===== 기획안 승인/반려 =====
     @PostMapping("/approve")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PUBLISHER')")
     public ResponseEntity<String> reviewPlan(@RequestBody ReviewPlanRequest request) {
         String message = planReviewService.reviewPlan(
                 request.getPlanId(),
@@ -54,6 +56,7 @@ public class ReviewController {
 
     // ===== 제출된 기획안 목록 조회 =====
     @GetMapping("/pending")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PUBLISHER')")
     public ResponseEntity<List<PendingPlanDto>> getPendingPlans() {
         return ResponseEntity.ok(planReviewService.getPendingPlans());
     }

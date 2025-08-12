@@ -4,6 +4,7 @@ import React from 'react';
 import './Home.css';
 import boardgameImage from '../assets/boardgame.png'; 
 import Header from './Header';
+import { Link } from 'react-router-dom';
 
 function Home() {
   return (
@@ -25,6 +26,12 @@ function Home() {
             <button className="explore-button">
               프로젝트 시작하기 <span className="arrow">→</span>
             </button>
+            <Link to="/login" className="login-button">
+                로그인
+              </Link>
+              <Link to="/myPage" className="login-button">
+                마이페이지
+              </Link>
             <div className="page-dots">
               <span className="dot active"></span>
               <span className="dot"></span>

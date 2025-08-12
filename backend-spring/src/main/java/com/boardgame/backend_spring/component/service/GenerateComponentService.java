@@ -1,4 +1,3 @@
-// 파일: component/service/GenerateComponentService.java
 package com.boardgame.backend_spring.component.service;
 
 import com.boardgame.backend_spring.component.dto.GenerateComponentDto;
@@ -8,6 +7,8 @@ import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.ComponentRepository;
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.concept.repository.BoardgameConceptRepository;
+import com.boardgame.backend_spring.content.entity.Content;
+import com.boardgame.backend_spring.content.repository.ContentRepository;
 import com.boardgame.backend_spring.goal.entity.GameObjective;
 import com.boardgame.backend_spring.goal.repository.GameObjectiveRepository;
 import com.boardgame.backend_spring.rule.entity.GameRule;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +36,9 @@ public class GenerateComponentService {
     private final GameObjectiveRepository objectiveRepository;
     private final GameRuleRepository ruleRepository;
     private final ComponentRepository componentRepository;
-    private final ObjectMapper objectMapper; // JSON 변환을 위해 주입
+    private final ObjectMapper objectMapper;
+    private final ComponentStatusService componentStatusService;
+    private final ContentRepository contentRepository;
 
     @Value("${fastapi.service.url}/api/plans/generate-components")
     private String fastapiGenerateComponentsUrl;
@@ -44,7 +48,6 @@ public class GenerateComponentService {
 
     @Transactional
     public GenerateComponentDto.Response generateComponents(GenerateComponentDto.Request request) {
-        // 1. conceptId로 모든 정보 조회
         BoardgameConcept concept = conceptRepository.findById(request.conceptId())
                 .orElseThrow(() -> new EntityNotFoundException("컨셉을 찾을 수 없습니다: " + request.conceptId()));
         GameObjective objective = objectiveRepository.findByBoardgameConcept(concept)
@@ -52,7 +55,9 @@ public class GenerateComponentService {
         GameRule rule = ruleRepository.findByBoardgameConcept(concept)
                 .orElseThrow(() -> new EntityNotFoundException("게임 규칙이 먼저 생성되어야 합니다."));
 
-        // 2. FastAPI 요청 DTO 생성
+        componentRepository.deleteAllByBoardgameConcept(concept);
+        componentRepository.flush();
+
         GenerateComponentDto.FastApiRequest fastApiRequest = GenerateComponentDto.FastApiRequest.builder()
                 .theme(concept.getTheme())
                 .ideaText(concept.getIdeaText())
@@ -62,7 +67,6 @@ public class GenerateComponentService {
                 .actionRules(rule.getActionRules())
                 .build();
 
-        // 3. FastAPI 호출
         GenerateComponentDto.FastApiResponse responseFromAI = restTemplate.postForObject(
                 fastapiGenerateComponentsUrl, fastApiRequest, GenerateComponentDto.FastApiResponse.class);
 
@@ -70,27 +74,10 @@ public class GenerateComponentService {
             throw new RuntimeException("AI 서비스로부터 유효한 구성요소 데이터를 받지 못했습니다.");
         }
 
-        // 4. 받은 상세 데이터를 DB에 저장
-        List<Component> savedComponents = new ArrayList<>();
-        for (GenerateComponentDto.FastApiComponentItem item : responseFromAI.components()) {
-            Component newComponent = new Component();
-            newComponent.setBoardgameConcept(concept);
-            newComponent.setTitle(item.getTitle());
-            newComponent.setType(item.getType());
-            newComponent.setQuantity(item.getQuantity());
-            newComponent.setRoleAndEffect(item.getRoleAndEffect());
-            newComponent.setArtConcept(item.getArtConcept());
-            newComponent.setInterconnection(item.getInterconnection());
+        List<Component> savedComponents = saveComponents(concept, responseFromAI.components());
 
-            List<SubTask> subTasks = createSubTasksForComponent(newComponent);
-            newComponent.setSubTasks(subTasks);
-
-            savedComponents.add(componentRepository.save(newComponent));
-        }
-
-        // 5. 최종 응답 DTO로 변환
         List<GenerateComponentDto.ComponentDetail> componentDetails = savedComponents.stream()
-                .map(this::mapToComponentDetail)
+                .map(GenerateComponentDto.ComponentDetail::fromEntity)
                 .collect(Collectors.toList());
 
         return new GenerateComponentDto.Response(componentDetails);
@@ -98,7 +85,6 @@ public class GenerateComponentService {
 
     @Transactional
     public GenerateComponentDto.Response regenerateComponents(RegenerateComponentDto.Request request) {
-        // 1. conceptId로 모든 관련 정보 조회
         BoardgameConcept concept = conceptRepository.findById(request.conceptId())
                 .orElseThrow(() -> new EntityNotFoundException("컨셉을 찾을 수 없습니다: " + request.conceptId()));
         GameObjective objective = objectiveRepository.findByBoardgameConcept(concept)
@@ -111,10 +97,8 @@ public class GenerateComponentService {
             throw new IllegalStateException("재생성할 기존 구성요소가 없습니다. 먼저 구성요소를 생성해주세요.");
         }
 
-        // 2. 기존 구성요소 목록을 JSON 문자열로 변환
         String currentComponentsJson = convertComponentsToJson(existingComponents);
 
-        // 3. FastAPI 요청 DTO 생성
         RegenerateComponentDto.FastApiRequest fastApiRequest = RegenerateComponentDto.FastApiRequest.builder()
                 .currentComponentsJson(currentComponentsJson)
                 .feedback(request.feedback())
@@ -125,9 +109,10 @@ public class GenerateComponentService {
                 .mechanics(concept.getMechanics())
                 .mainGoal(objective.getMainGoal())
                 .winConditionType(objective.getWinConditionType())
+                .worldSetting("임시 세계관 설정")
+                .worldTone("임시 세계관 톤")
                 .build();
 
-        // 4. FastAPI 호출
         GenerateComponentDto.FastApiResponse responseFromAI = restTemplate.postForObject(
                 fastapiRegenerateComponentsUrl, fastApiRequest, GenerateComponentDto.FastApiResponse.class);
 
@@ -135,13 +120,21 @@ public class GenerateComponentService {
             throw new RuntimeException("AI 서비스로부터 유효한 구성요소 데이터를 받지 못했습니다.");
         }
 
-        // 5. 기존 구성요소 및 하위 작업(SubTask) 삭제
         componentRepository.deleteAllByBoardgameConcept(concept);
         componentRepository.flush();
 
-        // 6. 새로 받은 데이터로 DB에 저장
+        List<Component> savedComponents = saveComponents(concept, responseFromAI.components());
+
+        return new GenerateComponentDto.Response(
+                savedComponents.stream()
+                        .map(GenerateComponentDto.ComponentDetail::fromEntity)
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private List<Component> saveComponents(BoardgameConcept concept, List<GenerateComponentDto.FastApiComponentItem> items) {
         List<Component> savedComponents = new ArrayList<>();
-        for (GenerateComponentDto.FastApiComponentItem item : responseFromAI.components()) {
+        for (GenerateComponentDto.FastApiComponentItem item : items) {
             Component newComponent = new Component();
             newComponent.setBoardgameConcept(concept);
             newComponent.setTitle(item.getTitle());
@@ -151,18 +144,12 @@ public class GenerateComponentService {
             newComponent.setArtConcept(item.getArtConcept());
             newComponent.setInterconnection(item.getInterconnection());
 
-            List<SubTask> subTasks = createSubTasksForComponent(newComponent);
+            List<SubTask> subTasks = createSubTasksForComponent(newComponent, item.getExamples());
             newComponent.setSubTasks(subTasks);
 
             savedComponents.add(componentRepository.save(newComponent));
         }
-
-        // 7. 최종 응답 DTO로 변환하여 반환
-        return new GenerateComponentDto.Response(
-                savedComponents.stream()
-                        .map(this::mapToComponentDetail)
-                        .collect(Collectors.toList())
-        );
+        return savedComponents;
     }
 
     private String convertComponentsToJson(List<Component> components) {
@@ -184,46 +171,52 @@ public class GenerateComponentService {
         }
     }
 
-    private List<SubTask> createSubTasksForComponent(Component component) {
+    private List<SubTask> createSubTasksForComponent(Component component, List<GenerateComponentDto.ExampleItem> examples) {
         List<SubTask> tasks = new ArrayList<>();
         String type = component.getType().toLowerCase();
-        if (type.contains("card")) {
-            tasks.add(createSubTask(component, "text", "NOT_STARTED"));
-            tasks.add(createSubTask(component, "image", "NOT_STARTED"));
-        } else if (type.contains("token") || type.contains("pawn") || type.contains("miniature")) {
-            tasks.add(createSubTask(component, "3d_model", "NOT_STARTED"));
-        } else if (type.contains("board") || type.contains("mat")) {
-            tasks.add(createSubTask(component, "image", "NOT_STARTED"));
+
+        // AI가 생성한 개별 예시가 있고, 타입이 카드인 경우
+        if (type.contains("card") && examples != null && !examples.isEmpty()) {
+            for (GenerateComponentDto.ExampleItem example : examples) {
+                // 각 예시마다 text와 image SubTask 생성
+                tasks.add(createSubTaskWithContent(component, "text", example));
+                tasks.add(createSubTaskWithContent(component, "image", example));
+            }
         } else {
-            tasks.add(createSubTask(component, "text", "NOT_STARTED"));
+            // 그 외의 경우 (카드가 아니거나, AI 예시가 없는 경우), 1개의 SubTask만 생성
+            if (type.contains("token") || type.contains("pawn") || type.contains("miniature") || type.contains("figure") || type.contains("dice")) {
+                tasks.add(createSubTaskWithContent(component, "3d_model", null));
+            } else if (type.contains("board") || type.contains("mat")) {
+                tasks.add(createSubTaskWithContent(component, "image", null));
+            } else {
+                tasks.add(createSubTaskWithContent(component, "text", null));
+            }
         }
         return tasks;
     }
 
-    private SubTask createSubTask(Component component, String type, String status) {
+    private SubTask createSubTaskWithContent(Component component, String subTaskType, GenerateComponentDto.ExampleItem example) {
+        Content content = new Content();
+        content.setComponent(component);
+        content.setContentType(subTaskType);
+        content.setCreatedAt(LocalDateTime.now());
+
+        // 🚨 [수정] AI가 제공한 예시 정보가 있으면 Content에 채워넣음
+        if (example != null) {
+            content.setName(example.getTitle());
+            content.setEffect(example.getEffect());
+        } else {
+            // 예시가 없는 경우 (룰북, 게임 박스 등), Component의 제목을 기본 이름으로 사용
+            content.setName(component.getTitle());
+        }
+
+        Content savedContent = contentRepository.save(content);
+
         SubTask task = new SubTask();
         task.setComponent(component);
-        task.setType(type);
-        task.setStatus(status);
+        task.setType(subTaskType);
+        task.setStatus("NOT_STARTED");
+        task.setContentId(savedContent.getContentId());
         return task;
-    }
-
-    private GenerateComponentDto.ComponentDetail mapToComponentDetail(Component component) {
-        return GenerateComponentDto.ComponentDetail.builder()
-                .componentId(component.getComponentId())
-                .title(component.getTitle())
-                .type(component.getType())
-                .quantity(component.getQuantity())
-                .roleAndEffect(component.getRoleAndEffect())
-                .artConcept(component.getArtConcept())
-                .interconnection(component.getInterconnection())
-                .subTasks(component.getSubTasks().stream().map(subTask ->
-                        GenerateComponentDto.SubTaskDetail.builder()
-                                .contentId(subTask.getContentId())
-                                .type(subTask.getType())
-                                .status(subTask.getStatus())
-                                .build()
-                ).collect(Collectors.toList()))
-                .build();
     }
 }

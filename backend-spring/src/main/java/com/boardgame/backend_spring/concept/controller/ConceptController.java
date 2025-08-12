@@ -1,9 +1,9 @@
+// `ConceptController.java`
 package com.boardgame.backend_spring.concept.controller;
 
 
 import com.boardgame.backend_spring.concept.dto.ConceptRequestDto;
 import com.boardgame.backend_spring.concept.dto.ConceptResponseDto;
-// [추가] 재생성 요청 DTO 임포트
 import com.boardgame.backend_spring.concept.dto.RegenerateConceptRequestDto;
 import com.boardgame.backend_spring.concept.service.ConceptService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class ConceptController {
         return ResponseEntity.ok(responseDto);
     }
 
-    // [신규 추가] 기존 컨셉 재생성
+    // 기존 컨셉 재생성
     @PostMapping("/regenerate-concept")
     public ResponseEntity<ConceptResponseDto> regenerateConcept(@RequestBody RegenerateConceptRequestDto requestDto) {
         ConceptResponseDto responseDto = conceptService.regenerateConcept(requestDto);

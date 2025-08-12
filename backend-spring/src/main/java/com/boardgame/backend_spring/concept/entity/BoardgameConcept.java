@@ -1,3 +1,4 @@
+// `BoardgameConcept.java`
 package com.boardgame.backend_spring.concept.entity;
 
 

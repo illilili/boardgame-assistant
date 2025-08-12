@@ -1,3 +1,4 @@
+// `Project.java` 엔티티
 package com.boardgame.backend_spring.project.entity;
 
 import com.boardgame.backend_spring.plan.entity.Plan;

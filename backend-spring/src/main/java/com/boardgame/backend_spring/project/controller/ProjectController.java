@@ -1,3 +1,4 @@
+// `ProjectController.java`
 package com.boardgame.backend_spring.project.controller;
 
 import com.boardgame.backend_spring.project.dto.*;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+import java.util.List;
+
 import java.time.LocalDateTime;
 
 @RestController
@@ -22,6 +25,12 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final TaskService taskService;
+
+    // 🚨 [신규] 로그인 사용자의 프로젝트 목록 조회
+    @GetMapping("/my")
+    public ResponseEntity<List<ProjectSummaryDto>> getMyProjects(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(projectService.getProjectsByCreator(user));
+    }
     private final ProjectRepository projectRepository;
 
 

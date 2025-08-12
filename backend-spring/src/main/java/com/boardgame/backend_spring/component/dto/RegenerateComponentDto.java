@@ -11,7 +11,6 @@ public class RegenerateComponentDto {
 
     /**
      * Spring -> FastAPI 요청에 사용할 내부 DTO
-     * FastAPI의 Pydantic 모델과 필드명을 일치시켜야 합니다.
      */
     @Builder
     public record FastApiRequest(

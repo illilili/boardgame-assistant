@@ -35,9 +35,6 @@ public class TaskService {
     private final ContentRepository contentRepository;
     private final SubTaskRepository subTaskRepository;
 
-    /**
-     * [1] 최초 개발 목록 초기화 - 고정 컴포넌트 3종 생성
-     */
     @Transactional
     public void initializeDeveloperTaskList(Long projectId) {
         Plan plan = planRepository.findByProjectIdAndStatus(projectId, PlanStatus.APPROVED)
@@ -45,9 +42,7 @@ public class TaskService {
 
         BoardgameConcept concept = plan.getBoardgameConcept();
 
-        // 중복 방지: 룰북 하나라도 있으면 생략
         if (!componentRepository.existsByBoardgameConceptAndTitle(concept, "룰북 초안")) {
-            // 1. 룰북
             Component rulebook = new Component();
             rulebook.setBoardgameConcept(concept);
             rulebook.setType("Document");
@@ -58,7 +53,6 @@ public class TaskService {
             rulebookTask = subTaskRepository.save(rulebookTask);
             rulebook.setSubTasks(List.of(rulebookTask));
 
-            // 2. 설명 스크립트
             Component script = new Component();
             script.setBoardgameConcept(concept);
             script.setType("Script");
@@ -71,9 +65,6 @@ public class TaskService {
         }
     }
 
-    /**
-     * [2] 개발 목록 전체 조회
-     */
     @Transactional(readOnly = true)
     public TaskListResponseDto getTaskListByProject(Long projectId) {
         Plan plan = planRepository.findByProjectIdAndStatus(projectId, PlanStatus.APPROVED)
@@ -113,17 +104,20 @@ public class TaskService {
                 .build();
     }
 
+    // 🚨 [수정] Content에서 name과 effect를 가져와 DTO에 담도록 수정
     private SubTaskDto toSubTaskDto(SubTask subTask) {
+        Content content = contentRepository.findById(subTask.getContentId())
+                .orElse(null);
+
         return SubTaskDto.builder()
                 .contentId(subTask.getContentId())
                 .type(subTask.getType())
                 .status(subTask.getStatus())
+                .name(content != null ? content.getName() : "")
+                .effect(content != null ? content.getEffect() : "")
                 .build();
     }
 
-    /**
-     * 콘텐츠 + 서브태스크 생성
-     */
     private SubTask makeFixedSubTask(String type, String title, Component component) {
         Content content = new Content();
         content.setContentType(mapContentType(type, title));
@@ -157,14 +151,14 @@ public class TaskService {
     private String calculateStatusSummary(Component component) {
         ComponentStatus status = component.getStatus();
         if (status == null) {
-            return "작업 대기"; // 기본값
+            return "작업 대기";
         }
 
         return switch (status) {
             case WAITING -> "작업 대기";
             case IN_PROGRESS -> "작업 중";
-            case READY_TO_SUBMIT -> "작업 완료";   // 제출 대기
-            case PENDING_REVIEW -> "제출 완료";    // 승인 대기
+            case READY_TO_SUBMIT -> "작업 완료";
+            case PENDING_REVIEW -> "제출 완료";
             case APPROVED -> "승인";
             case REJECTED -> "반려";
         };

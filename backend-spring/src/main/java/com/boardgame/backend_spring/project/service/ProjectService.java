@@ -1,3 +1,4 @@
+// ProjectService.java
 package com.boardgame.backend_spring.project.service;
 
 import com.boardgame.backend_spring.plan.entity.PlanStatus;
@@ -11,8 +12,11 @@ import com.boardgame.backend_spring.user.entity.User;
 import com.boardgame.backend_spring.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +27,27 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final PlanRepository planRepository;
 
+    // 🚨 [신규] 로그인 사용자가 참여한 프로젝트 목록 조회
+    @Transactional(readOnly = true)
+    public List<ProjectSummaryDto> getProjectsByCreator(User user) {
+        // 💡 로그인한 유저가 PUBLISHER 역할인지 확인합니다.
+        if (user.getRole() == User.Role.PUBLISHER) {
+            // PUBLISHER라면 모든 프로젝트 목록을 반환합니다.
+            return projectRepository.findAll().stream()
+                    .map(ProjectSummaryDto::from)
+                    .collect(Collectors.toList());
+        } else {
+            // 다른 역할(기획자 등)은 기존처럼 자신이 참여한 프로젝트만 봅니다.
+            List<ProjectMember> members = projectMemberRepository.findAllByUser(user);
+            return members.stream()
+                    .map(ProjectMember::getProject)
+                    .map(ProjectSummaryDto::from)
+                    .collect(Collectors.toList());
+        }
+    }
+
     // 프로젝트 생성 - 로그인 사용자 기준 (PLANNER만)
+    @Transactional
     public ProjectCreateResponseDto createProject(ProjectCreateRequestDto dto, User user) {
         if (user.getRole() != User.Role.PLANNER) {
             throw new RuntimeException("기획자만 프로젝트를 생성할 수 있습니다.");
@@ -75,6 +99,7 @@ public class ProjectService {
     }
 
     // 개발자 배정 (PUBLISHER만 가능)
+    @Transactional
     public void assignDeveloperToProject(Long projectId, AssignDeveloperRequestDto dto, User currentUser) {
         if (currentUser.getRole() != User.Role.PUBLISHER) {
             throw new RuntimeException("퍼블리셔만 개발자를 배정할 수 있습니다.");
@@ -83,9 +108,8 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("프로젝트를 찾을 수 없습니다."));
 
-        // 기획안 승인 여부 확인
-        boolean hasApprovedPlan = planRepository.findByProjectIdAndStatus(projectId, PlanStatus.APPROVED).isPresent();
-        if (!hasApprovedPlan) {
+        // 🚨 수정된 로직: Project 엔티티의 approvedPlan 필드를 직접 확인
+        if (project.getApprovedPlan() == null) {
             throw new RuntimeException("기획안이 승인되지 않은 상태에서는 개발자를 배정할 수 없습니다.");
         }
 

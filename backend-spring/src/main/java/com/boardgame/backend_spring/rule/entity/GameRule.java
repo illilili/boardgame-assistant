@@ -14,19 +14,19 @@ import java.util.List;
 public class GameRule {
 
     @Id
-    private Long conceptId; // BoardgameConcept의 ID를 기본 키로 사용
+    private Long conceptId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @MapsId // BoardgameConcept의 PK를 자신의 PK로 매핑
+    @MapsId
     @JoinColumn(name = "concept_id")
     private BoardgameConcept boardgameConcept;
 
-    private int ruleId; // AI가 생성한 임의의 ruleId
+    private int ruleId;
 
     @Column(length = 1000)
     private String turnStructure;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY) // 🚨 LAZY로 변경
     @CollectionTable(name = "action_rules", joinColumns = @JoinColumn(name = "rule_concept_id"))
     @Column(name = "rule", length = 1000)
     private List<String> actionRules;
@@ -34,7 +34,7 @@ public class GameRule {
     @Column(length = 1000)
     private String victoryCondition;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY) // 🚨 LAZY로 변경
     @CollectionTable(name = "penalty_rules", joinColumns = @JoinColumn(name = "rule_concept_id"))
     @Column(name = "rule", length = 1000)
     private List<String> penaltyRules;

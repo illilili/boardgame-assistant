@@ -1,12 +1,14 @@
+// `ConceptService.java`
 package com.boardgame.backend_spring.concept.service;
 
 import com.boardgame.backend_spring.concept.dto.ConceptRequestDto;
 import com.boardgame.backend_spring.concept.dto.ConceptResponseDto;
-// [추가] 재생성 요청 DTO 임포트
 import com.boardgame.backend_spring.concept.dto.RegenerateConceptRequestDto;
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.concept.repository.BoardgameConceptRepository;
-import jakarta.persistence.EntityNotFoundException; // [추가] 예외 처리
+import com.boardgame.backend_spring.project.entity.Project;
+import com.boardgame.backend_spring.project.repository.ProjectRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,17 +23,16 @@ public class ConceptService {
 
     private final RestTemplate restTemplate;
     private final BoardgameConceptRepository boardgameConceptRepository;
+    private final ProjectRepository projectRepository;
 
     @Value("${fastapi.service.url}/api/plans/generate-concept")
     private String generateConceptUrl;
 
-    // [추가] 재생성 API URL 프로퍼티
     @Value("${fastapi.service.url}/api/plans/regenerate-concept")
     private String regenerateConceptUrl;
 
     @Transactional
     public ConceptResponseDto generateConcept(ConceptRequestDto requestDto) {
-        // ... (기존 generateConcept 메소드 내용은 동일)
         ConceptResponseDto responseFromFastAPI;
         try {
             responseFromFastAPI = restTemplate.postForObject(generateConceptUrl, requestDto, ConceptResponseDto.class);
@@ -43,6 +44,9 @@ public class ConceptService {
             throw new RuntimeException("AI 서비스로부터 유효한 응답을 받지 못했습니다.");
         }
 
+        Project project = projectRepository.findById(requestDto.getProjectId())
+                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + requestDto.getProjectId()));
+
         BoardgameConcept newConcept = new BoardgameConcept();
         newConcept.setPlanId(responseFromFastAPI.getPlanId());
         newConcept.setTheme(responseFromFastAPI.getTheme());
@@ -52,16 +56,15 @@ public class ConceptService {
         newConcept.setMechanics(responseFromFastAPI.getMechanics());
         newConcept.setStoryline(responseFromFastAPI.getStoryline());
         newConcept.setCreatedAt(responseFromFastAPI.getCreatedAt());
+        newConcept.setProject(project);
 
         BoardgameConcept savedConcept = boardgameConceptRepository.save(newConcept);
 
         return mapEntityToDto(savedConcept);
     }
 
-    // [신규 추가] 컨셉 재생성 로직
     @Transactional
     public ConceptResponseDto regenerateConcept(RegenerateConceptRequestDto requestDto) {
-        // 1. FastAPI 재생성 API 호출
         ConceptResponseDto regeneratedConceptDto;
         try {
             regeneratedConceptDto = restTemplate.postForObject(regenerateConceptUrl, requestDto, ConceptResponseDto.class);
@@ -73,12 +76,14 @@ public class ConceptService {
             throw new RuntimeException("AI 재생성 서비스로부터 유효한 응답을 받지 못했습니다.");
         }
 
-        // 2. planId를 사용하여 기존 컨셉 엔티티를 DB에서 조회
+        // 🚨 재생성된 컨셉의 projectId를 가져와서 사용
         Long planId = regeneratedConceptDto.getPlanId();
         BoardgameConcept existingConcept = boardgameConceptRepository.findByPlanId(planId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 planId를 가진 컨셉을 찾을 수 없습니다: " + planId));
 
-        // 3. 조회된 엔티티의 내용을 FastAPI로부터 받은 새로운 정보로 업데이트
+        Project project = projectRepository.findById(requestDto.getOriginalConcept().getProjectId())
+                .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + requestDto.getOriginalConcept().getProjectId()));
+
         existingConcept.setTheme(regeneratedConceptDto.getTheme());
         existingConcept.setPlayerCount(regeneratedConceptDto.getPlayerCount());
         existingConcept.setAverageWeight(regeneratedConceptDto.getAverageWeight());
@@ -86,15 +91,12 @@ public class ConceptService {
         existingConcept.setMechanics(regeneratedConceptDto.getMechanics());
         existingConcept.setStoryline(regeneratedConceptDto.getStoryline());
         existingConcept.setCreatedAt(regeneratedConceptDto.getCreatedAt());
-        // conceptId는 그대로 유지하고 planId도 동일
+        existingConcept.setProject(project); // 🚨 업데이트 시에도 project를 다시 설정
 
-        // 4. 변경된 엔티티 저장 (JPA의 더티 체킹에 의해 @Transactional 어노테이션이 끝나면 자동 반영되지만, 명시적으로 save 호출도 가능)
         BoardgameConcept updatedConcept = boardgameConceptRepository.save(existingConcept);
 
-        // 5. 업데이트된 엔티티를 DTO로 변환하여 반환
         return mapEntityToDto(updatedConcept);
     }
-
 
     public List<ConceptResponseDto> getAllConcepts() {
         return boardgameConceptRepository.findAll().stream()
@@ -106,6 +108,7 @@ public class ConceptService {
         ConceptResponseDto dto = new ConceptResponseDto();
         dto.setConceptId(entity.getConceptId());
         dto.setPlanId(entity.getPlanId());
+        dto.setProjectId(entity.getProject().getId());
         dto.setTheme(entity.getTheme());
         dto.setPlayerCount(entity.getPlayerCount());
         dto.setAverageWeight(entity.getAverageWeight());
