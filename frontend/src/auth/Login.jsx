@@ -1,7 +1,7 @@
 import React, { useState as useStateLogin } from 'react';
 import { useNavigate as useNavigateLogin, Link as LinkLogin } from 'react-router-dom';
 import { login as apiLogin } from '../api/auth.js';
-
+import './Login.css';
 const Login = () => {
     const [email, setEmail] = useStateLogin('');
     const [password, setPassword] = useStateLogin('');

@@ -89,14 +89,14 @@ select, input[type="text"] {
 
 select:focus, input[type="text"]:focus {
     outline: none;
-    border-color: #E58A4E;
-    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+    border-color: #7C3AED; /* 포커스 색상 변경 */
+    box-shadow: 0 0 0 3px rgba(124, 60, 237, 0.2); /* 포커스 섀도우 색상 변경 */
 }
 
 .primary-button {
     width: 100%;
     padding: 14px 20px;
-    background-color: #E58A4E;
+    background-color: #7C3AED; /* 주 색상 변경 */
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
@@ -108,11 +108,11 @@ select:focus, input[type="text"]:focus {
 }
 
 .primary-button:hover:not(:disabled) {
-    background-color: #c06c38;
+    background-color: #5d2fc7; /* 호버 색상 변경 */
 }
 
 .primary-button:disabled {
-    background-color: #fbd6c0;
+    background-color: #d1b4fa; /* 비활성화 색상 변경 */
     cursor: not-allowed;
     transform: none;
 }
@@ -146,7 +146,7 @@ select:focus, input[type="text"]:focus {
 
 .secondary-button {
     padding: 10px 20px;
-    background-color: #4A5568;
+    background-color: #A78BFA; /* 보조 버튼 색상 변경 */
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
@@ -158,11 +158,11 @@ select:focus, input[type="text"]:focus {
 }
 
 .secondary-button:hover:not(:disabled) {
-    background-color: #2D3748;
+    background-color: #8b68f5; /* 호버 색상 변경 */
 }
 
 .secondary-button:disabled {
-    background-color: #A0AEC0;
+    background-color: #d1b4fa; /* 비활성화 색상 변경 */
     cursor: not-allowed;
 }
 
@@ -185,10 +185,9 @@ select:focus, input[type="text"]:focus {
 
 .document-editor:focus {
     outline: none;
-    border-color: #E58A4E;
-    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+    border-color: #7C3AED; /* 포커스 색상 변경 */
+    box-shadow: 0 0 0 3px rgba(124, 60, 237, 0.2); /* 포커스 섀도우 색상 변경 */
 }
-
 
 /* --- 버전 관리 섹션 (왼쪽 컬럼 내부) --- */
 .version-management-section {
@@ -229,8 +228,8 @@ select:focus, input[type="text"]:focus {
 .spinner {
     width: 48px;
     height: 48px;
-    border: 5px solid rgba(229, 138, 78, 0.2);
-    border-top-color: #E58A4E;
+    border: 5px solid rgba(167, 139, 250, 0.2); /* 스피너 테두리 색상 변경 */
+    border-top-color: #A78BFA; /* 스피너 색상 변경 */
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -239,9 +238,9 @@ select:focus, input[type="text"]:focus {
 }
 .error-message {
     padding: 16px;
-    background-color: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
+    background-color: #f5f3ff; /* 배경색 변경 */
+    color: #5b21b6; /* 글자색 변경 */
+    border: 1px solid #a78bfa; /* 테두리 색상 변경 */
     border-radius: 8px;
     text-align: center;
     font-weight: 500;
@@ -261,15 +260,14 @@ select:focus, input[type="text"]:focus {
 }
 .success-message {
     padding: 16px;
-    background-color: #f0fff4; /* Light green background */
-    color: #065f46; /* Dark green text */
-    border: 1px solid #6ee7b7; /* Green border */
+    background-color: #f5f3ff; /* 연한 보라색 배경 */
+    color: #5b21b6; /* 진한 보라색 텍스트 */
+    border: 1px solid #a78bfa; /* 보라색 테두리 */
     border-radius: 8px;
     text-align: center;
     font-weight: 500;
     margin-top: 1rem;
 }
-
 `;
 
 
@@ -490,7 +488,7 @@ const PlanPage = () => {
                 return `${sectionCounter++}. ${content}`;
             }
             if (trimmedLine.startsWith('* ')) {
-                return `   - ${trimmedLine.substring(2)}`;
+                return `    - ${trimmedLine.substring(2)}`;
             }
             if (trimmedLine.startsWith('# ')) {
                 return `[ ${trimmedLine.substring(2)} ]`;

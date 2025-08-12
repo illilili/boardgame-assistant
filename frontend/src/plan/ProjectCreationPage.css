@@ -1,0 +1,189 @@
+/* src/plan/ProjectCreationPage.css */
+
+.pcp-container {
+    max-width: 800px;
+    margin: 0 auto; /* 가운데 정렬 */
+    padding: 20px 0;
+}
+
+.pcp-card {
+    background-color: var(--bg-widget);
+    border-radius: 12px;
+    padding: 32px 40px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.pcp-header {
+    text-align: left;
+    margin-bottom: 32px;
+}
+
+.pcp-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 8px 0;
+}
+
+.pcp-subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.pcp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.pcp-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.pcp-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.pcp-input,
+.pcp-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.pcp-input:focus,
+.pcp-textarea:focus {
+    outline: none;
+    border-color: var(--brand-purple);
+    box-shadow: 0 0 0 2px var(--brand-purple-light);
+}
+
+.pcp-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.pcp-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 14px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pcp-button.primary {
+    background-color: var(--brand-purple);
+    color: white;
+}
+.pcp-button.primary:hover {
+    opacity: 0.9;
+}
+.pcp-button:disabled {
+    background-color: var(--text-tertiary);
+    cursor: not-allowed;
+}
+
+.pcp-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.pcp-spinner {
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* --- 결과 표시 박스 --- */
+.pcp-result-box {
+    text-align: center;
+    padding: 32px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+.pcp-result-box.success {
+    background-color: #F0FFF4; /* Light Green */
+    border: 1px solid #9AE6B4; /* Green */
+}
+.dark .pcp-result-box.success {
+    background-color: rgba(72, 187, 120, 0.1);
+    border-color: #2F855A;
+}
+.pcp-result-box.error {
+    background-color: #FFF5F5; /* Light Red */
+    border: 1px solid #FEB2B2; /* Red */
+}
+.dark .pcp-result-box.error {
+    background-color: rgba(229, 62, 62, 0.1);
+    border-color: #C53030;
+}
+
+.pcp-result-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px auto;
+}
+.pcp-result-icon.success { color: #38A169; }
+.pcp-result-icon.error { color: #E53E3E; }
+
+.pcp-result-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.pcp-result-message {
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.pcp-result-details {
+    text-align: left;
+    background-color: var(--bg-widget);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 24px;
+}
+.pcp-result-details p {
+    margin: 0 0 8px 0;
+    color: var(--text-secondary);
+}
+.pcp-result-details p:last-child {
+    margin-bottom: 0;
+}
+.pcp-result-details strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.pcp-button.error {
+    background-color: #E53E3E;
+    color: white;
+}

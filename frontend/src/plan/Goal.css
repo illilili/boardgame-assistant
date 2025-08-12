@@ -74,14 +74,14 @@
 
 .goal-form select:focus {
   outline: none;
-  border-color: #E58A4E;
+  border-color: #A78BFA;
   box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
 }
 
 .goal-form .submit-button {
   width: 100%;
   padding: 14px 20px;
-  background-color: #E58A4E;
+  background-color: #A78BFA;
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -93,7 +93,7 @@
 }
 
 .goal-form .submit-button:hover {
-  background-color: #c06c38;
+  background-color: #A78BFA;
 }
 
 .goal-form .submit-button:disabled {
@@ -128,7 +128,7 @@
   color: #2c2825;
   margin: 0 0 8px 0;
   padding-bottom: 8px;
-  border-bottom: 2px solid #E58A4E;
+  border-bottom: 2px solid #7C3AED;
   display: inline-block;
 }
 
@@ -152,7 +152,7 @@
   width: 48px;
   height: 48px;
   border: 5px solid rgba(229, 138, 78, 0.2);
-  border-top-color: #E58A4E;
+  border-top-color: #7C3AED;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 24px;
@@ -163,7 +163,7 @@
   padding: 16px;
   background-color: #fef2f2;
   color: #991b1b;
-  border: 1px solid #fca5a5;
+  border: 1px solid #A78BFA;
   border-radius: 8px;
   text-align: center;
   font-weight: 500;

@@ -1,82 +1,83 @@
 /* PlanReport.css */
 
 .plan-report-container {
-  background-color: #ffffff;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-  color: #333;
-  line-height: 1.8;
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    color: #333;
+    line-height: 1.8;
+    max-height: 100%;
+    overflow-y: auto;
 }
 
 /* --- 제목 및 헤더 스타일 --- */
-
-/* 기획서 전체 제목 (예: # 거인의 그림자...) */
 .plan-report-container h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  text-align: center;
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 2px solid #2c2825;
-  color: #2c2825;
+    font-size: 2rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #2c2825;
+    color: #2c2825;
 }
 
 /* 각 섹션 제목 (예: ## 1. 게임 개요...) */
 .plan-report-container h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-top: 48px; /* 섹션 간 여백 */
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eaeaea;
-  color: #2c2825;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 48px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eaeaea;
+    color: #2c2825;
 }
 
 /* --- 목록(리스트) 스타일 --- */
 .plan-report-container ul {
-  list-style: none; /* 기본 불릿 제거 */
-  padding-left: 0;
+    list-style: none;
+    padding-left: 0;
 }
 
 .plan-report-container li {
-  margin-bottom: 12px;
-  display: flex;
-  align-items: flex-start;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
 }
 
 /* 커스텀 불릿(■) 스타일 */
 .plan-report-container li::before {
-  content: '■';
-  color: #E58A4E; /* 포인트 컬러 */
-  font-size: 0.7em;
-  margin-right: 12px;
-  padding-top: 6px; /* 텍스트와 세로 정렬 맞추기 */
+    content: '■';
+    color: #A78BFA;
+    font-size: 0.7em;
+    margin-right: 12px;
+    padding-top: 6px;
 }
 
 /* --- 본문 스타일 --- */
-
 .plan-report-container p {
-  margin-bottom: 16px;
-  text-align: justify;
+    margin-bottom: 16px;
+    text-align: justify;
 }
 
 /* 목록 안의 텍스트에서 맨 앞 **...:** 부분을 굵게 처리 */
 .plan-report-container li strong {
-  font-weight: 600;
-  margin-right: 8px;
-  color: #000;
+    font-weight: 600;
+    margin-right: 8px;
+    color: #000;
 }
 
 /* 내용이 없을 때 표시될 플레이스홀더 */
 .plan-report-placeholder {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 300px;
-  background-color: #f8f8f8;
-  border-radius: 8px;
-  color: #888;
-  font-size: 1.1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    color: #888;
+    font-size: 1.1rem;
+    padding: 24px;
+    text-align: center;
 }
