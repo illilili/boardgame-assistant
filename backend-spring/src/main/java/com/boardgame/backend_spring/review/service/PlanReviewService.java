@@ -1,5 +1,7 @@
 package com.boardgame.backend_spring.review.service;
 
+import com.boardgame.backend_spring.log.entity.ActivityLog;
+import com.boardgame.backend_spring.log.repository.ActivityLogRepository;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.entity.PlanStatus;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
@@ -20,17 +22,29 @@ public class PlanReviewService {
 
     private final PlanRepository planRepository;
     private final ProjectRepository projectRepository;
+    private final ActivityLogRepository activityLogRepository;
 
     @Transactional(readOnly = true)
     public List<PendingPlanDto> getPendingPlans() {
         return planRepository.findByStatus(PlanStatus.SUBMITTED).stream()
-                .map(plan -> PendingPlanDto.builder()
-                        .planId(plan.getPlanId())
-                        .projectTitle(plan.getProject().getName())
-                        .conceptTheme(plan.getBoardgameConcept().getTheme())
-                        .planDocUrl(plan.getPlanDocUrl())
-                        .status(plan.getStatus())
-                        .build())
+                .map(plan -> {
+                    // 제출자 조회
+                    String submittedBy = activityLogRepository
+                            .findTopByActionAndTargetTypeAndTargetIdOrderByTimestampDesc(
+                                    "PLAN_SUBMIT", "PLAN", plan.getPlanId()
+                            )
+                            .map(ActivityLog::getUsername)
+                            .orElse(null);
+
+                    return PendingPlanDto.builder()
+                            .planId(plan.getPlanId())
+                            .projectTitle(plan.getProject().getName())
+                            .conceptTheme(plan.getBoardgameConcept().getTheme())
+                            .planDocUrl(plan.getPlanDocUrl())
+                            .status(plan.getStatus())
+                            .submittedBy(submittedBy)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

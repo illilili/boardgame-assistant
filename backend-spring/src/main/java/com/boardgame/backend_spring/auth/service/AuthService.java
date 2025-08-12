@@ -64,7 +64,11 @@ public class AuthService {
         user.setFailedLoginCount(0);
         userRepository.save(user);
 
-        String accessToken = jwtTokenProvider.createAccessToken(user.getEmail(), user.getRole().name());
+        String accessToken = jwtTokenProvider.createAccessToken(
+                user.getEmail(),
+                user.getRole().name(),
+                user.getName() // ★ 이름 전달
+        );
         String refreshToken = "not-implemented";
 
         return new LoginResponse(accessToken, refreshToken);

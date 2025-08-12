@@ -12,4 +12,8 @@ public class PendingPlanDto {
     private String conceptTheme;
     private String planDocUrl;
     private PlanStatus status;
+    // 제출자 이름
+    private String submittedBy;
+
+
 }

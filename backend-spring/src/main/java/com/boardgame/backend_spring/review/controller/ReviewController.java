@@ -63,6 +63,7 @@ public class ReviewController {
 
     // ===== 제출된 컴포넌트 목록 조회 (기존 단일 리스트) =====
     @GetMapping("/components/pending")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PUBLISHER')")
     public ResponseEntity<List<PendingComponentDto>> getPendingComponents(
             @RequestParam(required = false) Long projectId
     ) {
@@ -71,6 +72,7 @@ public class ReviewController {
 
     // ===== 제출된 컴포넌트 목록 조회 (프로젝트별 그룹) =====
     @GetMapping("/components/pending/grouped")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PUBLISHER')")
     public ResponseEntity<List<PendingComponentGroupDto>> getPendingComponentsGrouped() {
         return ResponseEntity.ok(
                 // 새로 만든 그룹 조회 메서드 사용
@@ -87,6 +89,7 @@ public class ReviewController {
 
     // =====  컴포넌트 승인/반려 =====
     @PostMapping("/components/decision")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PUBLISHER')")
     public ResponseEntity<String> reviewComponent(@RequestBody ReviewComponentRequest request) {
         String msg = componentReviewService.reviewComponent(
                 request.getComponentId(),

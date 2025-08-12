@@ -1,5 +1,6 @@
 package com.boardgame.backend_spring.plan.controller;
 
+import com.boardgame.backend_spring.log.service.ActionLogger;
 import com.boardgame.backend_spring.plan.dto.PlanDetailResponse;
 import com.boardgame.backend_spring.plan.dto.PlanSubmitResponse;
 import com.boardgame.backend_spring.plan.entity.Plan;
@@ -24,7 +25,8 @@ public class PlanSubmissionController {
 
     private final PlanSubmissionService submissionService;
     private final PlanRepository planRepository;
-    private final ProjectRepository projectRepository; // ★ 추가
+    private final ProjectRepository projectRepository;
+    private final ActionLogger actionLogger;
 
     /**
      * 기획안 제출: 프로젝트 상태를 REVIEW_PENDING으로 전환
@@ -45,6 +47,9 @@ public class PlanSubmissionController {
         }
         project.setStatus(ProjectStatus.REVIEW_PENDING);
         projectRepository.save(project);
+
+        // 로그 기록
+        actionLogger.log("PLAN_SUBMIT", "PLAN", plan.getPlanId());
 
         // 3) 응답
         PlanSubmitResponse response = PlanSubmitResponse.builder()
