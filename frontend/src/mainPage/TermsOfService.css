@@ -1,0 +1,52 @@
+/* TermsOfService.css */
+
+.terms-of-service-container {
+    max-width: 960px;
+    margin: 40px auto;
+    padding: 20px 40px;
+    font-family: 'Noto Sans KR', sans-serif, Arial;
+    line-height: 1.8;
+    color: #333;
+}
+
+.terms-of-service-title {
+    font-size: 2em;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 30px;
+}
+
+.terms-section {
+    margin-bottom: 40px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 20px;
+}
+
+.terms-section:last-of-type {
+    border-bottom: none;
+}
+
+.terms-section-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 20px;
+}
+
+.terms-article {
+    margin-bottom: 20px;
+}
+
+.terms-article h3 {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.terms-article p {
+    font-size: 14px;
+    margin: 0;
+    padding-left: 20px;
+    text-align: justify;
+}

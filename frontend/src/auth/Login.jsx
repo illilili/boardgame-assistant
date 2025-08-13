@@ -1,6 +1,7 @@
 import React, { useState as useStateLogin } from 'react';
 import { useNavigate as useNavigateLogin, Link as LinkLogin } from 'react-router-dom';
 import { login as apiLogin } from '../api/auth.js';
+import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
     const [email, setEmail] = useStateLogin('');
@@ -18,6 +19,15 @@ const Login = () => {
             const result = await apiLogin({ email, password });
             localStorage.setItem('accessToken', result.accessToken);
             localStorage.setItem('refreshToken', result.refreshToken);
+
+            // JWT에서 role, name 추출 후 저장
+            const decoded = jwtDecode(result.accessToken);
+            if (decoded.role) {
+                localStorage.setItem('role', decoded.role);
+            }
+            if (decoded.name) {
+                localStorage.setItem('name', decoded.name);
+            }
             
             alert('로그인 성공!');
             window.dispatchEvent(new Event("storage"));

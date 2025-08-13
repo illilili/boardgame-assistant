@@ -1,0 +1,39 @@
+/* Footer.css */
+
+.footer-v3 {
+    width: 100%;
+    padding: 20px;
+    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
+    color: #555;
+    text-align: left;
+    box-sizing: border-box;
+    margin-top: auto; /* Home.js에서 푸터가 항상 하단에 붙도록 설정 */
+}
+
+.footer-links-container {
+    margin-bottom: 10px;
+}
+
+.footer-links-container a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 20px; /* 링크 사이의 간격 */
+}
+
+.footer-links-container a:hover {
+    text-decoration: underline;
+}
+
+.company-info, .copyright {
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0; /* 기본 마진 제거 */
+    padding: 0;
+}
+
+.company-info {
+    margin-bottom: 5px; /* 회사 정보와 저작권 사이의 간격 */
+}
