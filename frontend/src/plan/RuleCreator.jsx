@@ -1,12 +1,11 @@
-// src/components/RuleCreator.js
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './RuleCreator.css';
-import { getMyProjects, getAllConcepts, generateRule, regenerateRule } from '../api/auth.js';
+import { getAllConcepts, generateRule, regenerateRule } from '../api/auth.js';
+import { ProjectContext } from '../contexts/ProjectContext';
 
 const RuleCreator = () => {
-    const [projectList, setProjectList] = useState([]);
-    const [selectedProjectId, setSelectedProjectId] = useState('');
+    const { projectId } = useContext(ProjectContext);
+
     const [conceptList, setConceptList] = useState([]);
     const [filteredConceptList, setFilteredConceptList] = useState([]);
     const [selectedConceptId, setSelectedConceptId] = useState('');
@@ -15,24 +14,6 @@ const RuleCreator = () => {
     const [error, setError] = useState('');
     const [feedback, setFeedback] = useState('');
 
-    // 프로젝트 목록을 불러오는 useEffect
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const data = await getMyProjects();
-                setProjectList(data);
-                if (data.length > 0) {
-                    setSelectedProjectId(data[0].projectId.toString());
-                }
-            } catch (err) {
-                console.error(err);
-                setError('프로젝트 목록을 불러올 수 없습니다. 로그인이 유효한지 확인해주세요.');
-            }
-        };
-        fetchProjects();
-    }, []);
-
-    // 모든 컨셉 목록을 불러오는 useEffect
     useEffect(() => {
         const fetchAllConcepts = async () => {
             try {
@@ -45,24 +26,22 @@ const RuleCreator = () => {
         fetchAllConcepts();
     }, []);
 
-    // 선택된 프로젝트에 따라 컨셉 목록을 필터링하는 useEffect
     useEffect(() => {
-        if (!selectedProjectId || conceptList.length === 0) {
+        if (!projectId || conceptList.length === 0) {
             setFilteredConceptList([]);
             setSelectedConceptId('');
             return;
         }
         
-        const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(selectedProjectId));
+        const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(projectId));
         setFilteredConceptList(conceptsForProject.sort((a, b) => b.conceptId - a.conceptId));
         if (conceptsForProject.length > 0) {
             setSelectedConceptId(conceptsForProject[0].conceptId.toString());
         } else {
             setSelectedConceptId('');
         }
-    }, [selectedProjectId, conceptList]);
+    }, [projectId, conceptList]);
 
-    // 규칙 생성 핸들러
     const handleGenerateRules = async () => {
         if (!selectedConceptId) {
             setError('먼저 규칙을 생성할 기획안을 선택해주세요.');
@@ -83,7 +62,6 @@ const RuleCreator = () => {
         }
     };
 
-    // 규칙 재생성 핸들러
     const handleRegenerateRules = async () => {
         if (!generatedRules || !feedback) {
             setError('피드백을 입력해주세요.');
@@ -93,7 +71,6 @@ const RuleCreator = () => {
         setError('');
 
         try {
-            // API 요청 시 conceptId를 함께 전송하여 안정적인 조회를 보장합니다.
             const requestBody = {
                 conceptId: parseInt(selectedConceptId, 10),
                 ruleId: generatedRules.ruleId,
@@ -116,25 +93,6 @@ const RuleCreator = () => {
                 <p>규칙을 설계할 기획안을 선택하고 AI에게 생성을 요청하세요.</p>
                 
                 <form className="rule-form" onSubmit={(e) => e.preventDefault()}>
-                    <div className="form-group">
-                        <label htmlFor="project-select">프로젝트 선택</label>
-                        <select
-                            id="project-select"
-                            value={selectedProjectId}
-                            onChange={(e) => setSelectedProjectId(e.target.value)}
-                            required
-                        >
-                            {projectList.length > 0 ? (
-                                projectList.map((project) => (
-                                    <option key={project.projectId} value={project.projectId}>
-                                        {project.projectName}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>프로젝트를 먼저 생성해주세요.</option>
-                            )}
-                        </select>
-                    </div>
                     <div className="form-group">
                         <label htmlFor="concept-select">기획안 선택</label>
                         <select

@@ -1,12 +1,11 @@
-// 파일: src/components/Components.js
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './Components.css'; 
-import { getMyProjects, getAllConcepts, generateComponents, regenerateComponents } from '../api/auth.js';
+import { getAllConcepts, generateComponents, regenerateComponents } from '../api/auth.js';
+import { ProjectContext } from '../contexts/ProjectContext';
 
 const Components = () => {
-    const [projectList, setProjectList] = useState([]);
-    const [selectedProjectId, setSelectedProjectId] = useState('');
+    const { projectId } = useContext(ProjectContext);
+
     const [conceptList, setConceptList] = useState([]);
     const [filteredConceptList, setFilteredConceptList] = useState([]);
     const [selectedConceptId, setSelectedConceptId] = useState('');
@@ -15,24 +14,6 @@ const Components = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // 프로젝트 목록을 불러오는 useEffect
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const data = await getMyProjects();
-                setProjectList(data);
-                if (data.length > 0) {
-                    setSelectedProjectId(data[0].projectId.toString());
-                }
-            } catch (err) {
-                console.error(err);
-                setError('프로젝트 목록을 불러올 수 없습니다. 로그인이 유효한지 확인해주세요.');
-            }
-        };
-        fetchProjects();
-    }, []);
-
-    // 모든 컨셉 목록을 불러오는 useEffect
     useEffect(() => {
         const fetchAllConcepts = async () => {
             try {
@@ -45,25 +26,22 @@ const Components = () => {
         fetchAllConcepts();
     }, []);
 
-    // 선택된 프로젝트에 따라 컨셉 목록을 필터링하는 useEffect
     useEffect(() => {
-        if (!selectedProjectId || conceptList.length === 0) {
+        if (!projectId || conceptList.length === 0) {
             setFilteredConceptList([]);
             setSelectedConceptId('');
             return;
         }
         
-        const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(selectedProjectId));
+        const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(projectId));
         setFilteredConceptList(conceptsForProject.sort((a, b) => b.conceptId - a.conceptId));
         if (conceptsForProject.length > 0) {
             setSelectedConceptId(conceptsForProject[0].conceptId.toString());
         } else {
             setSelectedConceptId('');
         }
-    }, [selectedProjectId, conceptList]);
+    }, [projectId, conceptList]);
 
-
-    // 규칙 생성 핸들러
     const handleGenerateComponents = async (e) => {
         e.preventDefault();
         if (!selectedConceptId) {
@@ -85,7 +63,6 @@ const Components = () => {
         }
     };
 
-    // 규칙 재생성 핸들러
     const handleRegenerate = async (e) => {
         e.preventDefault();
         if (!selectedConceptId) {
@@ -121,25 +98,6 @@ const Components = () => {
                 <p>구성요소를 설계할 기획안을 선택하고 AI에게 생성을 요청하세요.</p>
                 
                 <form className="components-form" onSubmit={handleGenerateComponents}>
-                    <div className="form-group">
-                        <label htmlFor="project-select">프로젝트 선택</label>
-                        <select
-                            id="project-select"
-                            value={selectedProjectId}
-                            onChange={(e) => setSelectedProjectId(e.target.value)}
-                            required
-                        >
-                            {projectList.length > 0 ? (
-                                projectList.map((project) => (
-                                    <option key={project.projectId} value={project.projectId}>
-                                        {project.projectName}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>프로젝트를 먼저 생성해주세요.</option>
-                            )}
-                        </select>
-                    </div>
                     <div className="form-group">
                         <label htmlFor="concept-select">기획안 선택</label>
                         <select
