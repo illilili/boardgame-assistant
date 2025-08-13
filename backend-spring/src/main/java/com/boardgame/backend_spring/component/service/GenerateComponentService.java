@@ -107,6 +107,7 @@ public class GenerateComponentService {
                 .averageWeight(concept.getAverageWeight())
                 .ideaText(concept.getIdeaText())
                 .mechanics(concept.getMechanics())
+                .storyline(concept.getStoryline())
                 .mainGoal(objective.getMainGoal())
                 .winConditionType(objective.getWinConditionType())
                 .worldSetting("임시 세계관 설정")
@@ -144,8 +145,11 @@ public class GenerateComponentService {
             newComponent.setArtConcept(item.getArtConcept());
             newComponent.setInterconnection(item.getInterconnection());
 
-            List<SubTask> subTasks = createSubTasksForComponent(newComponent, item.getExamples());
+            // ✨ 변경점: 단순화된 SubTask 생성 로직 호출
+            List<SubTask> subTasks = createSubTasksForComponent(newComponent);
             newComponent.setSubTasks(subTasks);
+
+            componentStatusService.recalcAndSave(newComponent);
 
             savedComponents.add(componentRepository.save(newComponent));
         }
@@ -171,44 +175,33 @@ public class GenerateComponentService {
         }
     }
 
-    private List<SubTask> createSubTasksForComponent(Component component, List<GenerateComponentDto.ExampleItem> examples) {
+    // 🚨 [수정] 메서드 시그니처와 내부 로직을 대폭 단순화합니다.
+    private List<SubTask> createSubTasksForComponent(Component component) {
         List<SubTask> tasks = new ArrayList<>();
         String type = component.getType().toLowerCase();
 
-        // AI가 생성한 개별 예시가 있고, 타입이 카드인 경우
-        if (type.contains("card") && examples != null && !examples.isEmpty()) {
-            for (GenerateComponentDto.ExampleItem example : examples) {
-                // 각 예시마다 text와 image SubTask 생성
-                tasks.add(createSubTaskWithContent(component, "text", example));
-                tasks.add(createSubTaskWithContent(component, "image", example));
-            }
-        } else {
-            // 그 외의 경우 (카드가 아니거나, AI 예시가 없는 경우), 1개의 SubTask만 생성
-            if (type.contains("token") || type.contains("pawn") || type.contains("miniature") || type.contains("figure") || type.contains("dice")) {
-                tasks.add(createSubTaskWithContent(component, "3d_model", null));
-            } else if (type.contains("board") || type.contains("mat")) {
-                tasks.add(createSubTaskWithContent(component, "image", null));
-            } else {
-                tasks.add(createSubTaskWithContent(component, "text", null));
-            }
+        // Component의 타입에 따라 필요한 SubTask만 생성합니다.
+        if (type.contains("card")) {
+            // 카드 한 장은 'text'와 'image' 작업을 가집니다.
+            tasks.add(createSubTaskWithContent(component, "text"));
+            tasks.add(createSubTaskWithContent(component, "image"));
+        } else if (type.contains("token") || type.contains("pawn") || type.contains("miniature") || type.contains("figure") || type.contains("dice")) {
+            tasks.add(createSubTaskWithContent(component, "3d_model"));
+        } else if (type.contains("board") || type.contains("mat") || type.contains("image")) {
+            tasks.add(createSubTaskWithContent(component, "image"));
+        } else { // 룰북, 게임 박스 등
+            tasks.add(createSubTaskWithContent(component, "text"));
         }
         return tasks;
     }
 
-    private SubTask createSubTaskWithContent(Component component, String subTaskType, GenerateComponentDto.ExampleItem example) {
+    // 🚨 [수정] `example` 파라미터를 제거하고 Content 저장 로직을 단순화합니다.
+    private SubTask createSubTaskWithContent(Component component, String subTaskType) {
         Content content = new Content();
         content.setComponent(component);
         content.setContentType(subTaskType);
         content.setCreatedAt(LocalDateTime.now());
-
-        // 🚨 [수정] AI가 제공한 예시 정보가 있으면 Content에 채워넣음
-        if (example != null) {
-            content.setName(example.getTitle());
-            content.setEffect(example.getEffect());
-        } else {
-            // 예시가 없는 경우 (룰북, 게임 박스 등), Component의 제목을 기본 이름으로 사용
-            content.setName(component.getTitle());
-        }
+        // `name`과 `effect` 필드는 Content 엔티티에서 제거되었으므로 값을 설정하지 않습니다.
 
         Content savedContent = contentRepository.save(content);
 
@@ -217,6 +210,7 @@ public class GenerateComponentService {
         task.setType(subTaskType);
         task.setStatus("NOT_STARTED");
         task.setContentId(savedContent.getContentId());
+
         return task;
     }
 }

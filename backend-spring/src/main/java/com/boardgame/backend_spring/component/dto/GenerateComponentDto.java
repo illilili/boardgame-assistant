@@ -67,7 +67,7 @@ public class GenerateComponentDto {
 
     public record FastApiResponse(@JsonProperty("components") List<FastApiComponentItem> components) {}
 
-    // 🚨 [수정] FastApiComponentItem에 ExampleItem 리스트 추가
+    // 🚨 [수정] examples 필드를 제거합니다.
     @Data
     @NoArgsConstructor
     public static class FastApiComponentItem {
@@ -79,14 +79,7 @@ public class GenerateComponentDto {
         @JsonProperty("art_concept")
         private String artConcept;
         private String interconnection;
-        private List<ExampleItem> examples; // 🚨 신규 필드
     }
 
-    // 🚨 [신규] ExampleItem DTO 추가
-    @Data
-    @NoArgsConstructor
-    public static class ExampleItem {
-        private String title;
-        private String effect;
-    }
+    // 🚨 [삭제] ExampleItem 클래스는 더 이상 필요 없으므로 클래스 전체를 삭제합니다.
 }
