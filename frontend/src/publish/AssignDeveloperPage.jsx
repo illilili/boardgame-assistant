@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMyProjects, getAllDevelopers, assignDeveloper } from '../api/auth.js';
+import { getMyProjects, getAllDevelopers, assignDeveloper } from '../api/publish.js';
 
 const AssignDeveloperPageStyles = `
     .assign-container {
