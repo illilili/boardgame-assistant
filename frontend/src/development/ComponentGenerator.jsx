@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 // auth.js 파일에서 API 함수들을 import 합니다.
-import { getCardPreview, generateCardText, generateCardImage } from '../api/auth';
+import { getCardPreview, generateCardText, generateCardImage } from '../api/develop';
 import './ComponentGenerator.css';
 
 function ComponentGenerator() {

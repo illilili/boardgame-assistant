@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './Goal.css'; 
-import { getMyProjects, getAllConcepts, generateGoal } from '../api/auth'; 
+import { getAllConcepts, generateGoal } from '../api/auth'; 
+import { ProjectContext } from '../contexts/ProjectContext';
 
 const Goal = () => {
-    const [projectList, setProjectList] = useState([]);
-    const [selectedProjectId, setSelectedProjectId] = useState('');
+    const { projectId } = useContext(ProjectContext);
+
     const [conceptList, setConceptList] = useState([]);
     const [filteredConceptList, setFilteredConceptList] = useState([]);
     const [selectedConceptId, setSelectedConceptId] = useState('');
@@ -12,24 +13,6 @@ const Goal = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // 프로젝트 목록을 불러오는 useEffect
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const data = await getMyProjects();
-                setProjectList(data);
-                if (data.length > 0) {
-                    setSelectedProjectId(data[0].projectId.toString());
-                }
-            } catch (err) {
-                console.error(err);
-                setError('프로젝트 목록을 불러올 수 없습니다. 로그인이 유효한지 확인해주세요.');
-            }
-        };
-        fetchProjects();
-    }, []);
-
-    // 모든 컨셉 목록을 불러오는 새로운 useEffect
     useEffect(() => {
         const fetchAllConcepts = async () => {
             try {
@@ -42,22 +25,21 @@ const Goal = () => {
         fetchAllConcepts();
     }, []);
 
-    // 선택된 프로젝트에 따라 컨셉 목록을 필터링하는 useEffect
     useEffect(() => {
-        if (!selectedProjectId || conceptList.length === 0) {
+        if (!projectId || conceptList.length === 0) {
             setFilteredConceptList([]);
             setSelectedConceptId('');
             return;
         }
         
-        const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(selectedProjectId));
+        const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(projectId));
         setFilteredConceptList(conceptsForProject.sort((a, b) => b.conceptId - a.conceptId));
         if (conceptsForProject.length > 0) {
             setSelectedConceptId(conceptsForProject[0].conceptId.toString());
         } else {
             setSelectedConceptId('');
         }
-    }, [selectedProjectId, conceptList]);
+    }, [projectId, conceptList]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -65,11 +47,9 @@ const Goal = () => {
             setError('먼저 컨셉을 선택해주세요.');
             return;
         }
-
         setLoading(true);
         setError(null);
         setObjective(null);
-
         try {
             const data = await generateGoal({ conceptId: parseInt(selectedConceptId) });
             setObjective(data);
@@ -86,25 +66,6 @@ const Goal = () => {
                 <h2>게임 목표 설계</h2>
                 <p>게임 목표를 설계할 보드게임 컨셉을 선택하고 버튼을 눌러주세요.</p>
                 <form onSubmit={handleSubmit} className="goal-form">
-                    <div className="form-group">
-                        <label htmlFor="project-select">프로젝트 선택</label>
-                        <select
-                            id="project-select"
-                            value={selectedProjectId}
-                            onChange={(e) => setSelectedProjectId(e.target.value)}
-                            required
-                        >
-                            {projectList.length > 0 ? (
-                                projectList.map((project) => (
-                                    <option key={project.projectId} value={project.projectId}>
-                                        {project.projectName}
-                                    </option>
-                                ))
-                            ) : (
-                                <option value="" disabled>프로젝트를 먼저 생성해주세요.</option>
-                            )}
-                        </select>
-                    </div>
                     <div className="form-group">
                         <label htmlFor="concept-select">컨셉 선택</label>
                         <select
@@ -126,7 +87,6 @@ const Goal = () => {
                     </button>
                 </form>
             </div>
-
             <div className="goal-result-section">
                 {loading && <div className="spinner"></div>}
                 {error && <div className="error-message">{error}</div>}
@@ -139,11 +99,7 @@ const Goal = () => {
                         </div>
                         <div className="objective-item">
                             <h4>보조 목표 (Sub Goals)</h4>
-                            <ul>
-                                {objective.subGoals.map((goal, index) => (
-                                    <li key={index}>{goal}</li>
-                                ))}
-                            </ul>
+                            <ul>{objective.subGoals.map((goal, index) => <li key={index}>{goal}</li>)}</ul>
                         </div>
                         <div className="objective-item">
                             <h4>승리 조건 타입</h4>

@@ -1,13 +1,11 @@
-// 파일 위치: src/plan/Review.jsx
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './Review.css';
-// 🚨 getMyRulesByProject 함수를 임포트
-import { getMyProjects, getMyRulesByProject, runSimulation, analyzeBalance } from '../api/auth';
+import { getMyRulesByProject, runSimulation, analyzeBalance } from '../api/auth';
+import { ProjectContext } from '../contexts/ProjectContext';
 
 const Review = () => {
-    const [projectList, setProjectList] = useState([]);
-    const [selectedProjectId, setSelectedProjectId] = useState('');
+    const { projectId } = useContext(ProjectContext);
+
     const [ruleList, setRuleList] = useState([]);
     const [ruleId, setRuleId] = useState('');
     const [playerNames, setPlayerNames] = useState('탐험가 A, 공학자 B');
@@ -18,34 +16,16 @@ const Review = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // 프로젝트 목록을 불러오는 useEffect
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const data = await getMyProjects();
-                setProjectList(data);
-                if (data.length > 0) {
-                    setSelectedProjectId(data[0].projectId.toString());
-                }
-            } catch (err) {
-                console.error(err);
-                setError('프로젝트 목록을 불러올 수 없습니다. 로그인이 유효한지 확인해주세요.');
-            }
-        };
-        fetchProjects();
-    }, []);
-
-    // 🚨 [수정] 선택된 프로젝트에 따라 규칙 목록을 불러오는 useEffect
     useEffect(() => {
         const fetchRules = async () => {
-            if (!selectedProjectId) {
+            if (!projectId) {
                 setRuleList([]);
                 setRuleId('');
                 return;
             }
             setIsLoading(true);
             try {
-                const data = await getMyRulesByProject(selectedProjectId); // 🚨 getMyRulesByProject 함수 사용
+                const data = await getMyRulesByProject(projectId);
                 setRuleList(data);
                 if (data.length > 0) {
                     setRuleId(data[0].ruleId);
@@ -60,9 +40,8 @@ const Review = () => {
             }
         };
         fetchRules();
-    }, [selectedProjectId]);
+    }, [projectId]);
 
-    // 시뮬레이션 실행 핸들러
     const handleRunSimulation = async (e) => {
         e.preventDefault();
         if (!ruleId) {
@@ -89,7 +68,6 @@ const Review = () => {
         }
     };
 
-    // 밸런스 분석 핸들러
     const handleGetBalanceFeedback = async () => {
         if (!ruleId) {
             setError('먼저 규칙을 선택해주세요.');
@@ -123,33 +101,8 @@ const Review = () => {
                         <h2>규칙 시뮬레이션</h2>
                         <form onSubmit={handleRunSimulation}>
                             <div className="form-group">
-                                <label htmlFor="project-select">프로젝트 선택</label>
-                                <select
-                                    id="project-select"
-                                    value={selectedProjectId}
-                                    onChange={(e) => setSelectedProjectId(e.target.value)}
-                                    required
-                                >
-                                    {projectList.length > 0 ? (
-                                        projectList.map((project) => (
-                                            <option key={project.projectId} value={project.projectId}>
-                                                {project.projectName}
-                                            </option>
-                                        ))
-                                    ) : (
-                                        <option value="" disabled>프로젝트를 먼저 생성해주세요.</option>
-                                    )}
-                                </select>
-                            </div>
-                            <div className="form-group">
                                 <label htmlFor="ruleId">규칙 선택</label>
-                                <select
-                                    id="ruleId"
-                                    value={ruleId}
-                                    onChange={(e) => setRuleId(e.target.value)}
-                                    required
-                                    disabled={ruleList.length === 0 || isLoading}
-                                >
+                                <select id="ruleId" value={ruleId} onChange={(e) => setRuleId(e.target.value)} required disabled={ruleList.length === 0 || isLoading}>
                                     <option value="" disabled>-- 규칙을 선택하세요 --</option>
                                     {ruleList.map(rule => (
                                         <option key={rule.ruleId} value={rule.ruleId}>
@@ -160,32 +113,14 @@ const Review = () => {
                             </div>
                             <div className="form-group">
                                 <label htmlFor="playerNames">플레이어 이름 (쉼표로 구분)</label>
-                                <input
-                                    id="playerNames"
-                                    type="text"
-                                    value={playerNames}
-                                    onChange={(e) => setPlayerNames(e.target.value)}
-                                    required
-                                />
+                                <input id="playerNames" type="text" value={playerNames} onChange={(e) => setPlayerNames(e.target.value)} required />
                             </div>
                             <div className="form-group">
                                 <label htmlFor="maxTurns">최대 턴 수</label>
-                                <input
-                                    id="maxTurns"
-                                    type="number"
-                                    value={maxTurns}
-                                    onChange={(e) => setMaxTurns(e.target.value)}
-                                    min="1"
-                                    required
-                                />
+                                <input id="maxTurns" type="number" value={maxTurns} onChange={(e) => setMaxTurns(e.target.value)} min="1" required />
                             </div>
                             <div className="form-group checkbox-group">
-                                <input
-                                    id="enablePenalty"
-                                    type="checkbox"
-                                    checked={enablePenalty}
-                                    onChange={(e) => setEnablePenalty(e.target.checked)}
-                                />
+                                <input id="enablePenalty" type="checkbox" checked={enablePenalty} onChange={(e) => setEnablePenalty(e.target.checked)} />
                                 <label htmlFor="enablePenalty">페널티 규칙 적용</label>
                             </div>
                             <button type="submit" className="primary-button" disabled={isLoading || !ruleId}>
@@ -236,21 +171,10 @@ const Review = () => {
                             {balanceFeedback && balanceFeedback.balanceAnalysis && !isLoading && (
                                 <div>
                                     <p><strong>종합 평가:</strong> {balanceFeedback.balanceAnalysis.simulationSummary}</p>
-                                    
                                     <h4>발견된 문제점</h4>
-                                    <ul className="balance-list">
-                                        {balanceFeedback.balanceAnalysis.issuesDetected.map((issue, index) => (
-                                            <li key={index} className="issue">{issue}</li>
-                                        ))}
-                                    </ul>
-
+                                    <ul className="balance-list">{balanceFeedback.balanceAnalysis.issuesDetected.map((issue, index) => <li key={index} className="issue">{issue}</li>)}</ul>
                                     <h4>개선 제안</h4>
-                                    <ul className="balance-list">
-                                        {balanceFeedback.balanceAnalysis.recommendations.map((rec, index) => (
-                                            <li key={index} className="recommendation">{rec}</li>
-                                        ))}
-                                    </ul>
-                                    
+                                    <ul className="balance-list">{balanceFeedback.balanceAnalysis.recommendations.map((rec, index) => <li key={index} className="recommendation">{rec}</li>)}</ul>
                                     <div className="score-display">
                                         <div className="score-value">{balanceFeedback.balanceAnalysis.balanceScore} / 10</div>
                                         <div className="score-label">AI 밸런스 평점</div>
