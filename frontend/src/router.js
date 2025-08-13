@@ -40,7 +40,7 @@ const router = createBrowserRouter([
     },
     {
         id: 4,
-        path:'/plan',
+        path:'/projects/:projectId/plan',
         element: <Plan/>
     },
     {
@@ -70,7 +70,7 @@ const router = createBrowserRouter([
     },
     {
         id:10,
-        path:'/development',
+        path:'/projects/:projectId/development',
         element: <Development/>
     },
     {
@@ -80,7 +80,7 @@ const router = createBrowserRouter([
     },
     {
         id:12,
-        path: '/publish',
+        path: '/projects/:projectId/publish',
         element: <Publish/>
     },
         {
@@ -90,7 +90,7 @@ const router = createBrowserRouter([
     },
     {
         id: 14,
-        path: '/projects/:projectId',
+        path: '/projects/:projectId', 
         element: <ProjectHomePage/> 
     },
     {

@@ -1,4 +1,3 @@
-// src/components/Header.js
 import React, { useState, useEffect } from 'react';
 import './Header.css';
 import { Link, useNavigate } from 'react-router-dom';
@@ -35,9 +34,10 @@ const Header = () => {
 
   return (
     <header className="minimalist-header">
-      <div className="logo-minimalist">BOARD.CO</div>
+      {/* 로고를 클릭하면 홈("/")으로 이동 */}
+      <Link to="/" className="logo-minimalist">BOARD.CO</Link>
+      
       <nav className="main-nav">
-        {/* 로그인 안 한 경우 */}
         {!isLoggedIn && (
           <>
             <Link to="/login">로그인</Link>
@@ -45,18 +45,18 @@ const Header = () => {
           </>
         )}
 
-        {/* 로그인 한 경우 */}
         {isLoggedIn && (
           <>
             <Link to="/trend">트렌드분석</Link>
             <Link to="/projects">프로젝트</Link>
             <Link to="/mypage">마이페이지</Link> 
 
-            {/* 관리자 */}
-            {role && role.toUpperCase().includes('ADMIN') && (<Link to="/user-manage">회원관리</Link>)}
-
-            {/* 퍼블리셔 */}
-            {role === 'PUBLISHER' && <Link to="/approve-manage">승인관리</Link>}
+            {role && role.toUpperCase().includes('ADMIN') && (
+              <Link to="/user-manage">회원관리</Link>
+            )}
+            {role === 'PUBLISHER' && (
+              <Link to="/approve-manage">승인관리</Link>
+            )}
 
             <a href="/" onClick={handleLogout}>로그아웃</a>
           </>

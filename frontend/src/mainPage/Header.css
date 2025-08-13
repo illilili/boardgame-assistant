@@ -1,149 +1,48 @@
-/* 기본 헤더 스타일 */
-.app-header {
+/* 전체 헤더 레이아웃 */
+.minimalist-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
+  padding: 20px 32px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #eee;
   position: relative;
   z-index: 100;
 }
 
-.logo {
-  font-family: 'Fredoka One', cursive; /* 이전 디자인의 폰트 유지 */
-  font-size: 24px;
-  color: var(--color-primary-mint-dark, #38A169);
-  font-weight: bold;
+.logo-minimalist {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #E58A4E;
+  text-decoration: none;
 }
 
-/* 데스크톱 네비게이션 */
-.desktop-nav {
+.logo-minimalist:hover {
+  color: #E58A4E; /* hover 시 색상 변화 없음 */
+}
+
+/* 네비게이션 메뉴 */
+.main-nav {
   display: flex;
-  align-items: center;
   gap: 20px;
+  align-items: center;
 }
 
-.desktop-nav a {
+.main-nav a {
   text-decoration: none;
   color: var(--color-text, #2D3748);
   font-weight: 500;
   transition: color 0.2s;
 }
 
-.desktop-nav a:hover {
+.main-nav a:hover {
   color: var(--color-primary-mint, #4FD1C5);
 }
 
-.cta-button {
-  font-family: var(--font-body, 'Poppins', sans-serif);
-  font-weight: 700;
-  font-size: 15px;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  background: var(--color-primary-mint, #4FD1C5);
-  color: white;
-}
-
-.cta-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-}
-
-/* 햄버거 메뉴 버튼 (모바일에서만 보임) */
-.hamburger-menu {
-  display: none; /* 평소에는 숨김 */
-  flex-direction: column;
-  justify-content: space-around;
-  width: 30px;
-  height: 24px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  z-index: 200; /* 메뉴 위에 있도록 설정 */
-}
-
-.hamburger-menu span {
-  width: 30px;
-  height: 3px;
-  background: var(--color-text, #2D3748);
-  border-radius: 10px;
-  transition: all 0.3s linear;
-  position: relative;
-  transform-origin: 1px;
-}
-
-/* 햄버거가 X로 변하는 애니메이션 */
-.hamburger-menu.open span:nth-child(1) {
-  transform: rotate(45deg);
-}
-
-.hamburger-menu.open span:nth-child(2) {
-  opacity: 0;
-  transform: translateX(20px);
-}
-
-.hamburger-menu.open span:nth-child(3) {
-  transform: rotate(-45deg);
-}
-
-/* 모바일 네비게이션 메뉴 (슬라이드 패널) */
-.mobile-nav {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: white;
-  height: 100vh;
-  width: 80%;
-  max-width: 300px;
-  text-align: left;
-  padding: 2rem;
-  position: fixed;
-  top: 0;
-  right: 0;
-  transform: translateX(100%); /* 화면 오른쪽에 숨겨둠 */
-  transition: transform 0.3s ease-in-out;
-  box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-}
-
-.mobile-nav.open {
-  transform: translateX(0); /* 화면 안으로 슬라이드 */
-}
-
-.mobile-nav a {
-  font-size: 1.5rem;
-  padding: 1.5rem 0;
-  font-weight: bold;
-  letter-spacing: 0.5rem;
-  color: var(--color-text, #2D3748);
-  text-decoration: none;
-  transition: color 0.3s linear;
-}
-
-.mobile-nav a:hover {
-  color: var(--color-primary-mint, #4FD1C5);
-}
-
-.mobile-cta-button {
-  margin-top: 20px;
-  padding: 15px 30px !important;
-  border-radius: 30px;
-  background: var(--color-primary-mint, #4FD1C5);
-  color: white !important;
-}
-
-
-/* 반응형 쿼리: 화면 너비가 768px 이하일 때 적용 */
+/* 반응형 처리 */
 @media (max-width: 768px) {
-  .desktop-nav {
-    display: none; /* 데스크톱 메뉴 숨김 */
-  }
-
-  .hamburger-menu {
-    display: flex; /* 햄버거 버튼 보임 */
+  .main-nav {
+    gap: 16px;
   }
 }
