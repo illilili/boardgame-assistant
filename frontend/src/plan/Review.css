@@ -1,0 +1,242 @@
+/* Review.css */
+
+/* 전체 레이아웃 */
+.review-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #f0f2f5; /* 전체 배경색 적용 */
+}
+
+.review-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.review-header h1 {
+    font-size: 2.5rem;
+    color: #2c2825; /* 폰트 색상 통일 */
+    margin-bottom: 0.5rem;
+}
+
+.review-header p {
+    font-size: 1.1rem;
+    color: #888888; /* 폰트 색상 통일 */
+}
+
+.review-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+@media (max-width: 1024px) {
+    .review-main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 카드 스타일 */
+.card {
+    background-color: #FFFFFF; /* 흰색 배경 */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.card h2 {
+    font-size: 1.5rem;
+    color: #2c2825; /* 폰트 색상 통일 */
+    border-bottom: 2px solid #EAEAEA; /* 테두리 색상 통일 */
+    padding-bottom: 1rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+/* 폼 그룹 및 입력 요소 */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c2825; /* 폰트 색상 통일 */
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #EAEAEA; /* 테두리 색상 통일 */
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: #F8F8F8; /* 배경색 통일 */
+    color: #2c2825;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #E58A4E; /* 포커스 색상 통일 */
+    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2); /* 포커스 섀도우 통일 */
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* 버튼 스타일 */
+.primary-button, .secondary-button {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.primary-button {
+    background-color: #E58A4E; /* 주 색상 통일 */
+    color: white;
+}
+
+.primary-button:hover:not(:disabled) {
+    background-color: #c06c38; /* 호버 색상 통일 */
+    transform: translateY(-2px);
+}
+
+.secondary-button {
+    background-color: #6c757d; /* 부 색상 통일 */
+    color: white;
+}
+
+.secondary-button:hover:not(:disabled) {
+    background-color: #5a6268; /* 호버 색상 통일 */
+    transform: translateY(-2px);
+}
+
+.primary-button:disabled, .secondary-button:disabled {
+    background-color: #fbd6c0; /* 비활성화 색상 통일 */
+    opacity: 1; /* opacity 대신 색상으로 처리 */
+    cursor: not-allowed;
+    transform: none;
+}
+.secondary-button:disabled {
+    background-color: #adb5bd;
+}
+
+/* 결과 섹션 */
+.results-section h3 {
+    font-size: 1.3rem;
+    color: #2c2825; /* 폰트 색상 통일 */
+    margin-top: 0;
+}
+
+/* 로딩 스피너 */
+.spinner {
+    border: 4px solid #EAEAEA; /* 테두리 색상 통일 */
+    border-top: 4px solid #E58A4E; /* 스피너 색상 통일 */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+}
+
+/* 에러 메시지 */
+.error-message {
+    color: #991b1b; /* 어두운 빨강 통일 */
+    background-color: #fef2f2; /* 아주 밝은 빨강 통일 */
+    border: 1px solid #fca5a5; /* 밝은 빨강 테두리 통일 */
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+/* 시뮬레이션 로그 */
+.simulation-log {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 1rem;
+    border: 1px solid #EAEAEA; /* 테두리 색상 통일 */
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.turn-card {
+    background: #f8f9fa; /* 배경색 통일 */
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.turn-card h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    color: #E58A4E; /* 강조 색상 통일 */
+}
+
+.action-item {
+    margin-bottom: 0.75rem;
+    padding-left: 1rem;
+    border-left: 3px solid #E58A4E; /* 강조 색상 통일 */
+}
+
+.action-item strong {
+    font-weight: 600;
+}
+
+/* 밸런스 분석 리포트 */
+.balance-list {
+    list-style: none;
+    padding: 0;
+}
+
+.balance-list li {
+    background: #F8F8F8; /* 배경색 통일 */
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    position: relative;
+    padding-left: 2rem;
+}
+
+.balance-list li::before {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+}
+
+.balance-list .issue::before {
+    content: '⚠️';
+}
+
+.balance-list .recommendation::before {
+    content: '💡';
+}
+
+.score-display {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.score-display .score-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #E58A4E; /* 강조 색상 통일 */
+}
+
+.score-display .score-label {
+    font-size: 1rem;
+    color: #888888; /* 폰트 색상 통일 */
+}
