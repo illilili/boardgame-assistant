@@ -1,77 +1,95 @@
-.project-list-container {
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+.project-list-page__container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Pretendard', sans-serif;
 }
 
-.project-list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+.project-list-page__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
-.page-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #2c2825;
+.project-list-page__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a202c;
 }
 
-.primary-button {
-  padding: 12px 20px;
-  background-color: #E58A4E;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.project-list-page__create-button {
+    background-color: #E58A4E;
+    color: white;
+    font-weight: 600;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
-.primary-button:hover {
-  background-color: #c06c38;
+.project-list-page__create-button:hover {
+    background-color: #c06c38;
+    transform: translateY(-2px);
 }
 
-.project-list-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+.project-list-page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
 }
 
-.project-card {
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
+.project-list-page__card {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.project-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+.project-list-page__card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-.project-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #2c2825;
-  margin-bottom: 8px;
+.project-list-page__card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 8px 0;
 }
 
-.project-card p {
-  font-size: 0.9rem;
-  color: #666666;
-  margin-bottom: 12px;
+.project-list-page__card-id {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-bottom: 16px;
 }
 
-.project-status-badge {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background-color: #F8F8F8;
-  color: #444444;
+.project-list-page__status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    text-transform: uppercase;
 }
+
+.project-list-page__error {
+    color: #c53030;
+    background-color: #fed7d7;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.status--planning { background-color: #ebf8ff; color: #3182ce; }
+.status--review_pending { background-color: #fefcbf; color: #b7791f; }
+.status--development { background-color: #e6fffa; color: #2c7a7b; }
+.status--publishing { background-color: #f0fdf4; color: #166534; }
+.status--completed { background-color: #f3f4f6; color: #4b5563; }
+

@@ -12,7 +12,6 @@ public class SignupRequest {
     private String email;
     private String password;
     private String company;
-    private String role; // <-- 이 필드를 추가하세요!
 
     // 약관 동의 여부
     private boolean agreedToTerms;
