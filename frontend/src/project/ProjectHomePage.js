@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getProjectStatus } from '../api/project';
 import Header from '../mainPage/Header';
 import Footer from '../mainPage/Footer';
@@ -21,26 +21,21 @@ const ProjectHomePage = () => {
   return (
     <>
       <Header />
-      <main className="project-home-container">
-        <div className="project-home-card">
-          <div className="project-home-header">
-            <h1>프로젝트 #{projectId}</h1>
-            <button
-              className="primary-button"
-              onClick={() => navigate(`/project/${projectId}/rename`)}
-            >
-              이름 수정
-            </button>
-          </div>
-          <p className="project-status">현재 상태: {status}</p>
+      <div className="project-home-layout">
+        {/* 사이드바 */}
+        <aside className="sidebar">
+          <h2>메뉴</h2>
+          <button onClick={() => navigate(`/projects/${projectId}/plan`)}>기획</button>
+          <button onClick={() => navigate(`/projects/${projectId}/development`)}>개발</button>
+          <button onClick={() => navigate(`/projects/${projectId}/publish`)}>출판</button>
+        </aside>
 
-          <div className="link-list">
-            <Link to={`/projects/${projectId}/plan`} className="link-button plan">기획 페이지로 이동</Link>
-            <Link to={`/projects/${projectId}/development`} className="link-button dev">개발 페이지로 이동</Link>
-            <Link to={`/projects/${projectId}/publish`} className="link-button publish">퍼블리시 페이지로 이동</Link>
-          </div>
-        </div>
-      </main>
+        {/* 메인 컨텐츠 */}
+        <main className="main-content">
+          <h1>프로젝트 #{projectId}</h1>
+          <p>현재 상태: {status}</p>
+        </main>
+      </div>
       <Footer />
     </>
   );

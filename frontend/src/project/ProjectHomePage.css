@@ -1,91 +1,54 @@
-/* ProjectHomePage.css */
-
-/* 메인 컨테이너 */
-.project-home-container {
+.project-home-layout {
+  display: flex;
+  gap: 48px;
+  width: 100%;
   max-width: 1400px;
   margin: 2rem auto;
   padding: 0 2rem;
+  min-height: calc(100vh - 70px - 4rem);
+  box-sizing: border-box;
 }
 
-/* 카드 스타일 */
-.project-home-card {
+/* 사이드바 스타일 */
+.sidebar {
+  width: 220px;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #2c2825;
+}
+
+.sidebar button {
+  padding: 12px;
+  background-color: #F8F8F8;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sidebar button:hover {
+  background-color: #E58A4E;
+  color: white;
+}
+
+/* 메인 컨텐츠 */
+.main-content {
+  flex: 1;
   background-color: #FFFFFF;
   border-radius: 12px;
   padding: 32px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* 헤더 */
-.project-home-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.project-home-header h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #2c2825;
-}
-
-.project-status {
-  font-size: 1rem;
-  color: #888888;
-}
-
-/* 버튼 */
-.primary-button {
-  padding: 12px 20px;
-  background-color: #E58A4E;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.primary-button:hover {
-  background-color: #c06c38;
-}
-
-.link-button {
-  display: block;
-  width: 100%;
-  text-align: center;
-  padding: 14px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #FFFFFF;
-  transition: background-color 0.2s;
-}
-
-.link-button.plan {
-  background-color: #4F46E5;
-}
-.link-button.plan:hover {
-  background-color: #4338CA;
-}
-
-.link-button.dev {
-  background-color: #16A34A;
-}
-.link-button.dev:hover {
-  background-color: #15803D;
-}
-
-.link-button.publish {
-  background-color: #7C3AED;
-}
-.link-button.publish:hover {
-  background-color: #6D28D9;
-}
-
-.link-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }

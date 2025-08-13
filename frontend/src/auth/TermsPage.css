@@ -1,0 +1,74 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  overflow-y: auto;
+}
+
+.modal-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.modal-text {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.modal-text.small {
+  max-height: 150px;
+}
+
+.modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-cancel {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: white;
+  color: #333; /* 어두운 회색 텍스트 */
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #f0f0f0;
+}
+
+.btn-agree {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 5px;
+  background: #ea580c;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-agree:hover {
+  background: #f97316;
+}

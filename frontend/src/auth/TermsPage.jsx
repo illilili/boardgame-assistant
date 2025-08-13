@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-export default function TermsPage({ isOpen, onClose, onAgree }) {
-  if (!isOpen) return null; //팝업형태
+import React from 'react';
+import './TermsPage.css';
 
-return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-        <div className="bg-white p-6 rounded-lg max-w-lg w-full relative h-[80vh]">
-            
-            <h2 className="text-xl font-bold mb-4"> 1. (필수) BoardGame Assistant 이용약관</h2>
-            <div className="h-64  overflow-y-auto whitespace-pre-line text-sm p-4 text-gray-700 bg-gray-100 rounded">
-            {`
+export default function TermsPage({ isOpen, onClose, onAgree }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2 className="modal-title">1. (필수) BoardGame Assistant 이용약관</h2>
+        <div className="modal-text">
+          {/* 약관 전문 */}
+          <p>
     제1장 총칙
     1. 제1조 (목적)
             
@@ -230,12 +232,12 @@ return (
     1. 제1조 (시행일)
             
             본 약관은 2022년 6월 28일부터 시행합니다.
-            `}
-            </div>
+          </p>
+                    </div>
 
-            <h2 className="mt-10 text-xl font-bold mb-4"> 2. (필수) 개인정보 수집 및 이용 동의</h2>
-            <div className="h-48  overflow-y-auto whitespace-pre-line text-sm p-4 text-gray-700 bg-gray-100 rounded">
-                    {`
+                    <h2 className="modal-title">2. (필수) 개인정보 수집 및 이용 동의</h2>
+                    <div className="modal-text small">
+                    <p>
                          [개인정보 수집 및 이용 동의]
 
                             1. 수집하는 개인정보 항목
@@ -249,24 +251,14 @@ return (
                             - 회원 탈퇴 시까지 또는 관련 법령에 따라 보관
 
                             ※ 본인은 위 내용을 확인하였으며, 개인정보 수집 및 이용에 동의합니다.
-                    `}
-            </div>
-
-            <div className="mt-6 flex justify-end space-x-2">
-                <button
-                    onClick={onClose}
-                    className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100"
-                >
-                    닫기
-                </button>
-                <button
-                    onClick={onAgree}
-                    className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600"
-                >
-                    동의합니다
-                </button>
-            </div>
+                     </p>
         </div>
+
+        <div className="modal-buttons">
+          <button className="btn-cancel" onClick={onClose}>닫기</button>
+          <button className="btn-agree" onClick={onAgree}>동의합니다</button>
+        </div>
+      </div>
     </div>
-);
+  );
 }
