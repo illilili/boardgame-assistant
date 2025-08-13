@@ -96,4 +96,10 @@ public class ProjectController {
 
         return ResponseEntity.ok(new ProjectStatusResponseDto(project.getStatus()));
     }
+
+    // 전체 프로젝트 목록 조회
+    @GetMapping
+    public ResponseEntity<List<ProjectSummaryDto>> getAllProjects() {
+        return ResponseEntity.ok(projectService.getAllProjects());
+    }
 }

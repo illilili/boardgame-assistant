@@ -128,4 +128,11 @@ public class ProjectService {
                 .build();
         projectMemberRepository.save(newMember);
     }
+
+    @Transactional(readOnly = true)
+    public List<ProjectSummaryDto> getAllProjects() {
+        return projectRepository.findAll().stream()
+                .map(ProjectSummaryDto::from)
+                .collect(Collectors.toList());
+    }
 }
