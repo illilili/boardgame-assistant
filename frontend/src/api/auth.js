@@ -45,13 +45,21 @@ const request = async (endpoint, options = {}) => {
 // --- 기존 함수들 ---
 export const signup = (signupData) => request('/api/auth/signup', { method: 'POST', body: JSON.stringify(signupData) });
 export const login = (loginData) => request('/api/auth/login', { method: 'POST', body: JSON.stringify(loginData) });
-export const logout = () => {
+export const logout = async () => {
     const token = localStorage.getItem('accessToken');
+    let response;
+
     if (token) {
-        request('/api/auth/logout', { method: 'POST' }).catch(err => console.error("로그아웃 API 호출 실패:", err));
+        response = await request('/api/auth/logout', { method: 'POST' });
+    } else {
+        response = { message: '이미 로그아웃된 상태입니다.' };
     }
+
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('role');
+
+    return response; // 응답 메시지 반환
 };
 export const getMyPageInfo = () => request('/api/users/mypage');
 export const createProject = (projectData) => request('/api/projects', { method: 'POST', body: JSON.stringify(projectData) });

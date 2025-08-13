@@ -13,6 +13,9 @@ import ProjectRenamePage from './plan/ProjectRenamePage';
 import Development from './development/Development';
 import PlanReview from './publish/PlanReview';
 import Publish from './publish/Publish';
+import ProjectListPage from './project/ProjectListPage';
+import ProjectHomePage from './project/ProjectHomePage';
+import AdminUserManagePage from './admin/UserManagePage'
 
 const router = createBrowserRouter([
     {
@@ -79,7 +82,22 @@ const router = createBrowserRouter([
         id:12,
         path: '/publish',
         element: <Publish/>
-    }
+    },
+        {
+        id: 13,
+        path: '/projects',
+        element: <ProjectListPage/> 
+    },
+    {
+        id: 14,
+        path: '/projects/:projectId',
+        element: <ProjectHomePage/> 
+    },
+    {
+        id: 15,
+        path: '/user-manage', 
+        element: <AdminUserManagePage />
+      }
 
 
 

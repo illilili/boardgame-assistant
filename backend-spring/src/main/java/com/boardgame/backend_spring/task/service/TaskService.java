@@ -53,15 +53,15 @@ public class TaskService {
             rulebookTask = subTaskRepository.save(rulebookTask);
             rulebook.setSubTasks(List.of(rulebookTask));
 
-            Component script = new Component();
-            script.setBoardgameConcept(concept);
-            script.setType("Script");
-            script.setTitle("영상 설명 스크립트");
-            script = componentRepository.save(script);
+            Component thumbnail = new Component();
+            thumbnail.setBoardgameConcept(concept);
+            thumbnail.setType("Image");
+            thumbnail.setTitle("썸네일 이미지");
+            thumbnail = componentRepository.save(thumbnail);
 
-            SubTask scriptTask = makeFixedSubTask("text", "영상 설명 스크립트", script);
-            scriptTask = subTaskRepository.save(scriptTask);
-            script.setSubTasks(List.of(scriptTask));
+            SubTask thumbnailTask = makeFixedSubTask("image", "썸네일 이미지", thumbnail);
+            thumbnailTask = subTaskRepository.save(thumbnailTask);
+            thumbnail.setSubTasks(List.of(thumbnailTask));
         }
     }
 
