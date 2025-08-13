@@ -1,1 +1,2 @@
 .env
+faiss_boardgame_index/index.faiss
