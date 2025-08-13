@@ -36,24 +36,30 @@ function WelcomeScreen({ onStart }) {
 
 // --- 데이터 및 메인 컴포넌트 ---
 const workspaceNavItems = [
-    { id: 'approved-plan', title: '승인된 기획안 조회', component: <ApprovedPlanViewer /> },
-    { id: 'dev-list', title: '개발 목록 조회', component: <DevelopmentListViewer /> },
-    { id: 'card-gen', title: '카드/아이템 생성', component: <ComponentGenerator />},
-    { id: 'rulebook-gen', title: '룰북 초안 생성', component: <RulebookGenerator /> },
-    { id: 'script-gen', title: '설명 스크립트 자동생성', component: <ScriptGenerator />},
-    { id: 'model-gen', title: '3D 모델 생성', component: <ModelGenerator /> },
-    { id: 'thumbnail-gen', title: '썸네일 이미지 생성', component: <ThumbnailGenerator /> },
+  { id: 'approved-plan', title: '승인된 기획안 조회', component: <ApprovedPlanViewer /> },
+  { id: 'dev-list', title: '개발 목록 조회', component: <DevelopmentListViewer /> },
     { id: 'content-view', title: '콘텐츠 상세 조회', component: <ContentViewer /> },
-    { id: 'copyright-check', title: '콘텐츠 저작권 검토', component: <CopyrightChecker /> },
-    { id: 'content-submit', title: '콘텐츠 제출', component: <ContentSubmitter /> },
+  { id: 'card-gen', title: '카드/아이템 생성', component: <ComponentGenerator /> },
+  { id: 'rulebook-gen', title: '룰북 초안 생성', component: <RulebookGenerator /> },
+  { id: 'model-gen', title: '3D 모델 생성', component: <ModelGenerator /> },
+  { id: 'thumbnail-gen', title: '썸네일 이미지 생성', component: <ThumbnailGenerator /> },
+  { id: 'content-submit', title: '콘텐츠 제출', component: <ContentSubmitter /> }, // 수정 필요
 ];
 
 function Development() {
-  // 초기 상태를 null로 설정하여 시작 화면을 먼저 표시
-  const [activeViewId, setActiveViewId] = useState(null);
+  const [activeViewId, setActiveViewId] = useState(() => localStorage.getItem('activeViewId') || null);
+  const [selectedContentId, setSelectedContentId] = useState(() => localStorage.getItem('selectedContentId') || null);
 
-  // 선택된 뷰 컴포넌트를 찾음
-  const activeView = activeViewId ? workspaceNavItems.find(item => item.id === activeViewId) : null;
+  const handleNavigate = (viewId, contentId = null) => {
+    setActiveViewId(viewId);
+    setSelectedContentId(contentId);
+    localStorage.setItem('activeViewId', viewId);
+    localStorage.setItem('selectedContentId', contentId ?? '');
+  };
+
+  const activeView = activeViewId
+    ? workspaceNavItems.find(item => item.id === activeViewId)
+    : null;
 
   return (
     <div className="workspace-container new-design">
@@ -63,10 +69,10 @@ function Development() {
         </div>
         <ul className="workspace-nav-list">
           {workspaceNavItems.map((item) => (
-            <li 
-              key={item.id} 
+            <li
+              key={item.id}
               className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
-              onClick={() => setActiveViewId(item.id)}
+              onClick={() => handleNavigate(item.id)}
             >
               {item.title}
             </li>
@@ -75,8 +81,13 @@ function Development() {
       </aside>
 
       <main className="workspace-main-content">
-        {/* activeView가 있으면 해당 컴포넌트를, 없으면 WelcomeScreen을 렌더링 */}
-        {activeView ? activeView.component : <WelcomeScreen onStart={() => setActiveViewId('approved-plan')} />}
+        {activeViewId === 'dev-list' ? (
+          <DevelopmentListViewer onNavigate={handleNavigate} />
+        ) : activeView ? (
+          React.cloneElement(activeView.component, { contentId: selectedContentId })
+        ) : (
+          <WelcomeScreen onStart={() => handleNavigate('approved-plan')} />
+        )}
       </main>
     </div>
   );
