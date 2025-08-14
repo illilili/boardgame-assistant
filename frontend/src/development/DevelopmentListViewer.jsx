@@ -5,16 +5,16 @@ import { getTasksForProject } from '../api/auth';
 
 const getStatusClassName = (statusSummary) => {
   switch (statusSummary) {
-    case '작업 중':
-      return 'status-in-progress';
-    case '승인':
-      return 'status-completed';
     case '작업 대기':
       return 'status-waiting';
-    case '제출 완료':
-      return 'status-submitted';
+    case '작업 중':
+      return 'status-in-progress';
     case '작업 완료':
-      return 'status-ready';
+      return 'status-ready'; // READY_TO_SUBMIT
+    case '제출 완료':
+      return 'status-submitted'; // PENDING_REVIEW
+    case '승인':
+      return 'status-completed';
     case '반려':
       return 'status-rejected';
     default:
@@ -133,7 +133,8 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
                               <li key={subTask.contentId || subTask.id} className="sub-task-item">
                                 <div className="sub-task-info">
                                   <span className="sub-task-name">
-                                    {subTask.name || `콘텐츠 ID: ${subTask.contentId}`}
+                                    {subTask.name
+                                      || `콘텐츠 ID: ${subTask.contentId} (${subTask.type || 'unknown'})`}
                                   </span>
                                   {subTask.effect && <p className="sub-task-effect">{subTask.effect}</p>}
                                 </div>
@@ -144,7 +145,7 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
                                       className="sub-task-link"
                                       onClick={() => onNavigate(id, subTask.contentId)}
                                     >
-                                      {supported ? '작업하기 →' : '파일 업로드'}
+                                      {supported ? '작업하기 →' : '파일 업로드 →'}
                                     </button>
                                   ) : (
                                     <span className="sub-task-link disabled">ID 없음</span>

@@ -16,6 +16,10 @@ import ProjectListPage from './project/ProjectListPage';
 import ProjectHomePage from './project/ProjectHomePage';
 import AdminUserManagePage from './admin/UserManagePage'
 import DevelopmentWrapper from './development/DevelopmentWrapper';
+import PendingReviewPage from './publish/PendingReviewPage';
+import ReviewDetailPage from './publish/ReviewDetailPage';
+import AssignDeveloperPage from './publish/AssignDeveloperPage';
+
 
 const router = createBrowserRouter([
   {
@@ -76,7 +80,7 @@ const router = createBrowserRouter([
   {
     id: 11,
     path: '/plan-review',
-    element: <PlanReview />
+    element: <PendingReviewPage />
   },
   {
     id: 12,
@@ -97,7 +101,18 @@ const router = createBrowserRouter([
     id: 15,
     path: '/user-manage',
     element: <AdminUserManagePage />
-  }
+  },
+  {
+    id: 16,
+    path: '/review/:planId',
+    element: <ReviewDetailPage />
+  },
+  {
+    id: 17,// 3. 개발자 배정 페이지 (승인 후 이동)
+    path: '/assign-developer/:projectId',
+    element: <AssignDeveloperPage />
+  },
+
 
 
 
