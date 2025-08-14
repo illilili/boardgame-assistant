@@ -1,16 +1,13 @@
-// src/development/RulebookGenerator.jsx
-import React, { useState } from "react";
-import { Document, Packer, Paragraph, HeadingLevel, TextRun } from "docx";
+import React, { useState, useEffect } from "react";
+import { Document, Packer, Paragraph, HeadingLevel } from "docx";
 import { saveAs } from "file-saver";
-import { marked } from "marked"; // 마크다운 파서
-import { generateRulebook } from '../api/development';
+import { generateRulebook, getRulebookPreview } from '../api/development'; // getRulebookPreview 추가 가능
 import RulebookReport from "./RulebookReport";
 import "./RulebookGenerator.css";
 
 function RulebookGenerator({ contentId }) {
   const [rulebookText, setRulebookText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [downloadFormat, setDownloadFormat] = useState("docx");
   const [submissionFile, setSubmissionFile] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState("");
@@ -19,7 +16,32 @@ function RulebookGenerator({ contentId }) {
   const [manualId, setManualId] = useState(contentId || "");
   const finalContentId = isFromList ? contentId : manualId;
 
-  // 룰북 생성 요청
+  /** 📌 초기 로드 시 기존 저장된 룰북 불러오기 */
+  useEffect(() => {
+    if (!finalContentId) return;
+
+    (async () => {
+      try {
+        // 1) 로컬스토리지에서 읽기
+        const saved = localStorage.getItem(`rulebook_${finalContentId}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setRulebookText(parsed.rulebookText || "");
+        }
+
+        // 2) (선택) 서버에서 미리보기 불러오기
+        // const preview = await getRulebookPreview(finalContentId);
+        // if (preview?.rulebookText) {
+        //   setRulebookText(preview.rulebookText);
+        // }
+      } catch (err) {
+        console.error(err);
+        setError("룰북 데이터 불러오기 실패");
+      }
+    })();
+  }, [finalContentId]);
+
+  /** 룰북 생성 요청 */
   const handleGenerate = async () => {
     if (!finalContentId) {
       setError("콘텐츠 ID를 입력하세요.");
@@ -41,62 +63,53 @@ function RulebookGenerator({ contentId }) {
     }
   };
 
-  // 다운로드 (docx / md)
-  const downloadAsMarkdown = () => {
-    const blob = new Blob([rulebookText], { type: "text/markdown;charset=utf-8" });
-    saveAs(blob, "boardgame-rulebook.md");
+  /** 다운로드 */
+  const handleDownload = () => {
+    if (!rulebookText) {
+      setError("다운로드할 내용이 없습니다.");
+      return;
+    }
+    downloadAsDocx();
   };
 
+  /** docx 변환 */
   const downloadAsDocx = () => {
-    const tokens = marked.lexer(rulebookText); // 마크다운 → 토큰
+    if (!rulebookText) return;
 
-    const paragraphs = [];
+    const reportText = rulebookText
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .replace(/`(.*?)`/g, "$1")
+      .replace(/_/g, "");
 
-    tokens.forEach(token => {
-      if (token.type === "heading") {
-        paragraphs.push(
-          new Paragraph({
-            text: token.text,
-            heading:
-              token.depth === 1
-                ? HeadingLevel.HEADING_1
-                : token.depth === 2
-                  ? HeadingLevel.HEADING_2
-                  : HeadingLevel.HEADING_3,
-          })
-        );
-      } else if (token.type === "paragraph") {
-        paragraphs.push(new Paragraph(token.text));
-      } else if (token.type === "list") {
-        token.items.forEach(item => {
-          paragraphs.push(
-            new Paragraph({
-              children: [new TextRun({ text: item.text, bold: false })],
-              bullet: { level: 0 },
-            })
-          );
+    const lines = reportText.split("\n");
+    const paragraphs = lines.map((line) => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("# ")) {
+        return new Paragraph({
+          text: trimmed.replace(/^#\s*/, ""),
+          heading: HeadingLevel.HEADING_1,
         });
       }
+      if (trimmed.startsWith("## ")) {
+        return new Paragraph({
+          text: trimmed.replace(/^##\s*/, ""),
+          heading: HeadingLevel.HEADING_2,
+        });
+      }
+      if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+        return new Paragraph({
+          text: trimmed.replace(/^[-*]\s*/, ""),
+          bullet: { level: 0 },
+        });
+      }
+      return new Paragraph(trimmed);
     });
 
     const doc = new Document({ sections: [{ children: paragraphs }] });
-
-    Packer.toBlob(doc).then(blob => saveAs(blob, "boardgame-rulebook.docx"));
+    Packer.toBlob(doc).then((blob) => saveAs(blob, "boardgame-rulebook.docx"));
   };
 
-  const handleDownload = () => {
-  if (!rulebookText) {
-    setError("다운로드할 내용이 없습니다.");
-    return;
-  }
-  if (downloadFormat === "md") {
-    downloadAsMarkdown();
-  } else {
-    downloadAsDocx();
-  }
-};
-
-  // PDF 제출
+  /** PDF 제출 */
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type !== "application/pdf") {
@@ -161,21 +174,22 @@ function RulebookGenerator({ contentId }) {
         {rulebookText && (
           <>
             <div className="download-controls">
-              <select
-                value={downloadFormat}
-                onChange={(e) => setDownloadFormat(e.target.value)}
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={handleDownload}
               >
-                <option value="docx">Word (.docx)</option>
-                <option value="md">Markdown (.md)</option>
-              </select>
-              <button type="button" className="secondary-button" onClick={handleDownload}>
                 다운로드
               </button>
             </div>
 
             <form className="submit-section" onSubmit={handleSubmitPdf}>
               <label>PDF 파일 제출</label>
-              <input type="file" accept="application/pdf" onChange={handleFileChange} />
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+              />
               <button
                 className="primary-button"
                 type="submit"
@@ -195,7 +209,6 @@ function RulebookGenerator({ contentId }) {
         {isLoading ? (
           <div className="spinner"></div>
         ) : (
-          // 기존 <pre> 대신 Markdown 렌더링
           <RulebookReport content={rulebookText} />
         )}
       </div>
