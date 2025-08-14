@@ -10,9 +10,11 @@ import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import com.boardgame.backend_spring.review.dto.PendingPlanDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,11 +62,28 @@ public class PlanReviewService {
             project.setApprovedPlan(plan);
             projectRepository.save(project);
             planRepository.save(plan);
+
+            ActivityLog log = new ActivityLog();
+            log.setAction("PLAN_APPROVE");
+            log.setTargetType("PLAN");
+            log.setTargetId(plan.getPlanId());
+            log.setUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+            log.setTimestamp(LocalDateTime.now());
+            activityLogRepository.save(log);
+
             return "기획안이 승인되었습니다.";
         } else {
             plan.setStatus(PlanStatus.REJECTED);
             plan.setRejectionReason(reason);
             planRepository.save(plan);
+
+            ActivityLog log = new ActivityLog();
+            log.setAction("PLAN_REJECT");
+            log.setTargetType("PLAN");
+            log.setTargetId(plan.getPlanId());
+            log.setUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+            log.setTimestamp(LocalDateTime.now());
+            activityLogRepository.save(log);
             return "기획안이 반려되었습니다. 사유: " + reason;
         }
     }
