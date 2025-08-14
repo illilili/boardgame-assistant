@@ -4,6 +4,7 @@ import com.boardgame.backend_spring.project.enumtype.ProjectStatus;
 import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import com.boardgame.backend_spring.translate.dto.*;
 import com.boardgame.backend_spring.translate.service.TranslateService;
+import com.boardgame.backend_spring.translate.dto.TranslationCandidateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -80,5 +81,16 @@ public class TranslateController {
             @PathVariable Long translationId
     ) {
         return ResponseEntity.ok(translateService.completeTranslation(translationId));
+    }
+
+    /**
+     * [퍼블리셔] 프로젝트 내 번역 후보 목록 조회
+     * GET /api/translate/candidates?projectId=...
+     */
+    @GetMapping("/candidates")
+    public ResponseEntity<List<TranslationCandidateDto>> listCandidates(
+            @RequestParam Long projectId
+    ) {
+        return ResponseEntity.ok(translateService.listTranslationCandidates(projectId));
     }
 }
