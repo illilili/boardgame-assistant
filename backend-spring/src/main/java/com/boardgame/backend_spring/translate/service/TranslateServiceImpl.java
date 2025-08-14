@@ -1,13 +1,11 @@
 package com.boardgame.backend_spring.translate.service;
 
+import com.boardgame.backend_spring.component.enumtype.ComponentStatus;
 import com.boardgame.backend_spring.content.entity.Content;
 import com.boardgame.backend_spring.content.entity.ContentVersion;
 import com.boardgame.backend_spring.content.repository.ContentRepository;
 import com.boardgame.backend_spring.content.repository.ContentVersionRepository;
-import com.boardgame.backend_spring.translate.dto.TranslationCallbackRequest;
-import com.boardgame.backend_spring.translate.dto.TranslationItemDto;
-import com.boardgame.backend_spring.translate.dto.TranslationRequest;
-import com.boardgame.backend_spring.translate.dto.TranslationResponse;
+import com.boardgame.backend_spring.translate.dto.*;
 import com.boardgame.backend_spring.translate.entity.Translation;
 import com.boardgame.backend_spring.translate.repository.TranslationRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +15,10 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import com.boardgame.backend_spring.task.dto.TaskListResponseDto;
+import com.boardgame.backend_spring.task.dto.TaskComponentDto;
+import com.boardgame.backend_spring.task.dto.SubTaskDto;
+import com.boardgame.backend_spring.task.service.TaskService;
 
 import java.util.*;
 
@@ -27,6 +29,7 @@ public class TranslateServiceImpl implements TranslateService {
     private final TranslationRepository translationRepository;
     private final ContentRepository contentRepository;
     private final ContentVersionRepository contentVersionRepository;
+    private final TaskService taskService;
 
     private final RestTemplate rest = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -266,5 +269,29 @@ public class TranslateServiceImpl implements TranslateService {
         Map<String, Object> m = new HashMap<>();
         m.put("raw", raw);
         return m;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TranslationCandidateDto> listTranslationCandidates(Long projectId) {
+        TaskListResponseDto taskList = taskService.getTaskListByProject(projectId);
+
+        List<TranslationCandidateDto> candidates = new ArrayList<>();
+        for (TaskComponentDto comp : taskList.getComponents()) {
+            String status = comp.getStatusSummary();
+            if (ComponentStatus.APPROVED.name().equalsIgnoreCase(status) || "승인".equals(status)) {
+                for (SubTaskDto sub : comp.getSubTasks()) {
+                    if ("text".equalsIgnoreCase(sub.getType())) {
+                        candidates.add(TranslationCandidateDto.builder()
+                                .contentId(sub.getContentId())
+                                .name(sub.getName())
+                                .componentType(comp.getType())
+                                .status(comp.getStatusSummary())
+                                .build());
+                    }
+                }
+            }
+        }
+        return candidates;
     }
 }
