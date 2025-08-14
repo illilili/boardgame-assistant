@@ -606,7 +606,7 @@ const PlanPage = () => {
                                 <form className="save-version-form" onSubmit={handleSubmit}>
                                     <div className="form-group">
                                         <label htmlFor="submissionFile">제출할 기획서 파일</label>
-                                        <input type="file" id="submissionFile" onChange={handleFileChange} required />
+                                        <input type="file" id="submissionFile" accept="application/pdf" onChange={handleFileChange} required />
                                     </div>
                                     <button type="submit" className="primary-button" disabled={isSubmitting || !planId || !submissionFile}>
                                         {isSubmitting ? "제출 중..." : "최종 제출하기"}

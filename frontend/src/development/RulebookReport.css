@@ -1,0 +1,27 @@
+/* src/development/RulebookReport.css */
+.rulebook-report {
+  white-space: pre-wrap; /* 줄바꿈 유지 */
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.rulebook-report h1,
+.rulebook-report h2,
+.rulebook-report h3 {
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+}
+
+.rulebook-report ul {
+  list-style: disc;
+  margin-left: 20px;
+}
+
+.rulebook-report ol {
+  list-style: decimal;
+  margin-left: 20px;
+}
+
+.rulebook-report p {
+  margin: 0.4em 0;
+}

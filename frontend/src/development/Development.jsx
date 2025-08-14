@@ -1,5 +1,5 @@
 // Development.js
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import './Development.css';
 
 import ApprovedPlanViewer from './ApprovedPlanViewer';
@@ -10,8 +10,7 @@ import ComponentGenerator from './ComponentGenerator';
 import ModelGenerator from './ModelGenerator';
 import ThumbnailGenerator from './ThumbnailGenerator';
 import ContentViewer from './ContentViewer';
-import CopyrightChecker from './CopyrightChecker';
-import ScriptGenerator from './ScriptGenerator';
+import { ProjectContext } from '../contexts/ProjectContext'; 
 // --- 각 기능별 컴포넌트 Import ---
 // 각 기능은 별도의 파일로 만들어 관리하는 것이 좋습니다.
 // 우선은 이 파일 내에서 간단한 형태로 정의하겠습니다.
@@ -47,6 +46,7 @@ const workspaceNavItems = [
 ];
 
 function Development() {
+  const { projectId } = useContext(ProjectContext);
   const [activeViewId, setActiveViewId] = useState(() => localStorage.getItem('activeViewId') || null);
   const [selectedContentId, setSelectedContentId] = useState(() => localStorage.getItem('selectedContentId') || null);
 
@@ -66,6 +66,7 @@ function Development() {
       <aside className="workspace-sidebar">
         <div className="sidebar-header">
           <div className="logo">BOARD.CO DEV</div>
+          {projectId && <div className="project-id">Project ID: {projectId}</div>} {/* id 표시 */}
         </div>
         <ul className="workspace-nav-list">
           {workspaceNavItems.map((item) => (
@@ -82,9 +83,9 @@ function Development() {
 
       <main className="workspace-main-content">
         {activeViewId === 'dev-list' ? (
-          <DevelopmentListViewer onNavigate={handleNavigate} />
+          <DevelopmentListViewer onNavigate={handleNavigate} projectId={projectId} />
         ) : activeView ? (
-          React.cloneElement(activeView.component, { contentId: selectedContentId })
+          React.cloneElement(activeView.component, { contentId: selectedContentId, projectId })
         ) : (
           <WelcomeScreen onStart={() => handleNavigate('approved-plan')} />
         )}
