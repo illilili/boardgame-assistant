@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMyProjects } from '../api/project';
+import { getAllProjects } from '../api/project';
 import Header from '../mainPage/Header';
 import Footer from '../mainPage/Footer';
 import './ProjectListPage.css';
@@ -11,11 +11,11 @@ const ProjectListPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getMyProjects()
+    getAllProjects() // ⬅ 여기만 전체 조회 API로 교체
       .then(data => setProjects(data))
       .catch(err => {
         console.error('프로젝트 목록 불러오기 실패:', err);
-        setError('프로젝트 목록을 불러오는 데 실패했습니다. 로그인 상태를 확인해주세요.');
+        setError('프로젝트 목록을 불러오는 데 실패했습니다.');
       });
   }, []);
 
@@ -32,7 +32,7 @@ const ProjectListPage = () => {
       <Header />
       <main className="project-list-page__container">
         <div className="project-list-page__header">
-          <h2 className="project-list-page__title">내 프로젝트</h2>
+          <h2 className="project-list-page__title">프로젝트 목록</h2>
           <button
             className="project-list-page__create-button"
             onClick={handleCreateClick}

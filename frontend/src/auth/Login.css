@@ -1,0 +1,131 @@
+:root {
+  --accent-primary: #ea580c;
+  --accent-secondary: #f97316;
+  --bg-light: #f9fafb;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --white: #ffffff;
+  --font-main: 'Inter', sans-serif;
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-light);
+  margin: 0;
+}
+
+/* 로그인 컨테이너 */
+.login-container {
+  min-height: 100vh;
+  background-color: var(--bg-light);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+/* 카드 형태 */
+.login-card {
+  background-color: var(--white);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  max-width: 400px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* 제목 */
+.login-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--accent-primary);
+  margin-bottom: 24px;
+}
+
+/* 에러 메시지 */
+.error-message {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.9rem;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+/* 입력 필드 */
+.login-input {
+  width: 100%;
+  box-sizing: border-box; /* padding 포함 폭 고정 */
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+}
+
+/* 버튼 */
+.login-button {
+  width: 100%;               /* 입력창과 동일 폭 */
+  box-sizing: border-box;    /* padding 포함 폭 고정 */
+  background-color: var(--accent-primary);
+  color: var(--white);
+  padding: 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  border: none;
+}
+
+.login-button:hover {
+  background-color: var(--accent-secondary);
+  transform: translateY(-1px);
+}
+
+.login-button:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* 하단 링크 */
+.login-footer {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.login-footer a {
+  color: var(--accent-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
