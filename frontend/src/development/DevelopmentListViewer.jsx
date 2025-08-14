@@ -24,21 +24,28 @@ const getStatusClassName = (statusSummary) => {
 
 // 🚨 [신규] 모든 컴포넌트 타입에 맞는 작업 페이지 경로를 반환하는 헬퍼 함수
 const getLinkForComponentType = (type) => {
-    if (!type) return '/content-view'; // 타입이 없는 경우 기본값
+    if (!type) return { supported: false, path: '/file-upload' };
+
     const lowerCaseType = type.toLowerCase();
 
     if (lowerCaseType.includes('card')) {
-        return '/card-gen';
+        return { supported: true, path: '/card-gen' };
     } else if (lowerCaseType.includes('rulebook')) {
-        return '/rulebook-gen';
-    } else if (lowerCaseType.includes('script')) {
-        return '/script-gen';
-    } else if (lowerCaseType.includes('token') || lowerCaseType.includes('pawn') || lowerCaseType.includes('miniature') || lowerCaseType.includes('figure') || lowerCaseType.includes('dice')) {
-        return '/model-gen';
-    } else if (lowerCaseType.includes('box') || lowerCaseType.includes('board') || lowerCaseType.includes('mat')) {
-        return '/thumbnail-gen';
+        return { supported: true, path: '/rulebook-gen' };
+    } else if (
+        lowerCaseType.includes('token') ||
+        lowerCaseType.includes('pawn') ||
+        lowerCaseType.includes('miniature') ||
+        lowerCaseType.includes('figure') ||
+        lowerCaseType.includes('dice')
+    ) {
+        return { supported: true, path: '/model-gen' };
+    } else if (
+        lowerCaseType.includes('thumbnail')
+    ) {
+        return { supported: true, path: '/thumbnail-gen' };
     } else {
-        return '/content-view'; // 그 외 (Document 등)
+        return { supported: false, path: '/file-upload' }; // 기본: 직접 업로드 페이지
     }
 };
 
@@ -166,13 +173,17 @@ function DevelopmentListViewer() {
                                                             <div className="sub-task-actions">
                                                                 <span className="sub-task-status">상태: {subTask.status}</span>
                                                                 {subTask.contentId ? (
-                                                                    // 🚨 [수정] 동적 링크 생성
-                                                                    <Link to={`${getLinkForComponentType(component.type)}/${subTask.contentId}`} className="sub-task-link">
-                                                                        작업하기 &rarr;
-                                                                    </Link>
-                                                                ) : (
-                                                                    <span className="sub-task-link disabled">ID 없음</span>
-                                                                )}
+                                                                      (() => {
+                                                                          const { supported, path } = getLinkForComponentType(component.type);
+                                                                          return (
+                                                                              <Link to={`${path}/${subTask.contentId}`} className="sub-task-link">
+                                                                                  {supported ? '작업하기 →' : '지원 안됨 → 직접 업로드'}
+                                                                              </Link>
+                                                                          );
+                                                                      })()
+                                                                  ) : (
+                                                                      <span className="sub-task-link disabled">ID 없음</span>
+                                                                  )}
                                                             </div>
                                                         </li>
                                                     ))
