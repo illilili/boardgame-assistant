@@ -1,10 +1,14 @@
 // `ProjectController.java`
 package com.boardgame.backend_spring.project.controller;
 
+import com.boardgame.backend_spring.log.entity.ActivityLog;
+import com.boardgame.backend_spring.log.repository.ActivityLogRepository;
 import com.boardgame.backend_spring.log.service.ActionLogger;
 import com.boardgame.backend_spring.project.dto.*;
 import com.boardgame.backend_spring.project.entity.Project;
+import com.boardgame.backend_spring.project.entity.ProjectMember;
 import com.boardgame.backend_spring.project.enumtype.ProjectStatus;
+import com.boardgame.backend_spring.project.repository.ProjectMemberRepository;
 import com.boardgame.backend_spring.project.service.ProjectService;
 import com.boardgame.backend_spring.task.service.TaskService;
 import com.boardgame.backend_spring.project.repository.ProjectRepository;
@@ -27,6 +31,7 @@ public class ProjectController {
     private final ProjectService projectService;
     private final TaskService taskService;
     private final ActionLogger actionLogger;
+    private final ActivityLogRepository activityLogRepository;
 
     // 🚨 [신규] 로그인 사용자의 프로젝트 목록 조회
     @GetMapping("/my")
@@ -101,5 +106,21 @@ public class ProjectController {
     @GetMapping
     public ResponseEntity<List<ProjectSummaryDto>> getAllProjects() {
         return ResponseEntity.ok(projectService.getAllProjects());
+    }
+    // 전체 프로젝트 단건 조회
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectSummaryDto> getProjectDetail(@PathVariable Long projectId) {
+        return ResponseEntity.ok(projectService.getProjectDetail(projectId));
+    }
+
+    // 프로젝트 최근 5개 활동
+    @GetMapping("/{projectId}/logs/recent")
+    public List<ActivityLog> getRecentLogs(@PathVariable Long projectId) {
+        return activityLogRepository.findTop5ByProjectIdOrderByTimestampDesc(projectId);
+    }
+
+    @GetMapping("/{projectId}/members")
+    public ResponseEntity<List<ProjectMemberDto>> getProjectMembers(@PathVariable Long projectId) {
+        return ResponseEntity.ok(projectService.getProjectMembers(projectId));
     }
 }

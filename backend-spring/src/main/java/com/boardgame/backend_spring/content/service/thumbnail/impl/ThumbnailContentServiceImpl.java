@@ -14,6 +14,8 @@ import com.boardgame.backend_spring.content.service.PythonApiService;
 import com.boardgame.backend_spring.content.service.thumbnail.ThumbnailContentService;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
+import com.boardgame.backend_spring.project.entity.Project;
+import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ public class ThumbnailContentServiceImpl implements ThumbnailContentService {
     private final PlanRepository planRepository;
     private final SubTaskRepository subTaskRepository;
     private final ComponentStatusService componentStatusService;
+    private final ProjectRepository projectRepository;
 
     @Override
     public ThumbnailGenerateResponse generateThumbnail(Long contentId) {
@@ -56,6 +59,10 @@ public class ThumbnailContentServiceImpl implements ThumbnailContentService {
         // 5. 결과 저장
         content.setContentData(response.getThumbnailUrl());
         contentRepository.save(content);
+
+        Project project = plan.getProject(); // Plan → Project 연관관계 필요
+        project.setThumbnailUrl(response.getThumbnailUrl());
+        projectRepository.save(project);
 
         return response;
     }
