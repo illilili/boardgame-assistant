@@ -53,3 +53,11 @@ export const generateCardImage = (data) =>
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data), // { contentId, name, effect, description }
   });
+
+  // 룰북 생성 API
+export const generateRulebook = (data) =>
+  request('/api/content/generate-rulebook', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data), // { contentId: number }
+  });
