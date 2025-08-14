@@ -64,7 +64,7 @@ export const getAllProjects = async () => {
  */
 export const getProjectDetail = async (id) => {
     const response = await apiClient.get(`/projects/${id}`);
-    return response.data;
+    return response.data; // { projectId, projectName, status, thumbnailUrl }
 };
 
 /**
@@ -90,3 +90,18 @@ export const getProjectStatus = async (id) => {
     const response = await apiClient.get(`/projects/${id}/status`);
     return response.data;
 };
+/**
+ * [API] 프로젝트 최근 5개 활동 조회
+ */
+export const getProjectRecentLogs = async (projectId) => {
+    const response = await apiClient.get(`/projects/${projectId}/logs/recent`);
+    return response.data;
+};
+/**
+ * [API] 프로젝트 멤버 목록 조회
+ */
+export const getProjectMembers = async (projectId) => {
+    const response = await apiClient.get(`/projects/${projectId}/members`);
+    return response.data;
+};
+
