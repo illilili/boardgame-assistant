@@ -115,12 +115,12 @@ component_generation_prompt = PromptTemplate(
             "interconnection": "'자원 토큰'과 직접 상호작용하며, 상대방의 이동을 방해합니다."
         }},
         {{
-            "type": "card",
-            "title": "자원 증폭",
-            "quantity": "1장",
-            "role_and_effect": "비용: '수정' 토큰 1개. 효과: 이번 라운드 동안, 당신이 자원을 얻을 때마다 같은 자원을 1개 더 얻습니다.",
-            "art_concept": "사양: 63x88mm, 300gsm 블랙코어지. 마법사의 손에서 수정이 밝게 빛나며 에너지가 증폭되는 모습.",
-            "interconnection": "'수정 토큰'을 소모하여 발동하며, 자원 획득 효율을 높입니다."
+            "type": "token",
+            "title": "수정 토큰",
+            "quantity": "20개",
+            "role_and_effect": "강력한 효과를 발동하기 위한 특수 자원입니다. 희소성이 높아 전략적으로 사용해야 합니다.",
+            "art_concept": "사양: 20x20mm 정사각형, 반투명 파란색 아크릴. 아트워크: 내부에 미세한 균열과 빛나는 효과가 포함됨.",
+            "interconnection": "'자원 증폭'과 같은 고급 카드의 비용으로 소모되어, 게임의 흐름을 바꾸는 데 사용됩니다."
         }}
     ]
 }}

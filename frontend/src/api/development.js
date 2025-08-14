@@ -26,3 +26,30 @@ export const generate3DModel = (data) =>
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data), // { contentId, name, description, componentInfo, theme, storyline, style }
   });
+
+
+
+  // 카드 생성
+
+  // 카드 콘텐츠 미리보기 데이터 조회
+// 카드 콘텐츠 미리보기 데이터 조회
+export const getCardPreview = (contentId) =>
+  request(`/api/content/${contentId}/preview/card`, {
+    method: 'GET',
+  });
+
+// 카드 텍스트 생성 요청
+export const generateCardText = (data) =>
+  request('/api/content/generate-text', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data), // { contentId, name, effect, description }
+  });
+
+// 카드 이미지 생성 요청
+export const generateCardImage = (data) =>
+  request('/api/content/generate-image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data), // { contentId, name, effect, description }
+  });

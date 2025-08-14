@@ -55,7 +55,7 @@ const Header = () => {
               <Link to="/user-manage">회원관리</Link>
             )}
             {role === 'PUBLISHER' && (
-              <Link to="/approve-manage">승인관리</Link>
+              <Link to="/plan-review">승인관리</Link>
             )}
 
             <a href="/" onClick={handleLogout}>로그아웃</a>
