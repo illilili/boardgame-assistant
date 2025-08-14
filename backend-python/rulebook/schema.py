@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+from typing import Optional
 
 class ComponentDto(BaseModel):
     type: str
@@ -17,7 +18,7 @@ class RulebookStructuredRequest(BaseModel):
     victoryCondition: str
     actionRules: List[str]
     penaltyRules: List[str]
-    designNote: str
+    designNote: Optional[str] = None 
     components: List[ComponentDto]
 
 class RulebookTextResponse(BaseModel):
