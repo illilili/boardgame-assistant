@@ -3,6 +3,7 @@ package com.boardgame.backend_spring.content.service.thumbnail.impl;
 import com.boardgame.backend_spring.component.entity.Component;
 import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.SubTaskRepository;
+import com.boardgame.backend_spring.component.service.ComponentStatusService;
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailGenerateRequest;
 import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailGenerateResponse;
@@ -24,6 +25,7 @@ public class ThumbnailContentServiceImpl implements ThumbnailContentService {
     private final ContentRepository contentRepository;
     private final PlanRepository planRepository;
     private final SubTaskRepository subTaskRepository;
+    private final ComponentStatusService componentStatusService;
 
     @Override
     public ThumbnailGenerateResponse generateThumbnail(Long contentId) {
@@ -40,6 +42,7 @@ public class ThumbnailContentServiceImpl implements ThumbnailContentService {
                 .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
         subTask.setStatus("IN_PROGRESS");
         subTaskRepository.save(subTask);
+        componentStatusService.recalcAndSave(subTask.getComponent());
 
         // 3. FastAPI 호출 요청 구성
         ThumbnailGenerateRequest aiRequest = new ThumbnailGenerateRequest();
