@@ -1,0 +1,217 @@
+.card-generator {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card-gen-content {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    width: 100%;
+}
+
+.card-gen-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.concept-info {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.9em;
+}
+
+.concept-info h3 {
+    margin-top: 0;
+    color: #495057;
+}
+
+.concept-info p {
+    margin: 5px 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.generate-buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.generate-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.text-btn {
+    background-color: #007bff;
+}
+.text-btn:hover {
+    background-color: #0056b3;
+}
+
+.image-btn {
+    background-color: #28a745;
+}
+.image-btn:hover {
+    background-color: #1e7e34;
+}
+
+
+.card-result-container {
+    flex: 1;
+    padding: 20px;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.result-section {
+    width: 100%;
+}
+
+.generated-text {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: left;
+    white-space: pre-wrap; /* 줄바꿈 유지 */
+    border: 1px solid #ddd;
+}
+
+.card-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+}
+
+.reset-button-bottom {
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: center; /* 가운데 정렬 */
+}
+
+.reset-button-bottom:hover {
+    background-color: #c82333;
+}
+
+/* 로딩 및 에러 스타일은 ThumbnailGenerator.css와 공유하거나 여기에 추가 */
+.status-container {
+    /* ... */
+}
+.error-text {
+    /* ... */
+}
+
+/* ... 기존 CSS는 그대로 둡니다 ... */
+
+.card-result-container {
+    flex: 1;
+    padding: 20px;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 내부 요소들을 가운데 정렬합니다. */
+    gap: 20px;
+}
+
+/* [신규] 생성된 카드를 감싸는 컨테이너 */
+.generated-card-preview {
+    width: 100%;
+    max-width: 350px; /* 카드의 최대 너비를 지정합니다. */
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden; /* 이미지의 둥근 모서리를 적용하기 위해 추가 */
+}
+
+/* [수정] 카드 이미지 스타일 */
+.card-image {
+    width: 100%;
+    height: auto;
+    display: block; /* 이미지 아래의 작은 여백을 제거합니다. */
+}
+
+/* [신규] 텍스트 영역 스타일 */
+.card-text-area {
+    padding: 15px;
+    text-align: center;
+    font-size: 0.95em;
+    min-height: 60px; /* 텍스트가 없어도 최소 높이를 유지합니다. */
+}
+
+.card-text-area p {
+    margin: 0;
+    white-space: pre-wrap; /* 줄바꿈을 그대로 보여줍니다. */
+}
+
+/* [신규] 이미지/텍스트가 없을 때 보여줄 플레이스홀더 스타일 */
+.image-placeholder, .text-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    background-color: #f0f0f0;
+    font-size: 0.9em;
+}
+
+.image-placeholder {
+    height: 200px; /* 이미지 영역의 높이를 지정합니다. */
+}
+
+.text-placeholder {
+    min-height: 60px;
+    padding: 15px;
+}
+
+/* [신규] 결과 화면의 버튼들을 감싸는 컨테이너 */
+.result-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}

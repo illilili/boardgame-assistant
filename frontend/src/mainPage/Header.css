@@ -1,0 +1,48 @@
+/* 전체 헤더 레이아웃 */
+.minimalist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  z-index: 100;
+}
+
+.logo-minimalist {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #E58A4E;
+  text-decoration: none;
+}
+
+.logo-minimalist:hover {
+  color: #E58A4E; /* hover 시 색상 변화 없음 */
+}
+
+/* 네비게이션 메뉴 */
+.main-nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: var(--color-text, #2D3748);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.main-nav a:hover {
+  color: var(--color-primary-mint, #4FD1C5);
+}
+
+/* 반응형 처리 */
+@media (max-width: 768px) {
+  .main-nav {
+    gap: 16px;
+  }
+}
