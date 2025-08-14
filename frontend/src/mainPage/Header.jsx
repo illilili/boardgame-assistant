@@ -3,7 +3,7 @@ import './Header.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../api/auth.js';
 
-const Header = () => {
+const Header = ({ projectMode = false }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
   const navigate = useNavigate();
@@ -33,11 +33,15 @@ const Header = () => {
   };
 
   return (
-    <header className="minimalist-header">
-      {/* 로고를 클릭하면 홈("/")으로 이동 */}
-      <Link to="/" className="logo-minimalist">BOARD.CO</Link>
-      
-      <nav className="main-nav">
+    <header className={projectMode ? 'project-header' : 'minimalist-header'}>
+      <Link
+        to="/"
+        className={projectMode ? 'logo-project' : 'logo-minimalist'}
+      >
+        BOARD.CO
+      </Link>
+
+      <nav className={projectMode ? 'project-nav' : 'main-nav'}>
         {!isLoggedIn && (
           <>
             <Link to="/login">로그인</Link>
@@ -49,7 +53,7 @@ const Header = () => {
           <>
             <Link to="/trend">트렌드분석</Link>
             <Link to="/projects">프로젝트</Link>
-            <Link to="/mypage">마이페이지</Link> 
+            <Link to="/mypage">마이페이지</Link>
 
             {role && role.toUpperCase().includes('ADMIN') && (
               <Link to="/user-manage">회원관리</Link>

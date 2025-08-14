@@ -64,7 +64,7 @@ function Development() {
 
   return (
     <>
-      <Header />
+      <Header projectMode={true} />
       <div className="workspace-container new-design">
         <aside className="workspace-sidebar">
           <div className="sidebar-header">

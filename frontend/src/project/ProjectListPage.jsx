@@ -5,6 +5,8 @@ import Header from '../mainPage/Header';
 import Footer from '../mainPage/Footer';
 import './ProjectListPage.css';
 
+const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/%EC%95%84%EC%B9%B4%EC%9E%90.png';
+
 const ProjectListPage = () => {
   const [projects, setProjects] = useState([]);
   const [error, setError] = useState('');
@@ -51,8 +53,12 @@ const ProjectListPage = () => {
                 className="project-list-page__card"
                 onClick={() => handleCardClick(p.projectId)}
               >
+                <img
+                  src={p.thumbnailUrl || DEFAULT_THUMBNAIL}
+                  alt={`${p.projectName} 썸네일`}
+                  className="project-list-page__thumbnail"
+                />
                 <h3 className="project-list-page__card-title">{p.projectName}</h3>
-                <p className="project-list-page__card-id">프로젝트 ID: {p.projectId}</p>
                 <span className={`project-list-page__status-badge status--${p.status.toLowerCase()}`}>
                   {p.status}
                 </span>

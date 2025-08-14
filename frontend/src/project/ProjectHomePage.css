@@ -52,3 +52,77 @@
   padding: 32px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
+
+.project-home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.project-info {
+  flex: 1;
+}
+
+.project-thumbnail-wrapper {
+  flex-shrink: 0;
+}
+
+.project-home-thumbnail {
+  width: 400px; /* 썸네일 가로 크기 */
+  height: auto; /* 비율 유지 */
+  border-radius: 8px;
+  object-fit: cover; /* 비율 유지하며 자르기 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+/* 멤버 목록 */
+.member-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.member-role {
+  font-weight: bold;
+  color: #E58A4E;
+}
+
+.member-name {
+  color: #333;
+}
+
+/* 로그 목록 */
+.log-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.log-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.log-action {
+  font-weight: bold;
+  color: #4a4a4a;
+}
+
+.log-user {
+  color: #E58A4E;
+}
+
+.log-date {
+  font-size: 0.85rem;
+  color: #888;
+}
