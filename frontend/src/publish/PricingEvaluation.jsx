@@ -302,7 +302,7 @@ function PricingEvaluation() {
         <div className="creator-container">
           <div className="form-column">
             <div className="form-section">
-              <h2>가격 책정 대기 중인 프로젝트</h2>
+              <h2>프로젝트 선택</h2>
               <div className="game-cards-grid">
                 {projects.map(project => (
                   <div 
