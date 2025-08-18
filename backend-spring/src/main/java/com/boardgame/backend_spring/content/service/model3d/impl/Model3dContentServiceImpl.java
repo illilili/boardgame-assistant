@@ -70,7 +70,11 @@ public class Model3dContentServiceImpl implements Model3dContentService {
         Generate3DModelResponse response = pythonApiService.generate3DModel(request);
 
         // 콘텐츠에 previewUrl 저장
-        content.setContentData(response.getPreviewUrl());
+        if (response.getRefinedUrl() != null && !response.getRefinedUrl().isBlank()) {
+            content.setContentData(response.getRefinedUrl());
+        } else {
+            content.setContentData(response.getPreviewUrl());
+        }
         contentRepository.save(content);
 
         return response;

@@ -32,6 +32,10 @@ public class Project {
 
     private LocalDateTime completedAt;
 
+    // 썸네일 url
+    @Column(name = "thumbnail_url")
+    private String thumbnailUrl;
+
     @ManyToMany(mappedBy = "projects")
     private List<User> participants;
 
