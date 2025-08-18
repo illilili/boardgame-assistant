@@ -454,8 +454,8 @@ function PricingEvaluation() {
                     </span>
                     <div className="profit-explanation">
                       {calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue) >= 0 ? 
-                        '✅ 수익이 발생합니다' : 
-                        '❌ 손실이 발생합니다'
+                        '✅ 추천 가격에 비해 총 가격이 낮습니다.' : 
+                        '❌ 추천 가격에 비해 총 가격이 높습니다.'
                       }
                     </div>
                   </div>
