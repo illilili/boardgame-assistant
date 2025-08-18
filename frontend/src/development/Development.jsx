@@ -1,10 +1,9 @@
 // Development.js
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './Development.css';
 
 import ApprovedPlanViewer from './ApprovedPlanViewer';
-import ContentSubmitter from './ContentSubmitter';
+import FileUploadPage from './FileUploadPage';
 import DevelopmentListViewer from './DevelopmentListViewer';
 import RulebookGenerator from './RulebookGenerator';
 import ComponentGenerator from './ComponentGenerator';
@@ -12,12 +11,6 @@ import ModelGenerator from './ModelGenerator';
 import ThumbnailGenerator from './ThumbnailGenerator';
 import { ProjectContext } from '../contexts/ProjectContext';
 import Header from '../mainPage/Header';
-// --- 각 기능별 컴포넌트 Import ---
-// 각 기능은 별도의 파일로 만들어 관리하는 것이 좋습니다.
-// 우선은 이 파일 내에서 간단한 형태로 정의하겠습니다.
-
-
-
 
 // 시작 화면 컴포넌트
 function WelcomeScreen({ onStart }) {
@@ -25,14 +18,16 @@ function WelcomeScreen({ onStart }) {
     <div className="welcome-screen">
       <div className="welcome-icon">🚀</div>
       <h2>게임 개발을 시작해 보세요</h2>
-      <p>왼쪽 메뉴에서 원하는 개발 작업을 선택하여 프로젝트를 진행할 수 있습니다. 각 단계에 맞춰 필요한 콘텐츠를 생성하고 관리해 보세요.</p>
+      <p>
+        왼쪽 메뉴에서 원하는 개발 작업을 선택하여 프로젝트를 진행할 수 있습니다.
+        각 단계에 맞춰 필요한 콘텐츠를 생성하고 관리해 보세요.
+      </p>
       <button className="start-button" onClick={onStart}>
         개발 시작하기
       </button>
     </div>
   );
 }
-
 
 // --- 데이터 및 메인 컴포넌트 ---
 const workspaceNavItems = [
@@ -42,20 +37,28 @@ const workspaceNavItems = [
   { id: 'rulebook-gen', title: '룰북 초안 생성', component: <RulebookGenerator /> },
   { id: 'model-gen', title: '3D 모델 생성', component: <ModelGenerator /> },
   { id: 'thumbnail-gen', title: '썸네일 이미지 생성', component: <ThumbnailGenerator /> },
-  { id: 'content-submit', title: '콘텐츠 제출', component: <ContentSubmitter /> }, // 수정 필요
+  { id: 'file-upload', title: '파일 업로드', component: <FileUploadPage /> },
 ];
 
 function Development() {
   const { projectId } = useContext(ProjectContext);
   const [activeViewId, setActiveViewId] = useState(() => localStorage.getItem('activeViewId') || null);
-  const [selectedContentId, setSelectedContentId] = useState(() => localStorage.getItem('selectedContentId') || null);
-  const navigate = useNavigate();
+  const [selectedContentId, setSelectedContentId] = useState(() => {
+    const saved = localStorage.getItem('selectedContentId');
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return saved || null;
+    }
+  });
 
   const handleNavigate = (viewId, contentId = null) => {
     setActiveViewId(viewId);
     setSelectedContentId(contentId);
+
     localStorage.setItem('activeViewId', viewId);
-    localStorage.setItem('selectedContentId', contentId ?? '');
+    // card-gen이면 {textContentId, imageContentId} 그대로 저장
+    localStorage.setItem('selectedContentId', JSON.stringify(contentId ?? ''));
   };
 
   const activeView = activeViewId
@@ -88,7 +91,13 @@ function Development() {
           {activeViewId === 'dev-list' ? (
             <DevelopmentListViewer onNavigate={handleNavigate} projectId={projectId} />
           ) : activeView ? (
-            React.cloneElement(activeView.component, { contentId: selectedContentId, projectId })
+            activeViewId === 'card-gen'
+              ? React.cloneElement(activeView.component, {
+                textContentId: selectedContentId?.textContentId,
+                imageContentId: selectedContentId?.imageContentId,
+                projectId,
+              })
+              : React.cloneElement(activeView.component, { contentId: selectedContentId, projectId })
           ) : (
             <WelcomeScreen onStart={() => handleNavigate('approved-plan')} />
           )}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Document, Packer, Paragraph, HeadingLevel } from "docx";
 import { saveAs } from "file-saver";
-import { generateRulebook, getRulebookPreview } from '../api/development'; // getRulebookPreview 추가 가능
+import { generateRulebook } from '../api/development'; // getRulebookPreview 추가 가능
 import RulebookReport from "./RulebookReport";
 import "./RulebookGenerator.css";
 

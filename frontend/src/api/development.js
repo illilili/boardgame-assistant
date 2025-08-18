@@ -7,13 +7,13 @@ export const generateThumbnail = (data) =>
     body: JSON.stringify(data), // { contentId: number }
   });
 
-  // 썸네일 미리보기 가져오기
+// 썸네일 미리보기 가져오기
 export const getThumbnailPreview = (contentId) =>
   request(`/api/content/${contentId}/preview/thumbnail`, {
     method: 'GET',
   });
 
-  // 3D 모델 미리보기 가져오기
+// 3D 모델 미리보기 가져오기
 export const getModel3DPreview = (contentId) =>
   request(`/api/content/${contentId}/preview/3d`, {
     method: 'GET',
@@ -29,9 +29,9 @@ export const generate3DModel = (data) =>
 
 
 
-  // 카드 생성
+// 카드 생성
 
-  // 카드 콘텐츠 미리보기 데이터 조회
+// 카드 콘텐츠 미리보기 데이터 조회
 // 카드 콘텐츠 미리보기 데이터 조회
 export const getCardPreview = (contentId) =>
   request(`/api/content/${contentId}/preview/card`, {
@@ -54,10 +54,40 @@ export const generateCardImage = (data) =>
     body: JSON.stringify(data), // { contentId, name, effect, description }
   });
 
-  // 룰북 생성 API
+// 룰북 생성 API
 export const generateRulebook = (data) =>
   request('/api/content/generate-rulebook', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data), // { contentId: number }
+  });
+
+export const uploadContentFile = (contentId, file, dir) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (dir) formData.append('dir', dir);
+
+  return request(`/api/content/${contentId}/upload`, {
+    method: 'PUT',
+    body: formData,
+  });
+};
+
+// 콘텐츠 버전 저장
+export const saveContentVersion = (versionData) =>
+  request('/api/content/version/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(versionData),  // { contentId, note }
+  });
+
+// 콘텐츠 제출
+export const submitComponent = (componentId) =>
+  request(`/api/components/${componentId}/submit`, {
+    method: 'POST',
+  });
+
+export const getContentDetail = (contentId) =>
+  request(`/api/content/${contentId}`, {
+    method: 'GET',
   });

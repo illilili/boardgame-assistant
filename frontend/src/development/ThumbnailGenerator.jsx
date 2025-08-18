@@ -1,58 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import './ThumbnailGenerator.css';
-import { generateThumbnail, getThumbnailPreview } from '../api/development';
+import { getThumbnailPreview, generateThumbnail } from '../api/development';
 
 function ThumbnailGenerator({ contentId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedThumbnail, setGeneratedThumbnail] = useState(null);
   const [error, setError] = useState('');
 
-  // 폼 입력 값
   const [manualId, setManualId] = useState(contentId || '');
   const [theme, setTheme] = useState('');
   const [storyline, setStoryline] = useState('');
 
-  const isFromList = Boolean(contentId); // 개발 목록에서 온 경우
+  const isFromList = Boolean(contentId);
   const finalContentId = isFromList ? contentId : manualId;
 
-  // 미리보기 데이터 & 저장된 생성 결과 불러오기
+  // 미리보기 불러오기
   useEffect(() => {
     if (!finalContentId) return;
-
     (async () => {
       try {
-        // 1) 미리보기 API 호출
         const preview = await getThumbnailPreview(finalContentId);
         if (preview) {
           setTheme(preview.theme || '');
           setStoryline(preview.storyline || '');
         }
-
-        // 2) 로컬 저장된 생성 결과 불러오기
         const saved = localStorage.getItem(`thumbnail_${finalContentId}`);
-        if (saved) {
-          setGeneratedThumbnail(JSON.parse(saved));
-        }
+        if (saved) setGeneratedThumbnail(JSON.parse(saved));
       } catch (err) {
         console.error(err);
-        setError('미리보기 데이터 불러오기 실패');
+        setError('썸네일 미리보기 불러오기 실패');
       }
     })();
   }, [finalContentId]);
 
-  // 생성 요청
+  // 썸네일 생성
   const handleGenerateClick = async () => {
-    if (!finalContentId) {
-      setError('콘텐츠 ID를 입력하세요.');
-      return;
-    }
+    if (!finalContentId) return setError('콘텐츠 ID를 입력하세요.');
+
     setIsLoading(true);
     setError('');
+
     try {
       const response = await generateThumbnail({
         contentId: finalContentId,
         theme,
-        storyline
+        storyline,
       });
       setGeneratedThumbnail(response);
       localStorage.setItem(`thumbnail_${finalContentId}`, JSON.stringify(response));
@@ -64,13 +56,10 @@ function ThumbnailGenerator({ contentId }) {
     }
   };
 
-  // 다시 생성
   const handleReset = () => {
     setGeneratedThumbnail(null);
     setError('');
-    if (finalContentId) {
-      localStorage.removeItem(`thumbnail_${finalContentId}`);
-    }
+    if (finalContentId) localStorage.removeItem(`thumbnail_${finalContentId}`);
   };
 
   return (
@@ -86,7 +75,7 @@ function ThumbnailGenerator({ contentId }) {
 
       {!isLoading && (
         <>
-          {/* 콘텐츠 ID */}
+          {/* ID 입력 */}
           <div className="id-input-container">
             <label>콘텐츠 ID</label>
             <input
@@ -98,26 +87,12 @@ function ThumbnailGenerator({ contentId }) {
             />
           </div>
 
-          {/* Theme */}
-          <div className="form-group">
-            <label>테마</label>
-            <input
-              type="text"
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              placeholder="테마 입력"
-            />
+          {/* 폼 입력 */}
+          <div className="form-group"><label>테마</label>
+            <input value={theme} onChange={(e) => setTheme(e.target.value)} />
           </div>
-
-          {/* Storyline */}
-          <div className="form-group">
-            <label>스토리라인</label>
-            <textarea
-              value={storyline}
-              onChange={(e) => setStoryline(e.target.value)}
-              placeholder="스토리라인 입력"
-              rows={3}
-            />
+          <div className="form-group"><label>스토리라인</label>
+            <textarea value={storyline} onChange={(e) => setStoryline(e.target.value)} rows={3} />
           </div>
 
           {/* 생성 버튼 */}
@@ -129,7 +104,7 @@ function ThumbnailGenerator({ contentId }) {
             </div>
           )}
 
-          {/* 생성 결과 */}
+          {/* 결과 */}
           {generatedThumbnail && (
             <div className="thumbnail-result-container">
               <h3>🎉 생성 완료!</h3>
