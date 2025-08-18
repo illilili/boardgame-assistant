@@ -129,50 +129,79 @@ component_generation_prompt = PromptTemplate(
 
 # ... (component_regeneration_prompt_template는 기존 구조를 유지해도 재생성 로직에 큰 문제가 없어 그대로 둡니다) ...
 component_regeneration_prompt_template = PromptTemplate(
-    input_variables=["current_components_json", "feedback", "theme", "playerCount", "averageWeight", "ideaText", "mechanics", "mainGoal", "winConditionType", "storyline", "world_setting", "world_tone"],
-    template="# Mission: 당신은 보드게임의 '리드 컴포넌트 전략가'로서, 기존에 설계된 게임 구성요소에 대한 피드백을 받아, 이를 반영하여 더욱 완벽한 구성요소 목록을 재생성하는 임무를 맡았습니다. 피드백의 의도를 정확히 파악하고, 기존 구성요소의 장점은 유지하되, 필요한 부분을 추가, 수정 또는 제거하여 최적의 목록을 도출해야 합니다.\n\n"
-             "# Component Design Philosophy:\n"
-             "1.  **피드백 반영 (Feedback Integration):** 주어진 피드백을 최우선으로 고려하여 구성요소 목록을 수정합니다.\n"
-             "2.  **기능성 (Functionality):** 모든 구성요소는 반드시 게임의 핵심 메커니즘이나 목표 달성과 직접적으로 연결되어야 합니다.\n"
-             "3.  **테마성 (Thematic Resonance):** 구성요소의 이름과 역할(effect)은 게임의 세계관과 스토리에 깊이 몰입하게 만드는 장치입니다.\n"
-             "4.  **직관성 (Intuitive UX):** 플레이어가 구성요소를 보고 그 역할과 사용법을 쉽게 이해할 수 있어야 합니다. 'effect' 설명 시, 플레이어의 행동 관점에서 구체적으로 서술해주세요.\n"
-             "5.  **기존 구성요소 유지/개선:** 기존에 존재하는 구성요소가 여전히 유효하다면 유지하고, 피드백에 따라 개선하거나 새로운 요소를 추가합니다. 불필요하다고 판단되면 제거할 수도 있습니다.\n\n"
-             "# Input Data Analysis:\n"
-             "---\n"
-             "**기존 보드게임 구성요소:**\n"
-             "{current_components_json}\n\n"
-             "**새로운 피드백:**\n"
-             "{feedback}\n\n"
-             "**보드게임 종합 정보 (참고용):**\n"
-             "- 테마: {theme}\n"
-             "- 컨셉: {ideaText}\n"
-             "- 메커니즘: {mechanics}\n"
-             "- 주요 목표: {mainGoal}\n"
-             "- 승리 조건: {winConditionType}\n"
-             "- 스토리라인: {storyline}\n"
-             "- 세계관 설정: {world_setting}\n"
-             "- 세계관 톤: {world_tone}\n"
-             "---\n\n"
-             "# Final Output Instruction:\n"
-             "이제, 위의 모든 지침과 철학, 그리고 피드백을 반영하여 아래 JSON 형식에 맞춰 최종 결과물만을 생성해주세요.\n"
-             "**'카드' 타입 구성요소의 경우, 카드 한 장 한 장을 개별 컴포넌트 객체로 생성해야 합니다. 'title'에 카드 이름, 'role_and_effect'에 카드 효과를 명시하세요.**\n"
-             "**JSON 코드 블록 외에 어떤 인사, 설명, 추가 텍스트도 절대 포함해서는 안 됩니다.**\n\n"
-             "```json\n"
-             "{{\n"
-             '    "components": [\n'
-             "        {{\n"
-             '            "type": "[구성요소의 종류 (예: card, Image, Token 등)]",\n'
-             '            "title": "[세계관에 몰입감을 더하는 고유한 이름 (한국어)]",\n'
-             '            "quantity": "[구성요소의 전체 수량 (예: 1장, 1개)]",\n'
-             '            "role_and_effect": "[이 구성요소의 \'게임플레이 기능\'을 설명. 플레이어는 이걸로 무엇을 할 수 있고, 게임 목표 달성에 어떤 영향을 미치는지 구체적으로 서술 (한국어)]",\n'
-             '            "art_concept": "[실제 제작을 고려한 시각적 컨셉 (재질, 스타일, 특징 등)]",\n'
-             '            "interconnection": "[다른 구성요소와의 상호작용 방식 설명]"\n'
-             "        }}\n"
-             "    ]\n"
-             "}}\n"
-             "```"
-)
+    input_variables=[
+        "current_components_json", "feedback", "theme", "playerCount", "averageWeight",
+        "ideaText", "mechanics", "mainGoal", "winConditionType", "storyline",
+        "world_setting", "world_tone"
+    ],
+    template="""# Mission: 당신은 보드게임의 '리드 컴포넌트 전략가'로서, 기존에 설계된 게임 구성요소에 대한 피드백을 받아 이를 반영하여 더욱 완벽한 구성요소 목록을 재생성하는 임무를 맡았습니다.
 
+# Component Design Philosophy:
+1. **피드백 반영 (Feedback Integration):** 주어진 피드백을 최우선으로 고려하여 구성요소 목록을 수정합니다.
+2. **기능성 (Functionality):** 모든 구성요소는 반드시 게임의 핵심 메커니즘이나 목표 달성과 직접적으로 연결되어야 합니다.
+3. **테마성 (Thematic Resonance):** 구성요소의 이름과 역할은 게임의 세계관과 스토리에 깊이 몰입하게 만드는 장치입니다.
+4. **직관성 (Intuitive UX):** 플레이어가 구성요소를 보고 그 역할과 사용법을 쉽게 이해할 수 있어야 합니다.
+5. **기존 구성요소 유지/개선:** 기존에 유효한 구성요소는 유지하고, 피드백에 따라 개선하거나 새로운 요소를 추가합니다. 불필요하면 제거할 수 있습니다.
+
+# Input Data Analysis:
+---
+**기존 보드게임 구성요소:**
+{current_components_json}
+
+**새로운 피드백:**
+{feedback}
+
+**보드게임 종합 정보 (참고용):**
+- 테마: {theme}
+- 컨셉: {ideaText}
+- 메커니즘: {mechanics}
+- 주요 목표: {mainGoal}
+- 승리 조건: {winConditionType}
+- 스토리라인: {storyline}
+- 세계관 설정: {world_setting}
+- 세계관 톤: {world_tone}
+---
+
+# Final Output Instruction:
+다음 조건을 반드시 지켜 최종 결과물을 JSON으로 생성하세요.
+
+- 'components' 배열 안에 모든 구성요소 객체를 넣습니다.
+- '카드' 타입 구성요소는 카드 한 장마다 별도의 객체를 생성합니다. (예: 10종류 카드 → 10개 객체, quantity는 항상 "1장")
+- 모든 필드명은 snake_case로 작성합니다. (`role_and_effect`, `art_concept` 그대로)
+- JSON 코드 블록 외에 인사말, 설명, 추가 텍스트를 절대 포함하지 마세요.
+- 예시는 반드시 여러 개의 구성요소를 포함해야 합니다.
+
+```json
+{{
+    "components": [
+        {{
+            "type": "Image",
+            "title": "시간의 균열: 아스트랄 연대기 (게임 박스)",
+            "quantity": "1개",
+            "role_and_effect": "모든 구성품을 안전하게 보관하며, 게임의 테마를 암시하는 몰입감 있는 아트워크로 첫인상을 결정합니다.",
+            "art_concept": "사양: 300x300x70mm, 2mm 압축보드, 무광 코팅. 아트워크: 시간의 균열 속에서 여러 영웅들이 격돌하는 역동적인 장면.",
+            "interconnection": "내부 플라스틱 트레이는 다른 구성요소를 정리하는 데 도움을 줍니다."
+        }},
+        {{
+            "type": "card",
+            "title": "매복",
+            "quantity": "1장",
+            "role_and_effect": "비용: 없음. 효과: 다른 플레이어가 이 지역에 들어왔을 때 이 카드를 공개할 수 있습니다. 그 플레이어는 '자원 토큰' 2개를 당신에게 지불해야 합니다.",
+            "art_concept": "사양: 63x88mm, 300gsm 블랙코어지. 어두운 골목에서 그림자가 드리워진 암살자가 잠복한 모습.",
+            "interconnection": "'자원 토큰'과 직접 상호작용하며, 상대방의 이동을 방해합니다."
+        }},
+        {{
+            "type": "token",
+            "title": "수정 토큰",
+            "quantity": "20개",
+            "role_and_effect": "강력한 효과를 발동하기 위한 특수 자원입니다. 희소성이 높아 전략적으로 사용해야 합니다.",
+            "art_concept": "사양: 20x20mm 정사각형, 반투명 파란색 아크릴. 아트워크: 내부에 미세한 균열과 빛나는 효과가 포함됨.",
+            "interconnection": "'자원 증폭'과 같은 고급 카드의 비용으로 소모되어, 게임의 흐름을 바꾸는 데 사용됩니다."
+        }}
+    ]
+}}
+```"""
+)
 
 # --- LLM 체인 정의 ---
 component_generation_chain = LLMChain(llm=llm_components, prompt=component_generation_prompt)

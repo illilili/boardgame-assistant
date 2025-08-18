@@ -28,7 +28,7 @@ public class Content {
     private Component component;
 
     @Column(nullable = false)
-    private String contentType;  // 예: "card_text", "rulebook"
+    private String contentType;
 
     private String name;         // 콘텐츠 이름 (예: 카드 이름)
     private String effect;       // 카드 효과 등

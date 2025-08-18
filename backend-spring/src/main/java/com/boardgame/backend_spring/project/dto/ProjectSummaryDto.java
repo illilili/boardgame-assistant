@@ -13,12 +13,14 @@ public class ProjectSummaryDto {
     private Long projectId;
     private String projectName;
     private String status;
+    private String thumbnailUrl;
 
     public static ProjectSummaryDto from(Project project) {
         return ProjectSummaryDto.builder()
                 .projectId(project.getId())
                 .projectName(project.getName())
-                .status(project.getStatus().name()) // enum → String 변환
+                .status(project.getStatus().name())
+                .thumbnailUrl(project.getThumbnailUrl())// enum → String 변환
                 .build();
     }
 }

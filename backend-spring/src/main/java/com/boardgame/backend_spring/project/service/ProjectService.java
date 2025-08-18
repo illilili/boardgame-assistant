@@ -10,6 +10,7 @@ import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import com.boardgame.backend_spring.project.repository.ProjectMemberRepository;
 import com.boardgame.backend_spring.user.entity.User;
 import com.boardgame.backend_spring.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +82,14 @@ public class ProjectService {
         return new ProjectStatusResponseDto(project.getStatus());
     }
 
+    // 프로젝트 단건 조회용
+    @Transactional(readOnly = true)
+    public ProjectSummaryDto getProjectDetail(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다."));
+        return ProjectSummaryDto.from(project);
+    }
+
     // 프로젝트 이름 변경 (PUBLISHER or ADMIN or 참여자)
     public ProjectRenameResponseDto renameProject(Long projectId, String newTitle, User user) {
         Project project = projectRepository.findById(projectId)
@@ -133,6 +142,20 @@ public class ProjectService {
     public List<ProjectSummaryDto> getAllProjects() {
         return projectRepository.findAll().stream()
                 .map(ProjectSummaryDto::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectMemberDto> getProjectMembers(Long projectId) {
+        List<ProjectMember> members = projectMemberRepository.findAllByProjectId(projectId);
+
+        return members.stream()
+                .map(m -> ProjectMemberDto.builder()
+                        .userId(m.getUser().getUserId())
+                        .userName(m.getUser().getName())
+                        .role(m.getRole())
+                        .build()
+                )
                 .collect(Collectors.toList());
     }
 }
