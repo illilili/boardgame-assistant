@@ -1,0 +1,193 @@
+/* SignUp.css (Orange Theme) */
+:root {
+  --accent-primary: #ea580c; /* 진한 주황 */
+  --accent-secondary: #f97316; /* 밝은 주황 */
+  --bg-light: #f9fafb; /* 페이지 배경 */
+  --text-primary: #111827; /* 진한 글씨 */
+  --text-secondary: #6b7280; /* 부드러운 회색 */
+  --border-color: #e5e7eb;
+  --white: #ffffff;
+  --font-main: 'Inter', sans-serif;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-light);
+  margin: 0;
+}
+
+/* 회원가입 컨테이너 */
+.signup-container {
+  min-height: 100vh;
+  background-color: var(--bg-light);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+/* 카드 형태 */
+.signup-card {
+  background-color: var(--white);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  max-width: 400px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* 제목 */
+.signup-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--accent-primary);
+  margin-bottom: 24px;
+}
+
+/* 에러 메시지 */
+.error-message {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.9rem;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+/* 입력 필드 */
+.signup-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.signup-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+}
+
+/* 안내 텍스트 */
+.input-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+/* 비밀번호 확인 상태 */
+.password-match {
+  font-size: 0.85rem;
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+/* 약관 동의 */
+.terms-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.terms-button {
+  background: none;
+  border: none;
+  color: var(--accent-secondary);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* 버튼 */
+.signup-button {
+  width: 100%;
+  background-color: var(--accent-primary);
+  color: var(--white);
+  padding: 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.signup-button:hover {
+  background-color: var(--accent-secondary);
+  transform: translateY(-1px);
+}
+
+.signup-button:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* 하단 링크 */
+.signup-footer {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.signup-footer a {
+  color: var(--accent-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signup-footer a:hover {
+  text-decoration: underline;
+}
+
+.signup-button {
+  all: unset; /* 브라우저 기본 스타일 제거 */
+  display: block;
+  width: 100%;
+  background-color: var(--accent-primary); /* 주황색 */
+  color: var(--white);
+  padding: 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.signup-button:hover {
+  background-color: var(--accent-secondary); /* hover 시 밝은 주황 */
+  transform: translateY(-1px);
+}
+
+.signup-button:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* 등장 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  
+}

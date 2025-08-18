@@ -1,0 +1,128 @@
+.project-home-layout {
+  display: flex;
+  gap: 48px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  min-height: calc(100vh - 70px - 4rem);
+  box-sizing: border-box;
+}
+
+/* 사이드바 스타일 */
+.sidebar {
+  width: 220px;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #2c2825;
+}
+
+.sidebar button {
+  padding: 12px;
+  background-color: #F8F8F8;
+  border: 1px solid #EAEAEA;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sidebar button:hover {
+  background-color: #E58A4E;
+  color: white;
+}
+
+/* 메인 컨텐츠 */
+.main-content {
+  flex: 1;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+.project-home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.project-info {
+  flex: 1;
+}
+
+.project-thumbnail-wrapper {
+  flex-shrink: 0;
+}
+
+.project-home-thumbnail {
+  width: 400px; /* 썸네일 가로 크기 */
+  height: auto; /* 비율 유지 */
+  border-radius: 8px;
+  object-fit: cover; /* 비율 유지하며 자르기 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+/* 멤버 목록 */
+.member-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.member-role {
+  font-weight: bold;
+  color: #E58A4E;
+}
+
+.member-name {
+  color: #333;
+}
+
+/* 로그 목록 */
+.log-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.log-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.log-action {
+  font-weight: bold;
+  color: #4a4a4a;
+}
+
+.log-user {
+  color: #E58A4E;
+}
+
+.log-date {
+  font-size: 0.85rem;
+  color: #888;
+}

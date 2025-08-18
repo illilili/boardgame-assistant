@@ -1,0 +1,83 @@
+/* PrivacyPolicy.css */
+
+.privacy-policy-container {
+    max-width: 960px; /* 전체 컨테이너 너비를 확장 */
+    margin: 40px auto;
+    padding: 20px 40px;
+    font-family: 'Noto Sans KR', sans-serif, Arial; /* 폰트 변경 (선택 사항) */
+    line-height: 1.6;
+    color: #333;
+}
+
+.privacy-policy-title {
+    text-align: left; /* 제목 정렬 변경 */
+    color: #000;
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.privacy-policy-preface {
+    font-size: 14px;
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #f8f8f8; /* 서문 배경색 추가 */
+    border-radius: 8px;
+    line-height: 1.8;
+}
+
+.privacy-policy-toc-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.privacy-policy-toc {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 40px;
+    display: grid; /* Grid를 사용해 2열 레이아웃 구현 */
+    grid-template-columns: repeat(2, 1fr); /* 2개의 동일한 너비 열 */
+    gap: 1px; /* 항목 사이의 간격 */
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden; /* 모서리 둥글게 처리 */
+}
+
+.privacy-policy-toc li {
+    padding: 15px 20px;
+    background-color: #ffffff;
+    border: none;
+}
+
+.privacy-policy-toc li:nth-child(odd) {
+    border-right: 1px solid #e0e0e0;
+}
+
+.privacy-policy-toc a {
+    text-decoration: none;
+    color: #333;
+    font-weight: normal; /* 굵기 제거 */
+    display: block;
+    font-size: 14px;
+}
+
+.privacy-policy-toc a:hover {
+    color: #000;
+    text-decoration: underline;
+}
+
+h2 {
+    color: #000;
+    margin-top: 50px;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding-bottom: 5px;
+    border-bottom: none;
+}
+
+p {
+    margin-bottom: 15px;
+    text-align: justify;
+    font-size: 14px;
+}
