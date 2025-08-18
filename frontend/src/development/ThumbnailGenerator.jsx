@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './ThumbnailGenerator.css';
 import {
   getThumbnailPreview,
@@ -7,13 +7,15 @@ import {
   getContentVersions,
   submitComponent,
   rollbackContentVersion,
-  getContentDetail, // ✅ 추가
+  getContentDetail,
+  completeContent,
 } from '../api/development';
 
 function ThumbnailGenerator({ contentId, componentId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedThumbnail, setGeneratedThumbnail] = useState(null);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState(''); // ✅ 메시지 상태 추가
 
   const [manualId, setManualId] = useState(contentId || '');
   const [theme, setTheme] = useState('');
@@ -22,51 +24,11 @@ function ThumbnailGenerator({ contentId, componentId }) {
   const isFromList = Boolean(contentId);
   const finalContentId = isFromList ? contentId : manualId;
 
-  // 버전 관리
   const [versions, setVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [versionNote, setVersionNote] = useState('썸네일 스냅샷');
 
-  // 초기 로드
-  useEffect(() => {
-    if (!finalContentId) return;
-    (async () => {
-      try {
-        await loadPreview(finalContentId);
-        await fetchVersions();
-      } catch (err) {
-        console.error(err);
-        setError('썸네일 미리보기 불러오기 실패');
-      }
-    })();
-  }, [finalContentId]);
-
-  // 썸네일 미리보기 로드
-  const loadPreview = async (cid) => {
-    try {
-      const preview = await getThumbnailPreview(cid);
-      if (preview) {
-        setTheme(preview.theme || '');
-        setStoryline(preview.storyline || '');
-        if (preview.thumbnailUrl) {
-          setGeneratedThumbnail({
-            contentId: cid,
-            thumbnailUrl: preview.thumbnailUrl,
-          });
-        } else {
-          setGeneratedThumbnail(null);
-        }
-      }
-      const saved = localStorage.getItem(`thumbnail_${cid}`);
-      if (saved) setGeneratedThumbnail(JSON.parse(saved));
-    } catch (err) {
-      console.error(err);
-      setError('미리보기 불러오기 실패');
-    }
-  };
-
-  // 버전 목록
-  const fetchVersions = async () => {
+  const fetchVersions = useCallback(async () => {
     if (!finalContentId) return;
     try {
       const list = await getContentVersions(finalContentId);
@@ -78,14 +40,56 @@ function ThumbnailGenerator({ contentId, componentId }) {
       console.error(err);
       setError('버전 목록 불러오기 실패');
     }
-  };
+  }, [finalContentId]);
 
-  // 썸네일 생성
+  const loadPreview = useCallback(async (cid) => {
+    try {
+      const preview = await getThumbnailPreview(cid);
+      if (preview) {
+        setTheme(preview.theme || '');
+        setStoryline(preview.storyline || '');
+        if (preview.thumbnailUrl) {
+          setGeneratedThumbnail({
+            contentId: cid,
+            thumbnailUrl: preview.thumbnailUrl,
+          });
+        }
+      }
+      const saved = localStorage.getItem(`thumbnail_${cid}`);
+      if (saved) setGeneratedThumbnail(JSON.parse(saved));
+    } catch (err) {
+      console.error(err);
+      setError('미리보기 불러오기 실패');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!finalContentId) return;
+    (async () => {
+      try {
+        if (isFromList) {
+          const detail = await getContentDetail(finalContentId);
+          if (detail && detail.contentData) {
+            setGeneratedThumbnail({
+              contentId: finalContentId,
+              thumbnailUrl: detail.contentData,
+            });
+          }
+        }
+        await loadPreview(finalContentId);
+        await fetchVersions();
+      } catch (err) {
+        console.error(err);
+        setError('썸네일 미리보기 불러오기 실패');
+      }
+    })();
+  }, [finalContentId, isFromList, loadPreview, fetchVersions]);
+
   const handleGenerateClick = async () => {
     if (!finalContentId) return setError('콘텐츠 ID를 입력하세요.');
-
     setIsLoading(true);
     setError('');
+    setMessage('');
 
     try {
       const response = await generateThumbnail({
@@ -95,75 +99,45 @@ function ThumbnailGenerator({ contentId, componentId }) {
       });
       setGeneratedThumbnail(response);
       localStorage.setItem(`thumbnail_${finalContentId}`, JSON.stringify(response));
+      setMessage('✅ 썸네일 생성 성공!');
     } catch (err) {
       console.error(err);
-      setError('썸네일 생성 실패');
+      setMessage('❌ 썸네일 생성 실패');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 버전 저장
   const handleSaveVersion = async () => {
-    if (!versionNote.trim()) return setError('버전 노트를 입력하세요.');
-    if (!finalContentId) return setError('콘텐츠 ID가 없습니다.');
-
+    if (!versionNote.trim()) return setMessage('❌ 버전 노트를 입력하세요.');
+    if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
     setIsLoading(true);
     setError('');
+    setMessage('');
 
     try {
       await saveContentVersion({ contentId: finalContentId, note: versionNote });
       setVersionNote('썸네일 스냅샷');
       await fetchVersions();
+      setMessage('✅ 버전 저장 성공!');
     } catch (err) {
       console.error(err);
-      setError('버전 저장 실패');
+      setMessage('❌ 버전 저장 실패');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 버전 선택
-  const handleVersionChange = (e) => {
-    const versionId = Number(e.target.value);
-    setSelectedVersion(versionId);
-  };
-
-  // 제출
-  const handleSubmitVersion = async () => {
-    if (!selectedVersion) return setError('제출할 버전을 선택하세요.');
-    if (!componentId) return setError('컴포넌트 ID가 없습니다.');
-
-    setIsLoading(true);
-    setError('');
-
-    try {
-      await submitComponent(componentId);
-      alert(`🎉 제출 완료! (버전 ID: ${selectedVersion})`);
-    } catch (err) {
-      console.error(err);
-      setError('제출 실패');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // 롤백
   const handleRollbackVersion = async () => {
-    if (!selectedVersion) return setError('롤백할 버전을 선택하세요.');
-    if (!finalContentId) return setError('콘텐츠 ID가 없습니다.');
-
+    if (!selectedVersion) return setMessage('❌ 롤백할 버전을 선택하세요.');
+    if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
     setIsLoading(true);
     setError('');
+    setMessage('');
 
     try {
       await rollbackContentVersion(finalContentId, selectedVersion);
-      alert(`🔄 롤백 완료! (버전 ID: ${selectedVersion})`);
-
-      // 캐시 제거
       localStorage.removeItem(`thumbnail_${finalContentId}`);
-
-      // ✅ 롤백된 최신 DB 값 직접 가져오기
       const detail = await getContentDetail(finalContentId);
       if (detail && detail.contentData) {
         setGeneratedThumbnail({
@@ -171,20 +145,54 @@ function ThumbnailGenerator({ contentId, componentId }) {
           thumbnailUrl: detail.contentData,
         });
       }
-
       await fetchVersions();
+      setMessage(`✅ 롤백 완료! (버전 ID: ${selectedVersion})`);
     } catch (err) {
       console.error(err);
-      setError('롤백 실패');
+      setMessage('❌ 롤백 실패');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 리셋
+  const handleComplete = async () => {
+    if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
+    setIsLoading(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await completeContent(finalContentId);
+      setMessage('✅ 완료 처리되었습니다. 이제 제출할 수 있어요.');
+    } catch (err) {
+      console.error(err);
+      setMessage('❌ 완료 처리 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmitVersion = async () => {
+    if (!componentId) return setMessage('❌ 컴포넌트 ID가 없습니다.');
+    setIsLoading(true);
+    setError('');
+    setMessage('');
+
+    try {
+      await submitComponent(componentId);
+      setMessage('🎉 제출 완료! 퍼블리셔 검토(PENDING_REVIEW)로 이동했습니다.');
+    } catch (err) {
+      console.error(err);
+      setMessage('❌ 제출 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleReset = () => {
     setGeneratedThumbnail(null);
     setError('');
+    setMessage('');
     if (finalContentId) localStorage.removeItem(`thumbnail_${finalContentId}`);
   };
 
@@ -198,6 +206,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
       )}
 
       {error && <p className="error-text">{error}</p>}
+      {message && <p className="upload-message">{message}</p>} {/* ✅ 메시지 출력 */}
 
       {!isLoading && (
         <>
@@ -245,6 +254,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
                 <span>콘텐츠 ID: {generatedThumbnail.contentId}</span>
               </div>
 
+              {/* 버전 저장 */}
               <div className="version-note-form">
                 <label>버전 노트</label>
                 <input
@@ -258,29 +268,34 @@ function ThumbnailGenerator({ contentId, componentId }) {
                 </button>
               </div>
 
+              {/* 편집 초기화(재생성) */}
               <button onClick={handleReset} className="reset-button-bottom">
                 다시 생성
               </button>
             </div>
           )}
 
-          {/* 버전 목록 */}
+          {/* 버전 목록 + 롤백/완료/제출 */}
           {versions.length > 0 && (
             <div className="version-select-form">
               <label>버전 선택</label>
-              <select value={selectedVersion || ''} onChange={handleVersionChange}>
+              <select value={selectedVersion || ''} onChange={(e) => setSelectedVersion(Number(e.target.value))}>
                 {versions.map((v) => (
                   <option key={v.versionId} value={v.versionId}>
                     v{v.versionNo} - {v.note} ({v.createdAt})
                   </option>
                 ))}
               </select>
+
               <div className="version-buttons">
-                <button onClick={handleSubmitVersion} className="generate-button">
-                  선택 버전 제출
-                </button>
                 <button onClick={handleRollbackVersion} className="reset-button-bottom">
                   선택 버전 롤백
+                </button>
+                <button onClick={handleComplete} className="generate-button">
+                  완료(확정)
+                </button>
+                <button onClick={handleSubmitVersion} className="generate-button">
+                  제출
                 </button>
               </div>
             </div>

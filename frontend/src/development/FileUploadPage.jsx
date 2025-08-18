@@ -4,7 +4,8 @@ import {
   uploadContentFile,
   saveContentVersion,
   submitComponent,
-  getContentVersions // ✅ 새로 추가
+  getContentVersions,
+  rollbackContentVersion,
 } from '../api/development';
 import './FileUploadPage.css';
 
@@ -20,23 +21,24 @@ function FileUploadPage({ contentId, componentId }) {
 
   // 버전 목록 불러오기
   useEffect(() => {
+    const fetchVersions = async () => {
+      try {
+        const versions = await getContentVersions(contentId);
+        setVersions(versions);
+        if (versions.length > 0) {
+          setSelectedVersion(versions[0].versionId);
+        }
+      } catch (err) {
+        console.error(err);
+        setMessage('❌ 버전 목록 불러오기 실패');
+      }
+    };
+
     if (contentId) {
       fetchVersions();
     }
   }, [contentId]);
 
-  const fetchVersions = async () => {
-    try {
-      const versions = await getContentVersions(contentId);
-      setVersions(versions);
-      if (versions.length > 0) {
-        setSelectedVersion(versions[0].versionId); // 최신 버전 기본 선택
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage('❌ 버전 목록 불러오기 실패');
-    }
-  };
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
@@ -70,10 +72,36 @@ function FileUploadPage({ contentId, componentId }) {
       await saveContentVersion({ contentId, note: versionNote });
       setMessage('✅ 버전 저장 성공!');
       setVersionNote('파일 업로드 스냅샷');
-      fetchVersions(); // 저장 후 버전 목록 새로고침
+      // 저장 후 목록 다시 불러오기
+      const versions = await getContentVersions(contentId);
+      setVersions(versions);
+      if (versions.length > 0) {
+        setSelectedVersion(versions[0].versionId);
+      }
     } catch (err) {
       console.error(err);
       setMessage('❌ 버전 저장 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRollbackVersion = async () => {
+    if (!contentId || !selectedVersion) {
+      return setMessage('❌ 롤백할 버전을 선택하세요.');
+    }
+
+    setIsLoading(true);
+    setMessage('롤백 중...');
+
+    try {
+      await rollbackContentVersion(contentId, selectedVersion);
+      setMessage(`✅ v${selectedVersion} 으로 롤백 완료!`);
+      const versions = await getContentVersions(contentId);
+      setVersions(versions);
+    } catch (err) {
+      console.error(err);
+      setMessage('❌ 롤백 실패');
     } finally {
       setIsLoading(false);
     }
@@ -100,27 +128,26 @@ function FileUploadPage({ contentId, componentId }) {
     <div className="component-placeholder">
       <h2>[개발] 파일 업로드 & 버전 관리</h2>
 
+      {/* 업로드 */}
       <div className="upload-form">
         <div className="form-group">
           <label>콘텐츠 ID</label>
           <input type="text" value={contentId || ''} disabled />
         </div>
-
         <div className="form-group">
           <label>컴포넌트 ID</label>
           <input type="text" value={componentId || ''} disabled />
         </div>
-
         <div className="form-group">
           <label>파일 선택</label>
           <input type="file" onChange={handleFileChange} />
         </div>
-
         <button className="upload-button" onClick={handleUpload} disabled={isLoading}>
           {isLoading ? '업로드 중...' : '파일 업로드'}
         </button>
       </div>
 
+      {/* 버전 저장 */}
       <div className="version-note-form">
         <label>버전 노트</label>
         <input
@@ -134,9 +161,10 @@ function FileUploadPage({ contentId, componentId }) {
         </button>
       </div>
 
+      {/* 버전 목록 + 롤백/제출 */}
       {versions.length > 0 && (
         <div className="version-select-form">
-          <label>제출할 버전 선택</label>
+          <label>버전 선택</label>
           <select
             value={selectedVersion || ''}
             onChange={(e) => setSelectedVersion(e.target.value)}
@@ -147,9 +175,14 @@ function FileUploadPage({ contentId, componentId }) {
               </option>
             ))}
           </select>
-          <button className="upload-button" onClick={handleSubmitVersion} disabled={isLoading}>
-            {isLoading ? '제출 중...' : '선택 버전 제출'}
-          </button>
+          <div className="button-group">
+            <button className="upload-button" onClick={handleRollbackVersion} disabled={isLoading}>
+              {isLoading ? '롤백 중...' : '선택 버전 롤백'}
+            </button>
+            <button className="upload-button" onClick={handleSubmitVersion} disabled={isLoading}>
+              {isLoading ? '제출 중...' : '선택 버전 제출'}
+            </button>
+          </div>
         </div>
       )}
 

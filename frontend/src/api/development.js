@@ -114,3 +114,12 @@ export const rollbackContentVersion = (contentId, versionId) =>
     method: 'POST',
     headers: {}, // ← body 없음 명시
   });
+
+  /**
+ * 콘텐츠 완료(확정) 처리
+ */
+export const completeContent = (contentId) =>
+  request(`/api/content/${contentId}/complete`, {
+    method: 'PUT',
+    headers: {}, // 바디 없이 보내도록 명시
+  });
