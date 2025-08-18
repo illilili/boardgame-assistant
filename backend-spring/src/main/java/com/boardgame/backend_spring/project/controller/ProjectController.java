@@ -67,7 +67,9 @@ public class ProjectController {
             @RequestBody ProjectRenameRequestDto dto,
             @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(projectService.renameProject(projectId, dto.getNewTitle(), user));
+        return ResponseEntity.ok(
+                projectService.renameProject(projectId, dto.getNewTitle(), dto.getNewDescription(), user)
+        );
     }
 
     // 개발자 배정
