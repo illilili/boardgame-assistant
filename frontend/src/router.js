@@ -10,7 +10,7 @@ import Login from './auth/Login';
 import SignUp from './auth/SignUp';
 import MyPage from './auth/Mypage';
 import ProjectRenamePage from './plan/ProjectRenamePage';
-import PlanReview from './publish/PlanReview';
+// import PlanReview from './publish/PlanReview';
 import Publish from './publish/Publish';
 import ProjectListPage from './project/ProjectListPage';
 import ProjectHomePage from './project/ProjectHomePage';
@@ -19,6 +19,10 @@ import DevelopmentWrapper from './development/DevelopmentWrapper';
 import PendingReviewPage from './publish/PendingReviewPage';
 import ReviewDetailPage from './publish/ReviewDetailPage';
 import AssignDeveloperPage from './publish/AssignDeveloperPage';
+import TrendAnalysisHome from './trendAnalysis/TrendAnalysisHome';
+import LiveTop50Analysis from './trendAnalysis/LiveTop50Analysis';
+import OriginalGameAnalysis from './trendAnalysis/OriginalGameAnalysis';
+import InteractiveDashboard from './trendAnalysis/components/interactive/InteractiveDashboard';
 
 
 const router = createBrowserRouter([
@@ -40,7 +44,7 @@ const router = createBrowserRouter([
   {
     id: 3,
     path: '/footer',
-    elment: <Footer />
+    element: <Footer />
   },
   {
     id: 4,
@@ -111,6 +115,26 @@ const router = createBrowserRouter([
     id: 17,// 3. 개발자 배정 페이지 (승인 후 이동)
     path: '/assign-developer/:projectId',
     element: <AssignDeveloperPage />
+  },
+  {
+    id: 18,
+    path: '/trend',
+    element: <TrendAnalysisHome />
+  },
+  {
+    id: 19,
+    path: '/trend/live-top50',
+    element: <LiveTop50Analysis />
+  },
+  {
+    id: 20,
+    path: '/trend/original',
+    element: <OriginalGameAnalysis />
+  },
+  {
+    id: 21,
+    path: '/trend/interactive',
+    element: <InteractiveDashboard />
   },
 
 
