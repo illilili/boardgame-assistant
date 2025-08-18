@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import './Review.css';
 import { getMyRulesByProject, runSimulation, analyzeBalance } from '../api/auth';
 import { ProjectContext } from '../contexts/ProjectContext';
+import { FaPlay, FaBalanceScale, FaExclamationTriangle, FaLightbulb, FaTrophy } from 'react-icons/fa';
 
 const Review = () => {
     const { projectId } = useContext(ProjectContext);
@@ -34,7 +35,7 @@ const Review = () => {
                 }
             } catch (err) {
                 console.error(err);
-                setError('규칙 목록을 가져올 수 없습니다. 백엔드 서버가 실행 중이거나 로그인 상태를 확인해주세요.');
+                setError('규칙 목록을 가져올 수 없습니다.');
             } finally {
                 setIsLoading(false);
             }
@@ -89,103 +90,105 @@ const Review = () => {
     };
 
     return (
-        <div className="review-container">
-            <header className="review-header">
-                <h1>규칙 시뮬레이션 및 밸런스 검토</h1>
-                <p>AI를 통해 게임 규칙의 실제 플레이 양상을 예측하고, 잠재적인 밸런스 문제를 분석합니다.</p>
-            </header>
+        <div className="review__container">
 
-            <main className="review-main-grid">
-                <div className="controls-column">
-                    <div className="card">
-                        <h2>규칙 시뮬레이션</h2>
-                        <form onSubmit={handleRunSimulation}>
-                            <div className="form-group">
-                                <label htmlFor="ruleId">규칙 선택</label>
-                                <select id="ruleId" value={ruleId} onChange={(e) => setRuleId(e.target.value)} required disabled={ruleList.length === 0 || isLoading}>
-                                    <option value="" disabled>-- 규칙을 선택하세요 --</option>
-                                    {ruleList.map(rule => (
-                                        <option key={rule.ruleId} value={rule.ruleId}>
-                                            ID: {rule.ruleId} - {rule.gameName}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="playerNames">플레이어 이름 (쉼표로 구분)</label>
-                                <input id="playerNames" type="text" value={playerNames} onChange={(e) => setPlayerNames(e.target.value)} required />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="maxTurns">최대 턴 수</label>
-                                <input id="maxTurns" type="number" value={maxTurns} onChange={(e) => setMaxTurns(e.target.value)} min="1" required />
-                            </div>
-                            <div className="form-group checkbox-group">
-                                <input id="enablePenalty" type="checkbox" checked={enablePenalty} onChange={(e) => setEnablePenalty(e.target.checked)} />
-                                <label htmlFor="enablePenalty">페널티 규칙 적용</label>
-                            </div>
-                            <button type="submit" className="primary-button" disabled={isLoading || !ruleId}>
-                                {isLoading ? '처리 중...' : '시뮬레이션 실행'}
-                            </button>
-                        </form>
-                    </div>
+            {error && <div className="review__error-message">{error}</div>}
 
-                    <div className="card">
-                        <h2>AI 밸런스 분석</h2>
-                        <p>선택된 규칙에 대한 AI의 전문적인 밸런스 분석 리포트를 받아봅니다.</p>
-                        <button onClick={handleGetBalanceFeedback} className="secondary-button" disabled={isLoading || !ruleId}>
-                            {isLoading ? '처리 중...' : '밸런스 분석 요청'}
+            {/* --- ✨ 1. 시뮬레이션 랩 --- */}
+            <div className="review__lab-section">
+                <div className="review__controls-column">
+                    <h2>규칙 시뮬레이션</h2>
+                    <p>가상 플레이어와 턴 수를 설정하여 게임이 어떻게 진행되는지 확인합니다.</p>
+                    <form onSubmit={handleRunSimulation}>
+                        <div className="review__form-group">
+                            <label htmlFor="ruleId">규칙 선택</label>
+                            <select id="ruleId" value={ruleId} onChange={(e) => setRuleId(e.target.value)} required disabled={ruleList.length === 0 || isLoading}>
+                                <option value="" disabled>-- 규칙을 선택하세요 --</option>
+                                {ruleList.map(rule => (
+                                    <option key={rule.ruleId} value={rule.ruleId}>
+                                        ID: {rule.ruleId} - {rule.gameName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="review__form-group">
+                            <label htmlFor="playerNames">플레이어 이름 (쉼표로 구분)</label>
+                            <input id="playerNames" type="text" value={playerNames} onChange={(e) => setPlayerNames(e.target.value)} required />
+                        </div>
+                        <div className="review__form-group">
+                            <label htmlFor="maxTurns">최대 턴 수</label>
+                            <input id="maxTurns" type="number" value={maxTurns} onChange={(e) => setMaxTurns(e.target.value)} min="1" required />
+                        </div>
+                        <div className="review__form-group review__checkbox-group">
+                            <input id="enablePenalty" type="checkbox" checked={enablePenalty} onChange={(e) => setEnablePenalty(e.target.checked)} />
+                            <label htmlFor="enablePenalty">페널티 규칙 적용</label>
+                        </div>
+                        <button type="submit" className="review__primary-button" disabled={isLoading || !ruleId}>
+                            <FaPlay /> {isLoading ? '처리 중...' : '시뮬레이션 실행'}
                         </button>
-                    </div>
+                    </form>
                 </div>
-
-                <div className="results-column">
-                    <div className="card">
-                        {error && <div className="error-message">{error}</div>}
-                        <div className="results-section">
-                            <h3>시뮬레이션 결과</h3>
-                            {isLoading && <div className="spinner"></div>}
-                            {simulationResult && !isLoading && (
-                                <div>
-                                    <h4>🏆 최종 결과: {simulationResult.simulationHistory[0].winner} ({simulationResult.simulationHistory[0].totalTurns}턴)</h4>
-                                    <div className="simulation-log">
-                                        {simulationResult.simulationHistory[0].turns.map(turn => (
-                                            <div key={turn.turn} className="turn-card">
-                                                <h4>[ {turn.turn}턴 ]</h4>
-                                                {turn.actions.map((action, index) => (
-                                                    <div key={index} className="action-item">
-                                                        <p><strong>{action.player}</strong>: {action.action} ({action.details})</p>
-                                                        <p><em>이유: {action.rationale}</em></p>
-                                                    </div>
-                                                ))}
+                <div className="review__results-column">
+                    <h3>시뮬레이션 결과</h3>
+                    {isLoading && <div className="review__spinner"></div>}
+                    {simulationResult && !isLoading && (
+                        <div className="review__simulation-result">
+                            <div className="review__simulation-summary">
+                                <FaTrophy className="summary-icon" />
+                                <div className="summary-text">
+                                    <strong>최종 결과: {simulationResult.simulationHistory[0].winner}</strong>
+                                    <span>({simulationResult.simulationHistory[0].totalTurns}턴)</span>
+                                </div>
+                            </div>
+                            <div className="review__simulation-log">
+                                {simulationResult.simulationHistory[0].turns.map(turn => (
+                                    <div key={turn.turn} className="review__turn-card">
+                                        <div className="turn-header">턴 {turn.turn}</div>
+                                        {turn.actions.map((action, index) => (
+                                            <div key={index} className="review__action-item">
+                                                <p><strong>{action.player}</strong>: {action.action} ({action.details})</p>
+                                                <p className="rationale"><em>이유: {action.rationale}</em></p>
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-                            )}
-                            {!isLoading && !simulationResult && <p>시뮬레이션을 실행하면 결과가 여기에 표시됩니다.</p>}
+                                ))}
+                            </div>
                         </div>
-                        <hr style={{border: "none", borderTop: "1px solid #eef2f7", margin: "2rem 0"}} />
-                        <div className="results-section">
-                            <h3>밸런스 분석 리포트</h3>
-                            {isLoading && <div className="spinner"></div>}
-                            {balanceFeedback && balanceFeedback.balanceAnalysis && !isLoading && (
-                                <div>
-                                    <p><strong>종합 평가:</strong> {balanceFeedback.balanceAnalysis.simulationSummary}</p>
-                                    <h4>발견된 문제점</h4>
-                                    <ul className="balance-list">{balanceFeedback.balanceAnalysis.issuesDetected.map((issue, index) => <li key={index} className="issue">{issue}</li>)}</ul>
-                                    <h4>개선 제안</h4>
-                                    <ul className="balance-list">{balanceFeedback.balanceAnalysis.recommendations.map((rec, index) => <li key={index} className="recommendation">{rec}</li>)}</ul>
-                                    <div className="score-display">
-                                        <div className="score-value">{balanceFeedback.balanceAnalysis.balanceScore} / 10</div>
-                                        <div className="score-label">AI 밸런스 평점</div>
-                                    </div>
-                                </div>
-                            )}
-                            {!isLoading && !balanceFeedback && <p>밸런스 분석을 요청하면 리포트가 여기에 표시됩니다.</p>}
-                        </div>
-                    </div>
+                    )}
+                    {!isLoading && !simulationResult && <p className="initial-text">시뮬레이션을 실행하면 결과가 여기에 표시됩니다.</p>}
                 </div>
-            </main>
+            </div>
+
+            {/* --- ✨ 2. 밸런스 분석 리포트 --- */}
+            <div className="review__lab-section">
+                <div className="review__controls-column">
+                    <h2>AI 밸런스 분석</h2>
+                    <p>선택된 규칙에 대한 AI의 전문적인 밸런스 분석 리포트를 받아봅니다.</p>
+                    <button onClick={handleGetBalanceFeedback} className="review__secondary-button" disabled={isLoading || !ruleId}>
+                        <FaBalanceScale /> {isLoading ? '처리 중...' : '밸런스 분석 요청'}
+                    </button>
+                </div>
+                <div className="review__results-column">
+                    <h3>밸런스 분석 리포트</h3>
+                    {isLoading && <div className="review__spinner"></div>}
+                    {balanceFeedback && balanceFeedback.balanceAnalysis && !isLoading && (
+                        <div className="review__balance-report">
+                            <div className="review__score-display">
+                                <div className="score-value">{balanceFeedback.balanceAnalysis.balanceScore}</div>
+                                <div className="score-label">AI 밸런스 평점</div>
+                            </div>
+                            <div className="report-content">
+                                <p className="balance-summary"><strong>종합 평가:</strong> {balanceFeedback.balanceAnalysis.simulationSummary}</p>
+                                <h4><FaExclamationTriangle /> 발견된 문제점</h4>
+                                <ul className="review__balance-list">{balanceFeedback.balanceAnalysis.issuesDetected.map((issue, index) => <li key={index} className="issue">{issue}</li>)}</ul>
+                                <h4><FaLightbulb /> 개선 제안</h4>
+                                <ul className="review__balance-list">{balanceFeedback.balanceAnalysis.recommendations.map((rec, index) => <li key={index} className="recommendation">{rec}</li>)}</ul>
+                            </div>
+                        </div>
+                    )}
+                    {!isLoading && !balanceFeedback && <p className="initial-text">밸런스 분석을 요청하면 리포트가 여기에 표시됩니다.</p>}
+                </div>
+            </div>
         </div>
     );
 };

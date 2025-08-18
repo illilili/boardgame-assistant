@@ -8,5 +8,6 @@ import lombok.Getter;
 public class ProjectRenameResponseDto {
     private Long projectId;
     private String updatedTitle;
+    private String updatedDescription;
     private String message;
 }
