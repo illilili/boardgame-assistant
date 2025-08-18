@@ -1,11 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './ModelGenerator.css';
-import { getModel3DPreview, generate3DModel } from '../api/development';
+import {
+  getModel3DPreview,
+  generate3DModel,
+  saveContentVersion,
+  getContentVersions,
+  rollbackContentVersion,
+  getContentDetail,
+  completeContent,
+  submitComponent
+} from '../api/development';
 
-function ModelGenerator({ contentId }) {
+function ModelGenerator({ contentId, componentId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedModel, setGeneratedModel] = useState(null);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const [manualId, setManualId] = useState(contentId || '');
   const [name, setName] = useState('');
@@ -18,7 +28,12 @@ function ModelGenerator({ contentId }) {
   const isFromList = Boolean(contentId);
   const finalContentId = isFromList ? contentId : manualId;
 
-  // camelCase 변환 함수
+  // 버전 관리 상태
+  const [versions, setVersions] = useState([]);
+  const [selectedVersion, setSelectedVersion] = useState(null);
+  const [versionNote, setVersionNote] = useState('3D 모델 스냅샷');
+
+  // camelCase 변환
   const normalizeModelKeys = (data) => {
     if (!data) return null;
     return {
@@ -28,6 +43,22 @@ function ModelGenerator({ contentId }) {
     };
   };
 
+  // 버전 목록 불러오기
+  const fetchVersions = useCallback(async () => {
+    if (!finalContentId) return;
+    try {
+      const list = await getContentVersions(finalContentId);
+      setVersions(list);
+      if (list.length > 0) {
+        setSelectedVersion(list[0].versionId);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('버전 목록 불러오기 실패');
+    }
+  }, [finalContentId]);
+
+  // 초기 미리보기 + 버전 불러오기
   useEffect(() => {
     if (!finalContentId) return;
     (async () => {
@@ -44,18 +75,21 @@ function ModelGenerator({ contentId }) {
         if (saved) {
           setGeneratedModel(normalizeModelKeys(JSON.parse(saved)));
         }
+        await fetchVersions();
       } catch (err) {
         console.error(err);
         setError('3D 모델 미리보기 불러오기 실패');
       }
     })();
-  }, [finalContentId]);
+  }, [finalContentId, fetchVersions]);
 
+  // 모델 생성
   const handleGenerateClick = async () => {
-    if (!finalContentId) return setError('콘텐츠 ID를 입력하세요.');
-    if (!style) return setError('스타일을 선택하세요.');
+    if (!finalContentId) return setMessage('❌ 콘텐츠 ID를 입력하세요.');
+    if (!style) return setMessage('❌ 스타일을 선택하세요.');
     setIsLoading(true);
     setError('');
+    setMessage('');
 
     try {
       const response = await generate3DModel({
@@ -67,22 +101,101 @@ function ModelGenerator({ contentId }) {
         storyline,
         style
       });
-
       const formatted = normalizeModelKeys(response);
       setGeneratedModel(formatted);
       localStorage.setItem(`model3d_${finalContentId}`, JSON.stringify(formatted));
+      setMessage('✅ 3D 모델 생성 성공!');
     } catch (err) {
       console.error(err);
-      setError('3D 모델 생성 실패');
+      setMessage('❌ 3D 모델 생성 실패');
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 버전 저장
+  const handleSaveVersion = async () => {
+    if (!versionNote.trim()) return setMessage('❌ 버전 노트를 입력하세요.');
+    if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
+    setIsLoading(true);
+    setMessage('');
 
+    try {
+      await saveContentVersion({ contentId: finalContentId, note: versionNote });
+      setVersionNote('3D 모델 스냅샷');
+      await fetchVersions();
+      setMessage('✅ 버전 저장 성공!');
+    } catch (err) {
+      console.error(err);
+      setMessage('❌ 버전 저장 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 롤백
+  const handleRollbackVersion = async () => {
+    if (!selectedVersion) return setMessage('❌ 롤백할 버전을 선택하세요.');
+    if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      await rollbackContentVersion(finalContentId, selectedVersion);
+      localStorage.removeItem(`model3d_${finalContentId}`);
+      const detail = await getContentDetail(finalContentId);
+      if (detail && detail.contentData) {
+        setGeneratedModel(normalizeModelKeys(detail));
+      }
+      await fetchVersions();
+      setMessage(`✅ 롤백 완료! (버전 ID: ${selectedVersion})`);
+    } catch (err) {
+      console.error(err);
+      setMessage('❌ 롤백 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 완료 처리
+  const handleComplete = async () => {
+    if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      await completeContent(finalContentId);
+      setMessage('✅ 완료 처리되었습니다. 이제 제출할 수 있어요.');
+    } catch (err) {
+      console.error(err);
+      setMessage('❌ 완료 처리 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 제출
+  const handleSubmitVersion = async () => {
+    if (!componentId) return setMessage('❌ 컴포넌트 ID가 없습니다.');
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      await submitComponent(componentId);
+      setMessage('🎉 제출 완료! 퍼블리셔 검토(PENDING_REVIEW)로 이동했습니다.');
+    } catch (err) {
+      console.error(err);
+      setMessage('❌ 제출 실패');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 초기화
   const handleReset = () => {
     setGeneratedModel(null);
     setError('');
+    setMessage('');
     if (finalContentId) localStorage.removeItem(`model3d_${finalContentId}`);
   };
 
@@ -91,11 +204,12 @@ function ModelGenerator({ contentId }) {
       {isLoading && (
         <div className="status-container">
           <div className="loader"></div>
-          <h3>3D 모델 생성 중...</h3>
+          <h3>처리 중...</h3>
         </div>
       )}
 
-      {error && <div className="error-container"><p>{error}</p></div>}
+      {error && <p className="error-text">{error}</p>}
+      {message && <p className="upload-message">{message}</p>}
 
       {!isLoading && (
         <>
@@ -111,7 +225,7 @@ function ModelGenerator({ contentId }) {
             />
           </div>
 
-          {/* 폼 필드 */}
+          {/* 입력 폼 */}
           <div className="form-group"><label>이름</label>
             <input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
@@ -165,22 +279,61 @@ function ModelGenerator({ contentId }) {
                 <div className="info-item">
                   <strong>이름</strong><span>{generatedModel.name}</span>
                 </div>
-                {(generatedModel.refinedUrl || generatedModel.previewUrl) && (
-                  <div className="download-links">
-                    {generatedModel.refinedUrl && (
-                      <a href={generatedModel.refinedUrl} target="_blank" rel="noreferrer">
-                        GLB 다운로드
-                      </a>
-                    )}
-                    {generatedModel.previewUrl && (
-                      <a href={generatedModel.previewUrl} target="_blank" rel="noreferrer">
-                        미리보기 링크
-                      </a>
-                    )}
-                  </div>
-                )}
-                <button onClick={handleReset} className="reset-button">
+                <div className="download-links">
+                  {generatedModel.refinedUrl && (
+                    <a href={generatedModel.refinedUrl} target="_blank" rel="noreferrer">
+                      GLB 다운로드
+                    </a>
+                  )}
+                  {generatedModel.previewUrl && (
+                    <a href={generatedModel.previewUrl} target="_blank" rel="noreferrer">
+                      미리보기 링크
+                    </a>
+                  )}
+                </div>
+
+                {/* 버전 저장 */}
+                <div className="version-note-form">
+                  <label>버전 노트</label>
+                  <input
+                    type="text"
+                    value={versionNote}
+                    onChange={(e) => setVersionNote(e.target.value)}
+                    placeholder="예: 3D 모델 스냅샷"
+                  />
+                  <button onClick={handleSaveVersion} className="reset-button-bottom">
+                    버전 저장
+                  </button>
+                </div>
+
+                <button onClick={handleReset} className="reset-button-bottom">
                   다시 생성
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 버전 선택 + 완료/제출 */}
+          {versions.length > 0 && (
+            <div className="version-select-form">
+              <label>버전 선택</label>
+              <select value={selectedVersion || ''} onChange={(e) => setSelectedVersion(Number(e.target.value))}>
+                {versions.map((v) => (
+                  <option key={v.versionId} value={v.versionId}>
+                    v{v.versionNo} - {v.note} ({v.createdAt})
+                  </option>
+                ))}
+              </select>
+
+              <div className="version-buttons">
+                <button onClick={handleRollbackVersion} className="reset-button-bottom">
+                  선택 버전 롤백
+                </button>
+                <button onClick={handleComplete} className="generate-button">
+                  완료(확정)
+                </button>
+                <button onClick={handleSubmitVersion} className="generate-button">
+                  제출
                 </button>
               </div>
             </div>
