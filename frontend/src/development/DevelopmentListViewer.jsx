@@ -1,8 +1,8 @@
-// DevelopmentListViewer.jsx
 import React, { useState, useEffect } from 'react';
 import './DevelopmentListViewer.css';
 import { getTasksForProject } from '../api/auth';
 
+// 상태 뱃지 색상 매핑
 const getStatusClassName = (statusSummary) => {
   switch (statusSummary) {
     case '작업 대기': return 'status-waiting';
@@ -15,6 +15,7 @@ const getStatusClassName = (statusSummary) => {
   }
 };
 
+// 타입별로 이동할 화면 매핑
 const getLinkForComponentType = (type) => {
   if (!type) return { supported: false, id: 'file-upload' };
   const lower = type.toLowerCase();
@@ -26,6 +27,12 @@ const getLinkForComponentType = (type) => {
   return { supported: false, id: 'file-upload' };
 };
 
+/**
+ * 개발 목록 화면
+ * - onNavigate(viewId, payload)로 다음 화면에 필요한 데이터 전달
+ *   - 카드: { textContentId, imageContentId, componentId }
+ *   - 일반: { contentId, componentId, type }
+ */
 function DevelopmentListViewer({ onNavigate, projectId }) {
   const [components, setComponents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +49,7 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
         const responseData = await getTasksForProject(projectId);
         setComponents(responseData.components || []);
       } catch (err) {
+        console.error(err);
         setError('개발 항목을 불러오는 데 실패했습니다.');
         setComponents([]);
       } finally {
@@ -98,6 +106,7 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
                     <ul className="sub-task-list">
                       {component.subTasks.length > 0 ? (
                         component.type.toLowerCase().includes('card') ? (
+                          // 카드형: 텍스트/이미지 두 콘텐츠를 묶어서 카드 생성 화면으로 이동
                           <li className="sub-task-item">
                             <div className="sub-task-info">
                               <span className="sub-task-name">
@@ -117,6 +126,7 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
                                   onNavigate('card-gen', {
                                     textContentId: textTask ? textTask.contentId : null,
                                     imageContentId: imageTask ? imageTask.contentId : null,
+                                    componentId: component.componentId, // ✅ 컴포넌트 ID 함께 전달
                                   });
                                 }}
                               >
@@ -125,6 +135,7 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
                             </div>
                           </li>
                         ) : (
+                          // 일반형: 각 하위 작업별로 개별 콘텐츠로 이동
                           component.subTasks.map(subTask => {
                             const { supported, id } = getLinkForComponentType(component.type);
                             return (
@@ -138,7 +149,16 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
                                 <div className="sub-task-actions">
                                   <button
                                     className="sub-task-link"
-                                    onClick={() => onNavigate(id, subTask.contentId)}
+                                    onClick={() =>
+                                      onNavigate(
+                                        id,
+                                        {
+                                          contentId: subTask.contentId,
+                                          componentId: component.componentId, // ✅ 컴포넌트 ID 함께 전달
+                                          type: subTask.type,
+                                        }
+                                      )
+                                    }
                                   >
                                     {supported ? '작업하기 →' : '파일 업로드 →'}
                                   </button>

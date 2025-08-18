@@ -91,3 +91,18 @@ export const getContentDetail = (contentId) =>
   request(`/api/content/${contentId}`, {
     method: 'GET',
   });
+
+// 버전 목록 조회 API
+export const getContentVersions = async (contentId) => {
+  try {
+    const response = await request(`/api/content/${contentId}/versions`, {
+      method: 'GET',
+    });
+
+    // 응답에서 versions 배열만 꺼내서 반환
+    return response.versions || [];
+  } catch (error) {
+    console.error("버전 목록 조회 실패:", error);
+    throw error;
+  }
+};
