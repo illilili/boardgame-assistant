@@ -1,0 +1,156 @@
+:root {
+  --accent-primary: #ea580c;
+  --accent-secondary: #f97316;
+  --bg-light: #f9fafb;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --white: #ffffff;
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 컨테이너 */
+.mypage-container {
+  min-height: 100vh;
+  background-color: var(--bg-light);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 16px;
+}
+
+/* 카드 */
+.mypage-card {
+  background-color: var(--white);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 800px;
+}
+
+/* 제목 */
+.mypage-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+/* 로딩/에러 */
+.mypage-loading,
+.mypage-error {
+  text-align: center;
+  font-size: 1rem;
+  padding: 20px;
+}
+.mypage-error {
+  color: red;
+}
+
+/* 섹션 */
+.mypage-section {
+  margin-bottom: 32px;
+}
+
+.mypage-section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+/* 정보 박스 */
+.mypage-info-box {
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  line-height: 1.6;
+}
+
+/* 프로젝트 리스트 */
+.mypage-project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mypage-project-card {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: box-shadow 0.2s ease;
+}
+
+.mypage-project-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* 프로젝트명 */
+.mypage-project-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  margin-bottom: 4px;
+}
+
+/* 상태 배지 */
+.mypage-status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.status-draft {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.status-active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+.status-completed {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+/* 이름 수정 버튼 */
+.mypage-rename-btn {
+  background-color: var(--accent-primary);
+  color: var(--white);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+.mypage-rename-btn:hover {
+  background-color: var(--accent-secondary);
+}
+
+/* 빈 상태 */
+.mypage-empty-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.mypage-project-card.clickable {
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.mypage-project-card.clickable:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}

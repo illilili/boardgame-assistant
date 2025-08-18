@@ -1,0 +1,106 @@
+.creation-page__background {
+    background-color: #f1f5f9;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Pretendard', sans-serif;
+    padding: 1rem;
+}
+
+.creation-page__container {
+    width: 100%;
+    max-width: 42rem;
+}
+
+.creation-page__card {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.creation-page__content {
+    padding: 2rem;
+}
+
+.creation-page__title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.creation-page__subtitle {
+    color: #64748b;
+    margin-bottom: 2rem;
+}
+
+.creation-page__form-group {
+    margin-bottom: 1.5rem;
+}
+
+.creation-page__label {
+    display: block;
+    color: #334155;
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.creation-page__input,
+.creation-page__textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #cbd5e1;
+    transition: all 0.3s;
+}
+
+.creation-page__input:focus,
+.creation-page__textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #6366f1;
+    border-color: #6366f1;
+}
+
+.creation-page__submit-button {
+    width: 100%;
+    background-color: #4f46e5;
+    color: white;
+    font-weight: 700;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.creation-page__submit-button:hover {
+    background-color: #4338ca;
+}
+
+.creation-page__submit-button:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.creation-page__error-box {
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #b91c1c;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.creation-page__error-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}

@@ -1,0 +1,76 @@
+/* ApprovedPlanViewer.css */
+
+/* --- 기획안 목록 컨테이너 --- */
+.plan-list-container {
+  margin-top: 2rem;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden; /* 컨테이너의 둥근 모서리를 살리기 위해 */
+  background-color: var(--white);
+  box-shadow: var(--shadow-md);
+}
+
+/* --- 기획안 목록(ul) 기본 스타일 초기화 --- */
+.plan-list {
+  list-style: none; /* 이 부분이 검은 점(bullet point)을 제거합니다 */
+  padding: 0;
+  margin: 0;
+}
+
+/* --- 목록의 각 항목(li) 스타일 --- */
+.plan-list-item {
+  /* Flexbox를 사용해 자식 요소들을 가로로 정렬합니다 */
+  display: flex;
+  justify-content: space-between; /* 요소들 사이에 공간을 균등하게 배분 */
+  align-items: center; /* 세로 중앙 정렬 */
+
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* 마지막 항목의 하단 테두리 제거 */
+.plan-list-item:last-child {
+  border-bottom: none;
+}
+
+/* 마우스를 올렸을 때 배경색 변경 */
+.plan-list-item:hover {
+  background-color: #fff8f3; /* 주황색 테마에 어울리는 연한 배경색 */
+}
+
+/* --- 각 컬럼(span) 스타일 --- */
+
+/* 제목 컬럼 */
+.plan-title {
+  flex-grow: 1; /* 남는 공간을 모두 차지하여 제목이 길어져도 밀려나지 않게 함 */
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 작성자 컬럼 */
+.plan-author {
+  min-width: 120px; /* 최소 너비를 지정하여 컬럼이 줄어드는 것을 방지 */
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* 날짜 컬럼 */
+.plan-date {
+  min-width: 150px; /* 최소 너비를 지정하여 컬럼이 줄어드는 것을 방지 */
+  text-align: right;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.pdf-viewer-container {
+    width: 100%;
+    height: calc(100vh - 200px); /* 상단 타이틀/패딩 제외한 높이 */
+    overflow: hidden;
+}
+
+.pdf-viewer-container iframe {
+    width: 100%;
+    height: 100%;
+}

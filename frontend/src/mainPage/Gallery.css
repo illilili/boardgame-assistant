@@ -1,0 +1,132 @@
+/* Gallery.css (업그레이드 버전) */
+
+.gallery-section {
+    padding: 120px 0;
+    text-align: center;
+    /* ✨ 배경에 깊이감을 주기 위한 미세한 그라데이션 추가 */
+    background: linear-gradient(180deg, var(--bg-white) 0%, #fcf9f6 100%);
+}
+
+.gallery-section h2 {
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+
+.gallery-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 80px;
+}
+
+/* --- ✨ 3D & 글로우 효과를 위한 부모 컨테이너 설정 --- */
+.gallery-card-wrapper {
+    padding: 20px 15px; /* 글로우 효과가 잘리지 않도록 상하 여백 추가 */
+    perspective: 1000px; /* 3D 효과를 위한 원근감 설정 */
+}
+
+/* --- ✨ 메인 카드 디자인 업그레이드 --- */
+.gallery-card {
+    position: relative;
+    border-radius: 18px; /* 더 부드러운 곡률 */
+    overflow: hidden;
+    height: 450px;
+    cursor: grab;
+    transform-style: preserve-3d; /* 자식 요소의 3D 변환 유지 */
+    will-change: transform; /* 애니메이션 성능 최적화 */
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.gallery-card:hover {
+    /* ✨ 마우스 호버 시 입체적으로 기울어지는 효과 */
+    transform: scale(1.05) rotateX(10deg) rotateY(-5deg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* --- ✨ Aurora Glow 효과 (카드 뒷면) --- */
+.gallery-card::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background: radial-gradient(circle, var(--accent-warm) 0%, transparent 70%);
+    filter: blur(40px); /* 빛이 부드럽게 퍼지는 효과 */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: -1; /* 카드 뒤로 배치 */
+}
+
+.gallery-card:hover::before {
+    opacity: 0.5; /* 호버 시 빛이 나타남 */
+}
+
+.gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* --- ✨ 글래스모피즘 캡션 & 오버레이 --- */
+/* 기존 after는 오버레이 역할 유지 */
+.gallery-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
+    opacity: 0.8;
+    transition: opacity var(--transition-fast);
+}
+
+.gallery-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+    color: white;
+    padding: 25px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: left;
+    box-sizing: border-box;
+    
+    /* ✨ Glassmorphism 효과 */
+    background: rgba(20, 20, 20, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* Safari 지원 */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+    transform: translateY(100%); /* 기본적으로 숨김 */
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.gallery-card:hover .gallery-caption {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* --- react-slick 커스텀 --- */
+.slick-dots li button:before {
+    font-size: 12px;
+    color: var(--border-color);
+}
+.slick-dots li.slick-active button:before {
+    color: var(--accent-warm) !important;
+}
+
+/* 슬라이더 중앙 카드 강조 효과 */
+.slick-center .gallery-card {
+    transform: scale(1.08);
+}
+.slick-center .gallery-card:hover {
+    transform: scale(1.12) rotateX(10deg) rotateY(-5deg);
+}

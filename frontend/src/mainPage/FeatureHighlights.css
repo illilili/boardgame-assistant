@@ -1,0 +1,52 @@
+.feature-highlights {
+    background-color: #fdfaf7;
+    border: 1px solid #f3e9e1;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    /* 애니메이션 효과 */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s 0.8s ease-out forwards;
+}
+
+.illustration-wrapper {
+    flex-shrink: 0;
+}
+
+.illustration-wrapper img {
+    width: 100px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.features-list h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.features-list ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.features-list li {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.features-list li svg {
+    color: var(--accent-warm);
+}

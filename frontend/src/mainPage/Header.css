@@ -1,0 +1,72 @@
+/* ===== 기본 헤더 (minimalist) ===== */
+.minimalist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 32px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  z-index: 100;
+}
+
+.logo-minimalist {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #E58A4E;
+  text-decoration: none;
+}
+
+.main-nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: #2D3748;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.main-nav a:hover {
+  color: #ea580c; /* 민트 대신 주황 */
+}
+
+/* ===== 프로젝트 내부 전용 헤더 ===== */
+.project-header {
+  background-color: var(--bg-dark); /* 사이드바와 동일 */
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  border-bottom: none
+}
+
+.logo-project {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  text-decoration: none;
+}
+
+.project-nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.project-nav a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.project-nav a:hover {
+  color: var(--accent-primary); /* 주황 hover */
+}

@@ -1,0 +1,39 @@
+.rulebook-report {
+  white-space: pre-wrap;       /* 줄바꿈 유지 */
+  line-height: 1.4;            /* 줄 간격 */
+  font-size: 0.95rem;          /* 기본 글자 크기 */
+  max-height: 80vh;            /* 최대 높이 제한 */
+  overflow-y: auto;            /* 세로 스크롤 */
+  padding-right: 8px;          /* 스크롤 여백 */
+}
+
+/* 제목 크기 조절 */
+.rulebook-report h1 { font-size: 1.4rem; }
+.rulebook-report h2 { font-size: 1.2rem; }
+.rulebook-report h3 { font-size: 1.05rem; }
+
+/* 제목 상하 여백 축소 */
+.rulebook-report h1,
+.rulebook-report h2,
+.rulebook-report h3 {
+  margin-top: 0.5em;
+  margin-bottom: 0.3em;
+}
+
+/* 리스트 여백 축소 */
+.rulebook-report ul,
+.rulebook-report ol {
+  margin-left: 18px;
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+.rulebook-report li {
+  margin-bottom: 0.1em;
+}
+
+/* 문단 여백 최소화 */
+.rulebook-report p {
+  margin-top: 0.15em;
+  margin-bottom: 0.15em;
+}
