@@ -1,178 +1,240 @@
-/* Goal.css (Architect 스타일에 맞춤) */
+/* Goal.css (전문가 버전 - 사용자 친화적 UI 개선) */
 
+/* --- ✨ 디자인 시스템 변수 (일관성 유지) --- */
+:root {
+    --accent-warm: #E58A4E;
+    --accent-warm-dark: #D4753A;
+    --text-dark: #1f2328;
+    --text-light: #6e7781;
+    --bg-main: #f6f8fa;
+    --bg-card: #ffffff;
+    --border-color: #d8dee4;
+    --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 8px 24px rgba(140, 149, 159, 0.15);
+    --font-main: 'Inter', sans-serif;
+    --transition-fast: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+    --transition-smooth: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- ✨ 애니메이션 --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- ✨ 전체 레이아웃 --- */
 .goal-container {
-  display: flex;
-  gap: 48px;
-  width: 100%;
-  max-width: 1400px; /* 너비를 조금 더 확보 */
-  margin: 0 auto;
-  height: calc(100vh - 70px - 4rem);
-  box-sizing: border-box;
+    display: flex;
+    gap: 32px;
+    width: 100%;
+    height: 100%; /* 부모 높이를 기준으로 채움 */
+    box-sizing: border-box;
+    animation: fadeIn 0.5s ease-out;
 }
 
 .goal-form-section,
 .goal-result-section {
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  max-height: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .goal-form-section {
-  flex: 1;
-  min-width: 350px;
-  max-width: 450px; /* 폼 섹션 너비 고정 */
-  align-self: start;
+    flex: 0 0 400px; /* 고정 너비 */
 }
 
 .goal-result-section {
-  flex: 2; /* 결과 섹션이 더 넓게 */
-  align-items: center;
-  justify-content: center;
+    flex: 1 1 auto; /* 나머지 공간 모두 차지 */
+    align-items: center;
+    justify-content: center;
+    padding: 0; /* 내부 카드에서 패딩 관리 */
+    background-image:
+        linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
 }
 
+/* --- ✨ 폼 섹션 스타일 --- */
 .goal-form-section h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #2c2825;
-  margin: 0 0 8px 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 8px 0;
 }
 
 .goal-form-section p {
-  font-size: 1rem;
-  color: #888888;
-  margin: 0 0 32px 0;
+    font-size: 1rem;
+    color: var(--text-light);
+    margin: 0 0 32px 0;
+    line-height: 1.6;
 }
 
 .goal-form .form-group {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .goal-form label {
-  display: block;
-  font-weight: 600;
-  color: #2c2825;
-  margin-bottom: 8px;
-  font-size: 0.875rem;
+    display: block;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    font-size: 0.875rem;
 }
 
 .goal-form select {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #EAEAEA;
-  border-radius: 8px;
-  font-size: 1rem;
-  box-sizing: border-box;
-  background-color: #F8F8F8;
-  color: #2c2825;
-  transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    background-color: #f6f8fa;
+    color: var(--text-dark);
+    transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="%236e7781" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8l4 4 4-4"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 1em;
 }
 
 .goal-form select:focus {
-  outline: none;
-  border-color: #E58A4E;
-  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+    outline: none;
+    border-color: var(--accent-warm);
+    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+    background-color: white;
 }
 
 .goal-form .submit-button {
-  width: 100%;
-  padding: 14px 20px;
-  background-color: #E58A4E;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  margin-top: 16px;
+    width: 100%;
+    padding: 14px 20px;
+    background: linear-gradient(90deg, var(--accent-warm), var(--accent-warm-dark));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-top: 16px;
+    box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
 }
 
 .goal-form .submit-button:hover {
-  background-color: #c06c38;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(229, 138, 78, 0.3);
 }
 
 .goal-form .submit-button:disabled {
-  background-color: #fbd6c0;
-  cursor: not-allowed;
+    background: #e0e0e0;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
-/* --- 결과 표시 영역 --- */
+/* --- ✨ 결과 표시 영역 (사용자 친화적 UI 개선) --- */
 .objective-card {
-  width: 100%;
-  height: 100%;
-  padding: 8px; /* 내부 스크롤을 위해 패딩 조정 */
-  overflow-y: auto;
-  animation: fadeIn 0.5s ease-in-out;
+    width: 100%;
+    height: 100%;
+    padding: 48px; /* ✨ 충분한 내부 여백 확보 */
+    overflow-y: auto;
+    animation: fadeIn 0.5s ease-in-out;
+    background-color: var(--bg-card);
+    box-sizing: border-box;
 }
 
 .objective-card h3 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2c2825;
-  margin-bottom: 24px;
-  text-align: left;
+    font-size: 2.2rem; /* ✨ 메인 타이틀 크기 증가 */
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 0 0 48px 0; /* ✨ 하단 여백 증가 */
+    text-align: left;
 }
 
 .objective-item {
-  margin-bottom: 24px;
+    margin-bottom: 40px; /* ✨ 섹션 간 여백 증가 */
+    text-align: center; /* ✨ 내부 콘텐츠 중앙 정렬 */
 }
 
 .objective-item h4 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #2c2825;
-  margin: 0 0 8px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #E58A4E;
-  display: inline-block;
+    font-size: 1.25rem; /* ✨ 부제 크기 증가 */
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 auto 16px auto; /* ✨ 중앙 정렬 및 하단 여백 */
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent-warm);
+    display: inline-block;
 }
 
 .objective-item p, .objective-item li {
-  color: #374151;
-  line-height: 1.7;
-  font-size: 1rem;
+    color: #374151;
+    line-height: 1.8; /* ✨ 줄 간격 증가로 가독성 향상 */
+    font-size: 1.05rem; /* ✨ 본문 폰트 크기 미세 조정 */
+    text-align: left; /* ✨ 텍스트는 왼쪽 정렬 유지 */
 }
 
 .objective-item ul {
-  padding-left: 20px;
-  margin: 0;
+    padding-left: 0; /* ✨ 기본 패딩 제거 */
+    margin: 0;
+    list-style: none; /* ✨ 기본 리스트 스타일 제거 */
+    display: inline-block; /* ✨ 콘텐츠 너비만큼만 차지하도록 */
+    text-align: left;
 }
 
-.initial-state {
-  text-align: center;
-  color: #888888;
+.objective-item li {
+    padding-left: 28px; /* ✨ 아이콘을 위한 공간 확보 */
+    position: relative;
+}
+
+.objective-item li::before {
+    content: '✔'; /* ✨ 체크마크 아이콘 */
+    color: var(--accent-warm);
+    font-weight: 700;
+    position: absolute;
+    left: 0;
+    top: 2px;
+}
+
+
+.initial-state, .loading-state {
+    text-align: center;
+    color: var(--text-light);
+    padding: 32px;
+}
+.initial-state p {
+    max-width: 400px;
+    line-height: 1.6;
 }
 
 .spinner {
-  width: 48px;
-  height: 48px;
-  border: 5px solid rgba(229, 138, 78, 0.2);
-  border-top-color: #E58A4E;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 24px;
+    width: 48px;
+    height: 48px;
+    border: 5px solid rgba(229, 138, 78, 0.2);
+    border-top-color: var(--accent-warm);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 24px;
 }
 
 .error-message {
-  width: 100%;
-  padding: 16px;
-  background-color: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fca5a5;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 500;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
+    width: calc(100% - 64px);
+    margin: 32px;
+    padding: 16px;
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
 }

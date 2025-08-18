@@ -1,271 +1,308 @@
-/* RuleCreator.css (생성 및 재생성 스타일 통합) */
+/* RuleCreator.css (전문가 버전 - 사용자 친화적 UI) */
 
+/* --- ✨ 디자인 시스템 변수 (일관성 유지) --- */
+:root {
+    --accent-warm: #E58A4E;
+    --accent-warm-dark: #D4753A;
+    --text-dark: #1f2328;
+    --text-light: #6e7781;
+    --bg-main: #f6f8fa;
+    --bg-card: #ffffff;
+    --border-color: #d8dee4;
+    --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 8px 24px rgba(140, 149, 159, 0.15);
+    --font-main: 'Inter', sans-serif;
+    --transition-fast: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+    --transition-smooth: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- ✨ 애니메이션 --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- ✨ 전체 레이아웃 --- */
 .rule-container {
-  display: flex;
-  gap: 48px;
-  width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  height: calc(100vh - 70px - 4rem); /* 헤더와 여백을 제외한 높이 */
-  box-sizing: border-box;
+    display: flex;
+    gap: 32px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    animation: fadeIn 0.5s ease-out;
 }
 
 .rule-form-section,
 .rule-result-section {
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  max-height: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .rule-form-section {
-  flex: 1;
-  min-width: 350px;
-  max-width: 450px;
-  align-self: flex-start; /* 상단에 고정 */
+    flex: 0 0 420px;
 }
 
 .rule-result-section {
-  flex: 2; /* 결과 섹션이 더 넓게 */
-  align-items: center;
-  justify-content: center;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background-image:
+        linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
 }
 
-/* --- 탭 네비게이션 (추가된 스타일) --- */
-/* 사용법: .rule-form-section 내부에 이 구조를 추가하세요.
-<div class="tab-navigation">
-  <button class="tab-button">새로 만들기</button>
-  <button class="tab-button active">다시 만들기</button>
-</div>
-*/
-.tab-navigation {
-  display: flex;
-  border-bottom: 1px solid #EAEAEA;
-  margin-bottom: 32px;
-}
-
-.tab-button {
-  padding: 12px 24px;
-  cursor: pointer;
-  background-color: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: #888888;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: color 0.2s, border-color 0.2s;
-  margin-bottom: -1px; /* 컨테이너의 하단 테두리와 겹치게 함 */
-}
-
-.tab-button:hover {
-  color: #2c2825;
-}
-
-.tab-button.active {
-  color: #E58A4E;
-  border-bottom-color: #E58A4E;
-}
-
-
+/* --- 폼 섹션 스타일 --- */
 .rule-form-section h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #2c2825;
-  margin: 0 0 8px 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 8px 0;
 }
 
 .rule-form-section p {
-  font-size: 1rem;
-  color: #888888;
-  margin: 0 0 32px 0;
+    font-size: 1rem;
+    color: var(--text-light);
+    margin: 0 0 32px 0;
+    line-height: 1.6;
 }
 
 .rule-form .form-group {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .rule-form label {
-  display: block;
-  font-weight: 600;
-  color: #2c2825;
-  margin-bottom: 8px;
-  font-size: 0.875rem;
+    display: block;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    font-size: 0.875rem;
 }
 
 .rule-form select {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #EAEAEA;
-  border-radius: 8px;
-  font-size: 1rem;
-  box-sizing: border-box;
-  background-color: #F8F8F8;
-  color: #2c2825;
-  transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    background-color: #f6f8fa;
+    color: var(--text-dark);
+    transition: all var(--transition-fast);
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="%236e7781" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8l4 4 4-4"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 1em;
 }
 
 .rule-form select:focus {
-  outline: none;
-  border-color: #E58A4E;
-  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+    outline: none;
+    border-color: var(--accent-warm);
+    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+    background-color: white;
 }
 
 .rule-form .submit-button {
-  width: 100%;
-  padding: 14px 20px;
-  background-color: #E58A4E;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  margin-top: 16px;
+    width: 100%;
+    padding: 14px 20px;
+    background: linear-gradient(90deg, var(--accent-warm), var(--accent-warm-dark));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
 }
 
 .rule-form .submit-button:hover {
-  background-color: #c06c38;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(229, 138, 78, 0.3);
 }
 
 .rule-form .submit-button:disabled {
-  background-color: #fbd6c0;
-  cursor: not-allowed;
-}
-
-/* --- 결과 표시 영역 --- */
-.rule-card {
-  width: 100%;
-  height: 100%;
-  padding: 8px; /* 내부 스크롤을 위해 패딩 조정 */
-  overflow-y: auto;
-  text-align: left;
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-.rule-card h3 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2c2825;
-  margin-bottom: 24px;
-  text-align: left;
-}
-
-.rule-item {
-  margin-bottom: 24px;
-}
-
-.rule-item h4 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #2c2825;
-  margin: 0 0 8px 0;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #E58A4E;
-  display: inline-block;
-}
-
-.rule-item p, .rule-item li {
-  color: #374151;
-  line-height: 1.7;
-  font-size: 1rem;
-}
-
-.rule-item ul {
-  padding-left: 20px;
-  margin: 0;
-}
-
-/* --- 공용 상태 표시 (로딩, 에러, 초기화면) --- */
-.initial-state {
-  text-align: center;
-  color: #888888;
-}
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 5px solid rgba(229, 138, 78, 0.2);
-  border-top-color: #E58A4E;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 24px;
-}
-
-.error-message {
-  width: 100%;
-  padding: 16px;
-  background-color: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fca5a5;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 500;
+    background: #e0e0e0;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 /* --- 재생성 UI 섹션 --- */
 .regenerate-section {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #EAEAEA;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+    animation: fadeIn 0.5s ease-out;
 }
 
 .regenerate-section h4 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #2c2825;
-  margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 8px 0;
 }
 
 .regenerate-section p {
-  font-size: 0.9rem;
-  color: #888888;
-  margin: 0 0 16px 0;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0 0 16px 0;
 }
 
 .regenerate-section textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 12px 16px;
-  border: 1px solid #EAEAEA;
-  border-radius: 8px;
-  font-size: 1rem;
-  box-sizing: border-box;
-  background-color: #F8F8F8;
-  color: #2c2825;
-  resize: vertical;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  font-family: inherit;
+    width: 100%;
+    min-height: 100px;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    background-color: #f6f8fa;
+    color: var(--text-dark);
+    resize: vertical;
+    transition: all var(--transition-fast);
+    font-family: inherit;
 }
 
 .regenerate-section textarea:focus {
-  outline: none;
-  border-color: #E58A4E;
-  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+    outline: none;
+    border-color: var(--accent-warm);
+    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+    background-color: white;
 }
 
 .regenerate-button {
-  background-color: #374151; /* 다른 색으로 구분 */
+    background: #374151;
 }
 
 .regenerate-button:hover {
-  background-color: #1f2937;
+    background: var(--text-dark);
 }
 
-.regenerate-button:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
+/* --- 결과 표시 영역 (룰북 디자인) --- */
+.rule-card {
+    width: 100%;
+    height: 100%;
+    padding: 48px;
+    overflow-y: auto;
+    text-align: left;
+    animation: fadeIn 0.5s ease-in-out;
+    background-color: var(--bg-card);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+    box-sizing: border-box;
 }
 
-/* --- 애니메이션 --- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.rule-card h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 32px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 24px;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
+
+.rule-item {
+    margin-bottom: 32px;
+}
+
+.rule-item h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent-warm);
+    display: inline-block;
+}
+
+.rule-item p, .rule-item li {
+    color: #374151;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.rule-item ul {
+    padding-left: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.rule-item li {
+    padding-left: 24px;
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.rule-item li::before {
+    content: '›';
+    font-weight: 700;
+    font-size: 1.5em;
+    color: var(--accent-warm);
+    position: absolute;
+    left: 0;
+    top: -4px;
+}
+
+/* --- ✨ 턴 순서 목록 스타일 (신규 추가) --- */
+.turn-structure-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 항목 간 간격 */
+}
+.turn-structure-item {
+    display: flex;
+    align-items: flex-start;
+    line-height: 1.8;
+}
+.turn-number {
+    font-weight: 700;
+    color: var(--accent-warm);
+    margin-right: 8px;
+}
+.turn-description {
+    color: #374151;
+}
+
+/* --- 공용 상태 표시 (로딩, 에러, 초기화면) --- */
+.initial-state, .loading-state {
+    text-align: center;
+    color: var(--text-light);
+    padding: 32px;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid rgba(229, 138, 78, 0.2);
+    border-top-color: var(--accent-warm);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 24px;
+}
+
+.error-message {
+    width: calc(100% - 64px);
+    margin: 32px;
+    padding: 16px;
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
 }
