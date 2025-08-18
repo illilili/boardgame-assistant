@@ -1,4 +1,4 @@
-/* WelcomeScreen.css (전문가 버전) */
+/* WelcomeScreen.css (전문가 버전 - 주황색 테마) */
 
 /* --- ✨ 애니메이션 키프레임 --- */
 @keyframes fadeInUp {
@@ -15,11 +15,11 @@
 @keyframes pulse {
     0%, 100% {
         transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+        box-shadow: 0 0 0 0 rgba(229, 138, 78, 0.4); /* ✨ 주황색 그림자 */
     }
     50% {
         transform: scale(1.05);
-        box-shadow: 0 0 0 15px rgba(79, 70, 229, 0);
+        box-shadow: 0 0 0 15px rgba(229, 138, 78, 0);
     }
 }
 
@@ -31,13 +31,14 @@
     justify-content: center;
     flex-grow: 1;
     text-align: center;
-    color: var(--text-primary);
-    background-color: var(--bg-light);
+    /* ✨ Plan.css에서 정의된 변수를 사용합니다 */
+    color: var(--text-dark); 
+    background-color: var(--bg-main);
     height: 100%;
     /* ✨ '설계' 느낌을 주는 은은한 그리드 배경 */
     background-image:
-        linear-gradient(rgba(230, 230, 230, 0.5) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(230, 230, 230, 0.5) 1px, transparent 1px);
+        linear-gradient(rgba(224, 217, 211, 0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(224, 217, 211, 0.5) 1px, transparent 1px);
     background-size: 50px 50px;
 }
 
@@ -52,17 +53,18 @@
     height: 100px;
     margin: 0 auto 32px auto;
     border-radius: 50%;
-    background: linear-gradient(145deg, #eef2ff, #c7d2fe);
+    /* ✨ 주황색 계열 그라데이션으로 변경 */
+    background: linear-gradient(145deg, #fef5ef, #fde8d7);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     animation: pulse 2.5s infinite;
 }
 
 .welcome-icon {
     font-size: 3.5rem;
-    color: var(--accent-primary);
+    color: var(--accent-warm); /* ✨ 주황색 변수 사용 */
 }
 
 /* --- ✨ 타이포그래피 --- */
@@ -70,13 +72,13 @@
     font-size: 2.8rem;
     font-weight: 800;
     margin: 0 0 16px 0;
-    color: var(--text-primary);
+    color: var(--text-dark);
     letter-spacing: -0.02em;
 }
 
 .welcome-subtitle {
     font-size: 1.1rem;
-    color: var(--text-secondary);
+    color: var(--text-light);
     max-width: 500px;
     line-height: 1.7;
     margin-bottom: 40px;
@@ -84,8 +86,8 @@
 
 /* --- ✨ 인터랙티브 시작 버튼 --- */
 .welcome-start-button {
-    background: var(--accent-primary);
-    color: var(--white);
+    background: var(--accent-warm); /* ✨ 주황색 변수 사용 */
+    color: white;
     font-weight: 600;
     font-size: 1.1rem;
     padding: 18px 36px;
@@ -94,7 +96,7 @@
     cursor: pointer;
     position: relative;
     overflow: hidden; /* Shine 효과를 위한 설정 */
-    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 4px 15px rgba(229, 138, 78, 0.3);
     transition: all 0.3s ease;
 }
 
@@ -118,7 +120,7 @@
 
 .welcome-start-button:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+    box-shadow: 0 8px 25px rgba(229, 138, 78, 0.4);
 }
 
 .welcome-start-button:hover::before {
