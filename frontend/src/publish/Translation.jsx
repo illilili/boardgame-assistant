@@ -1,7 +1,7 @@
 // Translation.jsx 다국어 번역 관리
 import './Translation.css';
-import React, { useEffect, useState } from 'react';
-import { getMyProjects, getTasksForProject } from '../api/auth';
+import React, { useEffect, useState, useContext } from 'react';
+import { ProjectContext } from '../contexts/ProjectContext';
 
 const LANGS = [
 	{ code: 'en', name: '영어', flag: '🇺🇸' },
@@ -13,8 +13,7 @@ const LANGS = [
 ];
 
 function Translation() {
-  const [projects, setProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const { projectId } = useContext(ProjectContext);
   const [contents, setContents] = useState([]);
   const [selectedContentId, setSelectedContentId] = useState(null);
   const [translationResults, setTranslationResults] = useState([]);
@@ -32,25 +31,9 @@ function Translation() {
   const [modalFeedback, setModalFeedback] = useState('');
   const [modalTranslationId, setModalTranslationId] = useState(null);
 
-  // 프로젝트 목록 로드
+  // 프로젝트 ID가 있을 때 콘텐츠 목록 로드
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const projectData = await getMyProjects();
-        setProjects(projectData);
-        if (projectData.length > 0) {
-          setSelectedProjectId(projectData[0].projectId);
-        }
-      } catch (err) {
-        setError('프로젝트 목록을 불러오는 데 실패했습니다.');
-      }
-    };
-    fetchProjects();
-  }, []);
-
-  // 프로젝트 선택 시 콘텐츠 목록 로드
-  useEffect(() => {
-    if (!selectedProjectId) return;
+    if (!projectId) return;
     
     setExpandedContentId(null);
     setSelectedContentId(null);
@@ -60,13 +43,18 @@ function Translation() {
       setIsLoading(true);
       setError(null);
       try {
-        // getTasksForProject API를 사용하여 프로젝트의 콘텐츠 목록을 가져옵니다
-        const responseData = await getTasksForProject(selectedProjectId);
-        console.log('API 응답 데이터:', responseData);
+        // 번역 후보 목록 API를 사용하여 프로젝트의 번역할 콘텐츠 목록을 가져옵니다
+        const response = await fetch(`/api/translate/candidates?projectId=${projectId}`);
+        if (!response.ok) {
+          throw new Error(`번역 후보 목록 조회 실패: ${response.status}`);
+        }
         
-        // components 배열이 있는지 확인하고, 없다면 빈 배열로 설정
-        const contentList = responseData?.components || [];
-        console.log('프로젝트 콘텐츠 목록:', contentList);
+        const responseData = await response.json();
+        console.log('번역 후보 목록 API 응답:', responseData);
+        
+        // 번역 후보 목록이 있는지 확인하고, 없다면 빈 배열로 설정
+        const contentList = responseData || [];
+        console.log('번역 후보 콘텐츠 목록:', contentList);
         
         if (contentList.length === 0) {
           setContents([]);
@@ -74,39 +62,21 @@ function Translation() {
           return;
         }
         
-        // 각 component의 subTasks를 개별 콘텐츠로 변환
-        const allContents = [];
-        contentList.forEach(component => {
-          console.log('컴포넌트 데이터:', component);
-          if (component.subTasks && component.subTasks.length > 0) {
-            component.subTasks.forEach(subTask => {
-              console.log('서브태스크 데이터:', subTask);
-              // 가능한 모든 이름 필드를 확인하고 상위 컴포넌트 정보와 결합
-              let contentName = subTask.name || 
-                               subTask.title || 
-                               subTask.contentName ||
-                               subTask.displayName ||
-                               subTask.label;
-              
-              // 상위 컴포넌트 정보가 있다면 결합
-              if (component.title && contentName) {
-                contentName = `${component.title} - ${contentName}`;
-              } else if (component.title) {
-                contentName = component.title;
-              } else if (!contentName) {
-                contentName = `콘텐츠 ${subTask.contentId || subTask.id}`;
-              }
-              
-              allContents.push({
-                contentId: subTask.contentId || subTask.id,
-                name: contentName,
-                type: component.type || '콘텐츠',
-                description: subTask.effect || subTask.description || subTask.roleAndEffect || `상태: ${subTask.status || '알 수 없음'}`,
-                status: '번역 대기', // 기본 상태
-                componentId: component.componentId // 상위 컴포넌트 ID 저장
-              });
-            });
-          }
+        // 번역 후보 목록을 콘텐츠 형식으로 변환
+        const allContents = contentList.map(content => {
+          console.log('번역 후보 콘텐츠:', content);
+          
+          // 이름이 null인 경우 기본값 설정
+          const contentName = content.name || `콘텐츠 ${content.contentId}`;
+          
+          return {
+            contentId: content.contentId,
+            name: contentName,
+            type: content.componentType || '콘텐츠',
+            description: `상태: ${content.status || '알 수 없음'}`,
+            status: '번역 대기', // 기본 상태
+            componentId: content.contentId // 컴포넌트 ID 저장
+          };
         });
         
         console.log('변환된 콘텐츠 목록:', allContents);
@@ -120,7 +90,7 @@ function Translation() {
       }
     };
     fetchContents();
-  }, [selectedProjectId]);
+  }, [projectId]);
 
   // 콘텐츠 선택 시 번역 결과 조회 및 상태 업데이트
   useEffect(() => {
@@ -556,7 +526,7 @@ function Translation() {
 
   // 프로젝트 번역 완료 처리
   const completeProjectTranslation = async () => {
-    if (!selectedProjectId) return;
+    if (!projectId) return;
     
     try {
       setPending(true);
@@ -603,26 +573,22 @@ function Translation() {
     return <div className="loading">로딩 중...</div>;
   }
 
+  // 프로젝트 ID가 없으면 메시지 표시
+  if (!projectId) {
+    return (
+      <div className="component-placeholder">
+        <h2>[번역] 번역 관리</h2>
+        <p>프로젝트를 선택해주세요.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="component-placeholder">
       <h2>[번역] 번역 관리</h2>
-      <p>프로젝트를 선택하여 번역할 콘텐츠 목록을 확인하고 콘텐츠를 번역합니다.</p> 
+      <p>현재 프로젝트의 승인된 콘텐츠 중 번역이 필요한 항목들을 확인하고 번역합니다.</p> 
       
-      <div className="project-selector-container">
-        <label htmlFor="project-select">프로젝트 선택:</label>
-        <select 
-          id="project-select" 
-          value={selectedProjectId} 
-          onChange={e => setSelectedProjectId(e.target.value)}
-          disabled={projects.length === 0}
-        >
-          {projects.map(p => (
-            <option key={p.projectId} value={p.projectId}>
-              {p.projectName}
-            </option>
-          ))}
-        </select>
-      </div>
+
 
       <div className="dev-list-container">
         <div className="dev-list-header">

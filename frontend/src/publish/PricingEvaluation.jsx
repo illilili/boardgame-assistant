@@ -1,14 +1,14 @@
 // PricingEvaluation.jsx 가격 측정
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMyProjects, getApprovedPlan } from '../api/auth';
+import { getApprovedPlan } from '../api/auth';
+import { ProjectContext } from '../contexts/ProjectContext';
 import './PricingEvaluation.css';
 
 function PricingEvaluation() {
   const navigate = useNavigate();
-  const [projects, setProjects] = useState([]);
-  const [selectedProject, setSelectedProject] = useState(null);
+  const { projectId } = useContext(ProjectContext);
   const [pricingData, setPricingData] = useState({
     developmentCost: '',
     translationCost: '',
@@ -18,114 +18,49 @@ function PricingEvaluation() {
     targetMargin: '',
     notes: ''
   });
-  const [loading, setLoading] = useState(true);
+  const [projectInfo, setProjectInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 프로젝트 목록 로드
+  // 프로젝트 ID가 있을 때 프로젝트 정보와 승인된 플랜 조회
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        console.log('프로젝트 데이터 로딩 시작...');
-        
-        // 토큰 상태 확인
-        const token = localStorage.getItem('accessToken');
-        console.log('액세스 토큰 존재 여부:', !!token);
-        if (token) {
-          console.log('토큰 길이:', token.length);
-          console.log('토큰 시작 부분:', token.substring(0, 20) + '...');
-        }
-        
-        // API 호출 전 상태 확인
-        console.log('getMyProjects 함수 타입:', typeof getMyProjects);
-        console.log('API 호출 시작...');
-        
-        const projectData = await getMyProjects();
-        console.log('getMyProjects API 응답:', projectData);
-        console.log('응답 타입:', typeof projectData);
-        console.log('응답 길이:', Array.isArray(projectData) ? projectData.length : '배열이 아님');
-        
-        if (!projectData) {
-          throw new Error('API 응답이 null 또는 undefined입니다.');
-        }
-        
-        if (!Array.isArray(projectData)) {
-          throw new Error(`API 응답이 배열이 아닙니다. 타입: ${typeof projectData}`);
-        }
-        
-        if (projectData.length === 0) {
-          console.log('프로젝트 데이터가 비어있습니다.');
-          setProjects([]);
-          setLoading(false);
-          return;
-        }
-        
-        // 각 프로젝트의 구조 상세 로깅
-        projectData.forEach((project, index) => {
-          console.log(`프로젝트 ${index + 1} 상세 구조:`, {
-            projectId: project.projectId,
-            projectName: project.projectName,
-            status: project.status,
-            description: project.description,
-            thumbnailUrl: project.thumbnailUrl,
-            전체데이터: project
-          });
-        });
-        
-        setProjects(projectData);
-        console.log('프로젝트 상태 업데이트 완료:', projectData.length, '개');
-        
-      } catch (err) {
-        console.error('프로젝트 로드 오류:', err);
-        console.error('오류 상세:', {
-          message: err.message,
-          stack: err.stack,
-          projectName: err.projectName
-        });
-        setError(`프로젝트 목록을 불러오는 데 실패했습니다: ${err.message}`);
-        
-        // 오류 발생 시 더미 데이터로 테스트
-        console.log('더미 데이터로 테스트 진행...');
-        const dummyProjects = [
-          {
-            projectId: 1,
-            projectName: "테스트 프로젝트 1",
-            description: "이것은 테스트용 프로젝트입니다.",
-            status: "PLANNING",
-            thumbnailUrl: null
-          },
-          {
-            projectId: 2,
-            projectName: "테스트 프로젝트 2", 
-            description: "두 번째 테스트용 프로젝트입니다.",
-            status: "DEVELOPMENT",
-            thumbnailUrl: null
-          }
-        ];
-        setProjects(dummyProjects);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
-
-  // 프로젝트 선택 시 자동 가격 추정 실행
-  useEffect(() => {
-    if (selectedProject) {
-      console.log('프로젝트 선택됨, 승인된 플랜 조회:', selectedProject.projectName);
+    if (projectId) {
+      console.log('프로젝트 ID 확인됨:', projectId);
+      fetchProjectInfo();
       fetchApprovedPlan();
     }
-  }, [selectedProject]);
+  }, [projectId]);
 
-  const fetchApprovedPlan = async () => {
-    if (!selectedProject) return;
+  const fetchProjectInfo = async () => {
+    if (!projectId) return;
 
     try {
-      console.log('승인된 플랜 조회 시작:', selectedProject.projectId);
-      const approvedPlan = await getApprovedPlan(selectedProject.projectId);
+      console.log('프로젝트 정보 조회 시작:', projectId);
+      const response = await fetch(`/api/projects/${projectId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`프로젝트 정보 조회 실패: ${response.status}`);
+      }
+
+      const projectData = await response.json();
+      console.log('프로젝트 정보 조회 결과:', projectData);
+      setProjectInfo(projectData);
+    } catch (error) {
+      console.error('프로젝트 정보 조회 오류:', error);
+      // 프로젝트 정보 조회 실패해도 계속 진행
+    }
+  };
+
+  const fetchApprovedPlan = async () => {
+    if (!projectId) return;
+
+    try {
+      console.log('승인된 플랜 조회 시작:', projectId);
+      const approvedPlan = await getApprovedPlan(projectId);
       console.log('승인된 플랜 조회 결과:', approvedPlan);
       
       if (approvedPlan && approvedPlan.planId) {
@@ -149,7 +84,7 @@ function PricingEvaluation() {
     }
 
     try {
-      console.log('자동 가격 추정 시작:', selectedProject.projectName, 'Plan ID:', planId);
+      console.log('자동 가격 추정 시작:', 'Project ID:', projectId, 'Plan ID:', planId);
       const response = await fetch('/api/pricing/estimate', {
         method: 'POST',
         headers: {
@@ -175,27 +110,10 @@ function PricingEvaluation() {
           suggestedPrice: result.korPriceAsInt.toString()
         }));
       }
-      
-      // alert('자동 가격 추정이 완료되었습니다!');
     } catch (error) {
       console.error('자동 가격 추정 오류:', error);
       alert(`자동 가격 추정 실패: ${error.message}`);
     }
-  };
-
-  const handleProjectSelect = (project) => {
-    setSelectedProject(project);
-    
-    // 프로젝트 선택 시 가격 데이터 초기화
-    setPricingData({
-      developmentCost: '',
-      translationCost: '',
-      marketingCost: '',
-      platformFee: '',
-      suggestedPrice: '',
-      targetMargin: '',
-      notes: ''
-    });
   };
 
   const handleInputChange = (field, value) => {
@@ -235,10 +153,10 @@ function PricingEvaluation() {
   };
 
   const savePricingData = () => {
-    if (!selectedProject) return;
+    if (!projectId) return;
 
     // 실제로는 API 호출
-    alert(`${selectedProject.projectName}의 가격 책정이 저장되었습니다.`);
+    alert(`프로젝트 ID ${projectId}의 가격 책정이 저장되었습니다.`);
   };
 
   const getStatusText = (status) => {
@@ -256,7 +174,7 @@ function PricingEvaluation() {
         <main className="workspace-main-content">
           <div className="loading-container">
             <div className="loading-spinner">🔄</div>
-            <h2>프로젝트 목록을 불러오는 중...</h2>
+            <h2>데이터를 불러오는 중...</h2>
             <p>잠시만 기다려주세요.</p>
           </div>
         </main>
@@ -284,15 +202,14 @@ function PricingEvaluation() {
     );
   }
 
-  if (!projects || projects.length === 0) {
+  // 프로젝트 ID가 없으면 메시지 표시
+  if (!projectId) {
     return (
       <div className="pricing-workspace">
         <main className="workspace-main-content">
-          <div className="no-projects-container">
-            <div className="no-projects-icon">📋</div>
-            <h2>프로젝트가 없습니다</h2>
-            <p>가격 책정할 프로젝트가 존재하지 않습니다.</p>
-            <p>새로운 프로젝트를 생성하거나 다른 페이지로 이동해주세요.</p>
+          <div className="creator-container">
+            <h2>가격 책정</h2>
+            <p>프로젝트를 선택해주세요.</p>
           </div>
         </main>
       </div>
@@ -305,169 +222,126 @@ function PricingEvaluation() {
     <div className="pricing-workspace">
       <main className="workspace-main-content">
         <div className="creator-container">
-          <div className="form-column">
-            <div className="form-section">
-              <h2>프로젝트 선택</h2>
-              <div className="game-cards-grid">
-                {projects.map(project => (
-                  <div 
-                    key={project.projectId}
-                    className={`game-card ${selectedProject?.projectId === project.projectId ? 'selected' : ''}`}
-                    onClick={() => handleProjectSelect(project)}
-                  >
-                    <div className="game-card-header">
-                      <h3 className="game-title">{project.projectName}</h3>
-                    </div>
-                    <div className="game-card-content">
-                      {project.thumbnailUrl ? (
-                        <div className="thumbnail-container">
-                          <img 
-                            src={project.thumbnailUrl} 
-                            alt={project.projectName}
-                            className="project-thumbnail"
-                          />
-                        </div>
-                      ) : (
-                        <div className="no-thumbnail">
-                          <span className="no-image-icon">🖼️</span>
-                          <p>이미지 없음</p>
-                        </div>
-                      )}
-                    </div>
+          <div className="result-column">
+            <div className="pricing-management">
+              <div className="selected-game-info">
+                <h3>{projectInfo?.projectName || '프로젝트명 로딩 중...'}</h3>
+                {projectInfo?.thumbnailUrl ? (
+                  <div className="selected-thumbnail-container">
+                    <img 
+                      src={projectInfo.thumbnailUrl} 
+                      alt={projectInfo.projectName || '프로젝트 이미지'}
+                      className="selected-project-thumbnail"
+                    />
                   </div>
-                ))}
+                ) : (
+                  <div className="selected-no-thumbnail">
+                    <span className="no-image-icon">🖼️</span>
+                    <p>이미지 없음</p>
+                  </div>
+                )}
+              </div>
+
+              {/* AI 가격 분석 결과 */}
+              <div className="ai-pricing-result">
+                <h2>비슷한 보드게임 AI 가격 분석 결과</h2>
+                <h5>아마존 가격 데이터 기준으로 추천 가격을 제시합니다.</h5>
+                <div className="price-recommendations">
+                  <div className="price-item">
+                    <span className="currency-label">추천 가격 (원)</span>
+                    <span className="price-value krw">
+                      {pricingData.suggestedPrice ? 
+                        Math.ceil(parseInt(pricingData.suggestedPrice) / 1000) * 1000 : 
+                        '---'
+                      }원
+                    </span>
+                  </div>
+                  <div className="price-item">
+                    <span className="currency-label">추천 가격 (달러)</span>
+                    <span className="price-value usd">
+                      {pricingData.suggestedPrice ? 
+                        `$${(parseInt(pricingData.suggestedPrice) / 1300).toFixed(2)}` : 
+                        '---'
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pricing-form">
+                <h2>비용 입력</h2>
+                <div className="form-group">
+                  <label>개발 비용 (원)</label>
+                  <input
+                    type="number"
+                    value={pricingData.developmentCost}
+                    onChange={(e) => handleInputChange('developmentCost', e.target.value)}
+                    placeholder="개발 비용을 입력하세요"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>플랫폼 수수료 (%)</label>
+                  <input
+                    type="number"
+                    value={pricingData.platformFee}
+                    onChange={(e) => handleInputChange('platformFee', e.target.value)}
+                    placeholder="30"
+                    min="0"
+                    max="100"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>목표 마진 (%)</label>
+                  <input
+                    type="number"
+                    value={pricingData.targetMargin}
+                    onChange={(e) => handleInputChange('targetMargin', e.target.value)}
+                    placeholder="40"
+                    min="0"
+                    max="100"
+                  />
+                </div>
+              </div>
+
+              <div className="pricing-calculations">
+                <h2>수익성 분석</h2>
+                <div className="calculation-item">
+                  <span className="label">개발비:</span>
+                  <span className="value">{calculations.totalCost.toLocaleString()}원</span>
+                </div>
+                <div className="calculation-item">
+                  <span className="label">플랫폼 수수료:</span>
+                  <span className="value">{calculations.platformCost.toLocaleString()}원</span>
+                </div>
+                <div className="calculation-item">
+                  <span className="label">목표 마진:</span>
+                  <span className="value">{calculations.netRevenue.toLocaleString()}원</span>
+                </div>
+                <div className="calculation-item total-cost">
+                  <span className="label">총 비용 (개발비 + 플랫폼 수수료 + 목표 마진):</span>
+                  <span className="value total-value">
+                    {(calculations.totalCost + calculations.platformCost + calculations.netRevenue).toLocaleString()}원
+                  </span>
+                </div>
+                <div className="calculation-divider">
+                  <span>-------</span>
+                </div>
+                <div className="calculation-item profit-difference">
+                  <span className="label">추천 가격 - 총비용 차이:</span>
+                  <span className={`value ${(calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue)) >= 0 ? 'positive' : 'negative'}`}>
+                    {(calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue)).toLocaleString()}원
+                  </span>
+                  <div className="profit-explanation">
+                    {calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue) >= 0 ? 
+                      '✅ 추천 가격에 비해 총 가격이 낮습니다.' : 
+                      '❌ 추천 가격에 비해 총 가격이 높습니다.'
+                    }
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="result-column">
-            {selectedProject ? (
-              <div className="pricing-management">
-                <div className="selected-game-info">
-                  <h3>{selectedProject.projectName}</h3>
-                  {selectedProject.thumbnailUrl ? (
-                    <div className="selected-thumbnail-container">
-                      <img 
-                        src={selectedProject.thumbnailUrl} 
-                        alt={selectedProject.projectName}
-                        className="selected-project-thumbnail"
-                      />
-                    </div>
-                  ) : (
-                    <div className="selected-no-thumbnail">
-                      <span className="no-image-icon">🖼️</span>
-                      <p>이미지 없음</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* AI 가격 분석 결과 */}
-                <div className="ai-pricing-result">
-                  <h2>비슷한 보드게임 AI 가격 분석 결과</h2>
-                  <h5>아마존 가격 데이터 기준으로 추천 가격을 제시합니다.</h5>
-                  <div className="price-recommendations">
-                    <div className="price-item">
-                      <span className="currency-label">추천 가격 (원)</span>
-                      <span className="price-value krw">
-                        {pricingData.suggestedPrice ? 
-                          Math.ceil(parseInt(pricingData.suggestedPrice) / 1000) * 1000 : 
-                          '---'
-                        }원
-                      </span>
-                    </div>
-                    <div className="price-item">
-                      <span className="currency-label">추천 가격 (달러)</span>
-                      <span className="price-value usd">
-                        {pricingData.suggestedPrice ? 
-                          `$${(parseInt(pricingData.suggestedPrice) / 1300).toFixed(2)}` : 
-                          '---'
-                        }
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pricing-form">
-                  <h2>비용 입력</h2>
-                  <div className="form-group">
-                    <label>개발 비용 (원)</label>
-                    <input
-                      type="number"
-                      value={pricingData.developmentCost}
-                      onChange={(e) => handleInputChange('developmentCost', e.target.value)}
-                      placeholder="개발 비용을 입력하세요"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>플랫폼 수수료 (%)</label>
-                    <input
-                      type="number"
-                      value={pricingData.platformFee}
-                      onChange={(e) => handleInputChange('platformFee', e.target.value)}
-                      placeholder="30"
-                      min="0"
-                      max="100"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>목표 마진 (%)</label>
-                    <input
-                      type="number"
-                      value={pricingData.targetMargin}
-                      onChange={(e) => handleInputChange('targetMargin', e.target.value)}
-                      placeholder="40"
-                      min="0"
-                      max="100"
-                    />
-                  </div>
-                </div>
-
-                <div className="pricing-calculations">
-                  <h2>수익성 분석</h2>
-                  <div className="calculation-item">
-                    <span className="label">개발비:</span>
-                    <span className="value">{calculations.totalCost.toLocaleString()}원</span>
-                  </div>
-                  <div className="calculation-item">
-                    <span className="label">플랫폼 수수료:</span>
-                    <span className="value">{calculations.platformCost.toLocaleString()}원</span>
-                  </div>
-                  <div className="calculation-item">
-                    <span className="label">목표 마진:</span>
-                    <span className="value">{calculations.netRevenue.toLocaleString()}원</span>
-                  </div>
-                  <div className="calculation-item total-cost">
-                    <span className="label">총 비용 (개발비 + 플랫폼 수수료 + 목표 마진):</span>
-                    <span className="value total-value">
-                      {(calculations.totalCost + calculations.platformCost + calculations.netRevenue).toLocaleString()}원
-                    </span>
-                  </div>
-                  <div className="calculation-divider">
-                    <span>-------</span>
-                  </div>
-                  <div className="calculation-item profit-difference">
-                    <span className="label">추천 가격 - 총비용 차이:</span>
-                    <span className={`value ${(calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue)) >= 0 ? 'positive' : 'negative'}`}>
-                      {(calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue)).toLocaleString()}원
-                    </span>
-                    <div className="profit-explanation">
-                      {calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue) >= 0 ? 
-                        '✅ 추천 가격에 비해 총 가격이 낮습니다.' : 
-                        '❌ 추천 가격에 비해 총 가격이 높습니다.'
-                      }
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="welcome-screen">
-                <div className="welcome-icon"></div>
-                <h2>가격 책정 관리</h2>
-                <p>프로젝트를 선택하여 비용을 입력하고 최적의 판매가를 책정하세요.</p>
-              </div>
-            )}
           </div>
         </div>
       </main>
