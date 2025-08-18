@@ -68,6 +68,7 @@ public class PlanSubmissionController {
 
         PlanDetailResponse response = PlanDetailResponse.builder()
                 .planId(plan.getPlanId())
+                .projectId(plan.getProject() != null ? plan.getProject().getId() : null)
                 .currentContent(plan.getCurrentContent())
                 .planDocUrl(plan.getPlanDocUrl())
                 .status(plan.getStatus())

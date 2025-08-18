@@ -3,6 +3,7 @@ package com.boardgame.backend_spring.content.service.thumbnail.impl;
 import com.boardgame.backend_spring.component.entity.Component;
 import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.SubTaskRepository;
+import com.boardgame.backend_spring.component.service.ComponentStatusService;
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailGenerateRequest;
 import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailGenerateResponse;
@@ -13,6 +14,8 @@ import com.boardgame.backend_spring.content.service.PythonApiService;
 import com.boardgame.backend_spring.content.service.thumbnail.ThumbnailContentService;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
+import com.boardgame.backend_spring.project.entity.Project;
+import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +27,8 @@ public class ThumbnailContentServiceImpl implements ThumbnailContentService {
     private final ContentRepository contentRepository;
     private final PlanRepository planRepository;
     private final SubTaskRepository subTaskRepository;
+    private final ComponentStatusService componentStatusService;
+    private final ProjectRepository projectRepository;
 
     @Override
     public ThumbnailGenerateResponse generateThumbnail(Long contentId) {
@@ -40,6 +45,7 @@ public class ThumbnailContentServiceImpl implements ThumbnailContentService {
                 .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
         subTask.setStatus("IN_PROGRESS");
         subTaskRepository.save(subTask);
+        componentStatusService.recalcAndSave(subTask.getComponent());
 
         // 3. FastAPI 호출 요청 구성
         ThumbnailGenerateRequest aiRequest = new ThumbnailGenerateRequest();
@@ -53,6 +59,10 @@ public class ThumbnailContentServiceImpl implements ThumbnailContentService {
         // 5. 결과 저장
         content.setContentData(response.getThumbnailUrl());
         contentRepository.save(content);
+
+        Project project = plan.getProject(); // Plan → Project 연관관계 필요
+        project.setThumbnailUrl(response.getThumbnailUrl());
+        projectRepository.save(project);
 
         return response;
     }

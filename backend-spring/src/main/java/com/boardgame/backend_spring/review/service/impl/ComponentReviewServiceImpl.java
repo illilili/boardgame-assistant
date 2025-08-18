@@ -10,9 +10,11 @@ import com.boardgame.backend_spring.review.dto.PendingComponentGroupDto;
 import com.boardgame.backend_spring.review.service.ComponentReviewService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -122,10 +124,28 @@ public class ComponentReviewServiceImpl implements ComponentReviewService {
         if (approve) {
             component.setStatus(ComponentStatus.APPROVED);
             componentRepository.save(component);
+
+            ActivityLog log = new ActivityLog();
+            log.setAction("COMPONENT_APPROVE");
+            log.setTargetType("CONTENT");
+            log.setTargetId(component.getComponentId());
+            log.setUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+            log.setTimestamp(LocalDateTime.now());
+            activityLogRepository.save(log);
+
             return "컴포넌트가 승인되었습니다.";
         } else {
             component.setStatus(ComponentStatus.REJECTED);
             componentRepository.save(component);
+
+            ActivityLog log = new ActivityLog();
+            log.setAction("COMPONENT_REJECT");
+            log.setTargetType("CONTENT");
+            log.setTargetId(component.getComponentId());
+            log.setUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+            log.setTimestamp(LocalDateTime.now());
+            activityLogRepository.save(log);
+
             return "컴포넌트가 반려되었습니다. 사유: " + (reason == null ? "-" : reason);
         }
     }

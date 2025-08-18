@@ -23,4 +23,6 @@ public interface TranslateService {
 
     TranslationItemDto completeTranslation(Long translationId);
     List<TranslationItemDto> getTranslationsByContent(Long contentId, boolean latestOnly);
+
+    List<TranslationCandidateDto> listTranslationCandidates(Long projectId);
 }

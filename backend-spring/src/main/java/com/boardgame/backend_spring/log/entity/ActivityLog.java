@@ -28,6 +28,8 @@ public class ActivityLog {
     // 타겟 ID (프로젝트, 기획안, 컴포넌트 등)
     private Long targetId;
 
+    private Long projectId;
+
     // 작업자 이름 (풀 네임)
     @Column(nullable = false)
     private String username;
