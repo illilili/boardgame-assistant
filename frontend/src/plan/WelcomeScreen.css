@@ -1,0 +1,130 @@
+/* WelcomeScreen.css (전문가 버전) */
+
+/* --- ✨ 애니메이션 키프레임 --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 15px rgba(79, 70, 229, 0);
+    }
+}
+
+/* --- ✨ 전체 레이아웃 --- */
+.welcome-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    text-align: center;
+    color: var(--text-primary);
+    background-color: var(--bg-light);
+    height: 100%;
+    /* ✨ '설계' 느낌을 주는 은은한 그리드 배경 */
+    background-image:
+        linear-gradient(rgba(230, 230, 230, 0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(230, 230, 230, 0.5) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+.welcome-content {
+    /* ✨ 각 요소에 순차적인 등장 애니메이션 적용 */
+    animation: fadeInUp 0.8s 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) backwards;
+}
+
+/* --- ✨ 아이콘 스타일 --- */
+.welcome-icon-wrapper {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 32px auto;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #eef2ff, #c7d2fe);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+    animation: pulse 2.5s infinite;
+}
+
+.welcome-icon {
+    font-size: 3.5rem;
+    color: var(--accent-primary);
+}
+
+/* --- ✨ 타이포그래피 --- */
+.welcome-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin: 0 0 16px 0;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 500px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+}
+
+/* --- ✨ 인터랙티브 시작 버튼 --- */
+.welcome-start-button {
+    background: var(--accent-primary);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 18px 36px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden; /* Shine 효과를 위한 설정 */
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+    transition: all 0.3s ease;
+}
+
+.welcome-start-button span {
+    position: relative;
+    z-index: 1;
+}
+
+/* ✨ 마우스 호버 시 빛이 나는 'Shine' 효과 */
+.welcome-start-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transform: skewX(-30deg);
+    transition: left 0.7s ease;
+}
+
+.welcome-start-button:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+}
+
+.welcome-start-button:hover::before {
+    left: 150%;
+}
+
+.welcome-start-button:active {
+    transform: translateY(-1px);
+}

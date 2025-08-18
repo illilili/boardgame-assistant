@@ -1,125 +1,164 @@
+/* --- ✨ 디자인 시스템 변수 --- */
+:root {
+    --accent-warm: #E58A4E;
+    --accent-warm-dark: #D4753A;
+    --text-dark: #1f2328;
+    --text-light: #6e7781;
+    --bg-main: #f6f8fa;
+    --bg-card: #ffffff;
+    --border-color: #d8dee4;
+    --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 8px 24px rgba(140, 149, 159, 0.2);
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    --transition-fast: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+    --transition-smooth: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- ✨ 애니메이션 --- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- ✨ 전체 레이아웃 --- */
 .project-list-page__container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 20px;
-  font-family: 'Pretendard', sans-serif;
+    max-width: 1280px;
+    margin: 48px auto;
+    padding: 0 24px;
+    font-family: var(--font-main);
+    background-color: var(--bg-main);
+    min-height: calc(100vh - 70px - 100px); /* 헤더,푸터 높이 제외 */
 }
 
 .project-list-page__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .project-list-page__title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a202c;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-dark);
 }
 
 .project-list-page__create-button {
-  background-color: #E58A4E;
-  color: white;
-  font-weight: 600;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+    background: var(--accent-warm);
+    color: white;
+    font-weight: 600;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
+    transition: all var(--transition-fast);
 }
 
 .project-list-page__create-button:hover {
-  background-color: #c06c38;
-  transform: translateY(-2px);
+    background-color: var(--accent-warm-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 138, 78, 0.3);
 }
 
+/* --- ✨ 프로젝트 카드 그리드 --- */
 .project-list-page__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 32px;
 }
 
 .project-list-page__card {
-  background-color: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 24px;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: var(--shadow-subtle);
+    transition: all var(--transition-smooth);
+    display: flex;
+    flex-direction: column;
+    animation: fadeInUp 0.5s ease-out backwards;
 }
 
 .project-list-page__card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-medium);
+}
+
+.project-list-page__thumbnail {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-top-left-radius: 11px;
+    border-top-right-radius: 11px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.project-list-page__card-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-list-page__card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0 0 12px 0;
 }
 
-.project-list-page__card-id {
-  font-size: 0.875rem;
-  color: #718096;
-  margin-bottom: 16px;
-}
-
+/* --- ✨ 상태 배지 (디자인 개선) --- */
 .project-list-page__status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border-radius: 9999px;
-  text-transform: uppercase;
+    align-self: flex-start; /* 왼쪽 정렬 */
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 20px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.status--planning { background-color: #dbf4ff; color: #0969da; }
+.status--review-pending { background-color: #fff8c5; color: #9a6700; }
+.status--development { background-color: #e2f5ea; color: #1f883d; }
+.status--publishing { background-color: #fbefff; color: #8250df; }
+.status--completed { background-color: #f6f8fa; color: #4b5563; }
+
+/* --- ✨ 진행률 바 (신규 추가) --- */
+.project-list-page__progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: #eef1f4;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: auto; /* 카드 하단에 고정 */
 }
 
+.project-list-page__progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd1a8, var(--accent-warm));
+    border-radius: 4px;
+    transition: width 0.6s ease-in-out;
+}
+
+/* --- ✨ 에러 및 빈 메시지 --- */
+.project-list-page__error, .project-list-page__empty-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px;
+    border-radius: 12px;
+}
 .project-list-page__error {
-  color: #c53030;
-  background-color: #fed7d7;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  text-align: center;
+    color: #c53030;
+    background-color: #fed7d7;
 }
-
-.status--planning {
-  background-color: #ebf8ff;
-  color: #3182ce;
-}
-
-.status--review_pending {
-  background-color: #fefcbf;
-  color: #b7791f;
-}
-
-.status--development {
-  background-color: #e6fffa;
-  color: #2c7a7b;
-}
-
-.status--publishing {
-  background-color: #f0fdf4;
-  color: #166534;
-}
-
-.status--completed {
-  background-color: #f3f4f6;
-  color: #4b5563;
-}
-
-.project-list-page__card img {
-  width: 100%;
-  height: 230px;
-  /* 원하는 높이 */
-  object-fit: cover;
-  /* 비율 유지 + 넘치는 부분 잘라내기 */
-  border-radius: 8px;
+.project-list-page__empty-message {
+    color: var(--text-light);
+    background-color: var(--bg-card);
+    border: 1px dashed var(--border-color);
 }
