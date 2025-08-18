@@ -87,6 +87,8 @@ export const submitComponent = (componentId) =>
     method: 'POST',
   });
 
+
+  // 콘텐츠 상세 조회
 export const getContentDetail = (contentId) =>
   request(`/api/content/${contentId}`, {
     method: 'GET',
@@ -106,3 +108,9 @@ export const getContentVersions = async (contentId) => {
     throw error;
   }
 };
+
+export const rollbackContentVersion = (contentId, versionId) =>
+  request(`/api/content/${contentId}/rollback/${versionId}`, {
+    method: 'POST',
+    headers: {}, // ← body 없음 명시
+  });

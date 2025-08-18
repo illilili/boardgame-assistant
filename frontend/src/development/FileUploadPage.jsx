@@ -80,14 +80,14 @@ function FileUploadPage({ contentId, componentId }) {
   };
 
   const handleSubmitVersion = async () => {
-    if (!selectedVersion) return setMessage('❌ 제출할 버전을 선택하세요.');
+    if (!componentId) return setMessage('❌ 컴포넌트 ID가 없습니다.');
 
     setIsLoading(true);
     setMessage('제출 중...');
 
     try {
-      await submitComponent(componentId, selectedVersion);
-      setMessage(`🎉 제출 완료! (버전 ID: ${selectedVersion})`);
+      await submitComponent(componentId);
+      setMessage(`🎉 제출 완료! (컴포넌트 ID: ${componentId}, 버전 ID: ${selectedVersion})`);
     } catch (err) {
       console.error(err);
       setMessage('❌ 제출 실패');
