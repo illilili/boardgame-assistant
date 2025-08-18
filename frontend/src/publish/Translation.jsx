@@ -1,9 +1,7 @@
 // Translation.jsx 다국어 번역 관리
-import { useNavigate } from 'react-router-dom';
 import './Translation.css';
-import { requestTranslations, getTranslationsByContent, completeTranslation, getContentsByProject } from '../api/publish';
-import React, { useEffect, useMemo, useState } from 'react';
-import { getMyProjects, getApprovedPlan } from '../api/auth';
+import React, { useEffect, useState } from 'react';
+import { getMyProjects, getTasksForProject } from '../api/auth';
 
 const LANGS = [
 	{ code: 'en', name: '영어', flag: '🇺🇸' },
@@ -15,17 +13,16 @@ const LANGS = [
 ];
 
 function Translation() {
-  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [contents, setContents] = useState([]);
   const [selectedContentId, setSelectedContentId] = useState(null);
   const [translationResults, setTranslationResults] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [expandedContentId, setExpandedContentId] = useState(null);
   const [pending, setPending] = useState(false);
+  const [contentTranslationStatuses, setContentTranslationStatuses] = useState({});
   
   // Review modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -63,34 +60,61 @@ function Translation() {
       setIsLoading(true);
       setError(null);
       try {
-        // 번역 후보 목록 조회 API 사용
-        const response = await fetch(`/api/translate/candidates?projectId=${selectedProjectId}`);
-        if (!response.ok) {
-          throw new Error('번역 후보 목록을 불러오는 데 실패했습니다.');
+        // getTasksForProject API를 사용하여 프로젝트의 콘텐츠 목록을 가져옵니다
+        const responseData = await getTasksForProject(selectedProjectId);
+        console.log('API 응답 데이터:', responseData);
+        
+        // components 배열이 있는지 확인하고, 없다면 빈 배열로 설정
+        const contentList = responseData?.components || [];
+        console.log('프로젝트 콘텐츠 목록:', contentList);
+        
+        if (contentList.length === 0) {
+          setContents([]);
+          setError('번역할 콘텐츠가 없습니다.');
+          return;
         }
         
-        const contentList = await response.json();
-        console.log('번역 후보 목록:', contentList);
+        // 각 component의 subTasks를 개별 콘텐츠로 변환
+        const allContents = [];
+        contentList.forEach(component => {
+          console.log('컴포넌트 데이터:', component);
+          if (component.subTasks && component.subTasks.length > 0) {
+            component.subTasks.forEach(subTask => {
+              console.log('서브태스크 데이터:', subTask);
+              // 가능한 모든 이름 필드를 확인하고 상위 컴포넌트 정보와 결합
+              let contentName = subTask.name || 
+                               subTask.title || 
+                               subTask.contentName ||
+                               subTask.displayName ||
+                               subTask.label;
+              
+              // 상위 컴포넌트 정보가 있다면 결합
+              if (component.title && contentName) {
+                contentName = `${component.title} - ${contentName}`;
+              } else if (component.title) {
+                contentName = component.title;
+              } else if (!contentName) {
+                contentName = `콘텐츠 ${subTask.contentId || subTask.id}`;
+              }
+              
+              allContents.push({
+                contentId: subTask.contentId || subTask.id,
+                name: contentName,
+                type: component.type || '콘텐츠',
+                description: subTask.effect || subTask.description || subTask.roleAndEffect || `상태: ${subTask.status || '알 수 없음'}`,
+                status: '번역 대기', // 기본 상태
+                componentId: component.componentId // 상위 컴포넌트 ID 저장
+              });
+            });
+          }
+        });
         
-        const mapped = (contentList || []).map(item => ({
-          contentId: item.contentId,
-          name: item.name,
-          type: item.componentType || '콘텐츠',
-          description: `상태: ${item.status}`,
-          status: '번역 대기' // 기본 상태
-        }));
-        
-        console.log('매핑된 콘텐츠:', mapped);
-        setContents(mapped);
+        console.log('변환된 콘텐츠 목록:', allContents);
+        setContents(allContents);
       } catch (error) {
         console.error('콘텐츠 로드 실패:', error);
         setError('번역할 콘텐츠를 불러오는 데 실패했습니다.');
-        // 임시 더미 데이터
-        setContents([
-          { contentId: 'content1', name: '마법 카드', type: 'card', description: '강력한 마법 효과', status: '번역 대기' },
-          { contentId: 'content2', name: '몬스터 카드', type: 'card', description: '위험한 몬스터', status: '번역 중' },
-          { contentId: 'content3', name: '룰북', type: 'rulebook', description: '게임 규칙서', status: '번역 완료' }
-        ]);
+        setContents([]);
       } finally {
         setIsLoading(false);
       }
@@ -107,10 +131,12 @@ function Translation() {
 
     const fetchTranslationData = async () => {
       try {
+        console.log('번역 결과 조회 시작:', selectedContentId);
         // 번역 결과 조회 (언어별 최신 1건)
         const resultsResponse = await fetch(`/api/translate/${selectedContentId}?latestOnly=true`);
         if (resultsResponse.ok) {
           const results = await resultsResponse.json();
+          console.log('번역 결과:', results);
           setTranslationResults(results);
           
           // 현재 콘텐츠의 번역 상태 업데이트
@@ -119,9 +145,13 @@ function Translation() {
             ...prev,
             [selectedContentId]: status
           }));
+        } else {
+          console.log('번역 결과가 없습니다. 새로 시작합니다.');
+          setTranslationResults([]);
         }
       } catch (error) {
         console.error('번역 데이터 로드 실패:', error);
+        setTranslationResults([]);
       }
     };
 
@@ -131,6 +161,7 @@ function Translation() {
   // 번역 요청 함수
   const requestTranslation = async (contentId, targetLanguages, feedback = null) => {
     try {
+      console.log('번역 요청 시작:', { contentId, targetLanguages, feedback });
       setPending(true);
       const payload = {
         contentId: contentId,
@@ -141,6 +172,8 @@ function Translation() {
         payload.feedback = feedback.trim();
       }
 
+      console.log('번역 요청 페이로드:', payload);
+
       const response = await fetch('/api/translate/request', {
         method: 'POST',
         headers: {
@@ -150,15 +183,19 @@ function Translation() {
       });
 
       if (!response.ok) {
-        throw new Error('번역 요청에 실패했습니다.');
+        const errorText = await response.text();
+        console.error('번역 요청 실패:', response.status, errorText);
+        throw new Error(`번역 요청에 실패했습니다. (${response.status})`);
       }
 
       const result = await response.json();
+      console.log('번역 요청 성공:', result);
       
       // 번역 결과 목록 갱신
       const resultsResponse = await fetch(`/api/translate/${contentId}?latestOnly=true`);
       if (resultsResponse.ok) {
         const results = await resultsResponse.json();
+        console.log('갱신된 번역 결과:', results);
         setTranslationResults(results);
         
         // 상태 업데이트
@@ -431,9 +468,11 @@ function Translation() {
   // 콘텐츠 번역 패널 토글
   const toggleTranslationPanel = (contentId) => {
     if (expandedContentId === contentId) {
+      // 현재 열린 콘텐츠를 닫기
       setExpandedContentId(null);
       setSelectedContentId(null);
     } else {
+      // 다른 콘텐츠를 열기 (기존에 열린 것이 있다면 닫기)
       setExpandedContentId(contentId);
       setSelectedContentId(contentId);
     }
@@ -513,8 +552,7 @@ function Translation() {
     }
   };
 
-  // 모든 콘텐츠의 번역 상태를 개별적으로 관리
-  const [contentTranslationStatuses, setContentTranslationStatuses] = useState({});
+
 
   // 프로젝트 번역 완료 처리
   const completeProjectTranslation = async () => {
@@ -561,7 +599,7 @@ function Translation() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return <div className="loading">로딩 중...</div>;
   }
 
@@ -613,7 +651,7 @@ function Translation() {
                       {/* <span className="item-related-plan">
                         {content.description && `${content.description}`}
                       </span> */}
-                      {/* 펼쳐진 상태일 때 상세 정보 표시 */}
+                      펼쳐진 상태일 때 상세 정보 표시
                       {isExpanded && (
                         <div className="item-details-wrapper">
                           <p className="item-details"><strong>설명:</strong> {content.description || '설명 없음'}</p>
@@ -683,7 +721,7 @@ function Translation() {
                                   ) : (
                                     <button 
                                       className="btn-request-translation"
-                                      onClick={() => requestTranslation(content .contentId, [lang.code])}
+                                                                             onClick={() => requestTranslation(content.contentId, [lang.code])}
                                       disabled={pending}
                                     >
                                       번역 요청
@@ -705,66 +743,66 @@ function Translation() {
           <div className="message-container">표시할 번역 콘텐츠가 없습니다.</div>
         )}
       </div>
-      {/* 번역 검토 모달 */}
-      {isModalOpen && (
-        <div className="modal-backdrop">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>번역 검토 · {LANGS.find(l => l.code === modalLang)?.name || '언어 정보 없음'}</h3>
-            </div>
-            <div className="modal-body">
-              <div className="text-comparison">
-                <div className="original-text-section">
-                  <h4>원본 내용</h4>
-                  <pre className="original-preview" style={{maxHeight:'200px'}}>
-                    {modalOriginalText || '원본 내용이 없습니다.'}
-                  </pre>
-                </div>
-                <div className="translated-text-section">
-                  <h4>번역 내용</h4>
-                  <pre className="translated-preview" style={{maxHeight:'200px'}}>
-                    {modalText || '번역 결과가 아직 없습니다.'}
-                  </pre>
-                </div>
-              </div>
-              <div className="modal-actions">
-                <textarea
-                  className="feedback-input"
-                  placeholder="번역 수정 내용을 입력해 주세요 (재생성 시 사용됩니다)"
-                  value={modalFeedback}
-                  onChange={(e) => setModalFeedback(e.target.value)}
-                  rows={5}
-                />
-                <button 
-                  className="regen-btn" 
-                  disabled={pending} 
-                  onClick={regenerateTranslation}
-                >
-                  {pending ? '재생성 중...' : '재생성'}
-                </button>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button className="close-btn" onClick={closeReviewModal}>닫기</button>
-              {modalTranslationId && (
-                <button 
-                  className="btn-edit-modal" 
-                  onClick={markCompleteFromModal}
-                  disabled={pending}
-                >
-                  {(() => {
-                    // 현재 번역 아이템의 상태 확인
-                    const currentTranslation = translationResults.find(
-                      item => item.translationId === modalTranslationId
-                    );
-                    return currentTranslation?.status === 'COMPLETED' ? '수정' : '완료';
-                  })()}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+             {/* 번역 검토 모달 */}
+       {isModalOpen && (
+         <div className="translation-modal-backdrop">
+           <div className="translation-modal-content">
+             <div className="translation-modal-header">
+               <h3>번역 검토 · {LANGS.find(l => l.code === modalLang)?.name || '언어 정보 없음'}</h3>
+             </div>
+             <div className="translation-modal-body">
+               <div className="text-comparison">
+                 <div className="original-text-section">
+                   <h4>원본 내용</h4>
+                   <pre className="original-preview" style={{maxHeight:'200px'}}>
+                     {modalOriginalText || '원본 내용이 없습니다.'}
+                   </pre>
+                 </div>
+                 <div className="translated-text-section">
+                   <h4>번역 내용</h4>
+                   <pre className="translated-preview" style={{maxHeight:'200px'}}>
+                     {modalText || '번역 결과가 아직 없습니다.'}
+                   </pre>
+                 </div>
+               </div>
+               <div className="translation-modal-actions">
+                 <textarea
+                   className="feedback-input"
+                   placeholder="번역 수정 내용을 입력해 주세요 (재생성 시 사용됩니다)"
+                   value={modalFeedback}
+                   onChange={(e) => setModalFeedback(e.target.value)}
+                   rows={5}
+                 />
+                 <button 
+                   className="regen-btn" 
+                   disabled={pending} 
+                   onClick={regenerateTranslation}
+                 >
+                   {pending ? '재생성 중...' : '재생성'}
+                 </button>
+               </div>
+             </div>
+             <div className="translation-modal-footer">
+               <button className="translation-close-btn" onClick={closeReviewModal}>닫기</button>
+               {modalTranslationId && (
+                 <button 
+                   className="translation-btn-edit-modal" 
+                   onClick={markCompleteFromModal}
+                   disabled={pending}
+                 >
+                   {(() => {
+                     // 현재 번역 아이템의 상태 확인
+                     const currentTranslation = translationResults.find(
+                       item => item.translationId === modalTranslationId
+                     );
+                     return currentTranslation?.status === 'COMPLETED' ? '수정' : '완료';
+                   })()}
+                 </button>
+               )}
+             </div>
+           </div>
+         </div>
+       )}
     </div>
   );
 }

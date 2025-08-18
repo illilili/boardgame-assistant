@@ -238,7 +238,7 @@
 
 /* AI 가격 분석 결과 */
 .ai-pricing-result {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2c445c 1000%, #a0d4e9 0%);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
@@ -292,7 +292,7 @@
 
 /* 개선된 수익성 분석 */
 .pricing-calculations {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #fd945b 0%, #f5576c 100%);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
@@ -337,7 +337,7 @@
 }
 
 .calculation-item .value.negative {
-  color: #ff6b6b;
+  color: #ff0000;
 }
 
 .calculation-item .value.suggested-price {

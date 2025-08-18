@@ -208,6 +208,7 @@ function PricingEvaluation() {
   const calculateTotalCost = () => {
     const dev = parseFloat(pricingData.developmentCost) || 0;
     const platformFee = parseFloat(pricingData.platformFee) || 0;
+    const targetMargin = parseFloat(pricingData.targetMargin) || 0;
     
     // AI 가격 분석 결과에서 추천 가격 가져오기
     const suggestedPrice = pricingData.suggestedPrice ? 
@@ -215,9 +216,13 @@ function PricingEvaluation() {
     
     const totalCost = dev;
     const platformCost = (suggestedPrice * platformFee) / 100;
-    const netRevenue = suggestedPrice - platformCost;
-    const profit = netRevenue - totalCost;
-    const marginPercent = netRevenue > 0 ? (profit / netRevenue) * 100 : 0;
+    
+    // 목표 마진을 원으로 계산 (추천 가격에서 플랫폼 수수료를 제외한 금액의 목표 마진%)
+    const revenueAfterPlatformFee = suggestedPrice - platformCost;
+    const netRevenue = (revenueAfterPlatformFee * targetMargin) / 100;
+    
+    const profit = netRevenue;
+    const marginPercent = targetMargin;
     
     return {
       totalCost,
@@ -430,11 +435,11 @@ function PricingEvaluation() {
                     <span className="value">{calculations.platformCost.toLocaleString()}원</span>
                   </div>
                   <div className="calculation-item">
-                    <span className="label">예상 순수익:</span>
+                    <span className="label">목표 마진:</span>
                     <span className="value">{calculations.netRevenue.toLocaleString()}원</span>
                   </div>
                   <div className="calculation-item total-cost">
-                    <span className="label">총 비용 (개발비 + 플랫폼 수수료 + 예상 순수익):</span>
+                    <span className="label">총 비용 (개발비 + 플랫폼 수수료 + 목표 마진):</span>
                     <span className="value total-value">
                       {(calculations.totalCost + calculations.platformCost + calculations.netRevenue).toLocaleString()}원
                     </span>
@@ -443,10 +448,16 @@ function PricingEvaluation() {
                     <span>-------</span>
                   </div>
                   <div className="calculation-item profit-difference">
-                    <span className="label">총비용 - 추천 가격 차이:</span>
-                    <span className={`value ${(calculations.totalCost + calculations.platformCost + calculations.netRevenue - calculations.suggestedPrice) >= 0 ? 'positive' : 'negative'}`}>
-                      {(calculations.totalCost + calculations.platformCost + calculations.netRevenue - calculations.suggestedPrice).toLocaleString()}원
+                    <span className="label">추천 가격 - 총비용 차이:</span>
+                    <span className={`value ${(calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue)) >= 0 ? 'positive' : 'negative'}`}>
+                      {(calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue)).toLocaleString()}원
                     </span>
+                    <div className="profit-explanation">
+                      {calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue) >= 0 ? 
+                        '✅ 수익이 발생합니다' : 
+                        '❌ 손실이 발생합니다'
+                      }
+                    </div>
                   </div>
                 </div>
               </div>
