@@ -1,5 +1,6 @@
 // Development.js
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Development.css';
 
 import ApprovedPlanViewer from './ApprovedPlanViewer';
@@ -9,9 +10,8 @@ import RulebookGenerator from './RulebookGenerator';
 import ComponentGenerator from './ComponentGenerator';
 import ModelGenerator from './ModelGenerator';
 import ThumbnailGenerator from './ThumbnailGenerator';
-import ContentViewer from './ContentViewer';
-import CopyrightChecker from './CopyrightChecker';
-import ScriptGenerator from './ScriptGenerator';
+import { ProjectContext } from '../contexts/ProjectContext';
+import Header from '../mainPage/Header';
 // --- 각 기능별 컴포넌트 Import ---
 // 각 기능은 별도의 파일로 만들어 관리하는 것이 좋습니다.
 // 우선은 이 파일 내에서 간단한 형태로 정의하겠습니다.
@@ -36,49 +36,65 @@ function WelcomeScreen({ onStart }) {
 
 // --- 데이터 및 메인 컴포넌트 ---
 const workspaceNavItems = [
-    { id: 'approved-plan', title: '승인된 기획안 조회', component: <ApprovedPlanViewer /> },
-    { id: 'dev-list', title: '개발 목록 조회', component: <DevelopmentListViewer /> },
-    { id: 'card-gen', title: '카드/아이템 생성', component: <ComponentGenerator />},
-    { id: 'rulebook-gen', title: '룰북 초안 생성', component: <RulebookGenerator /> },
-    { id: 'script-gen', title: '설명 스크립트 자동생성', component: <ScriptGenerator />},
-    { id: 'model-gen', title: '3D 모델 생성', component: <ModelGenerator /> },
-    { id: 'thumbnail-gen', title: '썸네일 이미지 생성', component: <ThumbnailGenerator /> },
-    { id: 'content-view', title: '콘텐츠 상세 조회', component: <ContentViewer /> },
-    { id: 'copyright-check', title: '콘텐츠 저작권 검토', component: <CopyrightChecker /> },
-    { id: 'content-submit', title: '콘텐츠 제출', component: <ContentSubmitter /> },
+  { id: 'approved-plan', title: '승인된 기획안 조회', component: <ApprovedPlanViewer /> },
+  { id: 'dev-list', title: '개발 목록 조회', component: <DevelopmentListViewer /> },
+  { id: 'card-gen', title: '카드/아이템 생성', component: <ComponentGenerator /> },
+  { id: 'rulebook-gen', title: '룰북 초안 생성', component: <RulebookGenerator /> },
+  { id: 'model-gen', title: '3D 모델 생성', component: <ModelGenerator /> },
+  { id: 'thumbnail-gen', title: '썸네일 이미지 생성', component: <ThumbnailGenerator /> },
+  { id: 'content-submit', title: '콘텐츠 제출', component: <ContentSubmitter /> }, // 수정 필요
 ];
 
 function Development() {
-  // 초기 상태를 null로 설정하여 시작 화면을 먼저 표시
-  const [activeViewId, setActiveViewId] = useState(null);
+  const { projectId } = useContext(ProjectContext);
+  const [activeViewId, setActiveViewId] = useState(() => localStorage.getItem('activeViewId') || null);
+  const [selectedContentId, setSelectedContentId] = useState(() => localStorage.getItem('selectedContentId') || null);
+  const navigate = useNavigate();
 
-  // 선택된 뷰 컴포넌트를 찾음
-  const activeView = activeViewId ? workspaceNavItems.find(item => item.id === activeViewId) : null;
+  const handleNavigate = (viewId, contentId = null) => {
+    setActiveViewId(viewId);
+    setSelectedContentId(contentId);
+    localStorage.setItem('activeViewId', viewId);
+    localStorage.setItem('selectedContentId', contentId ?? '');
+  };
+
+  const activeView = activeViewId
+    ? workspaceNavItems.find(item => item.id === activeViewId)
+    : null;
 
   return (
-    <div className="workspace-container new-design">
-      <aside className="workspace-sidebar">
-        <div className="sidebar-header">
-          <div className="logo">BOARD.CO DEV</div>
-        </div>
-        <ul className="workspace-nav-list">
-          {workspaceNavItems.map((item) => (
-            <li 
-              key={item.id} 
-              className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
-              onClick={() => setActiveViewId(item.id)}
-            >
-              {item.title}
-            </li>
-          ))}
-        </ul>
-      </aside>
+    <>
+      <Header projectMode={true} />
+      <div className="workspace-container new-design">
+        <aside className="workspace-sidebar">
+          <div className="sidebar-header">
+            <div className="logo">Dev</div>
+            {projectId && <div className="project-id">Project ID: {projectId}</div>}
+          </div>
+          <ul className="workspace-nav-list">
+            {workspaceNavItems.map((item) => (
+              <li
+                key={item.id}
+                className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
+                onClick={() => handleNavigate(item.id)}
+              >
+                {item.title}
+              </li>
+            ))}
+          </ul>
+        </aside>
 
-      <main className="workspace-main-content">
-        {/* activeView가 있으면 해당 컴포넌트를, 없으면 WelcomeScreen을 렌더링 */}
-        {activeView ? activeView.component : <WelcomeScreen onStart={() => setActiveViewId('approved-plan')} />}
-      </main>
-    </div>
+        <main className="workspace-main-content">
+          {activeViewId === 'dev-list' ? (
+            <DevelopmentListViewer onNavigate={handleNavigate} projectId={projectId} />
+          ) : activeView ? (
+            React.cloneElement(activeView.component, { contentId: selectedContentId, projectId })
+          ) : (
+            <WelcomeScreen onStart={() => handleNavigate('approved-plan')} />
+          )}
+        </main>
+      </div>
+    </>
   );
 }
 

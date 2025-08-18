@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { getPendingPlans, reviewPlan } from '../api/auth.js';
+// ⛔️ 변경 전: import { getPendingPlans, reviewPlan } from '../api/auth.js';
+// ✅ 변경 후: API 호출 함수를 새로운 publish.js 에서 가져옵니다.
+import { getPendingPlans, reviewPlan } from '../api/publish.js';
 
-// PlanReviewPage 전용 스타일
+// PlanReviewPage 전용 스타일 (기존 코드와 동일)
 const PlanReviewPageStyles = `
     .review-container {
         padding: 2rem;
@@ -40,6 +42,7 @@ const PlanReviewPageStyles = `
         margin-top: 1rem;
         display: flex;
         gap: 0.5rem;
+        align-items: center;
     }
     .plan-card-actions button {
         padding: 0.5rem 1rem;
@@ -57,8 +60,7 @@ const PlanReviewPageStyles = `
         color: white;
     }
     .reason-input {
-        width: 100%;
-        margin-top: 0.5rem;
+        flex-grow: 1; /* 남는 공간을 모두 차지하도록 수정 */
         padding: 0.5rem;
         border: 1px solid #e2e8f0;
         border-radius: 4px;
@@ -93,6 +95,7 @@ const PlanReviewPageStyles = `
 `;
 
 const PlanReviewPage = () => {
+    // 이 컴포넌트의 내부 로직은 기존 코드와 완전히 동일합니다.
     const [pendingPlans, setPendingPlans] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
@@ -101,6 +104,7 @@ const PlanReviewPage = () => {
     const fetchPendingPlans = async () => {
         setIsLoading(true);
         try {
+            // publish.js에 정의된 함수를 호출합니다.
             const data = await getPendingPlans();
             setPendingPlans(data);
         } catch (err) {
@@ -121,15 +125,16 @@ const PlanReviewPage = () => {
 
         if (window.confirm(`${isApprove ? '승인' : '반려'} 처리하시겠습니까?`)) {
             try {
+                // publish.js에 정의된 함수를 호출합니다.
                 await reviewPlan({
-                    planId: planId,
+                    planId,
                     approve: isApprove,
-                    reason: reason
+                    reason
                 });
                 alert(`기획안이 성공적으로 ${isApprove ? '승인' : '반려'}되었습니다!`);
                 fetchPendingPlans(); // 목록 새로고침
             } catch (err) {
-                alert(`${isApprove ? '승인' : '반려'} 실패: ${err.message}`);
+                alert(`${isApprove ? '승인' : '반려'} 처리 실패: ${err.message}`);
                 console.error(err);
             }
         }
@@ -161,18 +166,29 @@ const PlanReviewPage = () => {
         <div className="review-container">
             <style>{PlanReviewPageStyles}</style>
             <header className="review-header">
-                <h1 className="text-2xl font-bold">기획안 검토 (관리자/퍼블리셔)</h1>
+                <h1 style={{fontSize: "1.5rem", fontWeight: "bold"}}>기획안 검토 (퍼블리셔)</h1>
                 <p>제출된 기획안을 검토하고 승인 또는 반려할 수 있습니다.</p>
             </header>
             <div className="plan-list-section">
                 {pendingPlans.length > 0 ? (
                     pendingPlans.map(plan => (
                         <div key={plan.planId} className="plan-card">
-                            <h3>프로젝트: {plan.projectTitle}</h3>
+                            {/* 백엔드 응답에 projectTitle이 있다면 표시, 없으면 projectId를 표시 */}
+                            <h3>{plan.projectTitle || `프로젝트 ID: ${plan.projectId}`}</h3>
                             <p><strong>기획안 ID:</strong> {plan.planId}</p>
-                            <p><strong>컨셉:</strong> {plan.conceptTheme}</p>
+                            <p><strong>컨셉:</strong> {plan.conceptTheme || 'N/A'}</p>
                             <p><strong>상태:</strong> {plan.status}</p>
-                            <p><strong>문서 URL:</strong> <a href={plan.planDocUrl} target="_blank" rel="noopener noreferrer">{plan.planDocUrl}</a></p>
+                            <p>
+                                <strong>문서 URL:</strong>
+                                {/* planDocUrl이 유효할 때만 링크를 보여줍니다. */}
+                                {plan.planDocUrl ? (
+                                    <a href={plan.planDocUrl} target="_blank" rel="noopener noreferrer">
+                                        {plan.planDocUrl}
+                                    </a>
+                                ) : (
+                                    '문서 없음'
+                                )}
+                            </p>
                             <div className="plan-card-actions">
                                 <button
                                     onClick={() => handleReviewPlan(plan.planId, true)}
@@ -200,10 +216,11 @@ const PlanReviewPage = () => {
                         </div>
                     ))
                 ) : (
-                    <p className="text-gray-500">현재 검토할 기획안이 없습니다.</p>
+                    <p style={{textAlign: "center", color: "#64748b"}}>현재 검토할 기획안이 없습니다.</p>
                 )}
             </div>
         </div>
     );
 };
+
 export default PlanReviewPage;

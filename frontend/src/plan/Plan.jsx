@@ -1,9 +1,10 @@
-// Plan.js
 import React, { useState } from 'react';
-import './Plan.css'; 
+import { useParams } from 'react-router-dom';
+import { ProjectContext } from '../contexts/ProjectContext';
+import './Plan.css';
+import Header from '../mainPage/Header';
 
 // 분리된 컴포넌트들을 import 합니다.
-import ProjectCreationPage from './ProjectCreationPage';
 import GameConceptCreator from './GameConceptCreator';
 import Goal from './Goal';
 import Components from './Components';
@@ -12,54 +13,54 @@ import Review from './Review';
 import WelcomeScreen from './WelcomeScreen';
 import PlanPage from './PlanPage';
 
-
-
-// Header 컴포넌트는 현재 사용되지 않으므로 import에서 제거했습니다.
-// import Header from '../mainPage/Header'; 
-
-// --- 데이터 및 메인 컴포넌트 ---
+// 기획 단계별 네비게이션 아이템 목록
 const workspaceNavItems = [
-  { id: 'project', title: '프로젝트 생성', component: <ProjectCreationPage /> },
   { id: 'concept', title: '게임 컨셉 제작', component: <GameConceptCreator /> },
-  { id: 'goal', title: '게임 목표 설계', component: <Goal/>},  
+  { id: 'goal', title: '게임 목표 설계', component: <Goal /> },
   { id: 'rules', title: '규칙 생성', component: <RuleCreator /> },
-  { id: 'components', title: '게임 구성요소 생성', component: <Components/>},
+  { id: 'components', title: '게임 구성요소 생성', component: <Components /> },
   { id: 'review', title: '밸런스 테스트', component: <Review /> },
-  { id: 'planPage', title: '기획안 관리', component: <PlanPage/>},
-  
+  { id: 'planPage', title: '기획안 관리', component: <PlanPage /> },
 ];
 
+/**
+ * 전체 기획 프로세스를 관리하는 메인 컴포넌트입니다.
+ * 왼쪽 사이드바와 오른쪽 메인 콘텐츠 영역으로 구성됩니다.
+ */
 function Plan() {
-  // 초기 상태를 null로 변경하여 아무것도 선택되지 않은 상태에서 시작
-  const [activeViewId, setActiveViewId] = useState(null);
+  const { projectId } = useParams();
+  const [activeViewId, setActiveViewId] = useState('concept');
 
-  // 선택된 뷰를 찾는 로직 변경
   const activeView = activeViewId ? workspaceNavItems.find(item => item.id === activeViewId) : null;
 
   return (
-    <div className="workspace-container new-design">
-      <aside className="workspace-sidebar">
-        <div className="sidebar-header">
-          <div className="logo">BOARD.CO</div>
-        </div>
-        <ul className="workspace-nav-list">
-          {workspaceNavItems.map((item) => (
-            <li 
-              key={item.id} 
-              className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
-              onClick={() => setActiveViewId(item.id)}
-            >
-              {item.title}
-            </li>
-          ))}
-        </ul>
-      </aside>
+    <>
+      <Header />
+      <ProjectContext.Provider value={{ projectId }}>
+        <div className="workspace-container new-design">
+          <aside className="workspace-sidebar">
+            <div className="sidebar-header">
+              <div className="logo">PLANNING</div>
+            </div>
+            <ul className="workspace-nav-list">
+              {workspaceNavItems.map((item) => (
+                <li
+                  key={item.id}
+                  className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
+                  onClick={() => setActiveViewId(item.id)}
+                >
+                  {item.title}
+                </li>
+              ))}
+            </ul>
+          </aside>
 
-      <main className="workspace-main-content">
-        {/* activeView가 있을 때만 해당 컴포넌트를, 없으면 WelcomeScreen을 렌더링 */}
-        {activeView ? activeView.component : <WelcomeScreen onStart={() => setActiveViewId('concept')} />}
-      </main>
-    </div>
+          <main className="workspace-main-content">
+            {activeView ? activeView.component : <WelcomeScreen onStart={() => setActiveViewId('concept')} />}
+          </main>
+        </div>
+      </ProjectContext.Provider>
+    </>
   );
 }
 
