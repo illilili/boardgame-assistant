@@ -8,7 +8,8 @@ import './PricingEvaluation.css';
 
 function PricingEvaluation() {
   const navigate = useNavigate();
-  const { projectId } = useContext(ProjectContext);
+  const projectContext = useContext(ProjectContext);
+  const projectId = projectContext?.projectId;
   const [pricingData, setPricingData] = useState({
     developmentCost: '',
     translationCost: '',
@@ -24,12 +25,15 @@ function PricingEvaluation() {
 
   // 프로젝트 ID가 있을 때 프로젝트 정보와 승인된 플랜 조회
   useEffect(() => {
+    console.log('PricingEvaluation useEffect 실행:', { projectId, projectContext });
     if (projectId) {
       console.log('프로젝트 ID 확인됨:', projectId);
       fetchProjectInfo();
       fetchApprovedPlan();
+    } else {
+      console.log('프로젝트 ID가 없습니다.');
     }
-  }, [projectId]);
+  }, [projectId, projectContext]);
 
   const fetchProjectInfo = async () => {
     if (!projectId) return;
@@ -202,7 +206,21 @@ function PricingEvaluation() {
     );
   }
 
-  // 프로젝트 ID가 없으면 메시지 표시
+  // ProjectContext가 없거나 projectId가 없으면 메시지 표시
+  if (!projectContext) {
+    return (
+      <div className="pricing-workspace">
+        <main className="workspace-main-content">
+          <div className="creator-container">
+            <h2>가격 책정</h2>
+            <p>프로젝트 컨텍스트를 찾을 수 없습니다.</p>
+            <p>프로젝트 목록에서 프로젝트를 선택한 후 다시 시도해주세요.</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   if (!projectId) {
     return (
       <div className="pricing-workspace">
@@ -210,6 +228,7 @@ function PricingEvaluation() {
           <div className="creator-container">
             <h2>가격 책정</h2>
             <p>프로젝트를 선택해주세요.</p>
+            <p>현재 선택된 프로젝트 ID: {projectId}</p>
           </div>
         </main>
       </div>
