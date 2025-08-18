@@ -4,11 +4,15 @@ import './Publish.css'; // ✅ 정상: 같은 폴더에 있음
 // 🚨 임포트 경로 수정 (아래와 같이 되어있는지 확인)
 import PlanReview from './PlanReview'; // ✅ 정상: 같은 폴더에 있음
 import AssignDeveloperPage from './AssignDeveloperPage'; // ✅ 정상: 같은 폴더에 있음
+import TranslationWrapper from './TranslationWrapper';
+import PricingEvaluation from './PricingEvaluation';
 
 
 const workspaceNavItems = [
     { id: 'planapproval', title: '기획서 승인', component: <PlanReview/> },
     { id: 'developassi', title: '개발자 투입', component: <AssignDeveloperPage/> },
+    { id: 'translation', title: '번역', component: <TranslationWrapper/> },
+    { id: 'pricing', title: '가격 책정', component: <PricingEvaluation/> },
 ];
 
 function Publish() {
