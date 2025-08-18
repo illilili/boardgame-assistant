@@ -222,8 +222,7 @@
 }
 
 .creation-background {
-    background-color: var(--bg-light);
-    /* ✨ 헤더 높이를 뺀 나머지 화면을 채우도록 수정 */
+
     min-height: calc(100vh - var(--header-height)); 
     display: flex;
     align-items: center;

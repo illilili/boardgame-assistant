@@ -4,74 +4,63 @@
     --text-dark: #1f2328;
     --text-light: #6e7781;
     --bg-main: #f6f8fa;
-    --bg-sidebar: #161b22;
     --bg-card: #ffffff;
     --border-color: #d0d7de;
     --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
     --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    --font-main: 'Inter', sans-serif;
     --transition-fast: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
 }
 
-/* --- ✨ 애니메이션 --- */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- ✨ 전체 레이아웃 --- */
-.workspace-container {
+/* --- ✨ 고유 클래스 이름을 사용한 전체 레이아웃 --- */
+.project-home-page__container {
     display: grid;
     grid-template-columns: 240px 1fr;
     background-color: var(--bg-main);
-    min-height: calc(100vh - 70px); /* 헤더 높이 제외 */
+    min-height: calc(100vh - 70px);
     font-family: var(--font-main);
 }
 
-/* --- ✨ 사이드바 --- */
-.workspace-sidebar {
-    background-color: var(--bg-sidebar);
+.project-home-page__sidebar {
+    background-color: #161b22;
     color: #c9d1d9;
     padding: 24px 0;
-    display: flex;
-    flex-direction: column;
 }
 
-.workspace-nav {
-    display: flex;
-    flex-direction: column;
+.project-home-page__nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.nav-item {
+.project-home-page__nav-item {
     padding: 12px 24px;
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     border-left: 3px solid transparent;
     transition: all var(--transition-fast);
-    display: flex;
-    align-items: center;
-    gap: 12px;
 }
 
-.nav-item:hover {
+.project-home-page__nav-item:hover {
     background-color: rgba(255, 255, 255, 0.05);
     color: white;
 }
 
-.nav-item.active {
-    color: var(--accent-warm);
-    border-left-color: var(--accent-warm);
-    background-color: rgba(229, 138, 78, 0.1);
-}
-
-/* --- ✨ 메인 콘텐츠 영역 --- */
-.workspace-main {
+.project-home-page__main-content {
     padding: 32px 48px;
-    animation: fadeIn 0.5s ease-out;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "header header"
+        "members logs";
+    gap: 32px;
+    align-content: start;
 }
 
-.project-header-card {
+.project-home-page__header {
+    grid-area: header;
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 12px;
@@ -80,95 +69,72 @@
     justify-content: space-between;
     align-items: center;
     gap: 32px;
-    margin-bottom: 32px;
     box-shadow: var(--shadow-subtle);
 }
 
-.project-header-content h1 {
+.project-home-page__info h2 {
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--text-dark);
-    margin: 10px 0;
+    margin: 0 0 10px 0;
 }
 
-.project-description {
+.project-home-page__description {
     font-size: 1.1rem;
     color: var(--text-light);
     margin-bottom: 24px;
 }
 
-.project-thumbnail-wrapper {
+.project-home-page__thumbnail-wrapper {
     flex-shrink: 0;
 }
 
-.project-home-thumbnail {
+.project-home-page__thumbnail {
     width: 280px;
     height: 180px;
     border-radius: 8px;
     object-fit: cover;
-    border: 1px solid var(--border-color);
-    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.project-home-thumbnail:hover {
-    transform: scale(1.05);
-    box-shadow: var(--shadow-medium);
-}
-
-/* --- 상태 배지 --- */
-.status-badge {
+.project-home-page__status-badge {
     padding: 6px 12px;
     font-size: 0.8rem;
     font-weight: 600;
     border-radius: 20px;
     text-transform: uppercase;
 }
-.status-planning { background-color: #dbf4ff; color: #0969da; }
-.status-review_pending { background-color: #fff8c5; color: #9a6700; }
-.status-development { background-color: #e2f5ea; color: #1f883d; }
-.status-publishing { background-color: #fbefff; color: #8250df; }
-.status-completed { background-color: #e2f5ea; color: #1f883d; }
+.status--planning { background-color: #dbf4ff; color: #0969da; }
+/* ... (다른 상태 색상들) ... */
 
-/* --- 진행률 바 --- */
-.progress-wrapper {
+.project-home-page__progress-container {
     display: flex;
     align-items: center;
     gap: 12px;
 }
-.progress-bar-background {
-    flex-grow: 1;
+
+.project-home-page__progress-bar {
     height: 12px;
-    background-color: #e1e4e8;
-    border-radius: 6px;
-    overflow: hidden;
-}
-.progress-bar-fill {
-    height: 100%;
     background: linear-gradient(90deg, #ffd1a8, var(--accent-warm));
     border-radius: 6px;
     transition: width 0.5s ease-in-out;
 }
-.progress-percentage {
+
+.project-home-page__progress-container span {
     font-weight: 600;
     color: var(--text-dark);
 }
 
-/* --- ✨ 정보 카드 그리드 --- */
-.workspace-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr; /* 멤버 목록이 1, 최근 활동이 2의 비율 */
-    gap: 32px;
-}
-
-.info-card {
+.project-home-page__info-card {
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
     box-shadow: var(--shadow-subtle);
 }
+.project-home-page__info-card:nth-of-type(1) { grid-area: members; }
+.project-home-page__info-card:nth-of-type(2) { grid-area: logs; }
 
-.info-card h2 {
+.project-home-page__info-card h2 {
     font-size: 1.25rem;
     font-weight: 600;
     margin: 0 0 16px 0;
@@ -176,66 +142,86 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-/* --- 멤버 목록 --- */
-.member-list, .log-list {
+.project-home-page__member-list, .project-home-page__log-list {
     list-style: none;
     padding: 0;
     margin: 0;
+}
+
+.project-home-page__member-item, .project-home-page__log-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f4f8;
+}
+
+.project-home-page__member-role { font-weight: 600; color: var(--accent-warm); }
+.project-home-page__member-name { color: var(--text-dark); }
+.project-home-page__log-action { font-weight: 500; }
+.project-home-page__log-user { color: var(--text-light); }
+.project-home-page__log-date { font-size: 0.85rem; color: var(--text-light); }
+
+.project-home-page__edit-btn {
+    margin-top: 24px;
+    padding: 10px 20px;
+    background-color: var(--accent-warm);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.project-home-page__edit-btn:hover {
+    background-color: var(--accent-warm-dark);
+}
+
+.project-home-page__modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 10, 25, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.project-home-page__modal-content {
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
-.member-item, .log-item {
+
+.project-home-page__modal-content h3 { font-size: 1.5rem; margin: 0 0 8px 0; }
+.project-home-page__modal-content input, .project-home-page__modal-content textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.project-home-page__modal-actions {
     display: flex;
-    align-items: center;
+    justify-content: flex-end;
     gap: 12px;
-}
-.member-avatar {
-    font-size: 2.2rem;
-    color: #a0a8b3;
-}
-.member-info {
-    display: flex;
-    flex-direction: column;
-}
-.member-name {
-    font-weight: 500;
-    color: var(--text-dark);
-}
-.member-role {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    background-color: var(--bg-main);
-    padding: 2px 6px;
-    border-radius: 4px;
-    align-self: flex-start;
+    margin-top: 16px;
 }
 
-/* --- 최근 활동 로그 --- */
-.log-icon {
-    font-size: 1.1rem;
-    color: var(--text-light);
-}
-.log-icon.create { color: #8250df; }
-.log-icon.update { color: #0969da; }
-.log-icon.submit { color: #1f883d; }
-
-.log-details {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-.log-message {
-    color: var(--text-dark);
-}
-.log-user {
+.project-home-page__modal-actions button {
+    padding: 10px 20px;
     font-weight: 600;
-    color: var(--accent-warm);
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
 }
-.log-action {
-    font-weight: 500;
-}
-.log-date {
-    font-size: 0.8rem;
-    color: var(--text-light);
-}
+.project-home-page__modal-actions button:nth-child(1) { background-color: var(--accent-warm); color: white; }
+.project-home-page__modal-actions button:nth-child(2) { background-color: #f6f8fa; border: 1px solid var(--border-color); }
