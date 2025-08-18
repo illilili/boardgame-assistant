@@ -199,8 +199,13 @@
     gap: 16px;
 }
 
-.project-home-page__modal-content h3 { font-size: 1.5rem; margin: 0 0 8px 0; }
-.project-home-page__modal-content input, .project-home-page__modal-content textarea {
+.project-home-page__modal-content h3 {
+    font-size: 1.5rem;
+    margin: 0 0 8px 0;
+}
+
+.project-home-page__modal-content input,
+.project-home-page__modal-content textarea {
     width: 100%;
     padding: 12px 16px;
     border-radius: 8px;
@@ -223,5 +228,12 @@
     border: none;
     cursor: pointer;
 }
-.project-home-page__modal-actions button:nth-child(1) { background-color: var(--accent-warm); color: white; }
-.project-home-page__modal-actions button:nth-child(2) { background-color: #f6f8fa; border: 1px solid var(--border-color); }
+
+.project-home-page__modal-actions button:nth-child(1) {
+    background-color: var(--accent-warm);
+    color: white;
+}
+.project-home-page__modal-actions button:nth-child(2) {
+    background-color: #f6f8fa;
+    border: 1px solid var(--border-color);
+}

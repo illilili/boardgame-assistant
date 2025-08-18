@@ -52,6 +52,20 @@ body {
   letter-spacing: 1px;
 }
 
+.project-info {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #bdc3c7;
+  text-align: center;
+}
+
+.project-info span {
+  background: rgba(52, 152, 219, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
 .workspace-nav-list {
   list-style: none;
   padding: 0;
