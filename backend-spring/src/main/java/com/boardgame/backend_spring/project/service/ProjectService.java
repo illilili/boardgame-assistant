@@ -90,21 +90,33 @@ public class ProjectService {
         return ProjectSummaryDto.from(project);
     }
 
-    // 프로젝트 이름 변경 (PUBLISHER or ADMIN or 참여자)
-    public ProjectRenameResponseDto renameProject(Long projectId, String newTitle, User user) {
+    // 프로젝트 정보 변경 (PUBLISHER or ADMIN or 참여자)
+    public ProjectRenameResponseDto renameProject(Long projectId, String newTitle, String newDescription, User user) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
+        // 권한 체크
         if (user.getRole() != User.Role.PUBLISHER &&
                 user.getRole() != User.Role.ADMIN &&
                 !projectMemberRepository.existsByProjectAndUser(project, user)) {
             throw new RuntimeException("프로젝트 멤버 또는 관리자, 퍼블리셔만 수정할 수 있습니다.");
         }
 
-        project.setName(newTitle);
+        if (newTitle != null && !newTitle.isBlank()) {
+            project.setName(newTitle);
+        }
+        if (newDescription != null) {
+            project.setDescription(newDescription);
+        }
+
         projectRepository.save(project);
 
-        return new ProjectRenameResponseDto(projectId, newTitle, "프로젝트 이름이 성공적으로 수정되었습니다.");
+        return new ProjectRenameResponseDto(
+                projectId,
+                project.getName(),
+                project.getDescription(),
+                "프로젝트 정보가 성공적으로 수정되었습니다."
+        );
     }
 
     // 개발자 배정 (PUBLISHER만 가능)
