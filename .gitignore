@@ -12,3 +12,4 @@ frontend/.env
 # IDE/OS
 .vscode/
 .DS_Store
+.idea/
