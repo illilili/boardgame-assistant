@@ -1,98 +1,159 @@
-/* Review.css */
+/* Review.css (전문가 버전 - 'Balance Lab' 재설계) */
 
-/* 전체 레이아웃 */
-.review-container {
+/* --- ✨ 디자인 시스템 변수 (일관성 유지) --- */
+:root {
+    --accent-warm: #E58A4E;
+    --accent-warm-dark: #D4753A;
+    --text-dark: #1f2328;
+    --text-light: #6e7781;
+    --bg-main: #f6f8fa;
+    --bg-card: #ffffff;
+    --border-color: #d8dee4;
+    --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 8px 24px rgba(140, 149, 159, 0.15);
+    --font-main: 'Inter', sans-serif;
+    --transition-fast: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+}
+
+/* --- ✨ 애니메이션 --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- ✨ 전체 레이아웃 --- */
+.review__container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 2rem;
-    background-color: #f0f2f5; /* 전체 배경색 적용 */
+    background-color: var(--bg-main);
+    font-family: var(--font-main);
+    animation: fadeIn 0.5s ease-out;
 }
 
-.review-header {
+.review__header {
     text-align: center;
     margin-bottom: 2.5rem;
 }
 
-.review-header h1 {
+.review__header h1 {
     font-size: 2.5rem;
-    color: #2c2825; /* 폰트 색상 통일 */
+    color: var(--text-dark);
     margin-bottom: 0.5rem;
 }
 
-.review-header p {
+.review__header p {
     font-size: 1.1rem;
-    color: #888888; /* 폰트 색상 통일 */
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.review-main-grid {
+/* --- ✨ 새로운 랩 섹션 레이아웃 --- */
+.review__lab-section {
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 2rem;
-    align-items: flex-start;
+    grid-template-columns: 1fr 2fr;
+    gap: 0; /* 내부에서 패딩으로 간격 조절 */
+    align-items: stretch; /* 높이를 동일하게 맞춤 */
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    box-shadow: var(--shadow-subtle);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.review__controls-column {
+    padding: 2rem;
+    border-right: 1px solid var(--border-color);
+}
+
+.review__results-column {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px; /* 결과창 최소 높이 확보 */
 }
 
 @media (max-width: 1024px) {
-    .review-main-grid {
+    .review__lab-section {
         grid-template-columns: 1fr;
+    }
+    .review__controls-column {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
     }
 }
 
-/* 카드 스타일 */
-.card {
-    background-color: #FFFFFF; /* 흰색 배경 */
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 2rem;
-    margin-bottom: 2rem;
+.review__controls-column h2 {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    margin: 0 0 0.5rem 0;
+}
+.review__controls-column p {
+    color: var(--text-light);
+    margin: 0 0 1.5rem 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
 }
 
-.card h2 {
-    font-size: 1.5rem;
-    color: #2c2825; /* 폰트 색상 통일 */
-    border-bottom: 2px solid #EAEAEA; /* 테두리 색상 통일 */
-    padding-bottom: 1rem;
-    margin-top: 0;
+
+/* --- ✨ 폼 그룹 및 입력 요소 --- */
+.review__form-group {
     margin-bottom: 1.5rem;
 }
 
-/* 폼 그룹 및 입력 요소 */
-.form-group {
-    margin-bottom: 1.25rem;
-}
-
-.form-group label {
+.review__form-group label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: #2c2825; /* 폰트 색상 통일 */
+    color: var(--text-dark);
+    font-size: 0.9rem;
 }
 
-.form-group input, .form-group select {
+.review__form-group input[type="text"],
+.review__form-group input[type="number"],
+.review__form-group select {
     width: 100%;
     padding: 0.75rem;
     font-size: 1rem;
-    border: 1px solid #EAEAEA; /* 테두리 색상 통일 */
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     box-sizing: border-box;
-    background-color: #F8F8F8; /* 배경색 통일 */
-    color: #2c2825;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #f6f8fa;
+    color: var(--text-dark);
+    transition: all var(--transition-fast);
 }
 
-.form-group input:focus, .form-group select:focus {
+.review__form-group input:focus, .review__form-group select:focus {
     outline: none;
-    border-color: #E58A4E; /* 포커스 색상 통일 */
-    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2); /* 포커스 섀도우 통일 */
+    border-color: var(--accent-warm);
+    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+    background-color: white;
 }
 
-.checkbox-group {
+.review__checkbox-group {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
+.review__checkbox-group label {
+    margin-bottom: 0;
+    font-weight: 500;
+}
+.review__checkbox-group input {
+    width: auto;
+    height: 1.1em;
+    width: 1.1em;
+}
 
-/* 버튼 스타일 */
-.primary-button, .secondary-button {
+
+/* --- ✨ 버튼 스타일 --- */
+.review__primary-button, .review__secondary-button {
     width: 100%;
     padding: 0.8rem 1rem;
     font-size: 1.1rem;
@@ -101,49 +162,62 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-.primary-button {
-    background-color: #E58A4E; /* 주 색상 통일 */
+.review__primary-button {
+    background-color: var(--accent-warm);
     color: white;
 }
-
-.primary-button:hover:not(:disabled) {
-    background-color: #c06c38; /* 호버 색상 통일 */
+.review__primary-button:hover:not(:disabled) {
+    background-color: var(--accent-warm-dark);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
 }
 
-.secondary-button {
-    background-color: #6c757d; /* 부 색상 통일 */
+.review__secondary-button {
+    background-color: var(--text-light);
     color: white;
 }
-
-.secondary-button:hover:not(:disabled) {
-    background-color: #5a6268; /* 호버 색상 통일 */
+.review__secondary-button:hover:not(:disabled) {
+    background-color: var(--text-dark);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
 }
 
-.primary-button:disabled, .secondary-button:disabled {
-    background-color: #fbd6c0; /* 비활성화 색상 통일 */
-    opacity: 1; /* opacity 대신 색상으로 처리 */
+.review__primary-button:disabled, .review__secondary-button:disabled {
+    background-color: #e0e0e0;
     cursor: not-allowed;
     transform: none;
-}
-.secondary-button:disabled {
-    background-color: #adb5bd;
+    box-shadow: none;
 }
 
-/* 결과 섹션 */
-.results-section h3 {
-    font-size: 1.3rem;
-    color: #2c2825; /* 폰트 색상 통일 */
-    margin-top: 0;
+/* --- ✨ 결과 섹션 --- */
+.review__results-column h3 {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    margin: 0 0 1.5rem 0;
+    flex-shrink: 0;
+}
+.initial-text {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    text-align: center;
+    padding: 2rem;
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
 }
 
 /* 로딩 스피너 */
-.spinner {
-    border: 4px solid #EAEAEA; /* 테두리 색상 통일 */
-    border-top: 4px solid #E58A4E; /* 스피너 색상 통일 */
+.review__spinner {
+    border: 4px solid #eef1f4;
+    border-top: 4px solid var(--accent-warm);
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -152,91 +226,117 @@
 }
 
 /* 에러 메시지 */
-.error-message {
-    color: #991b1b; /* 어두운 빨강 통일 */
-    background-color: #fef2f2; /* 아주 밝은 빨강 통일 */
-    border: 1px solid #fca5a5; /* 밝은 빨강 테두리 통일 */
+.review__error-message {
+    color: #991b1b;
+    background-color: #fef2f2;
+    border: 1px solid #fca5a5;
     padding: 1rem;
     border-radius: 8px;
-    margin-top: 1rem;
-}
-
-/* 시뮬레이션 로그 */
-.simulation-log {
-    max-height: 500px;
-    overflow-y: auto;
-    padding-right: 1rem;
-    border: 1px solid #EAEAEA; /* 테두리 색상 통일 */
-    border-radius: 8px;
-    padding: 1rem;
-}
-
-.turn-card {
-    background: #f8f9fa; /* 배경색 통일 */
-    border-radius: 8px;
-    padding: 1rem;
     margin-bottom: 1rem;
 }
 
-.turn-card h4 {
+/* --- ✨ 시뮬레이션 로그 (디자인 업그레이드) --- */
+.review__simulation-result {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-grow: 1;
+}
+.review__simulation-summary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: #f6f8fa;
+    border: 1px solid var(--border-color);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+.summary-icon { font-size: 2rem; color: var(--accent-warm); }
+.summary-text strong { font-size: 1.2rem; display: block; }
+.summary-text span { color: var(--text-light); }
+
+.review__simulation-log {
+    overflow-y: auto;
+    padding-right: 1rem;
+    margin-right: -1rem;
+}
+
+.review__turn-card {
+    background: #f6f8fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.turn-header {
     margin: 0 0 1rem 0;
     font-size: 1.1rem;
-    color: #E58A4E; /* 강조 색상 통일 */
-}
-
-.action-item {
-    margin-bottom: 0.75rem;
-    padding-left: 1rem;
-    border-left: 3px solid #E58A4E; /* 강조 색상 통일 */
-}
-
-.action-item strong {
     font-weight: 600;
+    color: var(--accent-warm);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* 밸런스 분석 리포트 */
-.balance-list {
+.review__action-item {
+    margin-bottom: 0.75rem;
+}
+.review__action-item p { margin: 0 0 4px 0; }
+.review__action-item strong { font-weight: 600; }
+.rationale { color: var(--text-light); font-size: 0.9rem; }
+
+/* --- ✨ 밸런스 분석 리포트 (디자인 업그레이드) --- */
+.review__balance-report {
+    display: flex;
+    gap: 24px;
+    align-items: start;
+    width: 100%;
+}
+.review__score-display {
+    text-align: center;
+    background-color: #f6f8fa;
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+.score-value {
+    font-size: 3.5rem;
+    font-weight: bold;
+    color: var(--accent-warm);
+}
+.score-label {
+    font-size: 1rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+.report-content {
+    flex-grow: 1;
+}
+.balance-summary { margin-bottom: 1.5rem; }
+.review__balance-report h4 {
+    font-size: 1.1rem;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.review__balance-list {
     list-style: none;
     padding: 0;
 }
 
-.balance-list li {
-    background: #F8F8F8; /* 배경색 통일 */
+.review__balance-list li {
+    background: #f6f8fa;
     padding: 0.75rem 1rem;
     border-radius: 8px;
     margin-bottom: 0.5rem;
-    position: relative;
-    padding-left: 2rem;
+    border-left: 4px solid;
 }
 
-.balance-list li::before {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-weight: bold;
-}
-
-.balance-list .issue::before {
-    content: '⚠️';
-}
-
-.balance-list .recommendation::before {
-    content: '💡';
-}
-
-.score-display {
-    text-align: center;
-    margin-top: 1.5rem;
-}
-
-.score-display .score-value {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #E58A4E; /* 강조 색상 통일 */
-}
-
-.score-display .score-label {
-    font-size: 1rem;
-    color: #888888; /* 폰트 색상 통일 */
-}
+.review__balance-list .issue { border-color: #f85149; }
+.review__balance-list .recommendation { border-color: #1f883d; }

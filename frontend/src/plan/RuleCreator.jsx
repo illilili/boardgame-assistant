@@ -137,8 +137,19 @@ const RuleCreator = () => {
                 
                 {generatedRules ? (
                     <div className="rule-card">
-                        <h3>AI가 설계한 게임 규칙 (Rule ID: {generatedRules.ruleId})</h3>
-                        <div className="rule-item"><h4>턴 순서</h4><p>{generatedRules.turnStructure}</p></div>
+                        <h3>AI가 설계한 게임 규칙</h3>
+                        <div className="rule-item">
+                            <h4>턴 순서</h4>
+                            {/* ✨ 턴 순서 텍스트를 파싱하여 번호와 내용으로 분리 */}
+                            <div className="turn-structure-list">
+                                {generatedRules.turnStructure.split(/\s(?=\d\.)/).map((part, index) => (
+                                    <div key={index} className="turn-structure-item">
+                                        <span className="turn-number">{part.substring(0, 2)}</span>
+                                        <span className="turn-description">{part.substring(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                         <div className="rule-item"><h4>행동 규칙</h4><ul>{generatedRules.actionRules.map((rule, index) => <li key={index}>{rule}</li>)}</ul></div>
                         <div className="rule-item"><h4>승리 조건</h4><p>{generatedRules.victoryCondition}</p></div>
                         <div className="rule-item"><h4>페널티 규칙</h4><ul>{generatedRules.penaltyRules.map((rule, index) => <li key={index}>{rule}</li>)}</ul></div>

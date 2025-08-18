@@ -14,6 +14,10 @@ const Components = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    // ✨ 카테고리 필터링을 위한 state 추가
+    const [componentTypes, setComponentTypes] = useState([]);
+    const [activeCategory, setActiveCategory] = useState('All'); // 'All'을 기본값으로 설정
+
     useEffect(() => {
         const fetchAllConcepts = async () => {
             try {
@@ -41,6 +45,18 @@ const Components = () => {
             setSelectedConceptId('');
         }
     }, [projectId, conceptList]);
+
+    // ✨ componentsData가 변경될 때마다 카테고리 목록을 업데이트하는 useEffect
+    useEffect(() => {
+        if (componentsData && Array.isArray(componentsData.component)) {
+            const types = ['All', ...new Set(componentsData.component.map(item => item.type))];
+            setComponentTypes(types);
+            setActiveCategory('All'); // 새 데이터가 오면 'All' 카테고리로 초기화
+        } else {
+            setComponentTypes([]);
+        }
+    }, [componentsData]);
+
 
     const handleGenerateComponents = async (e) => {
         e.preventDefault();
@@ -90,15 +106,20 @@ const Components = () => {
             setIsLoading(false);
         }
     };
+    
+    // ✨ 현재 선택된 카테고리에 맞는 컴포넌트만 필터링
+    const filteredComponents = activeCategory === 'All' 
+        ? componentsData?.component 
+        : componentsData?.component.filter(item => item.type === activeCategory);
 
     return (
-        <div className="components-container">
-            <div className="components-form-section">
+        <div className="comp__container">
+            <div className="comp__form-section">
                 <h2>게임 구성요소 설계</h2>
                 <p>구성요소를 설계할 기획안을 선택하고 AI에게 생성을 요청하세요.</p>
                 
-                <form className="components-form" onSubmit={handleGenerateComponents}>
-                    <div className="form-group">
+                <form className="comp__form" onSubmit={handleGenerateComponents}>
+                    <div className="comp__form-group">
                         <label htmlFor="concept-select">기획안 선택</label>
                         <select
                             id="concept-select"
@@ -115,13 +136,13 @@ const Components = () => {
                         </select>
                     </div>
                     
-                    <button type="submit" disabled={isLoading || !selectedConceptId} className="submit-button">
+                    <button type="submit" disabled={isLoading || !selectedConceptId} className="comp__submit-button">
                         {isLoading ? 'AI 설계 중...' : '구성요소 생성하기'}
                     </button>
                 </form>
 
                 {componentsData && !isLoading && (
-                    <div className="regeneration-form-section">
+                    <div className="comp__regeneration-form-section">
                         <h4>피드백으로 개선하기</h4>
                         <p>AI가 생성한 구성요소가 마음에 들지 않으신가요? 아래에 피드백을 남겨 AI가 더 나은 결과물을 만들도록 해보세요.</p>
                         <form onSubmit={handleRegenerate}>
@@ -132,7 +153,7 @@ const Components = () => {
                                 rows="4"
                                 required
                             ></textarea>
-                            <button type="submit" disabled={isLoading || !feedback.trim()} className="regenerate-button">
+                            <button type="submit" disabled={isLoading || !feedback.trim()} className="comp__submit-button comp__regenerate-button">
                                 {isLoading ? 'AI 재설계 중...' : '피드백으로 재생성하기'}
                             </button>
                         </form>
@@ -140,30 +161,45 @@ const Components = () => {
                 )}
             </div>
 
-            <div className="components-result-section">
-                {isLoading && <div className="spinner"></div>}
-                {error && <div className="error-message">{error}</div>}
+            <div className="comp__result-section">
+                {isLoading && <div className="comp__spinner"></div>}
+                {error && <div className="comp__error-message">{error}</div>}
                 
                 {componentsData ? (
-                    <div className="components-card">
-                        <h3>AI가 설계한 게임 구성요소</h3>
-                        <div className="components-list">
-                            {Array.isArray(componentsData.component) && componentsData.component.map((item) => (
-                                <div key={item.componentId} className="component-item">
-                                    <div className="item-header">
-                                        <span className="item-type-tag">{item.type}</span>
-                                        <strong className="item-name">{item.title}</strong>
-                                        {item.quantity && <span className="item-quantity">({item.quantity})</span>}
+                    <div className="comp__card">
+                        <div className="comp__card-header">
+                            <h3>AI 게임 구성요소</h3>
+                            {/* ✨ 카테고리 필터 버튼 렌더링 */}
+                            <div className="comp__category-filters">
+                                {componentTypes.map(type => (
+                                    <button 
+                                        key={type} 
+                                        className={`comp__category-button ${activeCategory === type ? 'active' : ''}`}
+                                        onClick={() => setActiveCategory(type)}
+                                    >
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="comp__list">
+                            {/* ✨ 필터링된 컴포넌트 목록을 렌더링 */}
+                            {Array.isArray(filteredComponents) && filteredComponents.map((item) => (
+                                <div key={item.componentId} className="comp__item">
+                                    <div className="comp__item-header">
+                                        <span className="comp__item-type-tag">{item.type}</span>
+                                        <strong className="comp__item-name">{item.title}</strong>
+                                        {item.quantity && <span className="comp__item-quantity">({item.quantity})</span>}
                                     </div>
-                                    <p className="item-detail"><strong>역할 및 효과:</strong> {item.roleAndEffect}</p>
-                                    <p className="item-detail"><strong>아트 컨셉:</strong> {item.artConcept}</p>
-                                    <p className="item-detail"><strong>상호작용:</strong> {item.interconnection}</p>
+                                    <p className="comp__item-detail"><strong>역할 및 효과:</strong> {item.roleAndEffect}</p>
+                                    <p className="comp__item-detail"><strong>아트 컨셉:</strong> {item.artConcept}</p>
+                                    <p className="comp__item-detail"><strong>상호작용:</strong> {item.interconnection}</p>
                                     
-                                    <div className="subtask-section">
+                                    <div className="comp__subtask-section">
                                         <strong>세부 제작 작업:</strong>
-                                        <ul className="subtask-list">
+                                        <ul className="comp__subtask-list">
                                             {Array.isArray(item.subTasks) && item.subTasks.map(task => (
-                                                <li key={task.contentId} className={`status-${task.status.toLowerCase()}`}>
+                                                <li key={task.contentId} className={`comp__status-${task.status.toLowerCase()}`}>
                                                     {task.type} ({task.status})
                                                 </li>
                                             ))}
@@ -175,7 +211,7 @@ const Components = () => {
                     </div>
                 ) : (
                     !isLoading && !error && (
-                        <div className="initial-state">
+                        <div className="comp__initial-state">
                             <p>기획안을 선택하고 '구성요소 생성하기' 버튼을 누르면 AI가 설계한 결과가 여기에 표시됩니다.</p>
                         </div>
                     )
