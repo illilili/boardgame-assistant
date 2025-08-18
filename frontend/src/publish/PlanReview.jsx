@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// ⛔️ 변경 전: import { getPendingPlans, reviewPlan } from '../api/auth.js';
-// ✅ 변경 후: API 호출 함수를 새로운 publish.js 에서 가져옵니다.
-import { getPendingPlans, reviewPlan } from '../api/publish.js';
+// API 호출 함수를 auth.js에서 가져옵니다.
+import { getPendingPlans, reviewPlan } from '../api/auth.js';
 
 // PlanReviewPage 전용 스타일 (기존 코드와 동일)
 const PlanReviewPageStyles = `

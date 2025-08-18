@@ -11,6 +11,8 @@ import SignUp from './auth/SignUp';
 import MyPage from './auth/Mypage';
 import ProjectRenamePage from './plan/ProjectRenamePage';
 import PlanReview from './publish/PlanReview';
+import Translation from './publish/Translation';
+
 import Publish from './publish/Publish';
 import ProjectListPage from './project/ProjectListPage';
 import ProjectHomePage from './project/ProjectHomePage';
