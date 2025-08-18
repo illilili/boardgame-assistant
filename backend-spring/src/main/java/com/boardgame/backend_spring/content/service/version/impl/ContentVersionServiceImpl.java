@@ -93,4 +93,12 @@ public class ContentVersionServiceImpl implements ContentVersionService {
         content.setContentData(v.getData());
         contentRepository.save(content);
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public ContentVersionDetailResponse getVersionDetail(Long versionId) {
+        ContentVersion v = versionRepository.findById(versionId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 버전"));
+        return ContentVersionDetailResponse.from(v);
+    }
 }
