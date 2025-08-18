@@ -36,10 +36,13 @@ export const createProject = async (data) => {
 };
 
 /**
- * [API] 프로젝트 이름 변경
+ * [API] 프로젝트 이름 + 설명 변경
  */
-export const renameProject = async (id, newTitle) => {
-    const response = await apiClient.put(`/projects/${id}/rename`, { newTitle });
+export const renameProject = async (id, newTitle, newDescription) => {
+    const response = await apiClient.put(`/projects/${id}/rename`, {
+        newTitle,
+        newDescription,
+    });
     return response.data;
 };
 
