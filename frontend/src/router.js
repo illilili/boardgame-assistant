@@ -17,7 +17,6 @@ import ProjectListPage from './project/ProjectListPage';
 import ProjectHomePage from './project/ProjectHomePage';
 import AdminUserManagePage from './admin/UserManagePage'
 import DevelopmentWrapper from './development/DevelopmentWrapper';
-import PendingReviewPage from './publish/PendingReviewPage';
 import ReviewDetailPage from './publish/ReviewDetailPage';
 import AssignDeveloperPage from './publish/AssignDeveloperPage';
 import TrendAnalysisHome from './trendAnalysis/TrendAnalysisHome';

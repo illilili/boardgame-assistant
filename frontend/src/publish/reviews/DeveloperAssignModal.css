@@ -1,0 +1,106 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: var(--shadow-medium);
+  animation: fadeInUp 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.modal-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+  text-align: center;
+}
+
+.modal-content select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--gray-100);
+  color: var(--text-dark);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.modal-content select:focus {
+  outline: none;
+  border-color: var(--accent-warm);
+  box-shadow: 0 0 0 3px rgba(229,138,78,0.2);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.modal-button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+/* 배정 버튼 (주황) */
+.modal-button.assign {
+  background: var(--accent-warm);
+  color: var(--white);
+}
+.modal-button.assign:hover {
+  background: var(--accent-warm-dark);
+  transform: translateY(-2px);
+}
+
+/* 닫기 버튼 (회색) */
+.modal-button.close {
+  background: var(--gray-200);
+  color: var(--text-dark);
+}
+.modal-button.close:hover {
+  background: var(--gray-300);
+  transform: translateY(-2px);
+}
+
+
+.modal-content select {
+  -webkit-appearance: none; /* 크롬/사파리 기본 화살표 제거 */
+  -moz-appearance: none;    /* 파폭 기본 화살표 제거 */
+  appearance: none;         /* 표준 */
+  
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--gray-100) url("data:image/svg+xml;utf8,<svg fill='%23737373' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 1rem center;
+  background-size: 1rem;
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+.modal-content select:focus {
+  outline: none;
+  border-color: var(--accent-warm);
+  box-shadow: 0 0 0 3px rgba(229,138,78,0.2);
+}

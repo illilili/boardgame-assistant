@@ -95,3 +95,11 @@ export const reviewComponent = async ({ componentId, approve, reason }) => {
   });
   return res.data; // 성공 메시지
 };
+
+/**
+ * [API] 전체 프로젝트 목록 조회
+ */
+export const getAllProjects = async () => {
+  const response = await apiClient.get('/projects');
+  return response.data;
+};

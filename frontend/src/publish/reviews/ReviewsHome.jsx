@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import Header from '../../mainPage/Header';
 import PlanReviewsList from './PlanReviewsList';
 import PlanReviewDetail from './PlanReviewDetail';
-import ComponentReviewsList from './ComponentReviewsList';
+import DeveloperAssignList from './DeveloperAssignList'
 import ComponentReviewDetail from './ComponentReviewDetail';
+import ComponentReviewsList from './ComponentReviewsList';
 import './ReviewsHome.css';
 
 export default function ReviewsHome() {
@@ -12,6 +13,7 @@ export default function ReviewsHome() {
 
   const goPlanList = () => { setView('plan-list'); setSelectedId(null); };
   const goCompList = () => { setView('comp-list'); setSelectedId(null); };
+  const goDevAssign = () => { setView('dev-assign'); setSelectedId(null); };
 
   let content;
   switch (view) {
@@ -25,7 +27,10 @@ export default function ReviewsHome() {
       content = <ComponentReviewsList onSelect={(id) => { setSelectedId(id); setView('comp-detail'); }} />;
       break;
     case 'comp-detail':
-      content = <ComponentReviewDetail compId={selectedId} onBack={goCompList} />;
+      content = <ComponentReviewDetail componentId={selectedId} onBack={goCompList} />;
+      break;
+    case 'dev-assign':
+      content = <DeveloperAssignList />;
       break;
     default:
       content = <div style={{ padding: '2rem' }}>메뉴를 선택해주세요.</div>;
@@ -46,6 +51,12 @@ export default function ReviewsHome() {
           onClick={goCompList}
         >
           컴포넌트 승인
+        </div>
+        <div
+          className={`reviews-tab ${view.startsWith('dev') ? 'active' : ''}`}
+          onClick={goDevAssign}
+        >
+          개발자 배정
         </div>
       </div>
       <div className="reviews-content">
