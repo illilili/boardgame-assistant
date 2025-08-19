@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 router = APIRouter(
-    prefix="/api/translation",
+
     tags=["게임 번역"]
 )
 
