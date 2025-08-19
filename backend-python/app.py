@@ -13,6 +13,7 @@ from summary.router import router as summary_router
 from translate.router import router as translate_router 
 from pricing.api import router as pricing_router
 from copyright.router import router as copyright_router
+from game_translation.router import router as game_translation_router
 
 app = FastAPI()
 
@@ -30,3 +31,4 @@ app.include_router(rulebook_router)
 app.include_router(translate_router) 
 app.include_router(pricing_router)
 app.include_router(copyright_router)
+app.include_router(game_translation_router)
