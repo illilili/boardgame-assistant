@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Development.css';
 
 import ApprovedPlanViewer from './ApprovedPlanViewer';
@@ -32,7 +33,7 @@ function WelcomeScreen({ onStart }) {
 const workspaceNavItems = [
   { id: 'approved-plan', title: '승인된 기획안 조회', component: <ApprovedPlanViewer /> },
   { id: 'dev-list', title: '개발 목록 조회', component: <DevelopmentListViewer /> },
-  { id: 'card-gen', title: '카드/아이템 생성', component: <ComponentGenerator /> },
+  { id: 'card-gen', title: '카드 생성', component: <ComponentGenerator /> },
   { id: 'rulebook-gen', title: '룰북 초안 생성', component: <RulebookGenerator /> },
   { id: 'model-gen', title: '3D 모델 생성', component: <ModelGenerator /> },
   { id: 'thumbnail-gen', title: '썸네일 이미지 생성', component: <ThumbnailGenerator /> },
@@ -48,6 +49,7 @@ const workspaceNavItems = [
  */
 function Development() {
   const { projectId } = useContext(ProjectContext);
+  const navigate = useNavigate();
 
   // 현재 화면
   const [activeViewId, setActiveViewId] = useState(
@@ -93,8 +95,9 @@ function Development() {
       <div className="workspace-container new-design">
         <aside className="workspace-sidebar">
           <div className="sidebar-header">
-            <div className="logo">Dev</div>
-            {projectId && <div className="project-id">Project ID: {projectId}</div>}
+            <div className="logo" onClick={() => navigate(`/projects/${projectId}`)}>
+              Dev
+            </div>
           </div>
           <ul className="workspace-nav-list">
             {workspaceNavItems.map((item) => (

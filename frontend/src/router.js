@@ -10,8 +10,7 @@ import Login from './auth/Login';
 import SignUp from './auth/SignUp';
 import MyPage from './auth/Mypage';
 import ProjectRenamePage from './plan/ProjectRenamePage';
-import PlanReview from './publish/PlanReview';
-import TranslationWrapper from './publish/TranslationWrapper';
+import ReviewsHome from './publish/reviews/ReviewsHome';
 
 import Publish from './publish/Publish';
 import ProjectListPage from './project/ProjectListPage';
@@ -86,7 +85,7 @@ const router = createBrowserRouter([
   {
     id: 11,
     path: '/plan-review',
-    element: <PendingReviewPage />
+    element: <ReviewsHome />
   },
   {
     id: 12,
