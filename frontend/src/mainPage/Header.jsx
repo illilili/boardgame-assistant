@@ -19,7 +19,9 @@ const Header = ({ projectMode = false }) => {
     e.preventDefault();
     try {
       const result = await logout();
-      alert(result.message);
+      // result.message가 없으면 기본 메시지 출력
+      alert(result?.message || "로그아웃 되었습니다.");
+
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('role');

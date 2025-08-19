@@ -1,23 +1,27 @@
+// src/development/ModelGenerator.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import './ModelGenerator.css';
 import {
-  getModel3DPreview,
+  getModel3DPreview,      // 입력 폼 프리필용(옵션)
   generate3DModel,
   saveContentVersion,
   getContentVersions,
   rollbackContentVersion,
-  getContentDetail,
+  getContentDetail,       // ✅ GLB는 항상 여기서 읽음
   completeContent,
   submitComponent
 } from '../api/development';
 
 function ModelGenerator({ contentId, componentId }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [generatedModel, setGeneratedModel] = useState(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
   const [manualId, setManualId] = useState(contentId || '');
+  const isFromList = Boolean(contentId);
+  const finalContentId = isFromList ? contentId : manualId;
+
+  // 입력 폼(선택)
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [componentInfo, setComponentInfo] = useState('');
@@ -25,45 +29,51 @@ function ModelGenerator({ contentId, componentId }) {
   const [storyline, setStoryline] = useState('');
   const [style, setStyle] = useState('');
 
-  const isFromList = Boolean(contentId);
-  const finalContentId = isFromList ? contentId : manualId;
+  // ✅ 실제 표시/다운로드에 쓰는 GLB URL
+  const [glbUrl, setGlbUrl] = useState('');
 
-  // 버전 관리 상태
+  // 버전 관리
   const [versions, setVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [versionNote, setVersionNote] = useState('3D 모델 스냅샷');
 
-  // camelCase 변환
-  const normalizeModelKeys = (data) => {
-    if (!data) return null;
-    return {
-      ...data,
-      previewUrl: data.preview_url || data.previewUrl || '',
-      refinedUrl: data.refined_url || data.refinedUrl || ''
-    };
-  };
-
-  // 버전 목록 불러오기
+  // 버전 목록
   const fetchVersions = useCallback(async () => {
     if (!finalContentId) return;
     try {
       const list = await getContentVersions(finalContentId);
       setVersions(list);
-      if (list.length > 0) {
-        setSelectedVersion(list[0].versionId);
-      }
+      if (list.length > 0) setSelectedVersion(list[0].versionId);
     } catch (err) {
       console.error(err);
       setError('버전 목록 불러오기 실패');
     }
   }, [finalContentId]);
 
-  // 초기 미리보기 + 버전 불러오기
+  // ✅ 콘텐츠 상세에서 GLB URL 갱신
+  const refreshGlbFromDetail = useCallback(async () => {
+    if (!finalContentId) return;
+    try {
+      const detail = await getContentDetail(finalContentId);
+      // detail.contentData 가 GLB URL
+      if (detail?.contentData && typeof detail.contentData === 'string' && detail.contentData.endsWith('.glb')) {
+        setGlbUrl(detail.contentData);
+      } else {
+        setGlbUrl(''); // GLB 없으면 비움
+      }
+    } catch (e) {
+      console.error(e);
+      setError('3D 모델 상세 불러오기 실패');
+    }
+  }, [finalContentId]);
+
+  // 초기 로드: 프리필(선택) + GLB + 버전
   useEffect(() => {
     if (!finalContentId) return;
     (async () => {
       try {
-        const preview = await getModel3DPreview(finalContentId);
+        // 입력 폼 프리필(있으면)
+        const preview = await getModel3DPreview(finalContentId).catch(() => null);
         if (preview) {
           setName(preview.name || '');
           setDescription(preview.description || '');
@@ -71,19 +81,16 @@ function ModelGenerator({ contentId, componentId }) {
           setTheme(preview.theme || '');
           setStoryline(preview.storyline || '');
         }
-        const saved = localStorage.getItem(`model3d_${finalContentId}`);
-        if (saved) {
-          setGeneratedModel(normalizeModelKeys(JSON.parse(saved)));
-        }
+        await refreshGlbFromDetail();
         await fetchVersions();
       } catch (err) {
         console.error(err);
-        setError('3D 모델 미리보기 불러오기 실패');
+        setError('3D 모델 초기 데이터 불러오기 실패');
       }
     })();
-  }, [finalContentId, fetchVersions]);
+  }, [finalContentId, fetchVersions, refreshGlbFromDetail]);
 
-  // 모델 생성
+  // 생성
   const handleGenerateClick = async () => {
     if (!finalContentId) return setMessage('❌ 콘텐츠 ID를 입력하세요.');
     if (!style) return setMessage('❌ 스타일을 선택하세요.');
@@ -92,7 +99,7 @@ function ModelGenerator({ contentId, componentId }) {
     setMessage('');
 
     try {
-      const response = await generate3DModel({
+      await generate3DModel({
         contentId: finalContentId,
         name,
         description,
@@ -101,9 +108,8 @@ function ModelGenerator({ contentId, componentId }) {
         storyline,
         style
       });
-      const formatted = normalizeModelKeys(response);
-      setGeneratedModel(formatted);
-      localStorage.setItem(`model3d_${finalContentId}`, JSON.stringify(formatted));
+      // ✅ 생성 후 최신 GLB 재조회
+      await refreshGlbFromDetail();
       setMessage('✅ 3D 모델 생성 성공!');
     } catch (err) {
       console.error(err);
@@ -142,11 +148,8 @@ function ModelGenerator({ contentId, componentId }) {
 
     try {
       await rollbackContentVersion(finalContentId, selectedVersion);
-      localStorage.removeItem(`model3d_${finalContentId}`);
-      const detail = await getContentDetail(finalContentId);
-      if (detail && detail.contentData) {
-        setGeneratedModel(normalizeModelKeys(detail));
-      }
+      // ✅ 롤백 후 GLB 재조회
+      await refreshGlbFromDetail();
       await fetchVersions();
       setMessage(`✅ 롤백 완료! (버전 ID: ${selectedVersion})`);
     } catch (err) {
@@ -157,7 +160,7 @@ function ModelGenerator({ contentId, componentId }) {
     }
   };
 
-  // 완료 처리
+  // 완료
   const handleComplete = async () => {
     if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
     setIsLoading(true);
@@ -191,12 +194,11 @@ function ModelGenerator({ contentId, componentId }) {
     }
   };
 
-  // 초기화
+  // 다시 생성(입력값은 둔 채, 보기만 초기화)
   const handleReset = () => {
-    setGeneratedModel(null);
+    setGlbUrl('');
     setError('');
     setMessage('');
-    if (finalContentId) localStorage.removeItem(`model3d_${finalContentId}`);
   };
 
   return (
@@ -226,22 +228,28 @@ function ModelGenerator({ contentId, componentId }) {
           </div>
 
           {/* 입력 폼 */}
-          <div className="form-group"><label>이름</label>
+          <div className="form-group">
+            <label>이름</label>
             <input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-          <div className="form-group"><label>설명</label>
+          <div className="form-group">
+            <label>설명</label>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
-          <div className="form-group"><label>아트 컨셉</label>
+          <div className="form-group">
+            <label>아트 컨셉</label>
             <input value={componentInfo} onChange={(e) => setComponentInfo(e.target.value)} />
           </div>
-          <div className="form-group"><label>테마</label>
+          <div className="form-group">
+            <label>테마</label>
             <input value={theme} onChange={(e) => setTheme(e.target.value)} />
           </div>
-          <div className="form-group"><label>스토리라인</label>
+          <div className="form-group">
+            <label>스토리라인</label>
             <textarea value={storyline} onChange={(e) => setStoryline(e.target.value)} rows={3} />
           </div>
-          <div className="form-group"><label>스타일</label>
+          <div className="form-group">
+            <label>스타일</label>
             <select value={style} onChange={(e) => setStyle(e.target.value)}>
               <option value="">스타일 선택</option>
               <option value="realistic">Realistic</option>
@@ -250,7 +258,7 @@ function ModelGenerator({ contentId, componentId }) {
           </div>
 
           {/* 생성 버튼 */}
-          {!generatedModel && (
+          {!glbUrl && (
             <div className="generate-button-container">
               <button onClick={handleGenerateClick} className="generate-button">
                 3D 모델 생성하기
@@ -259,37 +267,21 @@ function ModelGenerator({ contentId, componentId }) {
           )}
 
           {/* 결과 */}
-          {generatedModel && (
+          {glbUrl && (
             <div className="model-result-container">
               <div className="model-viewer-wrapper">
-                {(generatedModel.refinedUrl || generatedModel.previewUrl) ? (
-                  <model-viewer
-                    src={generatedModel.refinedUrl || generatedModel.previewUrl}
-                    alt={generatedModel.name}
-                    auto-rotate
-                    camera-controls
-                    style={{ width: '100%', height: '500px' }}
-                  ></model-viewer>
-                ) : (
-                  <p>3D 미리보기를 표시할 수 없습니다.</p>
-                )}
+                <model-viewer
+                  src={glbUrl}
+                  alt={name || '3D Model'}
+                  auto-rotate
+                  camera-controls
+                  style={{ width: '100%', height: '500px' }}
+                ></model-viewer>
               </div>
               <div className="model-info-wrapper">
-                <h3>🎉 생성 완료!</h3>
-                <div className="info-item">
-                  <strong>이름</strong><span>{generatedModel.name}</span>
-                </div>
+                <h3>🎉 생성/불러오기 완료!</h3>
                 <div className="download-links">
-                  {generatedModel.refinedUrl && (
-                    <a href={generatedModel.refinedUrl} target="_blank" rel="noreferrer">
-                      GLB 다운로드
-                    </a>
-                  )}
-                  {generatedModel.previewUrl && (
-                    <a href={generatedModel.previewUrl} target="_blank" rel="noreferrer">
-                      미리보기 링크
-                    </a>
-                  )}
+                  <a href={glbUrl} target="_blank" rel="noreferrer">GLB 다운로드</a>
                 </div>
 
                 {/* 버전 저장 */}
@@ -317,7 +309,10 @@ function ModelGenerator({ contentId, componentId }) {
           {versions.length > 0 && (
             <div className="version-select-form">
               <label>버전 선택</label>
-              <select value={selectedVersion || ''} onChange={(e) => setSelectedVersion(Number(e.target.value))}>
+              <select
+                value={selectedVersion || ''}
+                onChange={(e) => setSelectedVersion(Number(e.target.value))}
+              >
                 {versions.map((v) => (
                   <option key={v.versionId} value={v.versionId}>
                     v{v.versionNo} - {v.note} ({v.createdAt})
