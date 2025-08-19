@@ -206,7 +206,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
       )}
 
       {error && <p className="error-text">{error}</p>}
-      {message && <p className="upload-message">{message}</p>} {/* ✅ 메시지 출력 */}
+
 
       {!isLoading && (
         <>
@@ -298,6 +298,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
                   제출
                 </button>
               </div>
+              {message && <p className="upload-message">{message}</p>} {/* ✅ 메시지 출력 */}
             </div>
           )}
         </>
