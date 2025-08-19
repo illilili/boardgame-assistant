@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { getComponentDetail, reviewComponent } from '../../api/apiClient';
+import './ComponentReviewDetail.css';
 
 function ComponentReviewDetail({ componentId, onBack }) {
   const [component, setComponent] = useState(null);
@@ -32,9 +33,8 @@ function ComponentReviewDetail({ componentId, onBack }) {
     try {
       setActionLoading(true);
       await reviewComponent({ componentId, approve, reason: approve ? null : rejectReason });
-      setStatusMessage(approve ? '✅ 승인 완료' : '❌ 반려 완료');
+      setStatusMessage(approve ? '✅ 승인되었습니다.' : '❌ 반려되었습니다.');
       setRejectReason('');
-      onBack(); // ✅ 성공 후 목록으로 이동
     } catch (err) {
       setStatusMessage(err.response?.data?.message || '처리 실패');
     } finally {
@@ -45,21 +45,27 @@ function ComponentReviewDetail({ componentId, onBack }) {
   const renderContent = (item) => {
     const type = (item.contentType || item.subTaskType || '').toLowerCase();
 
-    if (!item.contentData) return <p style={{ color: '#888' }}>내용 없음</p>;
+    if (!item.contentData) return <p className="empty-content">내용 없음</p>;
 
     if (type.includes('image') || /\.(png|jpg|jpeg|gif)$/i.test(item.contentData)) {
-      return <img src={item.contentData} alt="미리보기" style={{ maxWidth: '300px', border: '1px solid #ccc' }} />;
+      return (
+        <div className="content-preview">
+          <img src={item.contentData} alt="미리보기" />
+        </div>
+      );
     }
 
     if (type.includes('3d') || /\.glb$/i.test(item.contentData)) {
       return (
-        <model-viewer
-          src={item.contentData}
-          alt="3D 모델"
-          auto-rotate
-          camera-controls
-          style={{ width: '400px', height: '400px' }}
-        />
+        <div className="content-preview">
+          <model-viewer
+            src={item.contentData}
+            alt="3D 모델"
+            auto-rotate
+            camera-controls
+            style={{ width: '400px', height: '400px', margin: 'auto', display: 'block' }}
+          />
+        </div>
       );
     }
 
@@ -70,44 +76,37 @@ function ComponentReviewDetail({ componentId, onBack }) {
           title="PDF 미리보기"
           width="100%"
           height="500px"
-          style={{ border: '1px solid #ccc' }}
+          style={{ border: '1px solid #ccc', display: 'block', margin: 'auto' }}
         />
       );
     }
 
-    return (
-      <pre style={{ whiteSpace: 'pre-wrap', background: '#f5f5f5', padding: '0.5rem' }}>
-        {item.contentData}
-      </pre>
-    );
+    return <pre className="content-text">{item.contentData}</pre>;
   };
 
-  if (loading) return <div style={{ padding: '2rem' }}>로딩 중...</div>;
-  if (!component) return <div style={{ padding: '2rem', color: 'red' }}>컴포넌트 정보를 불러올 수 없습니다.</div>;
+  if (loading) return <div className="loading">로딩 중...</div>;
+  if (!component) return <div className="error">컴포넌트 정보를 불러올 수 없습니다.</div>;
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '900px', margin: 'auto' }}>
-      <h1>컴포넌트 상세 검토</h1>
-      <button onClick={onBack} style={{ marginBottom: '1rem' }}>← 목록으로</button>
+    <div className="review-detail-container">
+      <h1 className="detail-title">컴포넌트 상세 검토</h1>
 
-      <div style={{ marginBottom: '1rem' }}>
+      <div className="detail-header">
         <h3>{component.title}</h3>
-        <p>타입: {component.type}</p>
-        <p>상태: {component.status}</p>
       </div>
 
       {statusMessage && (
-        <div style={{ marginBottom: '1rem', color: statusMessage.includes('완료') ? 'green' : 'red' }}>
+        <div className={`status-message ${statusMessage.includes('되었습니다') ? 'success' : 'error'}`}>
           {statusMessage}
         </div>
       )}
 
-      <h3>세부 항목</h3>
-      <ul>
+      <ul className="item-list">
         {component.items?.map((item) => (
-          <li key={item.contentId} style={{ marginBottom: '1.5rem' }}>
-            <p><b>SubTask:</b> {item.subTaskType} ({item.subTaskStatus})</p>
-            {item.note && <p><b>비고:</b> {item.note}</p>}
+          <li key={item.contentId} className="item-row">
+            <span className={`comp-type ${item.subTaskType?.toLowerCase()}`}>
+              {item.subTaskType}
+            </span>
             {renderContent(item)}
           </li>
         ))}
@@ -118,44 +117,28 @@ function ComponentReviewDetail({ componentId, onBack }) {
         onChange={(e) => setRejectReason(e.target.value)}
         placeholder="반려 사유 입력..."
         rows={3}
-        style={{
-          width: '100%',
-          marginBottom: '1rem',
-          padding: '0.5rem',
-          borderRadius: '6px',
-          border: '1px solid #ccc',
-          resize: 'none',
-        }}
+        className="reject-textarea"
       />
 
-      <div style={{ display: 'flex', gap: '1rem' }}>
-        <button
-          onClick={() => handleDecision(true)}
-          disabled={actionLoading}
-          style={{
-            background: '#4CAF50',
-            color: 'white',
-            padding: '0.7rem 1.5rem',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: actionLoading ? 'not-allowed' : 'pointer',
-          }}
-        >
-          ✅ 승인
-        </button>
-        <button
-          onClick={() => handleDecision(false)}
-          disabled={actionLoading || !rejectReason.trim()}
-          style={{
-            background: rejectReason.trim() ? '#f44336' : '#ccc',
-            color: 'white',
-            padding: '0.7rem 1.5rem',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: actionLoading || !rejectReason.trim() ? 'not-allowed' : 'pointer',
-          }}
-        >
-          ❌ 반려
+      <div className="action-buttons">
+        <div className="left-buttons">
+          <button
+            onClick={() => handleDecision(true)}
+            disabled={actionLoading}
+            className="approve-btn"
+          >
+            ✅ 승인
+          </button>
+          <button
+            onClick={() => handleDecision(false)}
+            disabled={actionLoading || !rejectReason.trim()}
+            className="reject-btn"
+          >
+            ❌ 반려
+          </button>
+        </div>
+        <button onClick={onBack} className="back-btn">
+          ← 목록으로
         </button>
       </div>
     </div>

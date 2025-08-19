@@ -1,0 +1,91 @@
+.plan-reviews-wrapper {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+}
+
+.plan-reviews-wrapper h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 0.5rem;
+}
+
+.plan-reviews-wrapper p {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin: 0 0 1.5rem;
+}
+
+.plan-reviews-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-reviews-item {
+  background: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.plan-reviews-item:hover {
+  background: var(--gray-100);
+  box-shadow: var(--shadow-subtle);
+  transform: translateY(-2px);
+}
+
+.plan-reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.plan-reviews-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.plan-status-badge {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.plan-reviews-sub {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin: 0.3rem 0 0.6rem;
+}
+
+.plan-reviews-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+.plan-reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* start → center */
+  gap: 12px;
+}
+
+.plan-reviews-sub {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin: 0.3rem 0 0.4rem;
+  text-align: left; /* ✅ 항상 왼쪽 정렬 */
+}

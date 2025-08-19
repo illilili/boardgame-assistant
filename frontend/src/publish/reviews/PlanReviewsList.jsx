@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getPendingPlans } from '../../api/apiClient';
+import './PlanReviewsList.css';
 
 /**
  * PlanReviewsList
@@ -31,63 +32,33 @@ function PlanReviewsList({ onSelect, onBack }) {
   if (error) return <div style={{ padding: '2rem', color: 'red' }}>오류: {error}</div>;
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '900px', margin: 'auto' }}>
+    <div className="plan-reviews-wrapper">
       <h1>제출된 기획안 목록</h1>
       <p>기획안을 선택해 상세 내용을 검토할 수 있습니다.</p>
-      <hr />
+
       {plans.length === 0 ? (
         <p>검토할 기획안이 없습니다.</p>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <ul className="plan-reviews-list">
           {plans.map((plan) => (
             <li
               key={plan.planId}
+              className="plan-reviews-item"
               onClick={() => onSelect(plan.planId)}
-              style={{
-                border: '1px solid #e5e7eb',
-                borderRadius: '10px',
-                marginBottom: '1rem',
-                padding: '1rem 1.25rem',
-                cursor: 'pointer',
-                transition: 'background 0.2s, box-shadow .2s'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f9fafb';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'white';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 12 }}>
-                <h3 style={{ marginTop: 0, marginBottom: 6 }}>
-                  {plan.projectTitle || `프로젝트 ID: ${plan.projectId}`}
-                </h3>
-                {/* 상태 뱃지 */}
+              <div className="plan-reviews-header">
+                <h3>{plan.projectTitle || `프로젝트 ID: ${plan.projectId}`}</h3>
                 {plan.status && (
-                  <span
-                    style={{
-                      fontSize: 12,
-                      padding: '4px 8px',
-                      borderRadius: 999,
-                      background: '#eef2ff',
-                      color: '#3730a3',
-                      fontWeight: 600,
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    {plan.status}
-                  </span>
+                  <span className="plan-status-badge">{plan.status}</span>
                 )}
               </div>
 
-              {/* 부제 정보 라인 */}
-              <div style={{ color: '#6b7280', fontSize: 14, marginBottom: 6 }}>
+              {/* 컨셉을 제목 바로 아래 라인 */}
+              <div className="plan-reviews-sub">
                 {plan.conceptTheme ? `컨셉: ${plan.conceptTheme}` : '컨셉 정보 없음'}
               </div>
 
-              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center', color: '#4b5563', fontSize: 14 }}>
+              <div className="plan-reviews-meta">
                 <span>기획안 ID: <b>{plan.planId}</b></span>
                 <span>제출자: <b>{plan.submittedBy || '알 수 없음'}</b></span>
               </div>

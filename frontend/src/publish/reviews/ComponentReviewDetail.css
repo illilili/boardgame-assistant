@@ -1,0 +1,139 @@
+.review-detail-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.detail-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  margin: 1.5rem 0 1rem;
+  font-size: 1.3rem;
+  font-weight: 700;       /* ✅ 더 굵게 */
+  text-align: center;
+  color: #111;            /* ✅ 더 진한 색 */
+}
+
+.detail-header {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.item-list {
+  list-style: none;
+  padding: 0;
+}
+
+.item-row {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.comp-type {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.comp-type.card { background: #fff3e0; color: #e65100; }
+.comp-type.rulebook, .comp-type.document { background: #ede7f6; color: #4527a0; }
+.comp-type.token, .comp-type.model, .comp-type.pawn, .comp-type.dice { background: #f1f8e9; color: #33691e; }
+.comp-type.image, .comp-type.thumbnail { background: #fce4ec; color: #ad1457; }
+.comp-type.text { background: #e3f2fd; color: #1565c0; }
+
+.content-preview img {
+  max-width: 400px;
+  margin: auto;
+  display: block;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.content-text {
+  background: #f5f5f5;
+  padding: 0.5rem;
+  border-radius: 6px;
+  text-align: left;
+}
+
+.reject-textarea {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: none;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.left-buttons {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.approve-btn {
+  background: #4CAF50;
+  color: white;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.approve-btn:disabled {
+  background: #A5D6A7;
+  cursor: not-allowed;
+}
+
+.reject-btn {
+  background: #f44336;
+  color: white;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.reject-btn:disabled {
+  background: #9ca3af; /* Tailwind gray-400 느낌 */
+  color: #f5f5f5;      /* 글자는 연한 흰색 */
+  cursor: not-allowed;
+  transform: none;
+}
+
+.back-btn {
+  background: #e0e0e0;
+  color: #333;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.status-message {
+  margin: 1rem 0;
+  padding: 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+  text-align: center;
+}
+.status-message.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.status-message.error {
+  background: #ffebee;
+  color: #c62828;
+}
