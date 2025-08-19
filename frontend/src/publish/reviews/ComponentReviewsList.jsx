@@ -79,7 +79,7 @@ function ComponentReviewList() {
 
   return (
     <div className="review-container">
-      <h1 className="review-title">제출된 컴포넌트 목록 (승인 대기)</h1>
+      <h1 className="review-title">제출된 컴포넌트 목록</h1>
       {groups.length === 0 ? (
         <p>승인 대기 중인 컴포넌트가 없습니다.</p>
       ) : (

@@ -54,7 +54,17 @@ const ProjectHomePage = () => {
       })
       .catch(err => {
         console.error("프로젝트 정보 로딩 실패:", err);
-        navigate('/projects');
+        const code = err.response?.status;
+        if (code === 403) {
+          alert("권한이 없습니다. 프로젝트 멤버 또는 관리자만 접근 가능합니다.");
+          navigate('/projects');
+        } else if (code === 404) {
+          alert("존재하지 않는 프로젝트입니다.");
+          navigate('/projects');
+        } else {
+          alert("프로젝트 정보를 불러올 수 없습니다.");
+          navigate('/projects');
+        }
       });
   }, [projectId, navigate]);
 
@@ -112,10 +122,9 @@ const ProjectHomePage = () => {
               <p className="project-home-page__description">
                 {projectDesc || "프로젝트 설명이 없습니다."}
               </p>
-              <span className={`project-home-page__status-badge status--${status.toLowerCase()}`}>{status}</span>
-              <div className="project-home-page__progress-container" style={{ marginTop: '10px' }}>
+              <div className="project-home-page__progress-container">
                 <div className="project-home-page__progress-bar" style={{ width: `${progress}%` }}></div>
-                <span>{progress}%</span>
+                <span className="project-home-page__progress-percent">{progress}%</span>
               </div>
               <button
                 className="project-home-page__edit-btn"
@@ -186,7 +195,7 @@ const ProjectHomePage = () => {
           </div>
         </div>
       )}
-      <Footer />
+
     </ProjectContext.Provider>
   );
 };

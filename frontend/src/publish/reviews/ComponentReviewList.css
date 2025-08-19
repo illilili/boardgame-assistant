@@ -15,7 +15,7 @@
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.08);
-  padding: 1.5rem 2rem;
+  padding: 1rem 2rem 1.5rem 2rem; /* 위 1rem, 아래 1.5rem */
   margin-bottom: 2rem;
   max-width: 900px;
   width: 100%;
@@ -29,10 +29,11 @@
 .project-card h2 {
   font-size: 1.3rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin: 0 0 1rem 0;  /* 위는 0, 아래는 1rem */
   padding-bottom: 0.5rem;
   border-bottom: 3px solid #E58A4E;
   color: #333;
+  display: inline-block;
 }
 
 .component-list {

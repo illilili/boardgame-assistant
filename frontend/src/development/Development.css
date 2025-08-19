@@ -1,40 +1,35 @@
 /* Development.css (전문가 레이아웃 버전, Plan.css 참고) */
-
-/* --- ✨ 디자인 시스템 변수 --- */
-:root {
-  --bg-dark: #1f2937;
-  --bg-light: #f9fafb;
-  --accent-primary: #4f46e5;
-  --accent-warm: #E58A4E; 
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --border-color: #e5e7eb;
-  --white: #ffffff;
-  --font-main: 'Inter', sans-serif;
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1),
-               0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --header-height: 70px;
-}
-
-/* --- ✨ 기본 설정 --- */
-body {
-  font-family: var(--font-main);
-  margin: 0;
-  background-color: var(--bg-light);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* --- ✨ 전체 레이아웃 --- */
-.workspace-container.new-design {
+/* --- 전체 레이아웃 (Development 한정) --- */
+.development-page .workspace-container.new-design {
   display: flex;
-  height: calc(100vh - var(--header-height));
+  height: calc(100vh - var(--header-height)); /* 내부 스크롤만 */
   background-color: var(--bg-light);
 }
 
-/* --- ✨ 사이드바 --- */
+/* --- 메인 컨텐츠 (Development 한정) --- */
+.development-page .workspace-main-content {
+  flex-grow: 1;
+  padding: 40px 60px;
+  overflow-y: auto;   /* 안쪽에서만 스크롤 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- 반응형 (Development 한정) --- */
+@media (max-width: 1024px) {
+  .development-page .workspace-container.new-design {
+    flex-direction: column;
+  }
+
+  .development-page .workspace-main-content {
+    padding: 32px 24px;
+  }
+}
+
 .workspace-sidebar {
   width: 280px;
   background-color: var(--white);
+  /* ✨ 기존: var(--bg-dark) */
   border-right: 1px solid var(--border-color);
   padding: 32px;
   flex-shrink: 0;
@@ -43,26 +38,45 @@ body {
   box-sizing: border-box;
 }
 
+body {
+  font-family: var(--font-main);
+  margin: 0;
+  background-color: var(--bg-light);
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* --- 사이드바 --- */
+.dev-workspace-sidebar {
+  width: 280px;
+  background-color: var(--white);
+  /* ✨ Dev는 흰색 */
+  border-right: 1px solid var(--border-color);
+  padding: 32px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* --- 사이드바 헤더 --- */
 .sidebar-header {
   margin-bottom: 40px;
-  padding-left: 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 20px;
 }
 
-.logo {
+.dev-logo {
   font-weight: 800;
   font-size: 1.5rem;
-  color: var(--text-primary);
   letter-spacing: 1px;
+  text-transform: uppercase; /* DEV 대문자 */
+  cursor: pointer;
+  color: var(--text-primary);
 }
 
-.project-id {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-top: 4px;
-}
-
-/* --- ✨ 네비게이션 리스트 --- */
+/* --- 네비게이션 --- */
 .workspace-nav-list {
   list-style: none;
   padding: 0;
@@ -72,7 +86,7 @@ body {
   gap: 8px;
 }
 
-.nav-item {
+.dev-nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -85,18 +99,18 @@ body {
   transition: color 0.2s, background-color 0.2s;
 }
 
-.nav-item:hover {
+.dev-nav-item:hover {
   color: var(--text-primary);
   background-color: #f3f4f6;
 }
 
-.nav-item.active {
-  color: var(--accent-primary);
+.dev-nav-item.active {
+  color: var(--accent-warm);
   font-weight: 600;
   background-color: #f3f4f6;
 }
 
-/* --- ✨ 메인 컨텐츠 영역 --- */
+/* --- 메인 컨텐츠 --- */
 .workspace-main-content {
   flex-grow: 1;
   padding: 40px 60px;
@@ -105,91 +119,12 @@ body {
   flex-direction: column;
 }
 
-/* --- ✨ 시작 화면 (WelcomeScreen) --- */
-.welcome-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-grow: 1;
-  text-align: center;
-  color: var(--text-primary);
-}
-
-.welcome-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  line-height: 1;
-  color: var(--accent-warm);
-}
-
-.welcome-screen h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 0 10px 0;
-}
-
-.welcome-screen p {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  max-width: 450px;
-  line-height: 1.6;
-  margin-bottom: 30px;
-}
-
-.start-button {
-  background: linear-gradient(to right, var(--accent-warm), #fb923c);
-  color: var(--white);
-  border: none;
-  padding: 14px 28px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: var(--shadow-md);
-}
-
-.start-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-/* --- ✨ 각 컴포넌트 박스 공통 --- */
-.component-placeholder {
-  animation: fadeIn 0.5s ease-in-out;
-  background-color: var(--white);
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-md);
-}
-
-.component-placeholder h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-  border-bottom: 2px solid var(--accent-warm);
-  padding-bottom: 8px;
-}
-
-.component-placeholder p {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-/* --- ✨ 애니메이션 --- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- ✨ 반응형 --- */
+/* --- 반응형 --- */
 @media (max-width: 1024px) {
   .workspace-container.new-design {
     flex-direction: column;
   }
+
   .workspace-sidebar {
     width: 100%;
     height: auto;
@@ -199,19 +134,20 @@ body {
     border-right: none;
     border-bottom: 1px solid var(--border-color);
   }
+
   .sidebar-header {
     margin: 0;
   }
+
   .workspace-nav-list {
     flex-direction: row;
     gap: 16px;
     margin-left: auto;
   }
-  .nav-item.active {
+
+  .dev-nav-item.active {
     background-color: transparent;
     color: var(--accent-warm);
-  }
-  .workspace-main-content {
-    padding: 32px 24px;
+    /* 모바일도 주황 */
   }
 }
