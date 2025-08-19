@@ -1,4 +1,11 @@
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+# .env 파일 로드
+load_dotenv()
+
 from concept.router import router as concept_router
 from goal.router import router as goal_router
 from rule.router import router as rule_router
@@ -16,6 +23,15 @@ from copyright.router import router as copyright_router
 from game_translation.router import router as game_translation_router
 
 app = FastAPI()
+
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # React 개발 서버
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(concept_router)
 app.include_router(goal_router)
