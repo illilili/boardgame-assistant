@@ -11,6 +11,7 @@ import com.boardgame.backend_spring.project.repository.ProjectMemberRepository;
 import com.boardgame.backend_spring.user.entity.User;
 import com.boardgame.backend_spring.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,11 +83,21 @@ public class ProjectService {
         return new ProjectStatusResponseDto(project.getStatus());
     }
 
-    // 프로젝트 단건 조회용
+    // 프로젝트 단건 조회 (권한 체크 추가)
     @Transactional(readOnly = true)
-    public ProjectSummaryDto getProjectDetail(Long projectId) {
+    public ProjectSummaryDto getProjectDetail(Long projectId, User user) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다."));
+
+        // 권한 체크
+        boolean isAdmin = user.getRole() == User.Role.ADMIN;
+        boolean isPublisher = user.getRole() == User.Role.PUBLISHER;
+        boolean isMember = projectMemberRepository.existsByProjectAndUser(project, user);
+
+        if (!(isAdmin || isPublisher || isMember)) {
+            throw new AccessDeniedException("해당 프로젝트에 접근할 권한이 없습니다.");
+        }
+
         return ProjectSummaryDto.from(project);
     }
 
@@ -169,5 +180,21 @@ public class ProjectService {
                         .build()
                 )
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteProject(Long projectId, User user) {
+        // 권한 체크
+        if (user.getRole() != User.Role.ADMIN) {
+            throw new RuntimeException("관리자만 프로젝트를 삭제할 수 있습니다.");
+        }
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다."));
+
+        // 연관된 멤버/로그/태스크 등 cascade 설정이 없다면 직접 삭제 필요
+        projectMemberRepository.deleteAll(projectMemberRepository.findAllByProject(project));
+
+        projectRepository.delete(project);
     }
 }
