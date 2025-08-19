@@ -1,3 +1,4 @@
+// src/mypage/MyPage.jsx
 import React, { useState as useStateMyPage, useEffect as useEffectMyPage } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getMyPageInfo as apiGetMyPageInfo } from '../api/auth.js';
@@ -5,6 +6,8 @@ import Header from '../mainPage/Header';
 import Footer from '../mainPage/Footer';
 import './MyPage.css';
 import '../project/ProjectListPage.css';
+
+const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/%EC%95%84%EC%B9%B4%EC%9E%90.png';
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -62,9 +65,16 @@ const MyPage = () => {
                         className="project-list-page__card"
                         onClick={() => navigate(`/projects/${project.projectId}`)}
                       >
+                        {/* ✅ 썸네일 추가 */}
+                        <img
+                          src={project.thumbnailUrl || DEFAULT_THUMBNAIL}
+                          alt={`${project.projectName} 썸네일`}
+                          className="project-list-page__thumbnail"
+                        />
                         <h3 className="project-list-page__card-title">{project.projectName}</h3>
-                        <p className="project-list-page__card-id">프로젝트 ID: {project.projectId}</p>
-                        <span className={`project-list-page__status-badge status--${project.status.toLowerCase()}`}>
+                        <span
+                          className={`project-list-page__status-badge status--${project.status.toLowerCase()}`}
+                        >
                           {project.status}
                         </span>
                       </div>
