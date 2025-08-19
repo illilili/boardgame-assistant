@@ -14,6 +14,7 @@ from translate.router import router as translate_router
 from pricing.api import router as pricing_router
 from copyright.router import router as copyright_router
 
+
 app = FastAPI()
 
 app.include_router(concept_router)
