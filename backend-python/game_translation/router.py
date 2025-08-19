@@ -14,8 +14,14 @@ router = APIRouter(
     tags=["게임 번역"]
 )
 
-# 번역 서비스 인스턴스
-translation_service = GameTranslationService()
+# 번역 서비스 인스턴스 (지연 초기화)
+translation_service = None
+
+def get_translation_service():
+    global translation_service
+    if translation_service is None:
+        translation_service = GameTranslationService()
+    return translation_service
 
 
 @router.post("/game", response_model=GameTranslationResponse)
@@ -26,7 +32,8 @@ async def translate_game(request: GameTranslationRequest):
         logger.info(f"게임 번역 요청: categories={len(request.categories or [])}, mechanics={len(request.mechanics or [])}, description={'있음' if request.description else '없음'}")
         
         # 번역 실행
-        translation_result = await translation_service.translate_game_data(
+        service = get_translation_service()
+        translation_result = await service.translate_game_data(
             categories=request.categories,
             mechanics=request.mechanics,
             description=request.description
@@ -71,7 +78,8 @@ async def translate_batch(request: BatchTranslationRequest):
             games_data.append(game_dict)
         
         # 배치 번역 실행
-        translation_results = await translation_service.translate_batch(games_data)
+        service = get_translation_service()
+        translation_results = await service.translate_batch(games_data)
         
         # 응답 데이터 구성
         translations = []
@@ -142,7 +150,8 @@ async def health_check():
 async def translate_categories_only(categories: List[str]):
     """카테고리만 번역"""
     try:
-        translated = await translation_service.translate_categories(categories)
+        service = get_translation_service()
+        translated = await service.translate_categories(categories)
         return {
             "original": categories,
             "translated": translated,
@@ -160,7 +169,8 @@ async def translate_categories_only(categories: List[str]):
 async def translate_mechanics_only(mechanics: List[str]):
     """메카닉만 번역"""
     try:
-        translated = await translation_service.translate_mechanics(mechanics)
+        service = get_translation_service()
+        translated = await service.translate_mechanics(mechanics)
         return {
             "original": mechanics,
             "translated": translated,
@@ -186,7 +196,8 @@ async def translate_description_only(request: dict):
             
         logger.info(f"설명 번역 요청: {len(description)}글자")
         
-        translated = await translation_service.translate_description(description)
+        service = get_translation_service()
+        translated = await service.translate_description(description)
         return {
             "original": description,
             "translated": translated,
@@ -230,7 +241,8 @@ async def translate_batch_optimized(request: dict):
                 logger.info(f"  [{i}] ID: {game.get('id')}, Name: {game.get('name')}, Rank: {game.get('rank')}")
         
         # 2단계: 배치 번역 수행 (중복 제거하여 한 번만 번역)
-        translation_map = await translation_service.translate_batch_categories_and_mechanics(
+        service = get_translation_service()
+        translation_map = await service.translate_batch_categories_and_mechanics(
             all_categories, all_mechanics
         )
         

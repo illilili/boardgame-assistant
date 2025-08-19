@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# .env 파일 로드
+# .env 파일 로드 /
 load_dotenv()
 
 from concept.router import router as concept_router
