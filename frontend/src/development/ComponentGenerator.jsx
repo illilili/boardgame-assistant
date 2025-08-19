@@ -1,9 +1,9 @@
+// src/development/ComponentGenerator.jsx
 import React, { useState, useEffect } from 'react';
 import { getCardPreview, generateCardText, generateCardImage } from '../api/development';
 import './ComponentGenerator.css';
 
-function ComponentGenerator({ contentId }) {
-  // 상태 관리 (변경 없음)
+function ComponentGenerator({ textContentId, imageContentId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [loadingMessage, setLoadingMessage] = useState('');
@@ -11,34 +11,45 @@ function ComponentGenerator({ contentId }) {
   const [previewInfo, setPreviewInfo] = useState({ theme: '', storyline: '' });
   const [generatedResult, setGeneratedResult] = useState({ text: null, imageUrl: null });
 
-  // 핸들러 및 useEffect (변경 없음)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setCardData(prev => ({ ...prev, [name]: value }));
   };
 
+  // 프리뷰 + 로컬스토리지 불러오기
   useEffect(() => {
-    if (!contentId) return;
     const fetchData = async () => {
+      const targetId = textContentId || imageContentId;
+      if (!targetId) return;
+
       setIsLoading(true);
       setLoadingMessage('카드 정보 불러오는 중...');
       try {
-        const preview = await getCardPreview(contentId);
+        const preview = await getCardPreview(targetId);
         if (preview) {
           setCardData({
             name: preview.name || '',
             effect: preview.effect || '',
-            description: preview.description || '',
+            description: preview.description || preview.imageDescription || '',
           });
           setPreviewInfo({
-            theme: preview.theme || 'N/A',
-            storyline: preview.storyline || 'N/A',
+            theme: preview.theme || '',
+            storyline: preview.storyline || '',
           });
         }
-        const saved = localStorage.getItem(`card_${contentId}`);
-        if (saved) {
-          setGeneratedResult(JSON.parse(saved));
+
+        // 🔹 텍스트 기준으로 로드 + 이미지 추가
+        let restored = {};
+        if (textContentId) {
+          const savedText = localStorage.getItem(`card_${textContentId}`);
+          if (savedText) restored = { ...JSON.parse(savedText) };
         }
+        if (imageContentId) {
+          const savedImage = localStorage.getItem(`card_${imageContentId}`);
+          if (savedImage) restored = { ...restored, ...JSON.parse(savedImage) };
+        }
+        if (Object.keys(restored).length > 0) setGeneratedResult(restored);
+
       } catch (err) {
         console.error(err);
         setError('미리보기 데이터를 불러오는 데 실패했습니다.');
@@ -47,21 +58,28 @@ function ComponentGenerator({ contentId }) {
         setLoadingMessage('');
       }
     };
+
     fetchData();
-  }, [contentId]);
+  }, [textContentId, imageContentId]);
 
+  // 결과 저장
   useEffect(() => {
-    if (contentId && (generatedResult.text || generatedResult.imageUrl)) {
-      localStorage.setItem(`card_${contentId}`, JSON.stringify(generatedResult));
+    if (textContentId && generatedResult.text) {
+      localStorage.setItem(`card_${textContentId}`, JSON.stringify({ text: generatedResult.text }));
     }
-  }, [generatedResult, contentId]);
+    if (imageContentId && generatedResult.imageUrl) {
+      localStorage.setItem(`card_${imageContentId}`, JSON.stringify({ imageUrl: generatedResult.imageUrl }));
+    }
+  }, [generatedResult, textContentId, imageContentId]);
 
+  // 텍스트 생성
   const handleGenerateText = async () => {
+    if (!textContentId) return;
     setIsLoading(true);
     setLoadingMessage('카드 텍스트 생성 중...');
     setError('');
     try {
-      const requestData = { contentId, ...cardData };
+      const requestData = { contentId: textContentId, ...cardData };
       const response = await generateCardText(requestData);
       const resultText = response.generated_texts[0].text;
       setGeneratedResult(prev => ({ ...prev, text: resultText }));
@@ -73,12 +91,14 @@ function ComponentGenerator({ contentId }) {
     }
   };
 
+  // 이미지 생성
   const handleGenerateImage = async () => {
+    if (!imageContentId) return;
     setIsLoading(true);
     setLoadingMessage('카드 이미지 생성 중...');
     setError('');
     try {
-      const requestData = { contentId, ...cardData };
+      const requestData = { contentId: imageContentId, ...cardData };
       const response = await generateCardImage(requestData);
       const resultImage = response.generated_images[0].imageUrl;
       setGeneratedResult(prev => ({ ...prev, imageUrl: resultImage }));
@@ -90,12 +110,12 @@ function ComponentGenerator({ contentId }) {
     }
   };
 
+  // 초기화
   const handleReset = () => {
     setGeneratedResult({ text: null, imageUrl: null });
     setError('');
-    if (contentId) {
-      localStorage.removeItem(`card_${contentId}`);
-    }
+    if (textContentId) localStorage.removeItem(`card_${textContentId}`);
+    if (imageContentId) localStorage.removeItem(`card_${imageContentId}`);
   };
 
   const hasResult = generatedResult.text || generatedResult.imageUrl;
@@ -122,7 +142,7 @@ function ComponentGenerator({ contentId }) {
               <p><strong>테마:</strong> {previewInfo.theme}</p>
               <p><strong>스토리라인:</strong> {previewInfo.storyline}</p>
             </div>
-            
+
             <div className="form-group">
               <label>카드 이름</label>
               <input type="text" name="name" value={cardData.name} onChange={handleInputChange} placeholder="카드 이름 입력" />
@@ -138,25 +158,33 @@ function ComponentGenerator({ contentId }) {
 
             {!hasResult && (
               <div className="generate-buttons-container">
-                <button onClick={handleGenerateText} className="generate-button text-btn">텍스트 생성하기</button>
-                <button onClick={handleGenerateImage} className="generate-button image-btn">이미지 생성하기</button>
+                <button
+                  onClick={handleGenerateText}
+                  className="generate-button text-btn"
+                  disabled={!textContentId}
+                >
+                  텍스트 생성하기
+                </button>
+                <button
+                  onClick={handleGenerateImage}
+                  className="generate-button image-btn"
+                  disabled={!imageContentId}
+                >
+                  이미지 생성하기
+                </button>
               </div>
             )}
           </div>
 
-          {/* 🚨 [수정] 생성 결과 표시부를 하나로 통합했습니다. */}
           {hasResult && (
             <div className="card-result-container">
               <h3>🎉 생성 완료!</h3>
-              
-              {/* 카드 미리보기 형태로 통합 */}
               <div className="generated-card-preview">
                 {generatedResult.imageUrl ? (
                   <img src={generatedResult.imageUrl} alt="Generated Card" className="card-image" />
                 ) : (
                   <div className="image-placeholder">이미지를 생성해 주세요.</div>
                 )}
-                
                 {generatedResult.text ? (
                   <div className="card-text-area">
                     <p>{generatedResult.text}</p>
@@ -170,12 +198,11 @@ function ComponentGenerator({ contentId }) {
                 <button onClick={handleReset} className="reset-button-bottom">
                   다시 생성
                 </button>
-                {/* 텍스트나 이미지가 하나만 생성되었을 경우, 마저 생성할 수 있는 버튼을 보여줍니다. */}
-                {!generatedResult.text && 
-                  <button onClick={handleGenerateText} className="generate-button text-btn">텍스트 마저 생성</button>
+                {!generatedResult.text && textContentId &&
+                  <button onClick={handleGenerateText} className="generate-button text-btn">텍스트 생성</button>
                 }
-                {!generatedResult.imageUrl &&
-                  <button onClick={handleGenerateImage} className="generate-button image-btn">이미지 마저 생성</button>
+                {!generatedResult.imageUrl && imageContentId &&
+                  <button onClick={handleGenerateImage} className="generate-button image-btn">이미지 생성</button>
                 }
               </div>
             </div>

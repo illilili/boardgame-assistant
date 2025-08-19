@@ -1,51 +1,38 @@
-// DevelopmentListViewer.js
 import React, { useState, useEffect } from 'react';
 import './DevelopmentListViewer.css';
 import { getTasksForProject } from '../api/auth';
 
+// 상태 뱃지 색상 매핑
 const getStatusClassName = (statusSummary) => {
   switch (statusSummary) {
-    case '작업 대기':
-      return 'status-waiting';
-    case '작업 중':
-      return 'status-in-progress';
-    case '작업 완료':
-      return 'status-ready'; // READY_TO_SUBMIT
-    case '제출 완료':
-      return 'status-submitted'; // PENDING_REVIEW
-    case '승인':
-      return 'status-completed';
-    case '반려':
-      return 'status-rejected';
-    default:
-      return '';
+    case '작업 대기': return 'status-waiting';
+    case '작업 중': return 'status-in-progress';
+    case '작업 완료': return 'status-ready'; // READY_TO_SUBMIT
+    case '제출 완료': return 'status-submitted'; // PENDING_REVIEW
+    case '승인': return 'status-completed';
+    case '반려': return 'status-rejected';
+    default: return '';
   }
 };
 
+// 타입별로 이동할 화면 매핑
 const getLinkForComponentType = (type) => {
-  if (!type) return { supported: false, id: 'content-submit' };
-
-  const lowerCaseType = type.toLowerCase();
-
-  if (lowerCaseType.includes('card')) {
-    return { supported: true, id: 'card-gen' };
-  } else if (lowerCaseType.includes('rulebook') || lowerCaseType.includes('document')) {
-    return { supported: true, id: 'rulebook-gen' };
-  } else if (
-    lowerCaseType.includes('token') ||
-    lowerCaseType.includes('pawn') ||
-    lowerCaseType.includes('miniature') ||
-    lowerCaseType.includes('figure') ||
-    lowerCaseType.includes('dice')
-  ) {
+  if (!type) return { supported: false, id: 'file-upload' };
+  const lower = type.toLowerCase();
+  if (lower.includes('card')) return { supported: true, id: 'card-gen' };
+  if (lower.includes('rulebook') || lower.includes('document')) return { supported: true, id: 'rulebook-gen' };
+  if (['token', 'pawn', 'miniature', 'figure', 'dice'].some(k => lower.includes(k)))
     return { supported: true, id: 'model-gen' };
-  } else if (lowerCaseType.includes('thumbnail') || lowerCaseType.includes('image')) {
-    return { supported: true, id: 'thumbnail-gen' };
-  } else {
-    return { supported: false, id: 'content-submit' };
-  }
+  if (lower.includes('thumbnail') || lower.includes('image')) return { supported: true, id: 'thumbnail-gen' };
+  return { supported: false, id: 'file-upload' };
 };
 
+/**
+ * 개발 목록 화면
+ * - onNavigate(viewId, payload)로 다음 화면에 필요한 데이터 전달
+ *   - 카드: { textContentId, imageContentId, componentId }
+ *   - 일반: { contentId, componentId, type }
+ */
 function DevelopmentListViewer({ onNavigate, projectId }) {
   const [components, setComponents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,28 +41,26 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
 
   useEffect(() => {
     if (!projectId) return;
-
     setExpandedComponentId(null);
 
     const fetchTasks = async () => {
       setIsLoading(true);
-      setError(null);
       try {
         const responseData = await getTasksForProject(projectId);
         setComponents(responseData.components || []);
       } catch (err) {
+        console.error(err);
         setError('개발 항목을 불러오는 데 실패했습니다.');
         setComponents([]);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchTasks();
   }, [projectId]);
 
   const toggleSubTasks = (componentId) => {
-    setExpandedComponentId(prevId => (prevId === componentId ? null : componentId));
+    setExpandedComponentId(prev => (prev === componentId ? null : componentId));
   };
 
   return (
@@ -96,73 +81,100 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
           <div className="message-container error">{error}</div>
         ) : components.length > 0 ? (
           <ul className="dev-list">
-            {components.map(component => {
-              return (
-                <React.Fragment key={component.componentId}>
-                  <li
-                    className="dev-list-item clickable"
-                    onClick={() => toggleSubTasks(component.componentId)}
-                  >
-                    <span className="item-category">{component.type}</span>
-                    <div className="item-task-group">
-                      <span className="item-task-name">{component.title}</span>
-                      <span className="item-related-plan">
-                        {component.quantity && `수량: ${component.quantity}`}
-                      </span>
-                      {expandedComponentId === component.componentId && (
-                        <div className="item-details-wrapper">
-                          {component.roleAndEffect && <p className="item-details"><strong>효과:</strong> {component.roleAndEffect}</p>}
-                          {component.artConcept && <p className="item-details"><strong>설명:</strong> {component.artConcept}</p>}
-                        </div>
-                      )}
-                    </div>
-                    <span className="item-status">
-                      <span className={`status-badge ${getStatusClassName(component.statusSummary)}`}>
-                        {component.statusSummary}
-                      </span>
+            {components.map(component => (
+              <React.Fragment key={component.componentId}>
+                <li
+                  className="dev-list-item clickable"
+                  onClick={() => toggleSubTasks(component.componentId)}
+                >
+                  <span className="item-category">{component.type}</span>
+                  <div className="item-task-group">
+                    <span className="item-task-name">{component.title}</span>
+                    {component.quantity && (
+                      <span className="item-related-plan">수량: {component.quantity}</span>
+                    )}
+                  </div>
+                  <span className="item-status">
+                    <span className={`status-badge ${getStatusClassName(component.statusSummary)}`}>
+                      {component.statusSummary}
                     </span>
-                  </li>
+                  </span>
+                </li>
 
-                  {expandedComponentId === component.componentId && (
-                    <div className="sub-task-container">
-                      <ul className="sub-task-list">
-                        {component.subTasks.length > 0 ? (
+                {expandedComponentId === component.componentId && (
+                  <div className="sub-task-container">
+                    <ul className="sub-task-list">
+                      {component.subTasks.length > 0 ? (
+                        component.type.toLowerCase().includes('card') ? (
+                          // 카드형: 텍스트/이미지 두 콘텐츠를 묶어서 카드 생성 화면으로 이동
+                          <li className="sub-task-item">
+                            <div className="sub-task-info">
+                              <span className="sub-task-name">
+                                카드 작업&nbsp;
+                                {component.subTasks
+                                  .filter(st => st.type)
+                                  .map(st => `콘텐츠 ID: ${st.contentId} (${st.type})`)
+                                  .join(', ')}
+                              </span>
+                            </div>
+                            <div className="sub-task-actions">
+                              <button
+                                className="sub-task-link"
+                                onClick={() => {
+                                  const textTask = component.subTasks.find(st => st.type?.toLowerCase().includes('text'));
+                                  const imageTask = component.subTasks.find(st => st.type?.toLowerCase().includes('image'));
+                                  onNavigate('card-gen', {
+                                    textContentId: textTask ? textTask.contentId : null,
+                                    imageContentId: imageTask ? imageTask.contentId : null,
+                                    componentId: component.componentId, // ✅ 컴포넌트 ID 함께 전달
+                                  });
+                                }}
+                              >
+                                작업하기 →
+                              </button>
+                            </div>
+                          </li>
+                        ) : (
+                          // 일반형: 각 하위 작업별로 개별 콘텐츠로 이동
                           component.subTasks.map(subTask => {
                             const { supported, id } = getLinkForComponentType(component.type);
                             return (
                               <li key={subTask.contentId || subTask.id} className="sub-task-item">
                                 <div className="sub-task-info">
                                   <span className="sub-task-name">
-                                    {subTask.name
-                                      || `콘텐츠 ID: ${subTask.contentId} (${subTask.type || 'unknown'})`}
+                                    {subTask.name ||
+                                      `콘텐츠 ID: ${subTask.contentId} (${subTask.type || 'unknown'})`}
                                   </span>
-                                  {subTask.effect && <p className="sub-task-effect">{subTask.effect}</p>}
                                 </div>
                                 <div className="sub-task-actions">
-                                  <span className="sub-task-status">상태: {subTask.status}</span>
-                                  {subTask.contentId ? (
-                                    <button
-                                      className="sub-task-link"
-                                      onClick={() => onNavigate(id, subTask.contentId)}
-                                    >
-                                      {supported ? '작업하기 →' : '파일 업로드 →'}
-                                    </button>
-                                  ) : (
-                                    <span className="sub-task-link disabled">ID 없음</span>
-                                  )}
+                                  <button
+                                    className="sub-task-link"
+                                    onClick={() =>
+                                      onNavigate(
+                                        id,
+                                        {
+                                          contentId: subTask.contentId,
+                                          componentId: component.componentId, // ✅ 컴포넌트 ID 함께 전달
+                                          type: subTask.type,
+                                        }
+                                      )
+                                    }
+                                  >
+                                    {supported ? '작업하기 →' : '파일 업로드 →'}
+                                  </button>
                                 </div>
                               </li>
                             );
                           })
-                        ) : (
-                          <li className="sub-task-item no-sub-task">하위 작업이 없습니다.</li>
-                        )}
-                      </ul>
-                    </div>
-                  )}
-                </React.Fragment>
-              );
-            })}
+                        )
+                      ) : (
+                        <li className="sub-task-item no-sub-task">하위 작업이 없습니다.</li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
           </ul>
         ) : (
           <div className="message-container">표시할 개발 항목이 없습니다.</div>
