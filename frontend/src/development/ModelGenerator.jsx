@@ -281,7 +281,7 @@ function ModelGenerator({ contentId, componentId }) {
               <div className="model-info-wrapper">
                 <h3>🎉 생성/불러오기 완료!</h3>
                 <div className="download-links">
-                  <a href={glbUrl} target="_blank" rel="noreferrer">GLB 다운로드</a>
+                  <a href={glbUrl} target="_blank" rel="noreferrer">GLB 파일 다운로드</a>
                 </div>
 
                 {/* 버전 저장 */}
