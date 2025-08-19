@@ -20,7 +20,8 @@ from summary.router import router as summary_router
 from translate.router import router as translate_router 
 from pricing.api import router as pricing_router
 from copyright.router import router as copyright_router
-from game_translation.router import router as game_translation_router
+from game_translation.router import router as translation_router
+
 
 app = FastAPI()
 
@@ -29,7 +30,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # React 개발 서버
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -47,4 +48,4 @@ app.include_router(rulebook_router)
 app.include_router(translate_router) 
 app.include_router(pricing_router)
 app.include_router(copyright_router)
-app.include_router(game_translation_router)
+app.include_router(translation_router)
