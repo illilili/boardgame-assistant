@@ -90,20 +90,23 @@ function Development() {
     : null;
 
   return (
-    <>
+    <div className="development-page">
       <Header projectMode={true} />
       <div className="workspace-container new-design">
-        <aside className="workspace-sidebar">
+        <aside className="dev-workspace-sidebar">
           <div className="sidebar-header">
-            <div className="logo" onClick={() => navigate(`/projects/${projectId}`)}>
-              Dev
+            <div
+              className="dev-logo"
+              onClick={() => navigate(`/projects/${projectId}`)}
+            >
+              DEVELOP
             </div>
           </div>
           <ul className="workspace-nav-list">
             {workspaceNavItems.map((item) => (
               <li
                 key={item.id}
-                className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
+                className={`dev-nav-item ${activeViewId === item.id ? 'active' : ''}`}
                 onClick={() => handleNavigate(item.id)}
               >
                 {item.title}
@@ -118,30 +121,30 @@ function Development() {
           ) : activeView ? (
             activeViewId === 'card-gen'
               ? React.cloneElement(activeView.component, {
-                  // ✅ 카드 생성 화면: 두 콘텐츠 ID + 컴포넌트 ID 전달
-                  textContentId: selectedWork?.textContentId ?? null,
-                  imageContentId: selectedWork?.imageContentId ?? null,
-                  componentId: selectedWork?.componentId ?? null,
-                  projectId,
-                })
+                // ✅ 카드 생성 화면: 두 콘텐츠 ID + 컴포넌트 ID 전달
+                textContentId: selectedWork?.textContentId ?? null,
+                imageContentId: selectedWork?.imageContentId ?? null,
+                componentId: selectedWork?.componentId ?? null,
+                projectId,
+              })
               : React.cloneElement(activeView.component, {
-                  // ✅ 일반 화면: 콘텐츠/컴포넌트 ID 전달
-                  contentId:
-                    typeof selectedWork === 'object'
-                      ? (selectedWork?.contentId ?? null)
-                      : (selectedWork ?? null), // 구버전 호환
-                  componentId:
-                    typeof selectedWork === 'object'
-                      ? (selectedWork?.componentId ?? null)
-                      : null,
-                  projectId,
-                })
+                // ✅ 일반 화면: 콘텐츠/컴포넌트 ID 전달
+                contentId:
+                  typeof selectedWork === 'object'
+                    ? (selectedWork?.contentId ?? null)
+                    : (selectedWork ?? null), // 구버전 호환
+                componentId:
+                  typeof selectedWork === 'object'
+                    ? (selectedWork?.componentId ?? null)
+                    : null,
+                projectId,
+              })
           ) : (
             <WelcomeScreen onStart={() => handleNavigate('approved-plan')} />
           )}
         </main>
       </div>
-    </>
+    </div>
   );
 }
 

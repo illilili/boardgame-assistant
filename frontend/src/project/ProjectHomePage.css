@@ -50,11 +50,11 @@
 .project-home-page__main-content {
     padding: 32px 48px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 3fr 2fr; /* ✅ 기존 1fr 1fr → 3:2 비율 */
     grid-template-rows: auto 1fr;
     grid-template-areas:
         "header header"
-        "members logs";
+        "members logs"; /* ✅ 최근작업 왼쪽(넓게), 멤버 오른쪽(좁게) */
     gap: 32px;
     align-content: start;
 }
@@ -79,6 +79,11 @@
     margin: 0 0 10px 0;
 }
 
+.project-home-page__info {
+  flex: 1;       /* 남는 공간 전부 차지 */
+  min-width: 0;  /* flex item 잘림 방지 */
+}
+
 .project-home-page__description {
     font-size: 1.1rem;
     color: var(--text-light);
@@ -90,12 +95,11 @@
 }
 
 .project-home-page__thumbnail {
-    width: 280px;
-    height: 180px;
-    border-radius: 8px;
+    width: 340px;   /* 280 → 320 */
+    height: 240px;  /* 180 → 200 */
+    border-radius: 10px;
     object-fit: cover;
 }
-
 .project-home-page__status-badge {
     padding: 6px 12px;
     font-size: 0.8rem;
