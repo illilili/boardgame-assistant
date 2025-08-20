@@ -81,6 +81,10 @@ function Translation() {
         
         console.log('변환된 콘텐츠 목록:', allContents);
         setContents(allContents);
+        
+        // 각 콘텐츠의 번역 상태를 자동으로 조회
+        await fetchAllContentTranslationStatuses(allContents);
+        
       } catch (error) {
         console.error('콘텐츠 로드 실패:', error);
         setError('번역할 콘텐츠를 불러오는 데 실패했습니다.');
@@ -91,6 +95,62 @@ function Translation() {
     };
     fetchContents();
   }, [projectId]);
+
+  // 모든 콘텐츠의 번역 상태를 자동으로 조회하는 함수
+  const fetchAllContentTranslationStatuses = async (contentList) => {
+    try {
+      const statusPromises = contentList.map(async (content) => {
+        try {
+          const response = await fetch(`/api/translate/${content.contentId}?latestOnly=true`);
+          if (response.ok) {
+            const results = await response.json();
+            // 번역 상태를 더 정확하게 계산
+            let status = '번역 대기';
+            if (results && results.length > 0) {
+              const hasInProgress = results.some(item => item.status === 'IN_PROGRESS');
+              const hasCompleted = results.some(item => item.status === 'COMPLETED');
+              
+              if (hasInProgress) {
+                status = '번역 중';
+              } else if (hasCompleted) {
+                status = '번역 완료';
+              }
+            }
+            return { contentId: content.contentId, status, results };
+          }
+        } catch (error) {
+          console.error(`콘텐츠 ${content.contentId} 번역 상태 조회 실패:`, error);
+        }
+        return { contentId: content.contentId, status: '번역 대기', results: [] };
+      });
+
+      const statusResults = await Promise.all(statusPromises);
+      
+      // 번역 상태들을 상태 객체에 저장
+      const newStatuses = {};
+      statusResults.forEach(({ contentId, status }) => {
+        newStatuses[contentId] = status;
+      });
+      
+      setContentTranslationStatuses(newStatuses);
+      
+      // // 첫 번째 콘텐츠를 자동으로 펼치고 선택
+      // if (contentList.length > 0) {
+      //   const firstContent = contentList[0];
+      //   setExpandedContentId(firstContent.contentId);
+      //   setSelectedContentId(firstContent.contentId);
+        
+      //   // 첫 번째 콘텐츠의 번역 결과도 설정
+      //   const firstStatusResult = statusResults.find(r => r.contentId === firstContent.contentId);
+      //   if (firstStatusResult) {
+      //     setTranslationResults(firstStatusResult.results);
+      //   }
+      // }
+      
+    } catch (error) {
+      console.error('전체 콘텐츠 번역 상태 조회 실패:', error);
+    }
+  };
 
   // 콘텐츠 선택 시 번역 결과 조회 및 상태 업데이트
   useEffect(() => {
@@ -501,25 +561,25 @@ function Translation() {
 
   // 콘텐츠의 전체 번역 상태 확인 (하나라도 완료면 완료)
   const getContentTranslationStatus = (contentId) => {
-    // 현재 선택된 콘텐츠가 아니면 기본 상태 반환
-    if (contentId !== selectedContentId) {
-      return '번역 대기';
+    // contentTranslationStatuses에서 해당 콘텐츠의 상태를 가져옴
+    const currentStatus = contentTranslationStatuses[contentId];
+    
+    // 현재 선택된 콘텐츠이고 번역 결과가 있다면 실시간 상태 계산
+    if (contentId === selectedContentId && translationResults && translationResults.length > 0) {
+      const hasInProgress = translationResults.some(item => item.status === 'IN_PROGRESS');
+      const hasCompleted = translationResults.some(item => item.status === 'COMPLETED');
+      
+      if (hasInProgress) {
+        return '번역 중';
+      } else if (hasCompleted) {
+        return '번역 완료';
+      } else {
+        return '번역 대기';
+      }
     }
     
-    if (!translationResults || translationResults.length === 0) {
-      return '번역 대기';
-    }
-    
-    const hasCompleted = translationResults.some(item => item.status === 'COMPLETED');
-    const hasInProgress = translationResults.some(item => item.status === 'IN_PROGRESS');
-    
-    if (hasCompleted) {
-      return '번역 완료';
-    } else if (hasInProgress) {
-      return '번역 중';
-    } else {
-      return '번역 대기';
-    }
+    // 저장된 상태가 있으면 반환, 없으면 기본값
+    return currentStatus || '번역 대기';
   };
 
 
@@ -603,7 +663,7 @@ function Translation() {
           <ul className="dev-list">
             {contents.map(content => {
               const isExpanded = expandedContentId === content.contentId;
-              const translationStatus = contentTranslationStatuses[content.contentId] || '번역 대기';
+              const translationStatus = getContentTranslationStatus(content.contentId);
               
               return (
                 <React.Fragment key={content.contentId}>
@@ -617,7 +677,7 @@ function Translation() {
                       {/* <span className="item-related-plan">
                         {content.description && `${content.description}`}
                       </span> */}
-                      펼쳐진 상태일 때 상세 정보 표시
+                      {/* 펼쳐진 상태일 때 상세 정보 표시 */}
                       {isExpanded && (
                         <div className="item-details-wrapper">
                           <p className="item-details"><strong>설명:</strong> {content.description || '설명 없음'}</p>
@@ -673,21 +733,12 @@ function Translation() {
                                             미리보기
                                           </button>
                                         ) : null}
-                                        
-                                        {/* {status === 'COMPLETED' && (
-                                          <button 
-                                            className="btn-complete"
-                                            onClick={() => markComplete(translationItem.translationId)}
-                                          >
-                                            완료
-                                          </button>
-                                        )} */}
                                       </div>
                                     </div>
                                   ) : (
                                     <button 
                                       className="btn-request-translation"
-                                                                             onClick={() => requestTranslation(content.contentId, [lang.code])}
+                                      onClick={() => requestTranslation(content.contentId, [lang.code])}
                                       disabled={pending}
                                     >
                                       번역 요청
