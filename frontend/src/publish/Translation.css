@@ -7,72 +7,6 @@
   background-color: #f8f9fa;
 }
 
-/* 사이드바 - Architect 스타일 적용 */
-.workspace-sidebar {
-  width: 280px;
-  background-color: #FFFFFF;
-  color: #2c2825;
-  padding: 32px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid #EAEAEA;
-  position: static;
-  height: auto;
-  overflow-y: visible;
-}
-
-.sidebar-header {
-  margin-bottom: 40px;
-  padding: 0;
-  border-bottom: none;
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #E58A4E;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-}
-
-.workspace-nav-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.nav-item {
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 12px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  position: relative;
-  color: #374151;
-  transition: color 0.2s, background-color 0.2s;
-  border: none;
-  border-bottom: none;
-}
-
-.nav-item:hover {
-  color: #2c2825;
-  background-color: #F8F8F8;
-}
-
-.nav-item.nav-header {
-  background-color: #E58A4E;
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #FFFFFF;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
 /* 메인 콘텐츠 */
 .workspace-main-content {
   flex: 1;
@@ -1115,12 +1049,12 @@
   font-size: 14px;
   line-height: 1.4;
 }
-.dev-list .status-badge.status-completed {
+/* .dev-list .status-badge.status-completed {
   background-color: #d1ffd3 !important;
   color: #166534 !important;
   font-size: 16px;
   min-width: 90px;
-}
+} */
 .dev-list .status-badge.status-in-progress {
   background-color: #fefbc6 ;
   color: #b7791f ;

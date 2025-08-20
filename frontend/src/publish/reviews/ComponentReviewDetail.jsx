@@ -35,6 +35,10 @@ function ComponentReviewDetail({ componentId, onBack }) {
       await reviewComponent({ componentId, approve, reason: approve ? null : rejectReason });
       setStatusMessage(approve ? '✅ 승인되었습니다.' : '❌ 반려되었습니다.');
       setRejectReason('');
+      // 승인/반려 후 목록으로 이동
+      setTimeout(() => {
+        onBack();
+      }, 800); // 0.8초 정도 성공 메시지 보여준 뒤 이동
     } catch (err) {
       setStatusMessage(err.response?.data?.message || '처리 실패');
     } finally {

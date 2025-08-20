@@ -5,14 +5,11 @@ import { ProjectContext } from '../contexts/ProjectContext';
 
 import Header from '../mainPage/Header';
 
-// ✅ 개발 파트에서 쓰던 승인된 기획안 뷰어 재사용
-import ApprovedPlanViewer from '../development/ApprovedPlanViewer';
 import TranslationWrapper from './TranslationWrapper';
 import PricingEvaluation from './PricingEvaluation';
 
 // 사이드바 메뉴 정의
 const workspaceNavItems = [
-  { id: 'approved-plan', title: '승인된 기획안 조회', component: <ApprovedPlanViewer /> },
   { id: 'translation', title: '번역', component: <TranslationWrapper /> },
   { id: 'pricing', title: '가격 책정', component: <PricingEvaluation /> },
 ];
@@ -20,7 +17,7 @@ const workspaceNavItems = [
 function Publish() {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const [activeViewId, setActiveViewId] = useState('approved-plan'); // ✅ 기본 탭은 승인된 기획안 조회
+  const [activeViewId, setActiveViewId] = useState('translation'); // ✅ 기본 탭은 승인된 기획안 조회
 
   const activeView = activeViewId
     ? workspaceNavItems.find((item) => item.id === activeViewId)

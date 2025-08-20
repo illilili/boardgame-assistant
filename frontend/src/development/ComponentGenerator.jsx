@@ -332,14 +332,31 @@ function ComponentGenerator({ textContentId, imageContentId, componentId }) {
                       classNamePrefix="react-select"
                       value={selectedTextVersion}
                       onChange={(selected) => setSelectedTextVersion(selected)}
-                      options={textVersions.map((v) => ({
-                        value: v.versionId,
-                        label: `v${v.versionNo} - ${v.note} (${v.createdAt})`,
-                      }))}
+                      options={textVersions.map((v) => {
+                        const date = new Date(v.createdAt);
+                        const formattedDate = `${date.getFullYear()}-${String(
+                          date.getMonth() + 1
+                        ).padStart(2, "0")}-${String(date.getDate()).padStart(
+                          2,
+                          "0"
+                        )} ${String(date.getHours()).padStart(2, "0")}:${String(
+                          date.getMinutes()
+                        ).padStart(2, "0")}`;
+
+                        return {
+                          value: v.versionId,
+                          label: `v${v.versionNo} - ${v.note} (${formattedDate})`,
+                        };
+                      })}
                       placeholder="버전 선택"
                     />
                   ) : (
-                    <p className="no-version-text">저장된 버전 없음</p>
+                    <Select
+                      className="version-select"
+                      classNamePrefix="react-select"
+                      isDisabled
+                      placeholder="저장된 버전 없음"
+                    />
                   )}
                   <div className="version-buttons">
                     <button className="save" onClick={() => handleSaveVersion(textContentId)}>
@@ -368,14 +385,31 @@ function ComponentGenerator({ textContentId, imageContentId, componentId }) {
                       classNamePrefix="react-select"
                       value={selectedImageVersion}
                       onChange={(selected) => setSelectedImageVersion(selected)}
-                      options={imageVersions.map((v) => ({
-                        value: v.versionId,
-                        label: `v${v.versionNo} - ${v.note} (${v.createdAt})`,
-                      }))}
+                      options={imageVersions.map((v) => {
+                        const date = new Date(v.createdAt);
+                        const formattedDate = `${date.getFullYear()}-${String(
+                          date.getMonth() + 1
+                        ).padStart(2, "0")}-${String(date.getDate()).padStart(
+                          2,
+                          "0"
+                        )} ${String(date.getHours()).padStart(2, "0")}:${String(
+                          date.getMinutes()
+                        ).padStart(2, "0")}`;
+
+                        return {
+                          value: v.versionId,
+                          label: `v${v.versionNo} - ${v.note} (${formattedDate})`,
+                        };
+                      })}
                       placeholder="버전 선택"
                     />
                   ) : (
-                    <p className="no-version-text">저장된 버전 없음</p>
+                    <Select
+                      className="version-select"
+                      classNamePrefix="react-select"
+                      isDisabled
+                      placeholder="저장된 버전 없음"
+                    />
                   )}
                   <div className="version-buttons">
                     <button className="save" onClick={() => handleSaveVersion(imageContentId)}>
@@ -456,8 +490,9 @@ function ComponentGenerator({ textContentId, imageContentId, componentId }) {
             </div>
           </div>
         ) : (
-          <div className="initial-state">
-            <p>컨셉 정보를 바탕으로 카드 텍스트와 이미지를 생성할 수 있습니다. 좌측의 '생성하기' 버튼을 눌러주세요.</p>
+          <div className="placeholder-message">
+            <p>컨셉 정보를 바탕으로 카드 텍스트와 이미지를 생성할 수 있습니다.</p> 
+            <p>좌측의 '생성하기' 버튼을 눌러주세요.</p>
           </div>
         )}
       </div>

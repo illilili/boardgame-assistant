@@ -64,7 +64,7 @@ function DevelopmentListViewer({ onNavigate, projectId }) {
   };
 
   return (
-    <div className="component-placeholder">
+    <div className="dev-list-wrapper">
       <h2>개발 목록 조회</h2>
       <p>현재 프로젝트의 개발 항목과 상태를 확인합니다.</p>
 

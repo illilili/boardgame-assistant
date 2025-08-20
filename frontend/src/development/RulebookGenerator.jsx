@@ -12,7 +12,10 @@ import {
   uploadContentFile,
 } from "../api/development";
 import RulebookReport from "./RulebookReport";
-import "./RulebookGenerator.css";
+import './ComponentGenerator.css';   // 레이아웃, 공통 폼 스타일
+import './ModelGenerator.css';       // 버전관리 UI 공통
+import './RulebookGenerator.css';    // 룰북 전용
+import Select from "react-select";
 
 function RulebookGenerator({ contentId, componentId }) {
   const [rulebookText, setRulebookText] = useState("");
@@ -153,8 +156,14 @@ function RulebookGenerator({ contentId, componentId }) {
 
     try {
       await uploadContentFile(finalContentId, submissionFile, "manual");
-      setSuccessMessage("✅ PDF 업로드 성공! 버전 노트를 입력 후 저장하세요.");
+      setSuccessMessage("✅ PDF 업로드 성공!");
       setSubmissionFile(null);
+
+      // ✅ 업로드 후 최신 데이터 다시 로딩
+      const detail = await getContentDetail(finalContentId);
+      if (detail?.contentData) {
+        setRulebookText(detail.contentData);
+      }
     } catch (err) {
       console.error(err);
       setError("❌ PDF 업로드 실패");
@@ -236,108 +245,193 @@ function RulebookGenerator({ contentId, componentId }) {
   };
 
   return (
-    <div className="rulebook-page-container">
-      {/* 왼쪽 폼 */}
-      <div className="form-column">
-        <h1>📖 룰북 생성</h1>
-
-        {/* 콘텐츠 ID 입력 */}
-        <div className="id-input-container">
-          <label>콘텐츠 ID</label>
-          <input
-            type="text"
-            value={manualId}
-            onChange={(e) => !isFromList && setManualId(e.target.value)}
-            placeholder="콘텐츠 ID 입력"
-            disabled={isFromList}
-          />
+    <div className="generator-layout">
+      {/* ------------------- 왼쪽: 입력 및 버전관리 ------------------- */}
+      <div className="generator-form-section">
+        <div className="form-section-header">
+          <h2> 룰북 생성</h2>
+          <p>룰북 초안을 자동 생성하고 완성된 룰북 PDF를 업로드하세요.</p>
         </div>
 
-        {/* 1. 룰북 생성 */}
-        <button className="primary-button" onClick={handleGenerate} disabled={isLoading}>
-          {isLoading ? "생성 중..." : "룰북 생성하기"}
-        </button>
-
-        {/* 2. 버전 저장 */}
-        <div className="version-note-form">
-          <label>버전 노트</label>
-          <input
-            type="text"
-            value={versionNote}
-            onChange={(e) => setVersionNote(e.target.value)}
-            placeholder="예: 룰북 v1 초안"
-          />
-          <button className="primary-button" onClick={handleSaveVersion} disabled={isLoading}>
-            버전 저장
-          </button>
-        </div>
-
-        {/* 3. 롤백 */}
-        {versions.length > 0 && (
-          <div className="version-select-form">
-            <label>버전 선택</label>
-            <select
-              value={selectedVersion || ""}
-              onChange={(e) => setSelectedVersion(Number(e.target.value))}
-            >
-              {versions.map((v) => (
-                <option key={v.versionId} value={v.versionId}>
-                  v{v.versionNo} - {v.note} ({v.createdAt})
-                </option>
-              ))}
-            </select>
-            <div className="button-group">
-              <button className="secondary-button" onClick={handleRollbackVersion} disabled={isLoading}>
-                롤백
-              </button>
-            </div>
+        {/* 콘텐츠 ID */}
+        {!isFromList && (
+          <div className="form-group">
+            <label>콘텐츠 ID</label>
+            <input
+              type="text"
+              value={manualId}
+              onChange={(e) => setManualId(e.target.value)}
+              placeholder="콘텐츠 ID 입력"
+            />
           </div>
         )}
 
-        {/* 4. 다운로드 */}
-        <div className="download-controls">
-          <button type="button" className="secondary-button" onClick={handleDownload}>
-            다운로드
+        {/* 룰북 생성 + DOCX 다운로드 */}
+        <div className="rulebook-form-group">
+          <button
+            className="generate-btn"
+            onClick={handleGenerate}
+            disabled={isLoading}
+          >
+            {isLoading ? "생성 중..." : "룰북 초안 생성하기"}
+          </button>
+          <button
+            type="button"
+            className="download-btn"
+            onClick={handleDownload}
+          >
+            DOCX 다운로드
           </button>
         </div>
 
-        {/* 5. 파일 선택 → 업로드 */}
-        <div className="submit-section">
-          <label>PDF 파일 업로드</label>
-          <input type="file" accept="application/pdf" onChange={handleFileChange} />
-          <div className="button-group">
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={handleUploadPdf}
-              disabled={isLoading || !submissionFile}
-            >
-              업로드
-            </button>
-          </div>
-        </div>
+        {/* 버전관리 + PDF 업로드 + 제출 */}
+        {rulebookText && (
+          <>
+            {/* 버전관리 */}
+            <div className="model-version-manager">
+              <h4>버전 관리</h4>
 
-        {/* 6. 제출 */}
-        <button
-          type="button"
-          className="primary-button"
-          onClick={handleSubmitUploaded}
-          disabled={isLoading}
-        >
-          제출
-        </button>
+              {/* 버전 메모 + 저장 */}
+              <div className="model-version-note">
+                <label>버전 메모:</label>
+                <input
+                  type="text"
+                  value={versionNote}
+                  onChange={(e) => setVersionNote(e.target.value)}
+                  placeholder="예: 룰북 v1 초안"
+                />
+                <button
+                  className="save"
+                  onClick={handleSaveVersion}
+                  disabled={isLoading}
+                >
+                  버전 저장
+                </button>
+              </div>
+
+              {/* 버전 선택 + 롤백 */}
+              <div className="model-version-select-row">
+                {versions.length > 0 ? (
+                  <Select
+                    className="version-select"
+                    classNamePrefix="react-select"
+                    value={
+                      versions
+                        .map((v) => ({
+                          value: v.versionId,
+                          label: `v${v.versionNo} - ${v.note} (${new Date(
+                            v.createdAt
+                          ).toLocaleString()})`,
+                        }))
+                        .find((opt) => opt.value === selectedVersion) || null
+                    }
+                    onChange={(selected) => setSelectedVersion(selected.value)}
+                    options={versions.map((v) => ({
+                      value: v.versionId,
+                      label: `v${v.versionNo} - ${v.note} (${new Date(
+                        v.createdAt
+                      ).toLocaleString()})`,
+                    }))}
+                    placeholder="버전 선택"
+                  />
+                ) : (
+                  <Select
+                    className="version-select"
+                    classNamePrefix="react-select"
+                    isDisabled
+                    placeholder="저장된 버전 없음"
+                  />
+                )}
+
+                {selectedVersion && (
+                  <button
+                    className="rollback"
+                    onClick={handleRollbackVersion}
+                    disabled={isLoading}
+                  >
+                    롤백
+                  </button>
+                )}
+              </div>
+            </div> {/* ✅ div 닫음 */}
+
+            {/* PDF 업로드 */}
+            <div className="pdf-upload-section">
+              <h4>PDF 파일 업로드</h4>
+              <div className="file-upload-group">
+                <div className="file-input-row">
+                  <div className="file-input-box">
+                    <input
+                      type="file"
+                      id="fileInput"
+                      onChange={handleFileChange}
+                      className="file-upload-input"
+                      accept="application/pdf"
+                    />
+                    <label htmlFor="fileInput" className="file-select-btn">
+                      파일 선택
+                    </label>
+                    <span className="file-name">
+                      {submissionFile
+                        ? submissionFile.name
+                        : "파일을 선택해 주세요"}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="file-upload-button"
+                    onClick={handleUploadPdf}
+                    disabled={isLoading || !submissionFile}
+                  >
+                    업로드
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 제출 */}
+            <div className="submit-complete-section">
+              <button
+                className="primary-button"
+                onClick={handleSubmitUploaded}
+                disabled={isLoading}
+              >
+                제출
+              </button>
+            </div>
+          </>
+        )}
 
         {error && <p className="error-message">{error}</p>}
-        {successMessage && <p className="success-message">{successMessage}</p>}
+        {successMessage && (
+          <p className="success-message">{successMessage}</p>
+        )}
       </div>
 
-      {/* 오른쪽 미리보기 */}
-      <div className="result-column">
-        {isLoading ? <div className="spinner"></div> : renderResult()}
+      {/* ------------------- 오른쪽: 결과 뷰어 ------------------- */}
+      <div
+        className={`rulebook-preview ${rulebookText ? "filled" : "empty"
+          }`}
+      >
+        {isLoading ? (
+          <div className="status-container">
+            <div className="loader"></div>
+            <h3>처리 중...</h3>
+          </div>
+        ) : rulebookText ? (
+          renderResult()
+        ) : (
+          <div className="placeholder-message">
+            <p>
+              룰북 생성을 눌러주세요. 자동 생성된 초안 또는 업로드된 PDF가
+              이곳에 표시됩니다.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
 
-}
 
+}
 export default RulebookGenerator;

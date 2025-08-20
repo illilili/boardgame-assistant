@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './ThumbnailGenerator.css';
+import './ComponentGenerator.css';
+import './ModelGenerator.css';
+import Select from 'react-select';
 import {
   getThumbnailPreview,
   generateThumbnail,
@@ -15,7 +18,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedThumbnail, setGeneratedThumbnail] = useState(null);
   const [error, setError] = useState('');
-  const [message, setMessage] = useState(''); // ✅ 메시지 상태 추가
+  const [message, setMessage] = useState('');
 
   const [manualId, setManualId] = useState(contentId || '');
   const [theme, setTheme] = useState('');
@@ -24,6 +27,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
   const isFromList = Boolean(contentId);
   const finalContentId = isFromList ? contentId : manualId;
 
+  // 버전 관리
   const [versions, setVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [versionNote, setVersionNote] = useState('썸네일 스냅샷');
@@ -33,9 +37,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
     try {
       const list = await getContentVersions(finalContentId);
       setVersions(list);
-      if (list.length > 0) {
-        setSelectedVersion(list[0].versionId);
-      }
+      if (list.length > 0) setSelectedVersion(list[0].versionId);
     } catch (err) {
       console.error(err);
       setError('버전 목록 불러오기 실패');
@@ -85,6 +87,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
     })();
   }, [finalContentId, isFromList, loadPreview, fetchVersions]);
 
+  // ---------------- 함수들 ----------------
   const handleGenerateClick = async () => {
     if (!finalContentId) return setError('콘텐츠 ID를 입력하세요.');
     setIsLoading(true);
@@ -109,20 +112,21 @@ function ThumbnailGenerator({ contentId, componentId }) {
   };
 
   const handleSaveVersion = async () => {
-    if (!versionNote.trim()) return setMessage('❌ 버전 노트를 입력하세요.');
-    if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
-    setIsLoading(true);
-    setError('');
-    setMessage('');
-
+    if (!generatedThumbnail) return;
     try {
-      await saveContentVersion({ contentId: finalContentId, note: versionNote });
-      setVersionNote('썸네일 스냅샷');
-      await fetchVersions();
-      setMessage('✅ 버전 저장 성공!');
+      setIsLoading(true);
+
+      await saveContentVersion({
+        contentId: finalContentId,
+        note: versionNote || '썸네일 스냅샷',
+        contentData: generatedThumbnail.thumbnailUrl,
+      });
+
+      setMessage('✅ 버전이 저장되었습니다.');
+      const updated = await getContentVersions(finalContentId);
+      setVersions(updated);
     } catch (err) {
-      console.error(err);
-      setMessage('❌ 버전 저장 실패');
+      setError(err.response?.data?.message || '버전 저장 실패');
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +140,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
     setMessage('');
 
     try {
-      await rollbackContentVersion(finalContentId, selectedVersion);
+      await rollbackContentVersion(finalContentId, selectedVersion.value);
       localStorage.removeItem(`thumbnail_${finalContentId}`);
       const detail = await getContentDetail(finalContentId);
       if (detail && detail.contentData) {
@@ -146,7 +150,7 @@ function ThumbnailGenerator({ contentId, componentId }) {
         });
       }
       await fetchVersions();
-      setMessage(`✅ 롤백 완료! (버전 ID: ${selectedVersion})`);
+      setMessage(`✅ 롤백 완료! (버전 ID: ${selectedVersion.value})`);
     } catch (err) {
       console.error(err);
       setMessage('❌ 롤백 실패');
@@ -160,7 +164,6 @@ function ThumbnailGenerator({ contentId, componentId }) {
     setIsLoading(true);
     setError('');
     setMessage('');
-
     try {
       await completeContent(finalContentId);
       setMessage('✅ 완료 처리되었습니다. 이제 제출할 수 있어요.');
@@ -177,7 +180,6 @@ function ThumbnailGenerator({ contentId, componentId }) {
     setIsLoading(true);
     setError('');
     setMessage('');
-
     try {
       await submitComponent(componentId);
       setMessage('🎉 제출 완료! 퍼블리셔 검토(PENDING_REVIEW)로 이동했습니다.');
@@ -196,113 +198,123 @@ function ThumbnailGenerator({ contentId, componentId }) {
     if (finalContentId) localStorage.removeItem(`thumbnail_${finalContentId}`);
   };
 
+  // ---------------- JSX ----------------
   return (
-    <div className="component-placeholder">
-      {isLoading && (
-        <div className="status-container">
-          <div className="loader"></div>
-          <h3>처리 중...</h3>
+    <div className="generator-layout">
+      {/* 왼쪽 */}
+      <div className="generator-form-section">
+        <div className="form-section-header">
+          <h2>썸네일 생성</h2>
+          <p>테마와 스토리라인을 입력하고 썸네일 이미지를 생성/관리합니다.</p>
         </div>
-      )}
 
-      {error && <p className="error-text">{error}</p>}
-
-
-      {!isLoading && (
-        <>
-          {/* ID 입력 */}
-          <div className="id-input-container">
+        {!isFromList && (
+          <div className="form-group">
             <label>콘텐츠 ID</label>
             <input
               type="text"
               value={manualId}
-              onChange={(e) => !isFromList && setManualId(e.target.value)}
+              onChange={(e) => setManualId(e.target.value)}
               placeholder="콘텐츠 ID 입력"
-              disabled={isFromList}
             />
           </div>
+        )}
 
-          {/* 입력 */}
+        <div className="concept-info thumbnail-concept">
+          <h3>기본 컨셉 정보</h3>
           <div className="form-group">
             <label>테마</label>
-            <input value={theme} onChange={(e) => setTheme(e.target.value)} />
+            <input type="text" value={theme} onChange={(e) => setTheme(e.target.value)} />
           </div>
           <div className="form-group">
             <label>스토리라인</label>
-            <textarea value={storyline} onChange={(e) => setStoryline(e.target.value)} rows={3} />
+            <textarea rows={3} value={storyline} onChange={(e) => setStoryline(e.target.value)} />
           </div>
+        </div>
 
-          {/* 생성 버튼 */}
-          {!generatedThumbnail && (
-            <div className="generate-button-container">
-              <button onClick={handleGenerateClick} className="generate-button">
-                썸네일 생성하기
-              </button>
-            </div>
-          )}
+        {!generatedThumbnail && (
+          <div className="initial-generate-buttons">
+            <button onClick={handleGenerateClick} className="generate-button text-btn">
+              썸네일 생성하기
+            </button>
+          </div>
+        )}
 
-          {/* 결과 */}
-          {generatedThumbnail && (
-            <div className="thumbnail-result-container">
-              <h3>🎉 생성 완료!</h3>
-              <img
-                src={generatedThumbnail.thumbnailUrl}
-                alt="thumbnail"
-                className="thumbnail-image"
+        {/* 버전 관리 */}
+        {generatedThumbnail && (
+          <div className="model-version-manager">
+            <h4>버전 관리</h4>
+            <div className="model-version-note">
+              <label>버전 메모:</label>
+              <input
+                value={versionNote}
+                onChange={(e) => setVersionNote(e.target.value)}
+                placeholder="썸네일 스냅샷"
               />
-              <div className="thumbnail-info">
-                <span>콘텐츠 ID: {generatedThumbnail.contentId}</span>
-              </div>
+              <button className="save" onClick={handleSaveVersion}>버전 저장</button>
+            </div>
 
-              {/* 버전 저장 */}
-              <div className="version-note-form">
-                <label>버전 노트</label>
-                <input
-                  type="text"
-                  value={versionNote}
-                  onChange={(e) => setVersionNote(e.target.value)}
-                  placeholder="예: 썸네일 스냅샷"
+            <div className="model-version-select-row">
+              {versions.length > 0 ? (
+                <Select
+                  className="version-select"
+                  classNamePrefix="react-select"
+                  value={selectedVersion} 
+                  onChange={(selected) => setSelectedVersion(selected)} 
+                  options={versions.map((v) => {
+                    const date = new Date(v.createdAt);
+                    const formattedDate = `${date.getFullYear()}-${String(
+                      date.getMonth() + 1
+                    ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")} ${String(
+                      date.getHours()
+                    ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+
+                    return {
+                      value: v.versionId,
+                      label: `v${v.versionNo} - ${v.note} (${formattedDate})`,
+                    };
+                  })}
+                  placeholder="버전 선택"
                 />
-                <button onClick={handleSaveVersion} className="reset-button-bottom">
-                  버전 저장
+              ) : (
+                <Select className="version-select" classNamePrefix="react-select" isDisabled placeholder="저장된 버전 없음" />
+              )}
+              {selectedVersion && (
+                <button className="rollback" onClick={handleRollbackVersion} disabled={isLoading}>
+                  롤백
                 </button>
-              </div>
-
-              {/* 편집 초기화(재생성) */}
-              <button onClick={handleReset} className="reset-button-bottom">
-                다시 생성
-              </button>
+              )}
             </div>
-          )}
 
-          {/* 버전 목록 + 롤백/완료/제출 */}
-          {versions.length > 0 && (
-            <div className="version-select-form">
-              <label>버전 선택</label>
-              <select value={selectedVersion || ''} onChange={(e) => setSelectedVersion(Number(e.target.value))}>
-                {versions.map((v) => (
-                  <option key={v.versionId} value={v.versionId}>
-                    v{v.versionNo} - {v.note} ({v.createdAt})
-                  </option>
-                ))}
-              </select>
-
-              <div className="version-buttons">
-                <button onClick={handleRollbackVersion} className="reset-button-bottom">
-                  선택 버전 롤백
-                </button>
-                <button onClick={handleComplete} className="generate-button">
-                  완료(확정)
-                </button>
-                <button onClick={handleSubmitVersion} className="generate-button">
-                  제출
-                </button>
-              </div>
-              {message && <p className="upload-message">{message}</p>} {/* ✅ 메시지 출력 */}
+            <div className="submit-complete-section">
+              <button onClick={handleComplete}>완료(확정)</button>
+              <button onClick={handleSubmitVersion}>제출</button>
             </div>
-          )}
-        </>
-      )}
+          </div>
+        )}
+
+        {message && <p className="upload-message">{message}</p>}
+      </div>
+
+      {/* 오른쪽 */}
+      <div className="generator-result-section">
+        {isLoading ? (
+          <div className="status-container"><div className="loader"></div><h3>처리 중...</h3></div>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : generatedThumbnail ? (
+          <div className="card-result-container">
+            <img src={generatedThumbnail.thumbnailUrl} alt="thumbnail" className="thumbnail-image" />
+            <div className="result-actions">
+              <button onClick={handleReset} className="reset-button-bottom">다시 생성</button>
+            </div>
+          </div>
+        ) : (
+          <div className="placeholder-message">
+            <p>테마와 스토리라인을 입력하고 '썸네일 생성하기' 버튼을 눌러주세요.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

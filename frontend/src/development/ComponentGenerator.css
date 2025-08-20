@@ -89,7 +89,7 @@
   font-weight: 700;
   color: var(--text-dark);
   margin: 0 0 8px 0;
-  padding-bottom: 6px;             
+  padding-bottom: 6px;
   border-bottom: 3px solid var(--accent-warm);
 }
 
@@ -98,6 +98,7 @@
   color: var(--text-light);
   margin: 0 0 32px 0;
   line-height: 1.6;
+  text-align: center;
 }
 
 .concept-info {
@@ -122,35 +123,39 @@
 }
 
 .concept-info p strong {
-  color: var(--text-dark);
+  color: #d3702e;
 }
 
 /* --- 카드 정보 입력 폼 --- */
 .card-gen-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;   /* 👈 폼 사이 간격 (기존 18px → 12px) */
+  gap: 12px;
+  /* 👈 폼 사이 간격 (기존 18px → 12px) */
 }
 
 .form-group {
   width: 100%;
   display: flex;
   flex-direction: column;
-  margin-bottom: 0; /* 👈 불필요한 margin-bottom 제거 */
+  margin-bottom: 0;
+  /* 👈 불필요한 margin-bottom 제거 */
 }
 
 .form-group label {
   display: block;
   font-weight: 600;
   color: var(--text-dark);
-  margin-bottom: 6px;  /* 👈 라벨과 인풋 사이 간격 살짝 줄임 */
+  margin-bottom: 6px;
+  /* 👈 라벨과 인풋 사이 간격 살짝 줄임 */
   font-size: 0.875rem;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  box-sizing: border-box; /* ✅ padding 포함 계산 */
+  box-sizing: border-box;
+  /* ✅ padding 포함 계산 */
   padding: 12px 16px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -463,6 +468,7 @@ button.rollback:hover {
 .initial-state {
   text-align: center;
   color: var(--text-light);
+  justify-content: center;
 }
 
 .status-container h3 {
@@ -498,9 +504,61 @@ button.rollback:hover {
 }
 
 .upload-message {
-  margin-top: 24px;    
+  margin-top: 24px;
   text-align: center;
-  font-size: 1rem;     
+  font-size: 1rem;
   color: var(--text-light);
   font-weight: 500;
+}
+
+/* GLB 다운로드 버튼 (남색 톤) */
+.glb-download-button {
+  display: inline-flex;
+  align-items: center;
+  /* ✅ 수직 중앙 정렬 */
+  justify-content: center;
+  padding: 12px 24px;
+  /* reset-button-bottom 과 동일 */
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  /* ✅ 글자 baseline 보정 */
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: var(--accent-warm);
+  /* 주황 */
+  color: #fff;
+  border: none;
+  text-decoration: none;
+  /* ✅ 밑줄 제거 */
+  transition: all var(--transition-fast);
+}
+
+.glb-download-button:hover {
+  background-color: #e58a4e;
+  /* hover 주황 */
+}
+
+.glb-download-button:active {
+  background-color: #d67132;
+  transform: translateY(0) scale(0.95);
+}
+
+/* 안내 문구 스타일 */
+.placeholder-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  height: 100%;
+  text-align: center;
+}
+.placeholder-message h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.placeholder-message p {
+  font-size: 0.9rem;
+  color: #999;
 }
