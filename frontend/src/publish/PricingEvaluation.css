@@ -7,51 +7,72 @@
   background-color: #f8f9fa;
 }
 
-/* 사이드바 */
+/* 사이드바 - Architect 스타일 적용 */
 .workspace-sidebar {
-  width: 250px;
-  background-color: #2c3e50;
-  color: white;
-  padding: 0;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
+  width: 280px;
+  background-color: #FFFFFF;
+  color: #2c2825;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #EAEAEA;
 }
 
 .sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid #34495e;
+  margin-bottom: 40px;
+  border-bottom: none;
 }
 
 .logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: #3498db;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #E58A4E;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
 }
 
 .workspace-nav-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .nav-item {
-  padding: 15px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 12px 16px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  border-bottom: 1px solid #34495e;
+  position: relative;
+  color: #374151;
+  transition: color 0.2s, background-color 0.2s;
+  border: none;
+  border-bottom: none;
 }
 
 .nav-item:hover {
-  background-color: #34495e;
+  color: #2c2825;
+  background-color: #F8F8F8;
 }
 
 .nav-item.nav-header {
-  background-color: #3498db;
+  background-color: #E58A4E;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.nav-item.active {
+  color: #FFFFFF;
+  font-weight: 600;
+  background-color: #E58A4E;
 }
 
 /* 메인 콘텐츠 */
@@ -169,7 +190,7 @@
 
 /* 결과 컬럼 (오른쪽) */
 .result-column {
-  width: 500px;
+  width: 100%;
   flex-shrink: 0;
   background: white;
   border-radius: 12px;
@@ -245,6 +266,9 @@
   color: white;
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
+.ai-pricing-result h2{
+  color: #FFFFFF;
+}
 
 .ai-pricing-result h4 {
   margin: 0 0 16px 0;
@@ -298,6 +322,9 @@
   margin-bottom: 24px;
   color: white;
   box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);
+}
+.pricing-calculations h2{
+  color: #FFFFFF;
 }
 
 .pricing-calculations h4 {
@@ -626,6 +653,14 @@
   max-width: 300px;
 }
 
+
+.pricing-form .form-group {
+  width: 100%;
+  max-width: 450px; /* 입력창 최대 너비 제한 */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 중앙 정렬 */
+}
 /* 개선된 폼 스타일 */
 .pricing-form {
   background: white;
@@ -633,6 +668,9 @@
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 중앙 정렬 */
 }
 
 .pricing-form h4 {

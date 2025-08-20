@@ -81,6 +81,10 @@ function Translation() {
         
         console.log('변환된 콘텐츠 목록:', allContents);
         setContents(allContents);
+        
+        // 각 콘텐츠의 번역 상태를 자동으로 조회
+        await fetchAllContentTranslationStatuses(allContents);
+        
       } catch (error) {
         console.error('콘텐츠 로드 실패:', error);
         setError('번역할 콘텐츠를 불러오는 데 실패했습니다.');
@@ -91,6 +95,62 @@ function Translation() {
     };
     fetchContents();
   }, [projectId]);
+
+  // 모든 콘텐츠의 번역 상태를 자동으로 조회하는 함수
+  const fetchAllContentTranslationStatuses = async (contentList) => {
+    try {
+      const statusPromises = contentList.map(async (content) => {
+        try {
+          const response = await fetch(`/api/translate/${content.contentId}?latestOnly=true`);
+          if (response.ok) {
+            const results = await response.json();
+            // 번역 상태를 더 정확하게 계산
+            let status = '번역 대기';
+            if (results && results.length > 0) {
+              const hasInProgress = results.some(item => item.status === 'IN_PROGRESS');
+              const hasCompleted = results.some(item => item.status === 'COMPLETED');
+              
+              if (hasInProgress) {
+                status = '번역 중';
+              } else if (hasCompleted) {
+                status = '번역 완료';
+              }
+            }
+            return { contentId: content.contentId, status, results };
+          }
+        } catch (error) {
+          console.error(`콘텐츠 ${content.contentId} 번역 상태 조회 실패:`, error);
+        }
+        return { contentId: content.contentId, status: '번역 대기', results: [] };
+      });
+
+      const statusResults = await Promise.all(statusPromises);
+      
+      // 번역 상태들을 상태 객체에 저장
+      const newStatuses = {};
+      statusResults.forEach(({ contentId, status }) => {
+        newStatuses[contentId] = status;
+      });
+      
+      setContentTranslationStatuses(newStatuses);
+      
+      // // 첫 번째 콘텐츠를 자동으로 펼치고 선택
+      // if (contentList.length > 0) {
+      //   const firstContent = contentList[0];
+      //   setExpandedContentId(firstContent.contentId);
+      //   setSelectedContentId(firstContent.contentId);
+        
+      //   // 첫 번째 콘텐츠의 번역 결과도 설정
+      //   const firstStatusResult = statusResults.find(r => r.contentId === firstContent.contentId);
+      //   if (firstStatusResult) {
+      //     setTranslationResults(firstStatusResult.results);
+      //   }
+      // }
+      
+    } catch (error) {
+      console.error('전체 콘텐츠 번역 상태 조회 실패:', error);
+    }
+  };
 
   // 콘텐츠 선택 시 번역 결과 조회 및 상태 업데이트
   useEffect(() => {
@@ -262,46 +322,74 @@ function Translation() {
           console.log('콘텐츠 상세 정보 키들:', Object.keys(contentDetail));
           console.log('콘텐츠 상세 정보 값들:', Object.entries(contentDetail).map(([key, value]) => `${key}: ${typeof value} = ${JSON.stringify(value)}`));
           
-          // 원본 텍스트 설정 (실제 응답 구조에 따라 조정 필요)
+          // 원본 텍스트 설정 - 콘텐츠 타입에 따라 적절한 필드 선택
           let originalText = '';
+          const contentType = contentDetail.contentType;
           
-          // 우선순위에 따라 필드 확인
-          const priorityFields = [
-            'contentData','content', 'text', 'description', 'effect', 'rule', 'detail', 'name'
-          ];
+          console.log('콘텐츠 타입:', contentType);
           
-          // 우선순위 필드에서 문자열 값 찾기
-          for (const field of priorityFields) {
-            if (contentDetail[field]) {
-              const value = contentDetail[field];
-              if (typeof value === 'string' && value.trim().length > 0) {
-                originalText = value.trim();
-                break;
-              } else if (typeof value === 'object' && value !== null) {
-                // 객체인 경우 JSON.stringify로 변환
-                originalText = JSON.stringify(value, null, 2);
-                break;
+                     // 콘텐츠 타입별로 적절한 필드 선택
+           if (contentType === 'card_text' || contentType === 'text') {
+             // 카드 텍스트의 경우: 한국어 원본 필드만 표시 (name, effect, description)
+             const cardInfo = [];
+             if (contentDetail.name) cardInfo.push(`이름: ${contentDetail.name}`);
+             if (contentDetail.effect) cardInfo.push(`효과: ${contentDetail.effect}`);
+            //  if (contentDetail.description) cardInfo.push(`설명: ${contentDetail.description}`);
+             
+             // contentData는 영어 번역이 포함되어 있으므로 완전히 제외
+             // 한국어 원본 정보만 표시
+             
+             if (cardInfo.length > 0) {
+               originalText = cardInfo.join('\n');
+             } else {
+               originalText = '카드 정보를 찾을 수 없습니다.';
+             }
+          } else if (contentType === 'rulebook') {
+            // 룰북의 경우: contentData 우선
+            originalText = contentDetail.contentData || '룰북 내용을 찾을 수 없습니다.';
+          } else if (contentType === 'image' || contentType === 'card_image') {
+            // 이미지의 경우: name, effect, description 조합
+            const imageInfo = [];
+            if (contentDetail.name) imageInfo.push(`이름: ${contentDetail.name}`);
+            if (contentDetail.effect) imageInfo.push(`효과: ${contentDetail.effect}`);
+            if (contentDetail.description) imageInfo.push(`설명: ${contentDetail.description}`);
+            
+            if (imageInfo.length > 0) {
+              originalText = imageInfo.join('\n');
+            } else {
+              originalText = '이미지 정보를 찾을 수 없습니다.';
+            }
+          } else {
+            // 기타 타입: contentData 우선, 없으면 다른 필드들
+            if (contentDetail.contentData) {
+              // contentData가 JSON 형태인지 확인
+              try {
+                const parsedData = JSON.parse(contentDetail.contentData);
+                if (parsedData && typeof parsedData === 'object') {
+                  originalText = JSON.stringify(parsedData, null, 2);
+                } else {
+                  originalText = contentDetail.contentData;
+                }
+              } catch (e) {
+                originalText = contentDetail.contentData;
+              }
+            } else {
+              const fallbackFields = ['name', 'effect', 'description', 'text'];
+              for (const field of fallbackFields) {
+                if (contentDetail[field]) {
+                  originalText = contentDetail[field];
+                  break;
+                }
               }
             }
           }
           
-          // 우선순위 필드에서 찾지 못한 경우, 모든 문자열 필드 검색
-          if (!originalText) {
-            const stringFields = Object.entries(contentDetail)
-              .filter(([key, value]) => typeof value === 'string' && value.trim().length > 0)
-              .map(([key, value]) => `${key}: ${value.trim()}`)
-              .join('\n');
-            
-            if (stringFields) {
-              originalText = stringFields;
-            }
-          }
-          
-          // 여전히 찾지 못한 경우, 모든 필드를 표시
-          if (!originalText) {
+          // 원본 텍스트가 비어있으면 모든 필드 표시
+          if (!originalText || originalText.trim() === '') {
             const allFields = Object.entries(contentDetail)
+              .filter(([key, value]) => value !== null && value !== undefined)
               .map(([key, value]) => {
-                if (typeof value === 'object' && value !== null) {
+                if (typeof value === 'object') {
                   return `${key}: ${JSON.stringify(value, null, 2)}`;
                 } else {
                   return `${key}: ${value}`;
@@ -369,61 +457,66 @@ function Translation() {
           }
         }
         
-        // 원본 텍스트도 다시 가져오기
-        const contentResponse = await fetch(`/api/content/${selectedContentId}`);
-        if (contentResponse.ok) {
-          const contentDetail = await contentResponse.json();
-          let originalText = '';
-          
-          // 우선순위에 따라 필드 확인
-          const priorityFields = [
-            'content', 'text', 'description', 'effect', 'rule', 'detail', 'name'
-          ];
-          
-          // 우선순위 필드에서 문자열 값 찾기
-          for (const field of priorityFields) {
-            if (contentDetail[field]) {
-              const value = contentDetail[field];
-              if (typeof value === 'string' && value.trim().length > 0) {
-                originalText = value.trim();
-                break;
-              } else if (typeof value === 'object' && value !== null) {
-                // 객체인 경우 JSON.stringify로 변환
-                originalText = JSON.stringify(value, null, 2);
-                break;
-              }
-            }
-          }
-          
-          // 우선순위 필드에서 찾지 못한 경우, 모든 문자열 필드 검색
-          if (!originalText) {
-            const stringFields = Object.entries(contentDetail)
-              .filter(([key, value]) => typeof value === 'string' && value.trim().length > 0)
-              .map(([key, value]) => `${key}: ${value.trim()}`)
-              .join('\n');
-            
-            if (stringFields) {
-              originalText = stringFields;
-            }
-          }
-          
-          // 여전히 찾지 못한 경우, 모든 필드를 표시
-          if (!originalText) {
-            const allFields = Object.entries(contentDetail)
-              .map(([key, value]) => {
-                if (typeof value === 'object' && value !== null) {
-                  return `${key}: ${JSON.stringify(value, null, 2)}`;
-                } else {
-                  return `${key}: ${value}`;
-                }
-              })
-              .join('\n');
-            
-            originalText = allFields || '원본 내용을 찾을 수 없습니다.';
-          }
-          
-          setModalOriginalText(originalText);
-        }
+                 // 원본 텍스트도 다시 가져오기
+         const contentResponse = await fetch(`/api/content/${selectedContentId}`);
+         if (contentResponse.ok) {
+           const contentDetail = await contentResponse.json();
+           let originalText = '';
+           
+           // 콘텐츠 타입에 따라 적절한 필드 선택 (contentData 제외)
+           const contentType = contentDetail.contentType;
+           
+           if (contentType === 'card_text' || contentType === 'text') {
+             // 카드 텍스트의 경우: 한국어 원본 필드만 표시
+             const cardInfo = [];
+             if (contentDetail.name) cardInfo.push(`이름: ${contentDetail.name}`);
+             if (contentDetail.effect) cardInfo.push(`효과: ${contentDetail.effect}`);
+             if (contentDetail.description) cardInfo.push(`설명: ${contentDetail.description}`);
+             
+             if (cardInfo.length > 0) {
+               originalText = cardInfo.join('\n');
+             } else {
+               originalText = '카드 정보를 찾을 수 없습니다.';
+             }
+           } else if (contentType === 'rulebook') {
+             // 룰북의 경우: contentData 우선
+             originalText = contentDetail.contentData || '룰북 내용을 찾을 수 없습니다.';
+           } else if (contentType === 'image' || contentType === 'card_image') {
+             // 이미지의 경우: name, effect, description 조합
+             const imageInfo = [];
+             if (contentDetail.name) imageInfo.push(`이름: ${contentDetail.name}`);
+             if (contentDetail.effect) imageInfo.push(`효과: ${contentDetail.effect}`);
+             if (contentDetail.description) imageInfo.push(`설명: ${contentDetail.description}`);
+             
+             if (imageInfo.length > 0) {
+               originalText = imageInfo.join('\n');
+             } else {
+               originalText = '이미지 정보를 찾을 수 없습니다.';
+             }
+           } else {
+             // 기타 타입: contentData 제외하고 다른 필드들만
+             const fallbackFields = ['name', 'effect', 'description', 'text'];
+             for (const field of fallbackFields) {
+               if (contentDetail[field]) {
+                 originalText = contentDetail[field];
+                 break;
+               }
+             }
+           }
+           
+           // 원본 텍스트가 비어있으면 기본 정보만 표시
+           if (!originalText || originalText.trim() === '') {
+             const basicFields = ['name', 'effect', 'description'];
+             const basicInfo = basicFields
+               .filter(field => contentDetail[field])
+               .map(field => `${field}: ${contentDetail[field]}`)
+               .join('\n');
+             
+             originalText = basicInfo || '원본 내용을 찾을 수 없습니다.';
+           }
+           
+           setModalOriginalText(originalText);
+         }
       }
       
       alert('번역이 재생성되었습니다.');
@@ -501,25 +594,25 @@ function Translation() {
 
   // 콘텐츠의 전체 번역 상태 확인 (하나라도 완료면 완료)
   const getContentTranslationStatus = (contentId) => {
-    // 현재 선택된 콘텐츠가 아니면 기본 상태 반환
-    if (contentId !== selectedContentId) {
-      return '번역 대기';
+    // contentTranslationStatuses에서 해당 콘텐츠의 상태를 가져옴
+    const currentStatus = contentTranslationStatuses[contentId];
+    
+    // 현재 선택된 콘텐츠이고 번역 결과가 있다면 실시간 상태 계산
+    if (contentId === selectedContentId && translationResults && translationResults.length > 0) {
+      const hasInProgress = translationResults.some(item => item.status === 'IN_PROGRESS');
+      const hasCompleted = translationResults.some(item => item.status === 'COMPLETED');
+      
+      if (hasInProgress) {
+        return '번역 중';
+      } else if (hasCompleted) {
+        return '번역 완료';
+      } else {
+        return '번역 대기';
+      }
     }
     
-    if (!translationResults || translationResults.length === 0) {
-      return '번역 대기';
-    }
-    
-    const hasCompleted = translationResults.some(item => item.status === 'COMPLETED');
-    const hasInProgress = translationResults.some(item => item.status === 'IN_PROGRESS');
-    
-    if (hasCompleted) {
-      return '번역 완료';
-    } else if (hasInProgress) {
-      return '번역 중';
-    } else {
-      return '번역 대기';
-    }
+    // 저장된 상태가 있으면 반환, 없으면 기본값
+    return currentStatus || '번역 대기';
   };
 
 
@@ -603,7 +696,7 @@ function Translation() {
           <ul className="dev-list">
             {contents.map(content => {
               const isExpanded = expandedContentId === content.contentId;
-              const translationStatus = contentTranslationStatuses[content.contentId] || '번역 대기';
+              const translationStatus = getContentTranslationStatus(content.contentId);
               
               return (
                 <React.Fragment key={content.contentId}>
@@ -617,7 +710,7 @@ function Translation() {
                       {/* <span className="item-related-plan">
                         {content.description && `${content.description}`}
                       </span> */}
-                      펼쳐진 상태일 때 상세 정보 표시
+                      {/* 펼쳐진 상태일 때 상세 정보 표시 */}
                       {isExpanded && (
                         <div className="item-details-wrapper">
                           <p className="item-details"><strong>설명:</strong> {content.description || '설명 없음'}</p>
@@ -673,21 +766,12 @@ function Translation() {
                                             미리보기
                                           </button>
                                         ) : null}
-                                        
-                                        {/* {status === 'COMPLETED' && (
-                                          <button 
-                                            className="btn-complete"
-                                            onClick={() => markComplete(translationItem.translationId)}
-                                          >
-                                            완료
-                                          </button>
-                                        )} */}
                                       </div>
                                     </div>
                                   ) : (
                                     <button 
                                       className="btn-request-translation"
-                                                                             onClick={() => requestTranslation(content.contentId, [lang.code])}
+                                      onClick={() => requestTranslation(content.contentId, [lang.code])}
                                       disabled={pending}
                                     >
                                       번역 요청
@@ -719,14 +803,23 @@ function Translation() {
              <div className="translation-modal-body">
                <div className="text-comparison">
                  <div className="original-text-section">
-                   <h4>원본 내용</h4>
-                   <pre className="original-preview" style={{maxHeight:'200px'}}>
+                   <h4>
+                     <span className="language-badge">🇰🇷 한국어</span>
+                     원본 내용
+                   </h4>
+                   <pre className="original-preview">
                      {modalOriginalText || '원본 내용이 없습니다.'}
                    </pre>
                  </div>
                  <div className="translated-text-section">
-                   <h4>번역 내용</h4>
-                   <pre className="translated-preview" style={{maxHeight:'200px'}}>
+                   <h4>
+                     <span className="language-badge">
+                       {LANGS.find(l => l.code === modalLang)?.flag || '🌐'} 
+                       {LANGS.find(l => l.code === modalLang)?.name || '번역'}
+                     </span>
+                     번역 내용
+                   </h4>
+                   <pre className="translated-preview">
                      {modalText || '번역 결과가 아직 없습니다.'}
                    </pre>
                  </div>
