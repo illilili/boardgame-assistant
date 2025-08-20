@@ -100,9 +100,9 @@ function PricingEvaluation() {
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`가격 추정 실패: ${response.status}`);
-      }
+      // if (!response.ok) {
+      //   throw new Error(`가격 추정 실패: ${response.status}`);
+      // }
 
       const result = await response.json();
       console.log('자동 가격 추정 결과:', result);

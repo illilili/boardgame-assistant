@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TrendAnalysisHome.css';
+import Header from '../mainPage/Header';
+import Footer from '../mainPage/Footer';
 
 const TrendAnalysisHome = () => {
   const navigate = useNavigate();
@@ -16,21 +18,13 @@ const TrendAnalysisHome = () => {
   };
 
   return (
-    <div className="trend-analysis-home">
-      {/* 배경 애니메이션 */}
-      <div className="home-background"></div>
-      
-      <div className="home-container">
-        {/* 상단 네비게이션 */}
-        <div className="home-navigation">
-          <button 
-            className="plan-back-button"
-            onClick={() => navigate('/')}
-          >
-            ← 홈 화면
-          </button>
-        </div>
+    <>
+      <Header projectMode={false} />
+      <div className="trend-analysis-home">
+        {/* 배경 애니메이션 */}
+        <div className="home-background"></div>
         
+        <div className="home-container">
         {/* 헤더 */}
         <div className="home-header">
           <h1 className="home-title">🎲 보드게임 트렌드 분석</h1>
@@ -134,6 +128,8 @@ const TrendAnalysisHome = () => {
         </div>
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

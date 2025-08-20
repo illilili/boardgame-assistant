@@ -23,6 +23,7 @@ from copyright.router import router as copyright_router
 from game_translation.router import router as translation_router
 
 
+
 app = FastAPI()
 
 # CORS 설정

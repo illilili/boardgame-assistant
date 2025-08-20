@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LiveTop50Analysis.css';
 import TrendSummaryCards from './components/TrendSummaryCards';
 import GameDetailModal from './components/GameDetailModal';
+import Header from '../mainPage/Header';
+import Footer from '../mainPage/Footer';
 import { fetchLiveTop50, fetchLiveGameDetail, fetchLiveGameDetailsBatch, formatTrendApiError, translateAllGames } from './services/trendApiService';
 
 const LiveTop50Analysis = () => {
@@ -25,11 +27,7 @@ const LiveTop50Analysis = () => {
   const [isTranslated, setIsTranslated] = useState(false);
   const [translationProgress, setTranslationProgress] = useState('');
 
-  useEffect(() => {
-    fetchTop50Data();
-  }, []);
-
-  const fetchTop50Data = async () => {
+  const fetchTop50Data = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -54,7 +52,11 @@ const LiveTop50Analysis = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // 의존성 없음 - 컴포넌트 마운트 시에만 실행
+
+  useEffect(() => {
+    fetchTop50Data();
+  }, [fetchTop50Data]);
 
   // 게임 상세 정보를 배치로 로딩 - 성능 최적화
   const loadGameDetails = async (games) => {
@@ -215,17 +217,9 @@ const LiveTop50Analysis = () => {
       <div className="header-navigation">
         <button 
           className="back-button"
-          onClick={() => navigate('/trend')}
+          onClick={() => navigate('/trend/original')}
         >
-          ← 돌아가기
-        </button>
-        <button 
-          className="refresh-button-header"
-          onClick={fetchTop50Data}
-          disabled={loading}
-          title="최신 데이터로 새로고침"
-        >
-          {loading ? '🔄 조회 중...' : '🔄 새로고침'}
+          🔄 기존 인기 보드게임 분석
         </button>
       </div>
       
@@ -288,17 +282,6 @@ const LiveTop50Analysis = () => {
     setSelectedGameId(null);
   };
 
-  // 실패한 게임들 재시도
-  const retryFailedGames = () => {
-    const failedGames = top50Data.games.filter(game => 
-      !gameDetails.has(game.id) && !detailsLoading.has(game.id)
-    );
-    
-    if (failedGames.length > 0) {
-      console.log(`🔄 실패한 ${failedGames.length}개 게임 재시도...`);
-      loadGameDetails(failedGames);
-    }
-  };
 
   // 전체 게임 번역 핸들러
   const handleTranslateAll = async () => {
@@ -540,11 +523,13 @@ const LiveTop50Analysis = () => {
   if (error) return renderErrorState();
 
   return (
-    <div className="live-top50-analysis">
-      {/* 배경 */}
-      <div className="live-background"></div>
-      
-      <div className="live-container">
+    <>
+      <Header projectMode={false} />
+      <div className="live-top50-analysis">
+        {/* 배경 */}
+        <div className="live-background"></div>
+        
+        <div className="live-container">
         {renderHeader()}
         
         {/* 1단계: 실시간 트렌드 요약 */}
@@ -565,6 +550,8 @@ const LiveTop50Analysis = () => {
         />
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

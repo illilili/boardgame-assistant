@@ -1,17 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Scatter } from '@ant-design/plots';
 import { Card, Spin, Empty, Alert, Space, Typography, Tooltip, Button, Select, Modal, Table, Tag, Divider } from 'antd';
 import { 
-  BarChartOutlined, 
   InfoCircleOutlined,
-  FullscreenOutlined,
-  DownloadOutlined,
-  ReloadOutlined
+  DownloadOutlined
 } from '@ant-design/icons';
 
 import './BubbleChartVisualization.css';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 /**
@@ -37,7 +34,6 @@ const BubbleChartVisualization = ({
   
   const [selectedBubble, setSelectedBubble] = useState(null);
   const [chartError, setChartError] = useState(null);
-  const [clickIndex, setClickIndex] = useState(0); // 클릭 순서 추적
 
   // 차트별 독립 기준점 설정
   const getChartSpecificThresholds = () => {
@@ -647,13 +643,11 @@ const BubbleChartVisualization = ({
                 style={{
                   position: 'absolute',
                   top: 0,
-                  left: '50%',
-                  width: '50%',
-                  height: '50%',
+                  left: 'calc(50% + 1px)', /* 중심선에서 1px 떨어뜨려 겹침 방지 */
+                  width: 'calc(50% - 1px)',
+                  height: 'calc(50% - 1px)',
                   background: 'linear-gradient(135deg, rgba(114, 46, 209, 0.08) 0%, rgba(114, 46, 209, 0.02) 100%)',
                   border: '2px solid rgba(114, 46, 209, 0.15)',
-                  borderLeft: '1px dashed rgba(114, 46, 209, 0.3)',
-                  borderBottom: '1px dashed rgba(114, 46, 209, 0.3)',
                   borderRadius: '8px',
                   padding: '16px',
                   display: 'flex',
@@ -681,12 +675,10 @@ const BubbleChartVisualization = ({
                   position: 'absolute',
                   top: 0,
                   left: 0,
-                  width: '50%',
-                  height: '50%',
+                  width: 'calc(50% - 1px)', /* 중심선에서 1px 떨어뜨려 겹침 방지 */
+                  height: 'calc(50% - 1px)',
                   background: 'linear-gradient(135deg, rgba(245, 34, 45, 0.08) 0%, rgba(245, 34, 45, 0.02) 100%)',
                   border: '2px solid rgba(245, 34, 45, 0.15)',
-                  borderRight: '1px dashed rgba(245, 34, 45, 0.3)',
-                  borderBottom: '1px dashed rgba(245, 34, 45, 0.3)',
                   borderRadius: '8px',
                   padding: '16px',
                   display: 'flex',
@@ -713,13 +705,11 @@ const BubbleChartVisualization = ({
                 style={{
                   position: 'absolute',
                   bottom: 0,
-                  left: '50%',
-                  width: '50%',
-                  height: '50%',
+                  left: 'calc(50% + 1px)', /* 중심선에서 1px 떨어뜨려 겹침 방지 */
+                  width: 'calc(50% - 1px)',
+                  height: 'calc(50% - 1px)',
                   background: 'linear-gradient(135deg, rgba(82, 196, 26, 0.08) 0%, rgba(82, 196, 26, 0.02) 100%)',
                   border: '2px solid rgba(82, 196, 26, 0.15)',
-                  borderLeft: '1px dashed rgba(82, 196, 26, 0.3)',
-                  borderTop: '1px dashed rgba(82, 196, 26, 0.3)',
                   borderRadius: '8px',
                   padding: '16px',
                   display: 'flex',
@@ -747,12 +737,10 @@ const BubbleChartVisualization = ({
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
-                  width: '50%',
-                  height: '50%',
+                  width: 'calc(50% - 1px)', /* 중심선에서 1px 떨어뜨려 겹침 방지 */
+                  height: 'calc(50% - 1px)',
                   background: 'linear-gradient(135deg, rgba(250, 173, 20, 0.08) 0%, rgba(250, 173, 20, 0.02) 100%)',
                   border: '2px solid rgba(250, 173, 20, 0.15)',
-                  borderRight: '1px dashed rgba(250, 173, 20, 0.3)',
-                  borderTop: '1px dashed rgba(250, 173, 20, 0.3)',
                   borderRadius: '8px',
                   padding: '16px',
                   display: 'flex',

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OriginalGameAnalysis.css';
+import Header from '../mainPage/Header';
+import Footer from '../mainPage/Footer';
 import { 
   fetchOriginalDashboard, 
   formatTrendApiError
@@ -25,7 +27,6 @@ const OriginalGameAnalysis = () => {
 
   useEffect(() => {
     loadDashboardData();
-    loadChartData(); // 차트 데이터 로드
   }, []);
 
   // 차트 그룹화 기준 변경 시 데이터 다시 로드
@@ -33,10 +34,10 @@ const OriginalGameAnalysis = () => {
     if (dashboardData) {
       loadChartData();
     }
-  }, [chartGroupBy, dashboardData]);
+  }, [chartGroupBy, dashboardData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 테마 번역 함수
-  const translateTheme = (englishTheme) => {
+  const translateTheme = useCallback((englishTheme) => {
     // 데이터 정리: 백슬래시 제거
     const cleanedTheme = englishTheme?.replace(/\\/g, '');
     
@@ -106,7 +107,7 @@ const OriginalGameAnalysis = () => {
     };
     
     return themeTranslations[cleanedTheme] || cleanedTheme;
-  };
+  }, []);
 
   // 난이도 번역 함수  
   const translateDifficulty = (englishDifficulty) => {
@@ -124,7 +125,7 @@ const OriginalGameAnalysis = () => {
   };
 
   // 메커니즘 번역 함수
-  const translateMechanism = (englishMechanism) => {
+  const translateMechanism = useCallback((englishMechanism) => {
     // 데이터 정리: 백슬래시 제거
     const cleanedMechanism = englishMechanism?.replace(/\\/g, '');
     
@@ -194,11 +195,79 @@ const OriginalGameAnalysis = () => {
       'Contracts': '계약',
       'Multi-Use Cards': '다목적 카드',
       'Solo / Solitaire Game': '솔로/솔리테어 게임',
-      'Legacy Game': '레거시 게임'
+      'Legacy Game': '레거시 게임',
+      'Action Points': '행동 포인트',
+      'Deck, Bag, and Pool Building': '덱/백/풀 빌딩',
+      'Bag and Pool Building': '백/풀 빌딩',
+      'Pool Building': '풀 빌딩',
+      'Action Point Allowance': '행동 포인트 할당',
+      'Action Drafting': '행동 드래프팅',
+      'Action Queue': '행동 대기열',
+      'Action Retrieval': '행동 회수',
+      'Advantage Token': '유리 토큰',
+      'Alliances': '동맹',
+      'Automatic Resource Growth': '자동 자원 증가',
+      'Bingo': '빙고',
+      'Bias': '편향',
+      'Bribery': '뇌물',
+      'Catch the Leader': '선두 추격',
+      'Command Cards': '명령 카드',
+      'Communication Limits': '의사소통 제한',
+      'Constrained Bidding': '제한 입찰',
+      'Cube Tower': '큐브 타워',
+      'Elapsed Real Time Ending': '실시간 종료',
+      'Events': '이벤트',
+      'Finale Ending': '피날레 종료',
+      'Fixed Order Phase': '고정 순서 단계',
+      'Follow': '따라하기',
+      'Force Commitment': '강제 약속',
+      'Hidden Movement': '숨겨진 이동',
+      'Hot Potato': '핫 포테이토',
+      'I Cut, You Choose': '내가 자르고 네가 선택',
+      'Impulse Movement': '충동 이동',
+      'Increase Value of Unchosen Resources': '선택되지 않은 자원 가치 증가',
+      'Layering': '레이어링',
+      'Mancala': '만칼라',
+      'Market': '시장',
+      'Measurement Movement': '측정 이동',
+      'Melding and Splaying': '결합과 펼치기',
+      'Move Through Deck': '덱 이동',
+      'Multiple Maps': '다중 맵',
+      'Neighbor Scope': '인접 범위',
+      'Network and Route Building': '네트워크와 경로 구축',
+      'Once-Per-Game Abilities': '게임당 한 번 능력',
+      'Order Counters': '순서 카운터',
+      'Passed Action Token': '전달된 행동 토큰',
+      'Physical Removal': '물리적 제거',
+      'Pieces as Map': '말을 맵으로',
+      'Programmed Movement': '프로그래밍된 이동',
+      'Race': '레이스',
+      'Random Production': '무작위 생산',
+      'Relative Movement': '상대적 이동',
+      'Resource to Move': '이동을 위한 자원',
+      'Rondel': '론델',
+      'Score-and-Reset Game': '점수와 리셋 게임',
+      'Slide/Push': '밀기/누르기',
+      'Speed Matching': '속도 매칭',
+      'Square Grid': '정사각형 격자',
+      'Stacking and Balancing': '쌓기와 균형',
+      'Static Capture': '정적 포획',
+      'Sudden Death Ending': '서든 데스 종료',
+      'Tags': '태그',
+      'Three Dimensional Movement': '3차원 이동',
+      'Tug of War': '줄다리기',
+      'Turn Order: Auction': '턴 순서: 경매',
+      'Turn Order: Claim Action': '턴 순서: 행동 선점',
+      'Turn Order: Pass Order': '턴 순서: 패스 순서',
+      'Turn Order: Progressive': '턴 순서: 점진적',
+      'Turn Order: Random': '턴 순서: 무작위',
+      'Turn Order: Role Order': '턴 순서: 역할 순서',
+      'Turn Order: Stat-Based': '턴 순서: 스탯 기반',
+      'Victory Points as a Resource': '승점을 자원으로'
     };
     
     return mechanismTranslations[cleanedMechanism] || cleanedMechanism;
-  };
+  }, []);
 
   const loadDashboardData = async () => {
     try {
@@ -221,8 +290,8 @@ const OriginalGameAnalysis = () => {
     }
   };
 
-  // 4사분면 분석 함수 - 차트별 독립 기준점
-  const analyzeQuadrant = (avgRating, avgComplexity, chartType = 'categories') => {
+  // 4사분면 분석 함수 - 차트별 독립 기준점 (useCallback으로 래핑하여 의존성 최적화)
+  const analyzeQuadrant = useCallback((avgRating, avgComplexity, chartType = 'categories') => {
     let ratingThreshold, complexityThreshold;
     
     if (chartType === 'categories' || chartGroupBy === 'categories') {
@@ -282,10 +351,10 @@ const OriginalGameAnalysis = () => {
         color: '#faad14'
       };
     }
-  };
+  }, [chartGroupBy]);
 
   // TOP10 테마/메커니즘 기반 버블차트 데이터 생성
-  const generateBubbleChartData = () => {
+  const generateBubbleChartData = useCallback(() => {
     if (!dashboardData) return [];
     
     const data = [];
@@ -294,7 +363,7 @@ const OriginalGameAnalysis = () => {
       // TOP 15 테마 데이터로 버블차트 생성
       const topThemes = dashboardData.themes.slice(0, 15);
       
-      topThemes.forEach((theme, index) => {
+      topThemes.forEach((theme) => {
         // 백엔드에서 계산된 실제 평균 평점 및 난이도 사용
         const avgRating = parseFloat(theme.avgRating || 0);
         const avgComplexity = parseFloat(theme.avgComplexity || 0);
@@ -323,7 +392,7 @@ const OriginalGameAnalysis = () => {
       // TOP 15 메커니즘 데이터로 버블차트 생성
       const topMechanisms = dashboardData.mechanisms.slice(0, 15);
       
-      topMechanisms.forEach((mechanism, index) => {
+      topMechanisms.forEach((mechanism) => {
         // 백엔드에서 계산된 실제 평균 평점 및 난이도 사용
         const avgRating = parseFloat(mechanism.avgRating || 0);
         const avgComplexity = parseFloat(mechanism.avgComplexity || 0);
@@ -375,10 +444,10 @@ const OriginalGameAnalysis = () => {
     }
     
     return data;
-  };
+  }, [dashboardData, chartGroupBy, analyzeQuadrant, translateTheme, translateMechanism]);
 
   // 차트 데이터 로드 함수
-  const loadChartData = async () => {
+  const loadChartData = useCallback(async () => {
     try {
       setChartLoading(true);
       console.log(`📊 차트 데이터 로드 시작 - ${chartGroupBy} 기준`);
@@ -411,7 +480,7 @@ const OriginalGameAnalysis = () => {
     } finally {
       setChartLoading(false);
     }
-  };
+  }, [chartGroupBy, generateBubbleChartData]);
 
   const renderLoadingState = () => (
     <div className="original-analysis loading">
@@ -710,7 +779,7 @@ const OriginalGameAnalysis = () => {
         <div className="bubble-chart-section">
           <div className="chart-header">
             <div className="chart-title">
-              <h3>📊 TOP 10 {chartGroupBy === 'categories' ? '테마' : '메커니즘'} 분석 (버블차트)</h3>
+              <h3>📊 TOP 15 {chartGroupBy === 'categories' ? '테마' : '메커니즘'} 분석 (버블차트)</h3>
               <p>X축: 평균 평점 | Y축: 평균 난이도 | 버블 크기: 게임 수 (시장 규모) | 클릭하여 상세 정보를 확인하세요.</p>
             </div>
             
@@ -750,9 +819,9 @@ const OriginalGameAnalysis = () => {
 
     return (
       <div className="themes-section">
-        <h3>🎨 인기 테마 TOP 10</h3>
+        <h3>🎨 인기 테마 TOP 15</h3>
         <div className="themes-chart">
-          {dashboardData.themes.map((theme, index) => (
+          {dashboardData.themes.slice(0, 15).map((theme, index) => (
             <div key={index} className="theme-bar">
               <div className="theme-info">
                 <span className="theme-name">{translateTheme(theme.theme)}</span>
@@ -858,13 +927,13 @@ const OriginalGameAnalysis = () => {
       );
     }
 
-    const topMechanisms = dashboardData.mechanisms.slice(0, 10);
+    const topMechanisms = dashboardData.mechanisms.slice(0, 15);
     const totalMechanisms = dashboardData.mechanisms.length;
     const totalGamesCount = dashboardData.summary?.totalGames || 10000;
 
     return (
       <div className="mechanism-section">
-        <h3>⚙️ 인기 메커니즘 TOP 10</h3>
+        <h3>⚙️ 인기 메커니즘 TOP 15</h3>
         <div className="mechanisms-chart">
           {topMechanisms.map((mechanism, index) => (
             <div key={index} className="mechanism-bar">
@@ -968,9 +1037,9 @@ const OriginalGameAnalysis = () => {
         <div className="header-navigation">
           <button 
             className="back-button-original"
-            onClick={() => navigate('/trend')}
+            onClick={() => navigate('/trend/live-top50')}
           >
-            ← 돌아가기
+            🔄 실시간 TOP30 분석
           </button>
         </div>
         <div className="header-content">
@@ -1010,7 +1079,13 @@ const OriginalGameAnalysis = () => {
   if (error) return renderErrorState();
   if (!dashboardData) return null;
 
-  return renderDashboard();
+  return (
+    <>
+      <Header projectMode={false} />
+      {renderDashboard()}
+      <Footer />
+    </>
+  );
 };
 
 export default OriginalGameAnalysis;

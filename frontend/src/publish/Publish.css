@@ -33,12 +33,14 @@ body {
 /* --- 사이드바 --- */
 .workspace-sidebar {
   width: 280px;
-  background-color: var(--bg-dark);
-  color: var(--text-secondary);
+  background-color: #FFFFFF;
+  color: #2c2825;
   padding: 32px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-right: 1px solid #EAEAEA;
 }
 
 .sidebar-header {
@@ -48,22 +50,24 @@ body {
 .logo {
   font-weight: 800;
   font-size: 1.5rem;
-  color: var(--white);
+  color: #E58A4E;
   letter-spacing: 1px;
+  margin-bottom: 10px;
 }
 
 .project-info {
   margin-top: 10px;
   font-size: 12px;
-  color: #bdc3c7;
+  color: #6b7280;
   text-align: center;
 }
 
 .project-info span {
-  background: rgba(52, 152, 219, 0.2);
+  background: rgba(229, 138, 78, 0.1);
   padding: 4px 8px;
   border-radius: 4px;
-  border: 1px solid rgba(52, 152, 219, 0.3);
+  border: 1px solid rgba(229, 138, 78, 0.2);
+  color: #E58A4E;
 }
 
 .workspace-nav-list {
@@ -82,19 +86,19 @@ body {
   border-radius: 8px;
   cursor: pointer;
   position: relative;
-  color: #d1d5db; /* 밝은 회색 텍스트 */
+  color: #374151;
   transition: color 0.2s, background-color 0.2s;
 }
 
 .nav-item:hover {
-  color: var(--white);
-  background-color: rgba(255, 255, 255, 0.05);
+  color: #2c2825;
+  background-color: #F8F8F8;
 }
 
 .nav-item.active {
-  color: var(--white);
+  color: #FFFFFF;
   font-weight: 600;
-  background-color: var(--accent-primary);
+  background-color: #E58A4E;
 }
 
 /* --- 메인 컨텐츠 영역 --- */
