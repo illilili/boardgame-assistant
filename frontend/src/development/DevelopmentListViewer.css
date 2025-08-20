@@ -4,6 +4,16 @@
   margin-top: 2rem;
 }
 
+/* 개발 목록 전체 컨테이너 */
+.dev-list-wrapper {
+  animation: fadeIn 0.5s ease-in-out;
+  background-color: #ffffff;        /* 흰색 배경 */
+  padding: 32px 40px;              /* 여백 */
+  border-radius: 12px;             /* 둥근 모서리 */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* 은은한 그림자 */
+  margin-top: 20px;
+}
+
 /* --- 목록 헤더 스타일 --- */
 .dev-list-header {
   display: flex;

@@ -1,3 +1,4 @@
+// 파일: src/publish/Publish.jsx
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './Publish.css';
@@ -5,26 +6,25 @@ import { ProjectContext } from '../contexts/ProjectContext';
 
 import Header from '../mainPage/Header';
 
-// ✅ 개발 파트에서 쓰던 승인된 기획안 뷰어 재사용
-import ApprovedPlanViewer from '../development/ApprovedPlanViewer';
-import TranslationWrapper from './TranslationWrapper';
 import PricingEvaluation from './PricingEvaluation';
+import TranslationList from './TranslationList';
+import Translation from './Translation';
 
 // 사이드바 메뉴 정의
 const workspaceNavItems = [
-  { id: 'approved-plan', title: '승인된 기획안 조회', component: <ApprovedPlanViewer /> },
-  { id: 'translation', title: '번역', component: <TranslationWrapper /> },
-  { id: 'pricing', title: '가격 책정', component: <PricingEvaluation /> },
+  { id: 'translation-list', title: '번역 대기 목록' },
+  { id: 'translation', title: '번역' },
+  { id: 'pricing', title: '가격 책정' },
 ];
 
 function Publish() {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  const [activeViewId, setActiveViewId] = useState('approved-plan'); // ✅ 기본 탭은 승인된 기획안 조회
 
-  const activeView = activeViewId
-    ? workspaceNavItems.find((item) => item.id === activeViewId)
-    : null;
+  const [activeViewId, setActiveViewId] = useState(
+    () => localStorage.getItem('pubActiveViewId') || 'translation-list'
+  );
+  const [selectedContentId, setSelectedContentId] = useState(null);
 
   if (!projectId) {
     return (
@@ -44,23 +44,37 @@ function Publish() {
     );
   }
 
+  const handleNavigate = (viewId, payload = null) => {
+    setActiveViewId(viewId);
+    if (payload) setSelectedContentId(payload); // ✅ 번역 상세로 넘길 콘텐츠 ID 저장
+    localStorage.setItem('pubActiveViewId', viewId);
+  };
+
+  // 현재 보여줄 뷰 선택
+  let activeView = null;
+  if (activeViewId === 'translation-list') {
+    activeView = (
+      <TranslationList onSelectContent={(cid) => handleNavigate('translation', cid)} />
+    );
+  } else if (activeViewId === 'translation') {
+    activeView = <Translation contentId={selectedContentId} />;
+  } else if (activeViewId === 'pricing') {
+    activeView = <PricingEvaluation />;
+  }
+
   return (
-    <>
+    <div className="publish-page">
       <Header projectMode={true} />
       <ProjectContext.Provider value={{ projectId }}>
         <div className="workspace-container new-design">
-          <aside className="workspace-sidebar">
+          <aside className="pub-workspace-sidebar">
             <div className="sidebar-header">
               {/* 프로젝트 홈 이동 */}
               <div
-                className="logo"
+                className="pub-logo"
                 onClick={() => navigate(`/projects/${projectId}`)}
-                style={{ cursor: 'pointer' }}
-                title="프로젝트 홈으로"
               >
                 PUBLISH
-              </div>
-              <div className="project-info">
               </div>
             </div>
 
@@ -68,8 +82,8 @@ function Publish() {
               {workspaceNavItems.map((item) => (
                 <li
                   key={item.id}
-                  className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
-                  onClick={() => setActiveViewId(item.id)}
+                  className={`pub-nav-item ${activeViewId === item.id ? 'active' : ''}`}
+                  onClick={() => handleNavigate(item.id)}
                 >
                   {item.title}
                 </li>
@@ -78,20 +92,18 @@ function Publish() {
           </aside>
 
           <main className="workspace-main-content">
-            {activeView ? (
-              activeView.component
-            ) : (
+            {activeView || (
               <div className="welcome-screen">
-                <span className="welcome-icon">👋</span>
-                <h2>환영합니다!</h2>
-                <p>왼쪽 메뉴에서 작업을 선택하여 시작해주세요.</p>
+                <span className="welcome-icon">🚀</span>
+                <h2>퍼블리싱 작업을 시작해 보세요</h2>
+                <p>왼쪽 메뉴에서 번역 대기 목록, 번역, 가격 책정을 선택하여 시작할 수 있습니다.</p>
                 <p>현재 프로젝트 ID: {projectId}</p>
               </div>
             )}
           </main>
         </div>
       </ProjectContext.Provider>
-    </>
+    </div>
   );
 }
 

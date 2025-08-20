@@ -78,12 +78,11 @@ function FileUploadPage({ contentId, componentId }) {
         지원하지 않는 컴포넌트 타입은 직접 파일을 업로드 해주세요.
       </p>
 
-      {/* ✅ Generic Preview 표시 */}
+      {/* Generic Preview 표시 */}
       {previewInfo && (
         <div className="preview-info-box">
           <div className="preview-header">
             <h3 className="preview-title">{previewInfo.title}</h3>
-            <small className="content-id-display">콘텐츠 ID: {previewInfo.contentId}</small>
           </div>
           <div className="preview-body">
             <p><strong>역할/효과:</strong> {previewInfo.roleAndEffect}</p>

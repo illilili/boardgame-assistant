@@ -1,68 +1,114 @@
-.rulebook-page-container {
-  display: flex;
-  gap: 24px;
-  max-width: 1600px;
-  margin: auto;
-}
-
-.form-column {
-  flex: 1;
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.result-column {
-  flex: 2;
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  overflow-y: auto;
-}
-
-.primary-button {
-  width: 100%;
-  padding: 12px;
-  background: #E58A4E;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.secondary-button {
-  padding: 10px 14px;
-  background: #4A5568;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.download-controls {
+/* ============================= */
+/* 룰북 왼쪽 폼 - 버튼 묶음 */
+.rulebook-form-group {
   display: flex;
   gap: 12px;
-  margin-top: 16px;
+  margin-bottom: 20px;
 }
 
-.document-editor {
+.rulebook-form-group button {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+/* 룰북 초안 생성 버튼 */
+.rulebook-form-group .generate-btn {
+  background-color: #e58a4e;
+  color: #fff;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.rulebook-form-group .generate-btn:hover {
+  background-color: #d67132;
+}
+
+/* DOCX 다운로드 버튼 */
+.rulebook-form-group .download-btn {
+  background-color: #2f3c4e;
+  color: #fff;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.rulebook-form-group .download-btn:hover {
+  background-color: #1f2b3a;
+}
+
+/* ============================= */
+/* 룰북 오른쪽 초안 뷰어 */
+.rulebook-preview {
+  flex: 2;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  max-height: 80vh;
+  /* 화면 높이 제한 */
+  line-height: 1.6;
+}
+
+
+/* 기본은 빈 상태 → 격자 */
+.rulebook-preview.empty {
+  background: #fff;
+  background-image:
+    linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+
+/* 내용 채워졌을 때 → 흰색 */
+.rulebook-preview.filled {
+  background: #fff;
+  background-image: none;
+
+}
+
+
+/* 텍스트 가독성 */
+.rulebook-preview h3,
+.rulebook-preview h4 {
+  font-weight: 700;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.rulebook-preview p,
+.rulebook-preview li {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* ============================= */
+/* PDF 뷰어 */
+.pdf-viewer {
   width: 100%;
-  height: 80vh;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 16px;
-  font-size: 1rem;
+  height: 100%;
+  /* ✅ 고정값 대신 부모 높이 꽉 채움 */
+  min-height: 600px;
+  /* 최소 높이만 제한 */
+  border: none;
+  /* 불필요한 테두리 제거 */
+  border-radius: 8px;
+  display: block;
 }
 
-.error-message {
-  color: red;
-  margin-top: 8px;
+
+.pdf-upload-section h4 {
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+  color: var(--text-dark);
 }
 
-.success-message {
-  color: green;
-  margin-top: 8px;
+.pdf-upload-section {
+  margin-top: 2rem;
+  padding: 1rem 0;
+  border-top: 1px solid #ddd;
 }
