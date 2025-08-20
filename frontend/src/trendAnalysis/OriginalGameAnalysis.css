@@ -978,6 +978,7 @@
   margin: 2.5rem 0;
   position: relative;
   z-index: 1;
+  clear: both; /* 플로팅 요소의 영향 방지 */
 }
 
 .bubble-chart-section,
@@ -986,9 +987,11 @@
   border-radius: 16px;
   box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
   border: 1px solid var(--border-color, #e5e7eb);
-  margin-bottom: 2rem;
+  margin-bottom: 3rem; /* 여백을 더 크게 */
   overflow: visible; /* 버블차트 영역 겹침 방지 */
-  min-height: 600px; /* 최소 높이 확보 */
+  min-height: 700px; /* 최소 높이를 더 크게 확보 */
+  padding: 2rem; /* 내부 패딩 확보 */
+  position: relative;
 }
 
 .chart-header {

@@ -45,16 +45,16 @@
 /* ===== 차트 컨테이너 ===== */
 .chart-container {
   flex: 1;
-  min-height: 450px;
+  min-height: 550px; /* 높이를 늘려서 겹침 방지 */
   position: relative;
   background: #ffffff;
   border-radius: 16px;
   border: 1px solid #e2e8f0;
-  overflow: hidden;
+  overflow: visible; /* 버블이 컨테이너 밖으로 나가도 보이도록 */
   box-shadow: 
     0 4px 16px rgba(15, 23, 42, 0.08),
     0 0 0 1px rgba(15, 23, 42, 0.02);
-  padding: 16px;
+  padding: 20px; /* 패딩도 늘림 */
   display: flex; /* flexbox로 차트가 전체 영역을 사용하도록 */
   flex-direction: column;
 }
@@ -461,7 +461,7 @@
   position: relative;
   width: 100%;
   flex: 1; /* 부모의 flex 공간을 모두 사용 */
-  min-height: 400px; /* 패딩을 고려한 최소 높이 */
+  min-height: 500px; /* 패딩을 고려한 최소 높이를 늘림 */
   display: flex;
   flex-direction: column;
 }
@@ -471,7 +471,7 @@
   flex: 1; /* 부모 flex 공간 모두 사용 */
   position: relative;
   z-index: 1; /* 오버레이보다 아래에 위치하지만 차트는 보이도록 */
-  min-height: 350px; /* 최소 높이 보장 */
+  min-height: 450px; /* 최소 높이를 늘려서 겹침 방지 */
 }
 
 /* G2 차트 컨테이너 크기 강제 설정 */

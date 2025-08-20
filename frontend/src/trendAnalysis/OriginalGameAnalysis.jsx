@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OriginalGameAnalysis.css';
 import Header from '../mainPage/Header';
@@ -37,7 +37,7 @@ const OriginalGameAnalysis = () => {
   }, [chartGroupBy, dashboardData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 테마 번역 함수
-  const translateTheme = (englishTheme) => {
+  const translateTheme = useCallback((englishTheme) => {
     // 데이터 정리: 백슬래시 제거
     const cleanedTheme = englishTheme?.replace(/\\/g, '');
     
@@ -107,7 +107,7 @@ const OriginalGameAnalysis = () => {
     };
     
     return themeTranslations[cleanedTheme] || cleanedTheme;
-  };
+  }, []);
 
   // 난이도 번역 함수  
   const translateDifficulty = (englishDifficulty) => {
@@ -125,7 +125,7 @@ const OriginalGameAnalysis = () => {
   };
 
   // 메커니즘 번역 함수
-  const translateMechanism = (englishMechanism) => {
+  const translateMechanism = useCallback((englishMechanism) => {
     // 데이터 정리: 백슬래시 제거
     const cleanedMechanism = englishMechanism?.replace(/\\/g, '');
     
@@ -210,7 +210,6 @@ const OriginalGameAnalysis = () => {
       'Bingo': '빙고',
       'Bias': '편향',
       'Bribery': '뇌물',
-      'Campaign / Battle Card Driven': '캠페인/배틀 카드 주도',
       'Catch the Leader': '선두 추격',
       'Command Cards': '명령 카드',
       'Communication Limits': '의사소통 제한',
@@ -268,7 +267,7 @@ const OriginalGameAnalysis = () => {
     };
     
     return mechanismTranslations[cleanedMechanism] || cleanedMechanism;
-  };
+  }, []);
 
   const loadDashboardData = async () => {
     try {
@@ -291,8 +290,8 @@ const OriginalGameAnalysis = () => {
     }
   };
 
-  // 4사분면 분석 함수 - 차트별 독립 기준점
-  const analyzeQuadrant = (avgRating, avgComplexity, chartType = 'categories') => {
+  // 4사분면 분석 함수 - 차트별 독립 기준점 (useCallback으로 래핑하여 의존성 최적화)
+  const analyzeQuadrant = useCallback((avgRating, avgComplexity, chartType = 'categories') => {
     let ratingThreshold, complexityThreshold;
     
     if (chartType === 'categories' || chartGroupBy === 'categories') {
@@ -352,7 +351,7 @@ const OriginalGameAnalysis = () => {
         color: '#faad14'
       };
     }
-  };
+  }, [chartGroupBy]);
 
   // TOP10 테마/메커니즘 기반 버블차트 데이터 생성
   const generateBubbleChartData = useCallback(() => {
@@ -445,7 +444,7 @@ const OriginalGameAnalysis = () => {
     }
     
     return data;
-  }, [dashboardData, chartGroupBy]);
+  }, [dashboardData, chartGroupBy, analyzeQuadrant, translateTheme, translateMechanism]);
 
   // 차트 데이터 로드 함수
   const loadChartData = useCallback(async () => {
@@ -481,7 +480,7 @@ const OriginalGameAnalysis = () => {
     } finally {
       setChartLoading(false);
     }
-  }, [chartGroupBy, dashboardData]); // generateBubbleChartData 제거
+  }, [chartGroupBy, generateBubbleChartData]);
 
   const renderLoadingState = () => (
     <div className="original-analysis loading">
