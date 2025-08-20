@@ -87,6 +87,7 @@
   max-width: 1400px;
   margin: 0 auto;
   height: calc(100vh - 40px);
+
 }
 
 /* 폼 컬럼 (왼쪽) */
@@ -160,13 +161,14 @@
   color: white;
   padding: 4px 8px;
   border-radius: 12px;
-  font-size: 12px;
   font-weight: 500;
+  font-size: 16px;
 }
 
 .status-badge.pending {
   background-color: #f39c12;
   color: white;
+
 }
 
 .status-badge.in-progress {
@@ -521,6 +523,67 @@
   flex: 1;
   overflow-y: auto;
 }
+
+/* 언어 배지 스타일 */
+.language-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 한국어 배지 */
+.language-badge:contains("한국어"),
+.language-badge:has-text("한국어") {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
+
+/* 영어 배지 */
+.language-badge:contains("영어"),
+.language-badge:has-text("영어") {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+}
+
+/* 일본어 배지 */
+.language-badge:contains("일본어"),
+.language-badge:has-text("일본어") {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+  color: white;
+}
+
+/* 중국어 배지 */
+.language-badge:contains("중국어"),
+.language-badge:has-text("중국어") {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: white;
+}
+
+/* 독일어 배지 */
+.language-badge:contains("독일어"),
+.language-badge:has-text("독일어") {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: white;
+}
+
+/* 프랑스어 배지 */
+.language-badge:contains("프랑스어"),
+.language-badge:has-text("프랑스어") {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: white;
+}
+
+/* 스페인어 배지 */
+.language-badge:contains("스페인어"),
+.language-badge:has-text("스페인어") {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
+
 .translation-modal-actions { 
   display: grid; 
   grid-template-columns: 1fr 200px; 
@@ -553,19 +616,19 @@
   height: 160px; 
   border: none; 
   border-radius: 16px; 
-  background: linear-gradient(135deg, #3498db, #2d7cd1); 
+  background: linear-gradient(135deg, #E58A4E, #d17a3e); 
   color: #fff; 
   font-weight: 700; 
   font-size: 18px; 
   cursor: pointer; 
-  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3); 
+  box-shadow: 0 8px 25px rgba(229, 138, 78, 0.3); 
   transition: all 0.3s ease; 
 }
 
 .regen-btn:hover { 
   transform: translateY(-2px); 
-  box-shadow: 0 12px 35px rgba(52, 152, 219, 0.4);
-  background: linear-gradient(135deg, #2980b9, #21618c);
+  box-shadow: 0 12px 35px rgba(229, 138, 78, 0.4);
+  background: linear-gradient(135deg, #d17a3e, #b86a2e);
 }
 
 .regen-btn:disabled { 
@@ -603,7 +666,7 @@
 }
 
 .translation-btn-complete-modal {
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  background: linear-gradient(135deg, #27ae60, #219a52);
   color: white;
   border: none;
   padding: 10px 18px;
@@ -615,7 +678,7 @@
 
 .translation-btn-complete-modal:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
 }
 
 .translation-btn-complete-modal:disabled {
@@ -625,7 +688,7 @@
 }
 
 .translation-btn-edit-modal {
-  background: linear-gradient(135deg, #f39c12, #e67e22);
+  background: linear-gradient(135deg, #E58A4E, #d17a3e);
   color: white;
   border: none;
   padding: 10px 18px;
@@ -637,7 +700,7 @@
 
 .translation-btn-edit-modal:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+  box-shadow: 0 4px 12px rgba(229, 138, 78, 0.3);
 }
 
 .translation-btn-edit-modal:disabled {
@@ -704,15 +767,14 @@
   border-radius: 8px;
   padding: 16px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 14px;
+  font-size: 18px;
   line-height: 1.7;
   color: #2c3e50;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow: auto;
   flex: 1;
-  min-height: 0;
-  height: 500px;
+  max-height: 500px;
 }
 
 
@@ -800,6 +862,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  align-items: center;
 }
 
 .translation-status {
@@ -812,10 +875,11 @@
 .translation-badge {
   padding: 6px 12px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  min-width: 90px
 }
 
 .translation-badge.pending {
@@ -824,7 +888,7 @@
 }
 
 .translation-badge.requested {
-  background-color: #e67e22;
+  background-color: #E58A4E;
   color: white;
 }
 
@@ -834,7 +898,7 @@
 }
 
 .translation-badge.completed {
-  background-color: #d1ffd3;
+  background-color: #d1ffd3 ;
   color: #166534;
 }
 
@@ -847,21 +911,21 @@
 
 /* 버튼 스타일 */
 .btn-request-translation {
-  background: linear-gradient(135deg, #3498db, #2980b9);
+  background: linear-gradient(135deg, #E58A4E, #d17a3e);
   color: white;
   border: none;
   padding: 10px 16px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  width: 100%;
+  width: 100px;
   transition: all 0.2s ease;
 }
 
 .btn-request-translation:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 4px 12px rgba(229, 138, 78, 0.3);
 }
 
 .btn-request-translation:disabled {
@@ -871,24 +935,25 @@
 }
 
 .btn-review {
-  background: linear-gradient(135deg, #27ae60, #219a52);
-  color: white;
-  border: none;
+  background: #ffffff;
+  color: rgb(0, 0, 0);
+  border: 2px solid #e9ecef;
   padding: 8px 12px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-width: 100px
 }
 
 .btn-review:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
 }
 
 .btn-complete {
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  background: linear-gradient(135deg, #27ae60, #219a52);
   color: white;
   border: none;
   padding: 8px 12px;
@@ -901,7 +966,7 @@
 
 .btn-complete:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
 }
 
 /* 번역된 텍스트 미리보기 */
@@ -911,15 +976,16 @@
   border-radius: 8px;
   padding: 16px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 14px;
+  font-size: 18px;
   line-height: 1.7;
   color: #2c3e50;
   white-space: pre-wrap;
   word-wrap: break-word;
   margin: 0;
   flex: 1;
-  min-height: 0;
   overflow: auto;
+  max-height: 500px;
+
 }
 
 /* 피드백 입력 */
@@ -1048,4 +1114,16 @@
   color: #6c757d;
   font-size: 14px;
   line-height: 1.4;
+}
+.dev-list .status-badge.status-completed {
+  background-color: #d1ffd3 !important;
+  color: #166534 !important;
+  font-size: 16px;
+  min-width: 90px;
+}
+.dev-list .status-badge.status-in-progress {
+  background-color: #fefbc6 ;
+  color: #b7791f ;
+  font-size: 16px;
+  min-width: 90px;
 }

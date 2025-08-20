@@ -322,46 +322,74 @@ function Translation() {
           console.log('콘텐츠 상세 정보 키들:', Object.keys(contentDetail));
           console.log('콘텐츠 상세 정보 값들:', Object.entries(contentDetail).map(([key, value]) => `${key}: ${typeof value} = ${JSON.stringify(value)}`));
           
-          // 원본 텍스트 설정 (실제 응답 구조에 따라 조정 필요)
+          // 원본 텍스트 설정 - 콘텐츠 타입에 따라 적절한 필드 선택
           let originalText = '';
+          const contentType = contentDetail.contentType;
           
-          // 우선순위에 따라 필드 확인
-          const priorityFields = [
-            'contentData','content', 'text', 'description', 'effect', 'rule', 'detail', 'name'
-          ];
+          console.log('콘텐츠 타입:', contentType);
           
-          // 우선순위 필드에서 문자열 값 찾기
-          for (const field of priorityFields) {
-            if (contentDetail[field]) {
-              const value = contentDetail[field];
-              if (typeof value === 'string' && value.trim().length > 0) {
-                originalText = value.trim();
-                break;
-              } else if (typeof value === 'object' && value !== null) {
-                // 객체인 경우 JSON.stringify로 변환
-                originalText = JSON.stringify(value, null, 2);
-                break;
+                     // 콘텐츠 타입별로 적절한 필드 선택
+           if (contentType === 'card_text' || contentType === 'text') {
+             // 카드 텍스트의 경우: 한국어 원본 필드만 표시 (name, effect, description)
+             const cardInfo = [];
+             if (contentDetail.name) cardInfo.push(`이름: ${contentDetail.name}`);
+             if (contentDetail.effect) cardInfo.push(`효과: ${contentDetail.effect}`);
+            //  if (contentDetail.description) cardInfo.push(`설명: ${contentDetail.description}`);
+             
+             // contentData는 영어 번역이 포함되어 있으므로 완전히 제외
+             // 한국어 원본 정보만 표시
+             
+             if (cardInfo.length > 0) {
+               originalText = cardInfo.join('\n');
+             } else {
+               originalText = '카드 정보를 찾을 수 없습니다.';
+             }
+          } else if (contentType === 'rulebook') {
+            // 룰북의 경우: contentData 우선
+            originalText = contentDetail.contentData || '룰북 내용을 찾을 수 없습니다.';
+          } else if (contentType === 'image' || contentType === 'card_image') {
+            // 이미지의 경우: name, effect, description 조합
+            const imageInfo = [];
+            if (contentDetail.name) imageInfo.push(`이름: ${contentDetail.name}`);
+            if (contentDetail.effect) imageInfo.push(`효과: ${contentDetail.effect}`);
+            if (contentDetail.description) imageInfo.push(`설명: ${contentDetail.description}`);
+            
+            if (imageInfo.length > 0) {
+              originalText = imageInfo.join('\n');
+            } else {
+              originalText = '이미지 정보를 찾을 수 없습니다.';
+            }
+          } else {
+            // 기타 타입: contentData 우선, 없으면 다른 필드들
+            if (contentDetail.contentData) {
+              // contentData가 JSON 형태인지 확인
+              try {
+                const parsedData = JSON.parse(contentDetail.contentData);
+                if (parsedData && typeof parsedData === 'object') {
+                  originalText = JSON.stringify(parsedData, null, 2);
+                } else {
+                  originalText = contentDetail.contentData;
+                }
+              } catch (e) {
+                originalText = contentDetail.contentData;
+              }
+            } else {
+              const fallbackFields = ['name', 'effect', 'description', 'text'];
+              for (const field of fallbackFields) {
+                if (contentDetail[field]) {
+                  originalText = contentDetail[field];
+                  break;
+                }
               }
             }
           }
           
-          // 우선순위 필드에서 찾지 못한 경우, 모든 문자열 필드 검색
-          if (!originalText) {
-            const stringFields = Object.entries(contentDetail)
-              .filter(([key, value]) => typeof value === 'string' && value.trim().length > 0)
-              .map(([key, value]) => `${key}: ${value.trim()}`)
-              .join('\n');
-            
-            if (stringFields) {
-              originalText = stringFields;
-            }
-          }
-          
-          // 여전히 찾지 못한 경우, 모든 필드를 표시
-          if (!originalText) {
+          // 원본 텍스트가 비어있으면 모든 필드 표시
+          if (!originalText || originalText.trim() === '') {
             const allFields = Object.entries(contentDetail)
+              .filter(([key, value]) => value !== null && value !== undefined)
               .map(([key, value]) => {
-                if (typeof value === 'object' && value !== null) {
+                if (typeof value === 'object') {
                   return `${key}: ${JSON.stringify(value, null, 2)}`;
                 } else {
                   return `${key}: ${value}`;
@@ -429,61 +457,66 @@ function Translation() {
           }
         }
         
-        // 원본 텍스트도 다시 가져오기
-        const contentResponse = await fetch(`/api/content/${selectedContentId}`);
-        if (contentResponse.ok) {
-          const contentDetail = await contentResponse.json();
-          let originalText = '';
-          
-          // 우선순위에 따라 필드 확인
-          const priorityFields = [
-            'content', 'text', 'description', 'effect', 'rule', 'detail', 'name'
-          ];
-          
-          // 우선순위 필드에서 문자열 값 찾기
-          for (const field of priorityFields) {
-            if (contentDetail[field]) {
-              const value = contentDetail[field];
-              if (typeof value === 'string' && value.trim().length > 0) {
-                originalText = value.trim();
-                break;
-              } else if (typeof value === 'object' && value !== null) {
-                // 객체인 경우 JSON.stringify로 변환
-                originalText = JSON.stringify(value, null, 2);
-                break;
-              }
-            }
-          }
-          
-          // 우선순위 필드에서 찾지 못한 경우, 모든 문자열 필드 검색
-          if (!originalText) {
-            const stringFields = Object.entries(contentDetail)
-              .filter(([key, value]) => typeof value === 'string' && value.trim().length > 0)
-              .map(([key, value]) => `${key}: ${value.trim()}`)
-              .join('\n');
-            
-            if (stringFields) {
-              originalText = stringFields;
-            }
-          }
-          
-          // 여전히 찾지 못한 경우, 모든 필드를 표시
-          if (!originalText) {
-            const allFields = Object.entries(contentDetail)
-              .map(([key, value]) => {
-                if (typeof value === 'object' && value !== null) {
-                  return `${key}: ${JSON.stringify(value, null, 2)}`;
-                } else {
-                  return `${key}: ${value}`;
-                }
-              })
-              .join('\n');
-            
-            originalText = allFields || '원본 내용을 찾을 수 없습니다.';
-          }
-          
-          setModalOriginalText(originalText);
-        }
+                 // 원본 텍스트도 다시 가져오기
+         const contentResponse = await fetch(`/api/content/${selectedContentId}`);
+         if (contentResponse.ok) {
+           const contentDetail = await contentResponse.json();
+           let originalText = '';
+           
+           // 콘텐츠 타입에 따라 적절한 필드 선택 (contentData 제외)
+           const contentType = contentDetail.contentType;
+           
+           if (contentType === 'card_text' || contentType === 'text') {
+             // 카드 텍스트의 경우: 한국어 원본 필드만 표시
+             const cardInfo = [];
+             if (contentDetail.name) cardInfo.push(`이름: ${contentDetail.name}`);
+             if (contentDetail.effect) cardInfo.push(`효과: ${contentDetail.effect}`);
+             if (contentDetail.description) cardInfo.push(`설명: ${contentDetail.description}`);
+             
+             if (cardInfo.length > 0) {
+               originalText = cardInfo.join('\n');
+             } else {
+               originalText = '카드 정보를 찾을 수 없습니다.';
+             }
+           } else if (contentType === 'rulebook') {
+             // 룰북의 경우: contentData 우선
+             originalText = contentDetail.contentData || '룰북 내용을 찾을 수 없습니다.';
+           } else if (contentType === 'image' || contentType === 'card_image') {
+             // 이미지의 경우: name, effect, description 조합
+             const imageInfo = [];
+             if (contentDetail.name) imageInfo.push(`이름: ${contentDetail.name}`);
+             if (contentDetail.effect) imageInfo.push(`효과: ${contentDetail.effect}`);
+             if (contentDetail.description) imageInfo.push(`설명: ${contentDetail.description}`);
+             
+             if (imageInfo.length > 0) {
+               originalText = imageInfo.join('\n');
+             } else {
+               originalText = '이미지 정보를 찾을 수 없습니다.';
+             }
+           } else {
+             // 기타 타입: contentData 제외하고 다른 필드들만
+             const fallbackFields = ['name', 'effect', 'description', 'text'];
+             for (const field of fallbackFields) {
+               if (contentDetail[field]) {
+                 originalText = contentDetail[field];
+                 break;
+               }
+             }
+           }
+           
+           // 원본 텍스트가 비어있으면 기본 정보만 표시
+           if (!originalText || originalText.trim() === '') {
+             const basicFields = ['name', 'effect', 'description'];
+             const basicInfo = basicFields
+               .filter(field => contentDetail[field])
+               .map(field => `${field}: ${contentDetail[field]}`)
+               .join('\n');
+             
+             originalText = basicInfo || '원본 내용을 찾을 수 없습니다.';
+           }
+           
+           setModalOriginalText(originalText);
+         }
       }
       
       alert('번역이 재생성되었습니다.');
@@ -770,14 +803,23 @@ function Translation() {
              <div className="translation-modal-body">
                <div className="text-comparison">
                  <div className="original-text-section">
-                   <h4>원본 내용</h4>
-                   <pre className="original-preview" style={{maxHeight:'200px'}}>
+                   <h4>
+                     <span className="language-badge">🇰🇷 한국어</span>
+                     원본 내용
+                   </h4>
+                   <pre className="original-preview">
                      {modalOriginalText || '원본 내용이 없습니다.'}
                    </pre>
                  </div>
                  <div className="translated-text-section">
-                   <h4>번역 내용</h4>
-                   <pre className="translated-preview" style={{maxHeight:'200px'}}>
+                   <h4>
+                     <span className="language-badge">
+                       {LANGS.find(l => l.code === modalLang)?.flag || '🌐'} 
+                       {LANGS.find(l => l.code === modalLang)?.name || '번역'}
+                     </span>
+                     번역 내용
+                   </h4>
+                   <pre className="translated-preview">
                      {modalText || '번역 결과가 아직 없습니다.'}
                    </pre>
                  </div>
