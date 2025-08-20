@@ -1,8 +1,7 @@
+// src/admin/UserManagePage.jsx
 import React, { useEffect, useState, useCallback } from 'react';
 import { fetchAllUsers, unlockUser, assignRole } from '../api/admin';
 import { useNavigate } from 'react-router-dom';
-import Header from '../mainPage/Header';
-import Footer from '../mainPage/Footer';
 import './UserManagePage.css';
 
 const AdminUserManagePage = () => {
@@ -61,111 +60,83 @@ const AdminUserManagePage = () => {
   // 이름: 가운데 한 글자만 * 처리
   const maskName = (name) => {
     if (!name) return "-";
-    if (name.length === 2) {
-      return name[0] + "*";
-    }
+    if (name.length === 2) return name[0] + "*";
     if (name.length > 2) {
       return name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
     }
-    return name; // 한 글자는 그대로
+    return name;
   };
 
-// 이메일: @ 앞 두 글자만 보이게 처리
-const maskEmail = (email) => {
-  if (!email) return "-";
-  const [local, domain] = email.split("@");
-
-  if (!domain) return email; // 혹시 @ 없는 경우 그대로 리턴
-
-  const visible = local.slice(0, 2);
-  const hiddenCount = Math.max(0, local.length - 2); // 음수 방지
-  return `${visible}${"*".repeat(hiddenCount)}@${domain}`;
-  // abcd123@gmail.com → ab*****@gmail.com
-  // a@gmail.com → a*@gmail.com
-  // ab@gmail.com → ab@gmail.com (마스킹 없음)
-};
+  // 이메일: @ 앞 두 글자만 보이게 처리
+  const maskEmail = (email) => {
+    if (!email) return "-";
+    const [local, domain] = email.split("@");
+    if (!domain) return email;
+    const visible = local.slice(0, 2);
+    const hiddenCount = Math.max(0, local.length - 2);
+    return `${visible}${"*".repeat(hiddenCount)}@${domain}`;
+  };
 
   if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="admin-loading">로딩 중...</div>
-        <Footer />
-      </>
-    );
+    return <div className="admin-loading">로딩 중...</div>;
   }
 
   return (
-    <>
-      <Header />
-      <main className="admin-page__container">
-        <h2 className="admin-page__title">유저 관리</h2>
-        <table className="admin-page__table">
-          <thead>
-            <tr>
-              <th>아이디</th>
-              <th>이름</th>
-              <th>이메일</th>
-              <th>상태</th>
-              <th>잠금 해제</th>
-              <th>역할 부여</th>
+    <main className="admin-page__container">
+      <h2 className="admin-page__title">유저 관리</h2>
+      <table className="admin-page__table">
+        <thead>
+          <tr>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>상태</th>
+            <th>잠금 해제</th>
+            <th>역할 부여</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((u) => (
+            <tr key={u.userId}>
+              <td>{u.userId}</td>
+              <td>{maskName(u.name)}</td>
+              <td>{maskEmail(u.email)}</td>
+              <td>
+                <span
+                  className={`status-badge ${u.accountLocked ? 'status-locked' : 'status-normal'}`}
+                >
+                  {u.accountLocked ? '잠김' : '정상'}
+                </span>
+              </td>
+              <td>
+                {u.accountLocked && (
+                  <button
+                    onClick={() => handleUnlock(u.email)}
+                    className="admin-btn admin-btn--unlock"
+                  >
+                    Unlock
+                  </button>
+                )}
+              </td>
+              <td>
+                <select
+                  defaultValue={u.role}
+                  onChange={(e) => handleAssignRole(u.userId, e.target.value)}
+                  className="admin-select"
+                  disabled={u.role === 'ADMIN'}
+                >
+                  {u.role === "ADMIN" && <option value="ADMIN">ADMIN</option>}
+                  <option value="USER">USER</option>
+                  <option value="PLANNER">PLANNER</option>
+                  <option value="DEVELOPER">DEVELOPER</option>
+                  <option value="PUBLISHER">PUBLISHER</option>
+                </select>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.userId}>
-                {/* 아이디 */}
-                <td>{u.userId}</td>
-
-                {/* 이름 */}
-                <td>{maskName(u.name)}</td>
-
-                {/* 이메일 */}
-                <td>{maskEmail(u.email)}</td>
-
-                {/* 상태 */}
-                <td>
-                  <span
-                    className={`status-badge ${u.accountLocked ? 'status-locked' : 'status-normal'}`}
-                  >
-                    {u.accountLocked ? '잠김' : '정상'}
-                  </span>
-                </td>
-
-                {/* 잠금 해제 */}
-                <td>
-                  {u.accountLocked && (
-                    <button
-                      onClick={() => handleUnlock(u.email)}
-                      className="admin-btn admin-btn--unlock"
-                    >
-                      Unlock
-                    </button>
-                  )}
-                </td>
-
-                {/* 역할 */}
-                <td>
-                  <select
-                    defaultValue={u.role}
-                    onChange={(e) => handleAssignRole(u.userId, e.target.value)}
-                    className="admin-select"
-                    disabled={u.role === 'ADMIN'}
-                  >
-                    {u.role === "ADMIN" && <option value="ADMIN">ADMIN</option>}
-                    <option value="USER">USER</option>
-                    <option value="PLANNER">PLANNER</option>
-                    <option value="DEVELOPER">DEVELOPER</option>
-                    <option value="PUBLISHER">PUBLISHER</option>
-                  </select>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </main>
-      <Footer />
-    </>
+          ))}
+        </tbody>
+      </table>
+    </main>
   );
 };
 

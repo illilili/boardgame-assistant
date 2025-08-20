@@ -15,7 +15,7 @@ import ReviewsHome from './publish/reviews/ReviewsHome';
 import Publish from './publish/Publish';
 import ProjectListPage from './project/ProjectListPage';
 import ProjectHomePage from './project/ProjectHomePage';
-import AdminUserManagePage from './admin/UserManagePage'
+import AdminHomePage from './admin/AdminHomePage'
 import DevelopmentWrapper from './development/DevelopmentWrapper';
 import ReviewDetailPage from './publish/ReviewDetailPage';
 import AssignDeveloperPage from './publish/AssignDeveloperPage';
@@ -104,7 +104,7 @@ const router = createBrowserRouter([
   {
     id: 15,
     path: '/user-manage',
-    element: <AdminUserManagePage />
+    element: <AdminHomePage />
   },
   {
     id: 16,
