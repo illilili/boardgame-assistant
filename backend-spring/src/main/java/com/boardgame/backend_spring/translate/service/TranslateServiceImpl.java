@@ -284,7 +284,7 @@ public class TranslateServiceImpl implements TranslateService {
                     if ("text".equalsIgnoreCase(sub.getType())) {
                         candidates.add(TranslationCandidateDto.builder()
                                 .contentId(sub.getContentId())
-                                .name(sub.getName())
+                                .name(comp.getTitle())
                                 .componentType(comp.getType())
                                 .status(comp.getStatusSummary())
                                 .build());
