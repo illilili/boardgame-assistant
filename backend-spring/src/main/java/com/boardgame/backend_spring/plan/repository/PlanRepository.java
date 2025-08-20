@@ -3,6 +3,7 @@ package com.boardgame.backend_spring.plan.repository;
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.entity.PlanStatus;
+import com.boardgame.backend_spring.project.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +22,7 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
     //Optional<Plan> findByProjectIdAndStatus(Long projectId, PlanStatus status);
     @Query("SELECT p FROM Plan p WHERE p.project.id = :projectId AND p.status = :status")
     Optional<Plan> findByProjectIdAndStatus(@Param("projectId") Long projectId, @Param("status") PlanStatus status);
+
+    void deleteAllByProject(Project project);
+    List<Plan> findAllByProject(Project project);
 }

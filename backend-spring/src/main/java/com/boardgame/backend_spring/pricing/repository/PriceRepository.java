@@ -4,4 +4,5 @@ import com.boardgame.backend_spring.pricing.entity.Price;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PriceRepository extends JpaRepository<Price, Long> {
+    void deleteByPlanId(Long planId);
 }

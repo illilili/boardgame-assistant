@@ -1,8 +1,10 @@
 // ProjectService.java
 package com.boardgame.backend_spring.project.service;
 
+import com.boardgame.backend_spring.concept.repository.BoardgameConceptRepository;
 import com.boardgame.backend_spring.plan.entity.PlanStatus;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
+import com.boardgame.backend_spring.pricing.repository.PriceRepository;
 import com.boardgame.backend_spring.project.dto.*;
 import com.boardgame.backend_spring.project.entity.Project;
 import com.boardgame.backend_spring.project.entity.ProjectMember;
@@ -11,6 +13,9 @@ import com.boardgame.backend_spring.project.repository.ProjectMemberRepository;
 import com.boardgame.backend_spring.user.entity.User;
 import com.boardgame.backend_spring.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +32,8 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final PlanRepository planRepository;
+    private final BoardgameConceptRepository boardgameConceptRepository;
+    private final PriceRepository priceRepository;
 
     // 🚨 [신규] 로그인 사용자가 참여한 프로젝트 목록 조회
     @Transactional(readOnly = true)
@@ -82,11 +89,21 @@ public class ProjectService {
         return new ProjectStatusResponseDto(project.getStatus());
     }
 
-    // 프로젝트 단건 조회용
+    // 프로젝트 단건 조회 (권한 체크 추가)
     @Transactional(readOnly = true)
-    public ProjectSummaryDto getProjectDetail(Long projectId) {
+    public ProjectSummaryDto getProjectDetail(Long projectId, User user) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다."));
+
+        // 권한 체크
+        boolean isAdmin = user.getRole() == User.Role.ADMIN;
+        boolean isPublisher = user.getRole() == User.Role.PUBLISHER;
+        boolean isMember = projectMemberRepository.existsByProjectAndUser(project, user);
+
+        if (!(isAdmin || isPublisher || isMember)) {
+            throw new AccessDeniedException("해당 프로젝트에 접근할 권한이 없습니다.");
+        }
+
         return ProjectSummaryDto.from(project);
     }
 
@@ -169,5 +186,36 @@ public class ProjectService {
                         .build()
                 )
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteProject(Long projectId, User user) {
+        // 권한 체크
+        if (user.getRole() != User.Role.ADMIN) {
+            throw new RuntimeException("관리자만 프로젝트를 삭제할 수 있습니다.");
+        }
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다."));
+
+        // 1) 프로젝트 멤버 삭제
+        projectMemberRepository.deleteAll(projectMemberRepository.findAllByProject(project));
+
+        // 3) plan과 연결된 price 먼저 삭제
+        planRepository.findAllByProject(project).forEach(plan -> {
+            priceRepository.deleteByPlanId(plan.getPlanId());
+        });
+
+        // 4) plan 삭제
+        planRepository.deleteAllByProject(project);
+
+        // 5) boardgame_concept 삭제
+        boardgameConceptRepository.deleteAllByProject(project);
+
+        // TODO: taskRepository.deleteByProjectId(projectId);
+        // TODO: activityLogRepository.deleteByProjectId(projectId);
+
+        // 6) 마지막 프로젝트 삭제
+        projectRepository.delete(project);
     }
 }

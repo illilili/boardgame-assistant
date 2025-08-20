@@ -1,6 +1,7 @@
 package com.boardgame.backend_spring.content.controller;
 
 import com.boardgame.backend_spring.content.dto.version.*;
+import com.boardgame.backend_spring.content.entity.ContentVersion;
 import com.boardgame.backend_spring.content.service.version.ContentVersionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,5 +38,10 @@ public class ContentVersionController {
     public ResponseEntity<Void> rollback(@PathVariable Long contentId, @PathVariable Long versionId) {
         versionService.rollback(contentId, versionId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/version/{versionId}")
+    public ResponseEntity<ContentVersionDetailResponse> detail(@PathVariable Long versionId) {
+        return ResponseEntity.ok(versionService.getVersionDetail(versionId));
     }
 }
