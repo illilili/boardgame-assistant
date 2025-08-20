@@ -26,10 +26,10 @@ const ProjectHomePage = () => {
 
   const getProgressFromStatus = (status) => {
     switch (status) {
-      case 'PLANNING': return 15;
-      case 'REVIEW_PENDING': return 30;
-      case 'DEVELOPMENT': return 60;
-      case 'PUBLISHING': return 85;
+      case 'PLANNING': return 10;
+      case 'REVIEW_PENDING': return 20;
+      case 'DEVELOPMENT': return 50;
+      case 'PUBLISHING': return 80;
       case 'COMPLETED': return 100;
       default: return 0;
     }

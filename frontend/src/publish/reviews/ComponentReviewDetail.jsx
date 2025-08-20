@@ -104,10 +104,18 @@ function ComponentReviewDetail({ componentId, onBack }) {
       <ul className="item-list">
         {component.items
           ?.sort((a, b) => {
-            // 카드 타입일 때만 순서 바꿈: IMAGE 먼저, TEXT 나중
-            if (component.type?.toLowerCase() === 'card') {
-              if (a.subTaskType === 'IMAGE' && b.subTaskType === 'TEXT') return -1;
-              if (a.subTaskType === 'TEXT' && b.subTaskType === 'IMAGE') return 1;
+            // 카드 컴포넌트: 이미지 먼저 나오게
+            if (
+              (a.subTaskType === 'IMAGE' && b.subTaskType === 'TEXT') ||
+              (a.subTaskType?.toLowerCase().includes('image') && b.subTaskType?.toLowerCase().includes('text'))
+            ) {
+              return -1;
+            }
+            if (
+              (a.subTaskType === 'TEXT' && b.subTaskType === 'IMAGE') ||
+              (a.subTaskType?.toLowerCase().includes('text') && b.subTaskType?.toLowerCase().includes('image'))
+            ) {
+              return 1;
             }
             return 0;
           })
