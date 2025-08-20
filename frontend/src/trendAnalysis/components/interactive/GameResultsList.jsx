@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Table, 
-  Card, 
   Tag, 
   Space, 
   Typography, 
@@ -9,7 +8,6 @@ import {
   Input, 
   Select, 
   Rate, 
-  Avatar, 
   Tooltip,
   Pagination,
   Empty,
@@ -18,21 +16,18 @@ import {
   Menu
 } from 'antd';
 import { 
-  SearchOutlined, 
   FilterOutlined, 
   ExportOutlined,
   EyeOutlined,
-  StarOutlined,
   TeamOutlined,
   ClockCircleOutlined,
-  SettingOutlined,
   MoreOutlined,
   TrophyOutlined
 } from '@ant-design/icons';
 
 import './GameResultsList.css';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { Search } = Input;
 const { Option } = Select;
 
@@ -61,7 +56,6 @@ const GameResultsList = ({
     pageSize: 20
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [viewMode, setViewMode] = useState('table'); // 'table' | 'cards'
 
   // 검색 및 필터링된 데이터
   const filteredGames = useMemo(() => {

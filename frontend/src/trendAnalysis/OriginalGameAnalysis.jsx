@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './OriginalGameAnalysis.css';
 import { 
@@ -25,7 +25,6 @@ const OriginalGameAnalysis = () => {
 
   useEffect(() => {
     loadDashboardData();
-    loadChartData(); // 차트 데이터 로드
   }, []);
 
   // 차트 그룹화 기준 변경 시 데이터 다시 로드
@@ -33,7 +32,7 @@ const OriginalGameAnalysis = () => {
     if (dashboardData) {
       loadChartData();
     }
-  }, [chartGroupBy, dashboardData]);
+  }, [chartGroupBy, dashboardData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 테마 번역 함수
   const translateTheme = (englishTheme) => {
@@ -285,7 +284,7 @@ const OriginalGameAnalysis = () => {
   };
 
   // TOP10 테마/메커니즘 기반 버블차트 데이터 생성
-  const generateBubbleChartData = () => {
+  const generateBubbleChartData = useCallback(() => {
     if (!dashboardData) return [];
     
     const data = [];
@@ -294,7 +293,7 @@ const OriginalGameAnalysis = () => {
       // TOP 15 테마 데이터로 버블차트 생성
       const topThemes = dashboardData.themes.slice(0, 15);
       
-      topThemes.forEach((theme, index) => {
+      topThemes.forEach((theme) => {
         // 백엔드에서 계산된 실제 평균 평점 및 난이도 사용
         const avgRating = parseFloat(theme.avgRating || 0);
         const avgComplexity = parseFloat(theme.avgComplexity || 0);
@@ -323,7 +322,7 @@ const OriginalGameAnalysis = () => {
       // TOP 15 메커니즘 데이터로 버블차트 생성
       const topMechanisms = dashboardData.mechanisms.slice(0, 15);
       
-      topMechanisms.forEach((mechanism, index) => {
+      topMechanisms.forEach((mechanism) => {
         // 백엔드에서 계산된 실제 평균 평점 및 난이도 사용
         const avgRating = parseFloat(mechanism.avgRating || 0);
         const avgComplexity = parseFloat(mechanism.avgComplexity || 0);
@@ -375,10 +374,10 @@ const OriginalGameAnalysis = () => {
     }
     
     return data;
-  };
+  }, [dashboardData, chartGroupBy]);
 
   // 차트 데이터 로드 함수
-  const loadChartData = async () => {
+  const loadChartData = useCallback(async () => {
     try {
       setChartLoading(true);
       console.log(`📊 차트 데이터 로드 시작 - ${chartGroupBy} 기준`);
@@ -411,7 +410,7 @@ const OriginalGameAnalysis = () => {
     } finally {
       setChartLoading(false);
     }
-  };
+  }, [chartGroupBy, dashboardData]); // generateBubbleChartData 제거
 
   const renderLoadingState = () => (
     <div className="original-analysis loading">

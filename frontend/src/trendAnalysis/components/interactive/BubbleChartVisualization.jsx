@@ -1,17 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Scatter } from '@ant-design/plots';
 import { Card, Spin, Empty, Alert, Space, Typography, Tooltip, Button, Select, Modal, Table, Tag, Divider } from 'antd';
 import { 
-  BarChartOutlined, 
   InfoCircleOutlined,
-  FullscreenOutlined,
-  DownloadOutlined,
-  ReloadOutlined
+  DownloadOutlined
 } from '@ant-design/icons';
 
 import './BubbleChartVisualization.css';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 /**
@@ -37,7 +34,6 @@ const BubbleChartVisualization = ({
   
   const [selectedBubble, setSelectedBubble] = useState(null);
   const [chartError, setChartError] = useState(null);
-  const [clickIndex, setClickIndex] = useState(0); // 클릭 순서 추적
 
   // 차트별 독립 기준점 설정
   const getChartSpecificThresholds = () => {

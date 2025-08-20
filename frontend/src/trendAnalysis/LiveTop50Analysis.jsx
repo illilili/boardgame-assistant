@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LiveTop50Analysis.css';
 import TrendSummaryCards from './components/TrendSummaryCards';
@@ -25,11 +25,7 @@ const LiveTop50Analysis = () => {
   const [isTranslated, setIsTranslated] = useState(false);
   const [translationProgress, setTranslationProgress] = useState('');
 
-  useEffect(() => {
-    fetchTop50Data();
-  }, []);
-
-  const fetchTop50Data = async () => {
+  const fetchTop50Data = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -54,7 +50,11 @@ const LiveTop50Analysis = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // 의존성 없음 - 컴포넌트 마운트 시에만 실행
+
+  useEffect(() => {
+    fetchTop50Data();
+  }, [fetchTop50Data]);
 
   // 게임 상세 정보를 배치로 로딩 - 성능 최적화
   const loadGameDetails = async (games) => {
@@ -288,17 +288,6 @@ const LiveTop50Analysis = () => {
     setSelectedGameId(null);
   };
 
-  // 실패한 게임들 재시도
-  const retryFailedGames = () => {
-    const failedGames = top50Data.games.filter(game => 
-      !gameDetails.has(game.id) && !detailsLoading.has(game.id)
-    );
-    
-    if (failedGames.length > 0) {
-      console.log(`🔄 실패한 ${failedGames.length}개 게임 재시도...`);
-      loadGameDetails(failedGames);
-    }
-  };
 
   // 전체 게임 번역 핸들러
   const handleTranslateAll = async () => {

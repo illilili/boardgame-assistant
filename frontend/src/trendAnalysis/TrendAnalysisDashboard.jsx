@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TrendAnalysisDashboard.css';
-import TrendSummaryCards from './components/TrendSummaryCards';
 import { fetchAllOriginalData, formatTrendApiError } from './services/trendApiService';
 
 // Plotly 동적 로딩
@@ -519,7 +518,7 @@ const TrendAnalysisDashboard = () => {
     };
 
     setTimeout(createCharts, 100);
-  }, [dashboardData]);
+  }, [dashboardData, COLORS.difficulty, COLORS.players, COLORS.primary]);
 
   if (loading) return renderLoadingState();
   if (error) return renderErrorState();
