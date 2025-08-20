@@ -32,7 +32,6 @@ export const generate3DModel = (data) =>
 // 카드 생성
 
 // 카드 콘텐츠 미리보기 데이터 조회
-// 카드 콘텐츠 미리보기 데이터 조회
 export const getCardPreview = (contentId) =>
   request(`/api/content/${contentId}/preview/card`, {
     method: 'GET',
@@ -122,4 +121,11 @@ export const completeContent = (contentId) =>
   request(`/api/content/${contentId}/complete`, {
     method: 'PUT',
     headers: {}, // 바디 없이 보내도록 명시
+  });
+
+
+  // 제너릭 콘텐츠 미리보기 API
+export const getGenericPreview = (contentId) =>
+  request(`/api/content/${contentId}/preview/info`, {
+    method: 'GET',
   });

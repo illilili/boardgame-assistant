@@ -235,249 +235,232 @@ function ComponentGenerator({ textContentId, imageContentId, componentId }) {
   const hasResult = generatedResult.text || generatedResult.imageUrl;
 
   return (
-    <div className="card-generator-container">
-      <h2 className="card-generator-title">카드 생성</h2>
-      <p className="card-generator-desc">
-        카드의 이름, 효과, 설명을 입력하고 텍스트와 이미지를 생성합니다.
-      </p>
-
-      {isLoading && (
-        <div className="status-container">
-          <div className="loader"></div>
-          <h3>{loadingMessage}</h3>
+    <div className="generator-layout">
+      {/* ======================= 왼쪽: 입력 및 관리 섹션 ======================= */}
+      <div className="generator-form-section">
+        <div className="form-section-header">
+          <h2>카드 생성</h2>
+          <p>카드의 이름, 효과, 설명을 입력하고 텍스트와 이미지를 생성합니다.</p>
         </div>
-      )}
 
-      {error && <p className="error-text">{error}</p>}
+        {/* 카드 정보 입력 폼 */}
+        <div className="card-gen-form">
+          <div className="concept-info">
+            <h3>기본 컨셉 정보</h3>
+            <p>
+              <strong>테마:</strong> {previewInfo.theme}
+            </p>
+            <p>
+              <strong>스토리라인:</strong> {previewInfo.storyline}
+            </p>
+          </div>
 
-      {!isLoading && (
-        <>
-          <div className={`card-gen-content ${hasResult ? "double" : "single"}`}>
-            {/* 왼쪽: 입력 폼 */}
-            <div className="card-gen-form">
-              <div className="concept-info">
-                <h3>기본 컨셉 정보</h3>
-                <p>
-                  <strong>테마:</strong> {previewInfo.theme}
-                </p>
-                <p>
-                  <strong>스토리라인:</strong> {previewInfo.storyline}
-                </p>
-              </div>
+          <div className="form-group">
+            <label>카드 이름</label>
+            <input
+              type="text"
+              name="name"
+              value={cardData.name}
+              onChange={handleInputChange}
+              placeholder="카드 이름 입력"
+            />
+          </div>
+          <div className="form-group">
+            <label>카드 효과</label>
+            <textarea
+              name="effect"
+              value={cardData.effect}
+              onChange={handleInputChange}
+              placeholder="카드 효과 입력"
+              rows={4}
+            />
+          </div>
+          <div className="form-group">
+            <label>카드 설명 (이미지 생성 시 참고)</label>
+            <textarea
+              name="description"
+              value={cardData.description}
+              onChange={handleInputChange}
+              placeholder="카드에 대한 부가 설명이나 아트 컨셉 입력"
+              rows={4}
+            />
+          </div>
+        </div>
 
-              <div className="form-group">
-                <label>카드 이름</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={cardData.name}
-                  onChange={handleInputChange}
-                  placeholder="카드 이름 입력"
-                />
-              </div>
-              <div className="form-group">
-                <label>카드 효과</label>
-                <textarea
-                  name="effect"
-                  value={cardData.effect}
-                  onChange={handleInputChange}
-                  placeholder="카드 효과 입력"
-                  rows={4}
-                />
-              </div>
-              <div className="form-group">
-                <label>카드 설명 (이미지 생성 시 참고)</label>
-                <textarea
-                  name="description"
-                  value={cardData.description}
-                  onChange={handleInputChange}
-                  placeholder="카드에 대한 부가 설명이나 아트 컨셉 입력"
-                  rows={4}
-                />
-              </div>
+        {/* 초기 생성 버튼 (결과가 없을 때만 보임) */}
+        {!hasResult && !isLoading && (
+          <div className="initial-generate-buttons">
+            <button
+              onClick={handleGenerateText}
+              className="generate-button text-btn"
+              disabled={!textContentId}
+            >
+              텍스트 생성하기
+            </button>
+            <button
+              onClick={handleGenerateImage}
+              className="generate-button image-btn"
+              disabled={!imageContentId}
+            >
+              이미지 생성하기
+            </button>
+          </div>
+        )}
 
-              {!hasResult && (
-                <div className="generate-buttons-container">
-                  <button
-                    onClick={handleGenerateText}
-                    className="generate-button text-btn"
-                    disabled={!textContentId}
-                  >
-                    텍스트 생성하기
-                  </button>
-                  <button
-                    onClick={handleGenerateImage}
-                    className="generate-button image-btn"
-                    disabled={!imageContentId}
-                  >
-                    이미지 생성하기
-                  </button>
+        {/* ======================= 버전 관리 박스 (왼쪽으로 이동) ======================= */}
+        {(hasResult || textVersions.length > 0 || imageVersions.length > 0) && (
+          <div className="content-version-manager">
+            <h4>버전 관리</h4>
+
+            <div className="version-note-inline">
+              <label>버전 메모:</label>
+              <input
+                type="text"
+                value={versionNote}
+                onChange={(e) => setVersionNote(e.target.value)}
+                placeholder="예: 카드 스냅샷, 이미지 교체 전 상태 등"
+              />
+            </div>
+            <div className="version-block-row">
+              {/* 텍스트 버전 */}
+              {textContentId && (
+                <div className="version-block">
+                  <label>텍스트 버전</label>
+                  {textVersions.length > 0 ? (
+                    <Select
+                      className="version-select"
+                      classNamePrefix="react-select"
+                      value={selectedTextVersion}
+                      onChange={(selected) => setSelectedTextVersion(selected)}
+                      options={textVersions.map((v) => ({
+                        value: v.versionId,
+                        label: `v${v.versionNo} - ${v.note} (${v.createdAt})`,
+                      }))}
+                      placeholder="버전 선택"
+                    />
+                  ) : (
+                    <p className="no-version-text">저장된 버전 없음</p>
+                  )}
+                  <div className="version-buttons">
+                    <button className="save" onClick={() => handleSaveVersion(textContentId)}>
+                      저장
+                    </button>
+                    {selectedTextVersion && (
+                      <button
+                        className="rollback"
+                        onClick={() =>
+                          handleRollbackVersion(textContentId, selectedTextVersion.value)
+                        }
+                      >
+                        롤백
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+              {/* 이미지 버전 */}
+              {imageContentId && (
+                <div className="version-block">
+                  <label>이미지 버전</label>
+                  {imageVersions.length > 0 ? (
+                    <Select
+                      className="version-select"
+                      classNamePrefix="react-select"
+                      value={selectedImageVersion}
+                      onChange={(selected) => setSelectedImageVersion(selected)}
+                      options={imageVersions.map((v) => ({
+                        value: v.versionId,
+                        label: `v${v.versionNo} - ${v.note} (${v.createdAt})`,
+                      }))}
+                      placeholder="버전 선택"
+                    />
+                  ) : (
+                    <p className="no-version-text">저장된 버전 없음</p>
+                  )}
+                  <div className="version-buttons">
+                    <button className="save" onClick={() => handleSaveVersion(imageContentId)}>
+                      저장
+                    </button>
+                    {selectedImageVersion && (
+                      <button
+                        className="rollback"
+                        onClick={() =>
+                          handleRollbackVersion(imageContentId, selectedImageVersion.value)
+                        }
+                      >
+                        롤백
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* 오른쪽: 결과 미리보기 */}
-            {hasResult && (
-              <div className="card-result-container">
-                <h3>🎉 생성 완료!</h3>
-                <div className="generated-card-preview">
-                  {generatedResult.imageUrl ? (
-                    <img
-                      src={generatedResult.imageUrl}
-                      alt="Generated Card"
-                      className="card-image"
-                    />
-                  ) : (
-                    <div className="image-placeholder">이미지를 생성해 주세요.</div>
-                  )}
-                  {generatedResult.text ? (
-                    <div className="card-text-area">
-                      <p>{generatedResult.text}</p>
-                    </div>
-                  ) : (
-                    <div className="text-placeholder">텍스트를 생성해 주세요.</div>
-                  )}
-                </div>
 
-                <div className="result-actions">
-                  <button onClick={handleReset} className="reset-button-bottom">
-                    다시 생성
-                  </button>
-                  {!generatedResult.text && textContentId && (
-                    <button
-                      onClick={handleGenerateText}
-                      className="generate-button text-btn"
-                    >
-                      텍스트 생성
-                    </button>
-                  )}
-                  {!generatedResult.imageUrl && imageContentId && (
-                    <button
-                      onClick={handleGenerateImage}
-                      className="generate-button image-btn"
-                    >
-                      이미지 생성
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
 
-          {/* 버전 관리 박스 */}
-          {(hasResult || textVersions.length > 0 || imageVersions.length > 0) && (
-            <div className="content-version-manager">
-
-              {/* 텍스트 + 이미지 버전 블록 가로 배치 */}
-              <div className="version-block-row">
-                {/* 텍스트 버전 */}
-                {textContentId && (
-                  <div className="version-block">
-                    <label>텍스트 버전 선택</label>
-                    {textVersions.length > 0 ? (
-                      <Select
-                        className="version-select"
-                        value={selectedTextVersion}
-                        onChange={(selected) => setSelectedTextVersion(selected)}
-                        options={textVersions.map(v => ({
-                          value: v.versionId,
-                          label: `v${v.versionNo} - ${v.note} (${v.createdAt})`
-                        }))}
-                        placeholder="버전을 선택하세요"
-                      />
-                    ) : (
-                      <p>저장된 텍스트 버전이 없습니다.</p>
-                    )}
-                    <div className="version-buttons center">
-                      <button
-                        className="save"
-                        onClick={() => handleSaveVersion(textContentId)}
-                      >
-                        버전 저장
-                      </button>
-                      {selectedTextVersion && (
-                        <button
-                          className="rollback"
-                          onClick={() =>
-                            handleRollbackVersion(textContentId, selectedTextVersion.value)
-                          }
-                        >
-                          롤백
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* 이미지 버전 */}
-                {imageContentId && (
-                  <div className="version-block">
-                    <label>이미지 버전 선택</label>
-                    {imageVersions.length > 0 ? (
-                      <Select
-                        className="version-select"
-                        value={selectedImageVersion}
-                        onChange={(selected) => setSelectedImageVersion(selected)}
-                        options={imageVersions.map(v => ({
-                          value: v.versionId,
-                          label: `v${v.versionNo} - ${v.note} (${v.createdAt})`
-                        }))}
-                        placeholder="버전을 선택하세요"
-                      />
-                    ) : (
-                      <p>저장된 이미지 버전이 없습니다.</p>
-                    )}
-                    <div className="version-buttons center">
-                      <button
-                        className="save"
-                        onClick={() => handleSaveVersion(imageContentId)}
-                      >
-                        버전 저장
-                      </button>
-                      {selectedImageVersion && (
-                        <button
-                          className="rollback"
-                          onClick={() =>
-                            handleRollbackVersion(imageContentId, selectedImageVersion.value)
-                          }
-                        >
-                          롤백
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* 버전 메모 */}
-              <div className="version-note">
-                <label>버전 메모:</label>
-                <input
-                  type="text"
-                  value={versionNote}
-                  onChange={(e) => setVersionNote(e.target.value)}
-                  placeholder="예: 카드 스냅샷, 이미지 교체 전 상태 등"
-                />
-              </div>
-
-              {/* 완료/제출 */}
-              <div className="submit-complete-section">
-                {textContentId && (
-                  <button onClick={() => handleComplete(textContentId)}>텍스트 완료(확정)</button>
-                )}
-                {imageContentId && (
-                  <button onClick={() => handleComplete(imageContentId)}>이미지 완료(확정)</button>
-                )}
-                {componentId && (
-                  <button onClick={() => handleSubmit(componentId)}>제출</button>
-                )}
-              </div>
-
-              {message && <p className="upload-message">{message}</p>}
+            <div className="submit-complete-section">
+              {textContentId && (
+                <button onClick={() => handleComplete(textContentId)}>텍스트 완료</button>
+              )}
+              {imageContentId && (
+                <button onClick={() => handleComplete(imageContentId)}>이미지 완료</button>
+              )}
+              {componentId && (
+                <button onClick={() => handleSubmit(componentId)}>최종 제출</button>
+              )}
             </div>
-          )}
-        </>
-      )}
+            {message && <p className="upload-message">{message}</p>}
+          </div>
+        )}
+      </div>
+
+      {/* ======================= 오른쪽: 결과 표시 섹션 ======================= */}
+      <div className="generator-result-section">
+        {isLoading ? (
+          <div className="status-container">
+            <div className="loader"></div>
+            <h3>{loadingMessage}</h3>
+          </div>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : hasResult ? (
+          <div className="card-result-container">
+            <div className="generated-card-preview">
+              {generatedResult.imageUrl ? (
+                <img src={generatedResult.imageUrl} alt="Generated Card" className="card-image" />
+              ) : (
+                <div className="image-placeholder">이미지를 생성해 주세요.</div>
+              )}
+              {generatedResult.text ? (
+                <div className="card-text-area">
+                  <p>{generatedResult.text}</p>
+                </div>
+              ) : (
+                <div className="text-placeholder">텍스트를 생성해 주세요.</div>
+              )}
+            </div>
+            <div className="result-actions">
+              <button onClick={handleReset} className="reset-button-bottom">
+                다시 생성
+              </button>
+              {!generatedResult.text && textContentId && (
+                <button onClick={handleGenerateText} className="generate-button text-btn">
+                  텍스트 생성
+                </button>
+              )}
+              {!generatedResult.imageUrl && imageContentId && (
+                <button onClick={handleGenerateImage} className="generate-button image-btn">
+                  이미지 생성
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="initial-state">
+            <p>컨셉 정보를 바탕으로 카드 텍스트와 이미지를 생성할 수 있습니다. 좌측의 '생성하기' 버튼을 눌러주세요.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

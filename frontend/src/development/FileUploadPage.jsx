@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   uploadContentFile,
   completeContent,
   submitComponent,
+  getGenericPreview, // ✅ 새 API 클라이언트 함수
 } from '../api/development';
 import './FileUploadPage.css';
 
@@ -12,6 +13,22 @@ function FileUploadPage({ contentId, componentId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
+  const [previewInfo, setPreviewInfo] = useState(null); // ✅ GenericPreview 저장
+
+  // 미리보기 정보 불러오기
+  useEffect(() => {
+    if (!contentId) return;
+    const fetchPreview = async () => {
+      try {
+        const data = await getGenericPreview(contentId);
+        setPreviewInfo(data);
+      } catch (err) {
+        console.error('❌ 미리보기 불러오기 실패:', err);
+      }
+    };
+    fetchPreview();
+  }, [contentId]);
+
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
     setUploadSuccess(false);
@@ -19,7 +36,6 @@ function FileUploadPage({ contentId, componentId }) {
 
   const handleUpload = async () => {
     if (!contentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
-    if (!componentId) return setMessage('❌ 컴포넌트 ID가 없습니다.');
     if (!selectedFile) return setMessage('❌ 업로드할 파일을 선택하세요.');
 
     setIsLoading(true);
@@ -62,50 +78,60 @@ function FileUploadPage({ contentId, componentId }) {
         지원하지 않는 컴포넌트 타입은 직접 파일을 업로드 해주세요.
       </p>
 
-      <div className="file-upload-row">
-        <div className="file-upload-left">
-          <div className="file-upload-group">
-            <label>콘텐츠 ID</label>
-            <input type="text" value={contentId || ''} disabled />
+      {/* ✅ Generic Preview 표시 */}
+      {previewInfo && (
+        <div className="preview-info-box">
+          <div className="preview-header">
+            <h3 className="preview-title">{previewInfo.title}</h3>
+            <small className="content-id-display">콘텐츠 ID: {previewInfo.contentId}</small>
           </div>
-          <div className="file-upload-group">
-            <label>컴포넌트 ID</label>
-            <input type="text" value={componentId || ''} disabled />
-          </div>
-          <div className="file-upload-group">
-            <label>파일 선택</label>
-            <div className="file-input-wrapper">
-              <input
-                type="file"
-                id="fileInput"
-                onChange={handleFileChange}
-                className="file-upload-input"
-              />
-              <label htmlFor="fileInput" className="file-upload-label">
-                {selectedFile ? selectedFile.name : '파일 선택'}
-              </label>
-            </div>
+          <div className="preview-body">
+            <p><strong>역할/효과:</strong> {previewInfo.roleAndEffect}</p>
+            <p><strong>아트 컨셉:</strong> {previewInfo.artConcept}</p>
+            <p><strong>상호작용:</strong> {previewInfo.interconnection}</p>
           </div>
         </div>
+      )}
 
-        <div className="file-upload-right">
-          <button
-            className="file-upload-button"
-            onClick={handleUpload}
-            disabled={isLoading}
-          >
-            {isLoading ? '업로드 중...' : '파일 업로드'}
-          </button>
+      {/* 파일 선택 + 버튼 묶음 */}
+      <div className="file-upload-group">
+        <div className="file-input-row">
+          {/* 커스텀 파일 입력 박스 */}
+          <div className="file-input-box">
+            <input
+              type="file"
+              id="fileInput"
+              onChange={handleFileChange}
+              className="file-upload-input"
+            />
+            <label htmlFor="fileInput" className="file-select-btn">
+              파일 선택
+            </label>
+            <span className="file-name">
+              {selectedFile ? selectedFile.name : '파일을 선택해 주세요'}
+            </span>
+          </div>
 
-          {uploadSuccess && (
+          {/* 업로드/제출 버튼 그룹 */}
+          <div className="file-button-group">
             <button
-              className="file-submit-button"
-              onClick={handleSubmit}
+              className="file-upload-button"
+              onClick={handleUpload}
               disabled={isLoading}
             >
-              {isLoading ? '제출 중...' : '제출'}
+              {isLoading ? '업로드 중...' : '파일 업로드'}
             </button>
-          )}
+
+            {uploadSuccess && (
+              <button
+                className="file-submit-button"
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? '제출 중...' : '제출'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
