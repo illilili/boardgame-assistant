@@ -109,10 +109,14 @@ public class ProjectController {
     public ResponseEntity<List<ProjectSummaryDto>> getAllProjects() {
         return ResponseEntity.ok(projectService.getAllProjects());
     }
-    // 전체 프로젝트 단건 조회
+
+    // 전체 프로젝트 단건 조회 (권한 체크 추가된 Service 사용)
     @GetMapping("/{projectId}")
-    public ResponseEntity<ProjectSummaryDto> getProjectDetail(@PathVariable Long projectId) {
-        return ResponseEntity.ok(projectService.getProjectDetail(projectId));
+    public ResponseEntity<ProjectSummaryDto> getProjectDetail(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(projectService.getProjectDetail(projectId, user));
     }
 
     // 프로젝트 최근 5개 활동
@@ -124,5 +128,15 @@ public class ProjectController {
     @GetMapping("/{projectId}/members")
     public ResponseEntity<List<ProjectMemberDto>> getProjectMembers(@PathVariable Long projectId) {
         return ResponseEntity.ok(projectService.getProjectMembers(projectId));
+    }
+
+    // 프로젝트 삭제 (ADMIN만 가능)
+    @DeleteMapping("/{projectId}")
+    public ResponseEntity<String> deleteProject(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal User user
+    ) {
+        projectService.deleteProject(projectId, user);
+        return ResponseEntity.ok("프로젝트가 성공적으로 삭제되었습니다.");
     }
 }

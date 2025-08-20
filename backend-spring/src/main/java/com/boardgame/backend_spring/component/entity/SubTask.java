@@ -4,6 +4,8 @@ package com.boardgame.backend_spring.component.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -20,5 +22,6 @@ public class SubTask {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "component_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Component component;
 }

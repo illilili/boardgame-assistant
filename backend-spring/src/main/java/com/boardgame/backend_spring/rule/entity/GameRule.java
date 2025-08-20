@@ -5,6 +5,8 @@ import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
@@ -19,6 +21,7 @@ public class GameRule {
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "concept_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private BoardgameConcept boardgameConcept;
 
     private int ruleId;
@@ -28,6 +31,7 @@ public class GameRule {
 
     @ElementCollection(fetch = FetchType.LAZY) // 🚨 LAZY로 변경
     @CollectionTable(name = "action_rules", joinColumns = @JoinColumn(name = "rule_concept_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Column(name = "rule", length = 1000)
     private List<String> actionRules;
 
@@ -36,6 +40,7 @@ public class GameRule {
 
     @ElementCollection(fetch = FetchType.LAZY) // 🚨 LAZY로 변경
     @CollectionTable(name = "penalty_rules", joinColumns = @JoinColumn(name = "rule_concept_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @Column(name = "rule", length = 1000)
     private List<String> penaltyRules;
 

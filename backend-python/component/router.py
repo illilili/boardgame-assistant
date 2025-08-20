@@ -77,7 +77,7 @@ component_generation_prompt = PromptTemplate(
 3.  **Weave the Thematic Narrative (테마 서사 엮기):** 매핑된 구성요소에 게임 테마({theme})를 깊이 불어넣어, 단순한 '자원 토큰'이 아닌 '고대 정령의 눈물'과 같이 고유한 이름과 의미를 부여합니다.
 4.  **Engineer Player Engagement (재미 설계):** 각 구성요소가 다른 구성요소와 어떻게 '상호작용'하는지를 명확히 설계하여 플레이어에게 즐거운 '선택의 딜레마'를 안겨줍니다. 이 상호작용이 게임의 핵심 재미({mechanics})를 어떻게 증폭시키는지 명시해야 합니다.
 5.  **Specify for Production (초정밀 양산 사양 구체화):** **가장 중요한 단계.** 실제 제작을 위해, 각 구성요소의 '전체 수량', **'정확한 사이즈(mm 단위)', '구체적인 재질(예: 300gsm 블랙코어지)', '마감 처리(예: 린넨 마감, 무광 코팅)', '인쇄 방식(예: CMYK 4도 인쇄)'** 등, 공장에서 바로 견적을 낼 수 있을 수준의 상세한 물리적 사양과 아트 컨셉을 제안합니다.
-6.  **Design the Full Product Experience (완제품 경험 설계):** 마지막으로, 게임 보드, 카드, 토큰뿐만 아니라 **게임 박스, 룰북, 트레이(정리함), 플레이어 말/피규어, 특수 주사위 등** 게임의 완전한 패키지를 구성하는 모든 요소를 빠짐없이 구상하여, 하나의 완성된 '상품'으로 만듭니다.
+6.  **Design the Full Product Experience (완제품 경험 설계):** 마지막으로, 게임 보드, 카드, 토큰뿐만 아니라 **게임 박스, 트레이(정리함), 플레이어 말/피규어, 특수 주사위 등** 게임의 완전한 패키지를 구성하는 모든 요소를 빠짐없이 구상하여, 하나의 완성된 '상품'으로 만듭니다.
 
 # Input Data Analysis:
 ---
@@ -99,7 +99,7 @@ component_generation_prompt = PromptTemplate(
 {{
     "components": [
         {{
-            "type": "Image",
+            "type": "box",
             "title": "시간의 균열: 아스트랄 연대기 (게임 박스)",
             "quantity": "1개",
             "role_and_effect": "모든 구성품을 안전하게 보관하며, 게임의 테마를 암시하는 몰입감 있는 아트워크로 첫인상을 결정합니다.",
@@ -175,7 +175,7 @@ component_regeneration_prompt_template = PromptTemplate(
 {{
     "components": [
         {{
-            "type": "Image",
+            "type": "box",
             "title": "시간의 균열: 아스트랄 연대기 (게임 박스)",
             "quantity": "1개",
             "role_and_effect": "모든 구성품을 안전하게 보관하며, 게임의 테마를 암시하는 몰입감 있는 아트워크로 첫인상을 결정합니다.",
