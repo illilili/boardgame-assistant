@@ -1,8 +1,10 @@
 // ProjectService.java
 package com.boardgame.backend_spring.project.service;
 
+import com.boardgame.backend_spring.concept.repository.BoardgameConceptRepository;
 import com.boardgame.backend_spring.plan.entity.PlanStatus;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
+import com.boardgame.backend_spring.pricing.repository.PriceRepository;
 import com.boardgame.backend_spring.project.dto.*;
 import com.boardgame.backend_spring.project.entity.Project;
 import com.boardgame.backend_spring.project.entity.ProjectMember;
@@ -10,6 +12,8 @@ import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import com.boardgame.backend_spring.project.repository.ProjectMemberRepository;
 import com.boardgame.backend_spring.user.entity.User;
 import com.boardgame.backend_spring.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +32,8 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final PlanRepository planRepository;
+    private final BoardgameConceptRepository boardgameConceptRepository;
+    private final PriceRepository priceRepository;
 
     // 🚨 [신규] 로그인 사용자가 참여한 프로젝트 목록 조회
     @Transactional(readOnly = true)
@@ -192,9 +198,24 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다."));
 
-        // 연관된 멤버/로그/태스크 등 cascade 설정이 없다면 직접 삭제 필요
+        // 1) 프로젝트 멤버 삭제
         projectMemberRepository.deleteAll(projectMemberRepository.findAllByProject(project));
 
+        // 3) plan과 연결된 price 먼저 삭제
+        planRepository.findAllByProject(project).forEach(plan -> {
+            priceRepository.deleteByPlanId(plan.getPlanId());
+        });
+
+        // 4) plan 삭제
+        planRepository.deleteAllByProject(project);
+
+        // 5) boardgame_concept 삭제
+        boardgameConceptRepository.deleteAllByProject(project);
+
+        // TODO: taskRepository.deleteByProjectId(projectId);
+        // TODO: activityLogRepository.deleteByProjectId(projectId);
+
+        // 6) 마지막 프로젝트 삭제
         projectRepository.delete(project);
     }
 }

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +28,7 @@ public class PlanVersion {
     // 어떤 기획서에 대한 버전인지 N:1 관계를 맺습니다.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Plan plan;
 
     // 사용자가 입력한 버전 이름 (예: "v1.1 - 밸런스 수정")

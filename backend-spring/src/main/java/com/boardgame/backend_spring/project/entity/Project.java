@@ -6,6 +6,8 @@ import com.boardgame.backend_spring.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import com.boardgame.backend_spring.project.enumtype.ProjectStatus;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,6 +44,7 @@ public class Project {
     // 승인된 기획안 1개 (nullable 가능)
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "approved_plan_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private Plan approvedPlan;
 
     @PrePersist
