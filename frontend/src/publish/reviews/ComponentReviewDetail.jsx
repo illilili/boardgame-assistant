@@ -102,14 +102,23 @@ function ComponentReviewDetail({ componentId, onBack }) {
       )}
 
       <ul className="item-list">
-        {component.items?.map((item) => (
-          <li key={item.contentId} className="item-row">
-            <span className={`comp-type ${item.subTaskType?.toLowerCase()}`}>
-              {item.subTaskType}
-            </span>
-            {renderContent(item)}
-          </li>
-        ))}
+        {component.items
+          ?.sort((a, b) => {
+            // 카드 타입일 때만 순서 바꿈: IMAGE 먼저, TEXT 나중
+            if (component.type?.toLowerCase() === 'card') {
+              if (a.subTaskType === 'IMAGE' && b.subTaskType === 'TEXT') return -1;
+              if (a.subTaskType === 'TEXT' && b.subTaskType === 'IMAGE') return 1;
+            }
+            return 0;
+          })
+          .map((item) => (
+            <li key={item.contentId} className="item-row">
+              <span className={`comp-type ${item.subTaskType?.toLowerCase()}`}>
+                {item.subTaskType}
+              </span>
+              {renderContent(item)}
+            </li>
+          ))}
       </ul>
 
       <textarea

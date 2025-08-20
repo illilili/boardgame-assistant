@@ -1,28 +1,41 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080/api/admin';
+const USER_URL = 'http://localhost:8080/api/admin';
+const PROJECT_URL = 'http://localhost:8080/api/projects';
 
-//전체 유저 목록 가져오기
+// === 유저 관리 ===
 export const fetchAllUsers = async () => {
   const token = localStorage.getItem("accessToken");
-//   console.log(localStorage.getItem('accessToken'));
-  return axios.get(`${BASE_URL}/users`, {
+  return axios.get(`${USER_URL}/users`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
 
-//계정 잠금 해제
 export const unlockUser = async (email) => {
-    const token = localStorage.getItem("accessToken");
-  return axios.post(`${BASE_URL}/unlock-user`, { email }, {
+  const token = localStorage.getItem("accessToken");
+  return axios.post(`${USER_URL}/unlock-user`, { email }, {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
 
-//역할 부여
 export const assignRole = async (userId, newRole) => {
-    const token = localStorage.getItem("accessToken");
-    return axios.post(`${BASE_URL}/assign-role`, { userId, newRole }, {
+  const token = localStorage.getItem("accessToken");
+  return axios.post(`${USER_URL}/assign-role`, { userId, newRole }, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// === 프로젝트 관리 ===
+export const fetchAllProjects = async () => {
+  const token = localStorage.getItem("accessToken");
+  return axios.get(`${PROJECT_URL}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+export const deleteProject = async (projectId) => {
+  const token = localStorage.getItem("accessToken");
+  return axios.delete(`${PROJECT_URL}/${projectId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 };

@@ -1,0 +1,43 @@
+/* src/admin/AdminHomePage.css */
+.admin-nav {
+  display: flex;
+  justify-content: center;
+  background-color: #2D3748;
+  padding: 0.75rem 2rem;
+  box-shadow: var(--shadow-subtle);
+}
+
+.admin-tab {
+  color: #CBD5E0;
+  margin: 0 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.admin-tab:hover {
+  color: #FFFFFF;
+}
+
+.admin-tab.active {
+  color: var(--accent-warm);
+  font-weight: 700;
+}
+
+.admin-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--accent-warm);
+  border-radius: 2px;
+}
+
+.admin-content {
+  padding: 2rem;
+}
