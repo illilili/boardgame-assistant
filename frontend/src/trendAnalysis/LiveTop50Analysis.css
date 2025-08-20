@@ -1,38 +1,27 @@
-/* 실시간 TOP 50 분석 페이지 스타일 */
+/* 실시간 TOP 30 분석 페이지 스타일 - Plan 폴더 디자인 시스템 적용 */
 .live-top50-analysis {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: var(--bg-light, #f9fafb);
   position: relative;
-  font-family: 'Noto Sans KR', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-main, 'Inter'), 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text-primary, #111827);
 }
 
-/* 배경 애니메이션 */
-.live-background::before {
-  content: '';
+/* 배경 - 깔끔한 디자인으로 변경 */
+.live-background {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(245, 101, 101, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, rgba(252, 165, 165, 0.2) 0%, transparent 50%);
-  animation: liveFloat 25s ease-in-out infinite;
-  pointer-events: none;
+  background: var(--bg-light, #f9fafb);
   z-index: 0;
-}
-
-@keyframes liveFloat {
-  0%, 100% { transform: translate(0, 0px) rotate(0deg); }
-  33% { transform: translate(40px, -40px) rotate(120deg); }
-  66% { transform: translate(-30px, 30px) rotate(240deg); }
 }
 
 .live-container {
   position: relative;
   z-index: 1;
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -46,46 +35,50 @@
 
 .header-navigation {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   margin-bottom: 2rem;
 }
 
 .back-button {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  color: var(--text-primary, #111827);
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  white-space: nowrap;
+  min-width: auto;
 }
 
 .back-button:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
+  background: #f3f4f6;
+  border-color: var(--accent-warm, #E58A4E);
+  transform: translateY(-1px);
 }
 
 .refresh-button-header {
-  background: rgba(239, 68, 68, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: var(--accent-warm, #E58A4E);
+  border: 1px solid var(--accent-warm, #E58A4E);
   color: white;
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
 }
 
 .refresh-button-header:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  background: #B8713A;
+  border-color: #B8713A;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.3);
 }
 
 .refresh-button-header:disabled {
@@ -104,32 +97,24 @@
 }
 
 .main-title {
-  font-size: 3.2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 1rem 0;
-  background: linear-gradient(135deg, #ffffff 0%, #fecaca 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  animation: liveGlow 3s ease-in-out infinite alternate;
+  color: var(--text-primary, #111827);
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
 
 .subtitle {
-  font-size: 1.3rem;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.1rem;
+  color: var(--text-secondary, #6b7280);
   margin: 0;
   font-weight: 400;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   line-height: 1.5;
 }
 
-@keyframes liveGlow {
-  from { filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.3)); }
-  to { filter: drop-shadow(0 0 40px rgba(239, 68, 68, 0.5)); }
-}
+/* liveGlow 애니메이션 제거 - 깔끔한 디자인으로 변경 */
 
 .data-meta-info {
   display: grid;
@@ -139,30 +124,33 @@
 }
 
 .meta-item {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
   padding: 1.5rem;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
 }
 
 .meta-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
+  background: #f9fafb;
+  border-color: var(--accent-warm, #E58A4E);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.1);
 }
 
 .meta-icon {
   font-size: 1.5rem;
   flex-shrink: 0;
+  color: var(--accent-warm, #E58A4E);
 }
 
 .meta-label {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary, #6b7280);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -171,7 +159,7 @@
 
 .meta-value {
   font-size: 1rem;
-  color: white;
+  color: var(--text-primary, #111827);
   font-weight: 600;
   flex: 1;
 }
@@ -311,9 +299,14 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* TOP 50 랭킹 섹션 */
+/* TOP 30 랭킹 섹션 - Plan 스타일 적용 */
 .top50-ranking-section {
-  margin: 3rem 0;
+  margin: 2rem 0;
+  background: var(--white, #ffffff);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border: 1px solid var(--border-color, #e5e7eb);
 }
 
 .section-header {
@@ -322,20 +315,16 @@
 }
 
 .section-title {
-  font-size: 2.5rem;
+  font-size: 1.875rem;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary, #111827);
   margin: 0 0 1rem 0;
-  background: linear-gradient(135deg, #ffffff 0%, #fecaca 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.01em;
 }
 
 .section-subtitle {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-secondary, #6b7280);
   margin: 0;
   font-weight: 400;
 }
@@ -355,46 +344,51 @@
   gap: 1rem;
 }
 
-/* 전체 번역 버튼 */
+/* 전체 번역 버튼 - Plan 스타일 */
 .translate-all-button {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border: none;
-  border-radius: 12px;
+  background: var(--accent-warm, #E58A4E);
+  border: 1px solid var(--accent-warm, #E58A4E);
+  border-radius: 8px;
   color: white;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   white-space: nowrap;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
   min-width: 180px;
   justify-content: center;
 }
 
 .translate-all-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #059669, #047857);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+  background: #B8713A;
+  border-color: #B8713A;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.3);
 }
 
 .translate-all-button:disabled {
-  background: rgba(100, 116, 139, 0.5);
+  background: var(--text-secondary, #6b7280);
+  border-color: var(--text-secondary, #6b7280);
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  opacity: 0.6;
 }
 
 .translate-all-button.translating {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: #f59e0b;
+  border-color: #f59e0b;
   animation: translatePulse 2s ease-in-out infinite;
 }
 
 .translate-all-button.translated {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  background: #059669;
+  border-color: #059669;
 }
 
 @keyframes translatePulse {
@@ -410,109 +404,79 @@
   padding: 0;
 }
 
-/* 게임 카드 */
+/* 게임 카드 - Plan 스타일 적용 */
 .game-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
+  background: var(--white, #ffffff);
+  border-radius: 12px;
   padding: 1.5rem;
   display: flex;
   gap: 1rem;
   position: relative;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
-    0 8px 24px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border: 1px solid var(--border-color, #e5e7eb);
   overflow: hidden;
-  animation: cardFadeIn 0.6s ease-out;
 }
 
-@keyframes cardFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.game-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.1), transparent);
-  transition: left 0.5s ease;
-}
-
-.game-card:hover::before {
-  left: 100%;
-}
+/* 카드 애니메이션 제거 - 깔끔한 디자인 */
 
 .game-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(239, 68, 68, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.15);
+  border-color: var(--accent-warm, #E58A4E);
 }
 
 .game-card.clickable:active {
-  transform: translateY(-2px) scale(1.01);
+  transform: translateY(0);
   transition: all 0.1s ease;
 }
 
 .game-card.clickable:hover::after {
-  content: '🔍 클릭하여 상세보기';
+  content: '🔍 상세보기';
   position: absolute;
   top: 10px;
   right: 15px;
-  background: rgba(102, 126, 234, 0.9);
+  background: var(--accent-warm, #E58A4E);
   color: white;
   padding: 0.3rem 0.6rem;
-  border-radius: 12px;
+  border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 500;
   z-index: 2;
-  animation: tooltipFadeIn 0.2s ease-out;
+  opacity: 0.9;
 }
 
-@keyframes tooltipFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 게임 순위 - 흰색 배경에 잘 보이는 스타일 */
+/* 게임 순위 배지 - 썸네일 왼쪽 상단 빈 공간에 배치 */
 .game-rank {
   position: absolute;
   top: 0.75rem;
-  right: 0.75rem;
-  background: rgba(30, 41, 59, 0.92);
-  backdrop-filter: blur(8px);
-  color: white;
-  font-size: 0.8rem;
+  left: 0.75rem;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--accent-warm, #E58A4E);
+  font-size: 0.7rem;
   font-weight: 700;
   padding: 0.3rem 0.6rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  min-width: 32px;
-  height: 26px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(229, 138, 78, 0.2);
+  min-width: 30px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  z-index: 2;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.game-card:hover .game-rank {
+  background: var(--accent-warm, #E58A4E);
+  color: white;
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 3px 8px rgba(229, 138, 78, 0.3);
+  border-color: var(--accent-warm, #E58A4E);
 }
 
 /* 게임 썸네일 - 기존 작은 크기 */

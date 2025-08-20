@@ -10,6 +10,8 @@ import {
   AppstoreOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import Header from '../../../mainPage/Header';
+import Footer from '../../../mainPage/Footer';
 
 // API 서비스 imports
 import {
@@ -203,9 +205,11 @@ const InteractiveDashboard = () => {
   }
 
   return (
-    <div className="interactive-dashboard">
-      {/* 헤더 섹션 */}
-      <div className="dashboard-header">
+    <>
+      <Header projectMode={false} />
+      <div className="interactive-dashboard">
+        {/* 헤더 섹션 */}
+        <div className="dashboard-header">
         <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
           <Col>
             <Space size="middle">
@@ -408,6 +412,8 @@ const InteractiveDashboard = () => {
         </Col>
       </Row>
     </div>
+    <Footer />
+    </>
   );
 };
 

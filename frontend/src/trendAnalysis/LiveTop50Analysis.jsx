@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import './LiveTop50Analysis.css';
 import TrendSummaryCards from './components/TrendSummaryCards';
 import GameDetailModal from './components/GameDetailModal';
+import Header from '../mainPage/Header';
+import Footer from '../mainPage/Footer';
 import { fetchLiveTop50, fetchLiveGameDetail, fetchLiveGameDetailsBatch, formatTrendApiError, translateAllGames } from './services/trendApiService';
 
 const LiveTop50Analysis = () => {
@@ -215,17 +217,9 @@ const LiveTop50Analysis = () => {
       <div className="header-navigation">
         <button 
           className="back-button"
-          onClick={() => navigate('/trend')}
+          onClick={() => navigate('/trend/original')}
         >
-          ← 돌아가기
-        </button>
-        <button 
-          className="refresh-button-header"
-          onClick={fetchTop50Data}
-          disabled={loading}
-          title="최신 데이터로 새로고침"
-        >
-          {loading ? '🔄 조회 중...' : '🔄 새로고침'}
+          🔄 기존 인기 보드게임 분석
         </button>
       </div>
       
@@ -529,11 +523,13 @@ const LiveTop50Analysis = () => {
   if (error) return renderErrorState();
 
   return (
-    <div className="live-top50-analysis">
-      {/* 배경 */}
-      <div className="live-background"></div>
-      
-      <div className="live-container">
+    <>
+      <Header projectMode={false} />
+      <div className="live-top50-analysis">
+        {/* 배경 */}
+        <div className="live-background"></div>
+        
+        <div className="live-container">
         {renderHeader()}
         
         {/* 1단계: 실시간 트렌드 요약 */}
@@ -554,6 +550,8 @@ const LiveTop50Analysis = () => {
         />
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

@@ -1,11 +1,11 @@
-/* 게임 상세 정보 모달 스타일 */
+/* 게임 상세 정보 모달 스타일 - Plan 디자인 시스템 적용 */
 .game-detail-modal {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -18,46 +18,54 @@
 @keyframes modalFadeIn {
   from {
     opacity: 0;
-    transform: scale(0.9);
   }
   to {
     opacity: 1;
-    transform: scale(1);
   }
 }
 
+/* 모달 컨테이너 - Plan 스타일 */
 .modal-content {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 20px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  background: var(--white, #ffffff);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   max-width: 1200px;
   max-height: 90vh;
   width: 100%;
   overflow-y: auto;
-  animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: modalSlideIn 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid var(--border-color, #e5e7eb);
 }
 
 @keyframes modalSlideIn {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(20px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-/* 모달 헤더 */
+/* 모달 헤더 - Plan 스타일 */
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem 2.5rem 1rem;
-  border-bottom: 2px solid #e2e8f0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px 20px 0 0;
-  color: white;
+  padding: 2rem 2.5rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  background: var(--white, #ffffff);
+  border-radius: 16px 16px 0 0;
+}
+
+.game-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .header-actions {
@@ -66,66 +74,26 @@
   gap: 1rem;
 }
 
-.translate-button {
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  white-space: nowrap;
-}
-
-.translate-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #059669, #047857);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.translate-button:disabled {
-  background: rgba(100, 116, 139, 0.5);
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.translate-button.translating {
-  background: rgba(100, 116, 139, 0.5);
-  cursor: not-allowed;
-}
-
-.game-title {
-  margin: 0;
-  font-size: 1.8rem;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
+/* 닫기 버튼 - Plan 스타일 */
 .close-button {
-  background: rgba(255, 255, 255, 0.2);
+  background: none;
   border: none;
-  color: white;
-  font-size: 2rem;
-  font-weight: 300;
+  font-size: 1.5rem;
+  color: var(--text-secondary, #6b7280);
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: 50%;
-  width: 3rem;
-  height: 3rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 .close-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--border-color, #e5e7eb);
+  color: var(--text-primary, #111827);
   transform: scale(1.1);
 }
 
@@ -134,13 +102,15 @@
   padding: 2rem 2.5rem;
 }
 
+/* 게임 상세 레이아웃 */
 .game-detail-layout {
   display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 2.5rem;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  align-items: start;
 }
 
-/* 왼쪽 섹션: 이미지 및 기본 정보 */
+/* 왼쪽: 이미지 및 기본 정보 */
 .game-image-section {
   display: flex;
   flex-direction: column;
@@ -148,36 +118,35 @@
 }
 
 .game-image {
-  width: 100%;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color, #e5e7eb);
 }
 
 .game-image img {
   width: 100%;
   height: auto;
-  max-height: 300px;
-  object-fit: cover;
-  transition: transform 0.3s ease;
+  display: block;
 }
 
-.game-image:hover img {
-  transform: scale(1.05);
-}
-
+/* 기본 정보 카드 - Plan 스타일 */
 .basic-info-card {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-radius: 16px;
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .basic-info-card h4 {
-  margin: 0 0 1rem 0;
-  color: #1e293b;
-  font-size: 1.1rem;
+  font-size: 1.125rem;
   font-weight: 600;
+  color: var(--text-primary, #111827);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .info-grid {
@@ -191,7 +160,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  border-bottom: 1px solid rgba(229, 138, 78, 0.1);
 }
 
 .info-item:last-child {
@@ -199,18 +168,18 @@
 }
 
 .info-label {
-  font-size: 0.9rem;
-  color: #64748b;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
   font-weight: 500;
 }
 
 .info-value {
-  font-size: 0.95rem;
-  color: #1e293b;
+  font-size: 0.875rem;
+  color: var(--text-primary, #111827);
   font-weight: 600;
 }
 
-/* 오른쪽 섹션: 상세 정보 */
+/* 오른쪽: 상세 정보 */
 .game-info-section {
   display: flex;
   flex-direction: column;
@@ -218,85 +187,80 @@
 }
 
 .game-info-section h4 {
-  margin: 0 0 1rem 0;
-  color: #1e293b;
-  font-size: 1.2rem;
+  font-size: 1.125rem;
   font-weight: 600;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 0.5rem;
+  color: var(--text-primary, #111827);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* 평가 정보 섹션 */
 .stats-section {
-  background: linear-gradient(135deg, #fef7ff 0%, #f3e8ff 100%);
-  border-radius: 16px;
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
   padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1rem;
 }
 
 .stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1rem;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  padding: 1rem;
+  background: rgba(229, 138, 78, 0.05);
+  border: 1px solid rgba(229, 138, 78, 0.1);
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-}
-
-.stat-card.rating {
-  border-left: 4px solid #fbbf24;
-}
-
-.stat-card.complexity {
-  border-left: 4px solid #8b5cf6;
-}
-
-.stat-card.users {
-  border-left: 4px solid #06b6d4;
+  background: rgba(229, 138, 78, 0.08);
+  border-color: rgba(229, 138, 78, 0.2);
+  transform: translateY(-1px);
 }
 
 .stat-icon {
   font-size: 1.5rem;
+  line-height: 1;
+  color: var(--accent-warm, #E58A4E);
 }
 
 .stat-content {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .stat-value {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-primary, #111827);
   line-height: 1;
 }
 
 .stat-label {
-  font-size: 0.85rem;
-  color: #64748b;
-  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+  font-weight: 500;
 }
 
-/* 카테고리 및 메카닉 섹션 */
+/* 카테고리 & 메카닉 섹션 */
 .categories-section,
 .mechanics-section {
-  background: linear-gradient(135deg, #fef9e7 0%, #fef3c7 100%);
-  border-radius: 16px;
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
   padding: 1.5rem;
-}
-
-.mechanics-section {
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .tags-container {
@@ -307,54 +271,71 @@
 
 .category-tag,
 .mechanic-tag {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: white;
-  padding: 0.4rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  background: rgba(229, 138, 78, 0.1);
+  color: var(--accent-warm, #E58A4E);
+  border: 1px solid rgba(229, 138, 78, 0.2);
   border-radius: 20px;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 500;
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
-  transition: transform 0.2s ease;
-}
-
-.mechanic-tag {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
 }
 
 .category-tag:hover,
 .mechanic-tag:hover {
+  background: rgba(229, 138, 78, 0.15);
+  border-color: var(--accent-warm, #E58A4E);
   transform: translateY(-1px);
+}
+
+.mechanic-tag {
+  background: rgba(184, 113, 58, 0.1);
+  color: #B8713A;
+  border-color: rgba(184, 113, 58, 0.2);
+}
+
+.mechanic-tag:hover {
+  background: rgba(184, 113, 58, 0.15);
+  border-color: #B8713A;
 }
 
 /* 크레딧 섹션 */
 .credits-section {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border-radius: 16px;
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
   padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
 .credit-item h5 {
-  margin: 0 0 0.5rem 0;
-  color: #1e293b;
   font-size: 1rem;
   font-weight: 600;
+  color: var(--text-primary, #111827);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .credit-list {
-  color: #475569;
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  line-height: 1.5;
 }
 
 /* 설명 섹션 */
 .description-section {
-  background: linear-gradient(135deg, #fafafa 0%, #f4f4f5 100%);
-  border-radius: 16px;
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
   padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .description-header {
@@ -364,24 +345,16 @@
   margin-bottom: 1rem;
 }
 
-.description-header h4 {
-  margin: 0;
-  color: #4f46e5;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 .translate-description-button {
-  padding: 0.4rem 0.8rem;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border: none;
-  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  background: var(--accent-warm, #E58A4E);
+  border: 1px solid var(--accent-warm, #E58A4E);
+  border-radius: 8px;
   color: white;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -389,28 +362,40 @@
 }
 
 .translate-description-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #059669, #047857);
+  background: #B8713A;
+  border-color: #B8713A;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 8px rgba(229, 138, 78, 0.3);
 }
 
 .translate-description-button:disabled {
-  background: rgba(100, 116, 139, 0.5);
+  background: var(--text-secondary, #6b7280);
+  border-color: var(--text-secondary, #6b7280);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  opacity: 0.6;
 }
 
 .translate-description-button.translating {
-  background: rgba(100, 116, 139, 0.5);
-  cursor: not-allowed;
+  background: #f59e0b;
+  border-color: #f59e0b;
+  animation: translatePulse 2s ease-in-out infinite;
+}
+
+@keyframes translatePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .description-text {
-  color: #374151;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
   line-height: 1.6;
-  font-size: 0.95rem;
-  text-align: justify;
+  background: rgba(229, 138, 78, 0.03);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(229, 138, 78, 0.1);
 }
 
 /* 모달 푸터 */
@@ -419,35 +404,36 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2.5rem 2rem;
-  border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
-  border-radius: 0 0 20px 20px;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+  background: rgba(229, 138, 78, 0.02);
+  border-radius: 0 0 16px 16px;
 }
 
 .data-source {
-  color: #64748b;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
   font-weight: 500;
 }
 
 .close-footer-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-size: 1rem;
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  color: var(--text-primary, #111827);
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .close-footer-button:hover {
-  background: linear-gradient(135deg, #5a67d8 0%, #6b4ca0 100%);
+  background: #f3f4f6;
+  border-color: var(--accent-warm, #E58A4E);
   transform: translateY(-1px);
 }
 
-/* 로딩 및 에러 상태 */
+/* 로딩 상태 */
 .modal-content.loading,
 .modal-content.error {
   max-width: 500px;
@@ -457,16 +443,19 @@
 .loading-container,
 .error-container {
   padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .loading-spinner {
-  width: 3rem;
-  height: 3rem;
-  border: 4px solid #e2e8f0;
-  border-top: 4px solid #667eea;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid var(--border-color, #e5e7eb);
+  border-top: 3px solid var(--accent-warm, #E58A4E);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 1.5rem;
 }
 
 @keyframes spin {
@@ -474,67 +463,53 @@
   100% { transform: rotate(360deg); }
 }
 
-.loading-container h3 {
-  color: #1e293b;
-  margin: 0 0 0.5rem 0;
+.loading-container h3,
+.error-container h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+  margin: 0;
 }
 
 .loading-container p {
-  color: #64748b;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
   margin: 0;
 }
 
 .error-icon {
   font-size: 3rem;
-  margin-bottom: 1rem;
+  color: #dc2626;
 }
 
 .error-message {
-  color: #dc2626;
-  font-size: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  text-align: center;
   line-height: 1.5;
-  margin-bottom: 1.5rem;
+  max-width: 400px;
 }
 
 .retry-button {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-size: 1rem;
+  background: var(--accent-warm, #E58A4E);
+  border: 1px solid var(--accent-warm, #E58A4E);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .retry-button:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  background: #B8713A;
+  border-color: #B8713A;
   transform: translateY(-1px);
 }
 
 /* 반응형 디자인 */
-@media (max-width: 768px) {
-  .game-detail-modal {
-    padding: 1rem;
-  }
-  
-  .modal-content {
-    max-height: 95vh;
-  }
-  
-  .modal-header {
-    padding: 1.5rem 1.5rem 1rem;
-  }
-  
-  .game-title {
-    font-size: 1.4rem;
-  }
-  
-  .modal-body {
-    padding: 1.5rem;
-  }
-  
+@media (max-width: 1024px) {
   .game-detail-layout {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -549,33 +524,39 @@
   }
   
   .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .modal-footer {
-    padding: 1rem 1.5rem;
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 480px) {
-  .modal-header {
+@media (max-width: 768px) {
+  .game-detail-modal {
     padding: 1rem;
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
   
   .game-title {
-    font-size: 1.2rem;
-  }
-  
-  .modal-body {
-    padding: 1rem;
-  }
-  
-  .close-button {
-    width: 2.5rem;
-    height: 2.5rem;
     font-size: 1.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .description-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
   }
 }
