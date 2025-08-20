@@ -44,29 +44,29 @@ const request = async (endpoint, options = {}) => {
 
 /**
  * 번역 요청
- * @param {object} translationData - { contentId, languageCode }
+ * @param {object} translationData - { contentId, targetLanguages[], feedback? }
  */
-export const requestTranslations = (translationData) => request('/api/translations/request', {
+export const requestTranslations = (translationData) => request('/api/translate/request', {
     method: 'POST',
     body: JSON.stringify(translationData),
 });
 
+
 /**
- * 콘텐츠별 번역 조회
+ * 콘텐츠별 번역 조회 (최신 1건만)
  * @param {string} contentId - 콘텐츠 ID
  */
-export const getTranslationsByContent = (contentId) => request(`/api/translations/content/${contentId}`, {
+export const getTranslationsByContent = (contentId) =>
+  request(`/api/translate/${contentId}?latestOnly=true`, {
     method: 'GET',
-});
+  });
 
 /**
  * 번역 완료 처리
  * @param {string} translationId - 번역 ID
- * @param {object} translationData - 번역 데이터
  */
-export const completeTranslation = (translationId, translationData) => request(`/api/translations/${translationId}/complete`, {
+export const completeTranslation = (translationId) => request(`/api/translate/${translationId}/complete`, {
     method: 'PUT',
-    body: JSON.stringify(translationData),
 });
 
 /**

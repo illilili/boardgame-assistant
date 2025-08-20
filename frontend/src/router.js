@@ -17,8 +17,6 @@ import ProjectListPage from './project/ProjectListPage';
 import ProjectHomePage from './project/ProjectHomePage';
 import AdminHomePage from './admin/AdminHomePage'
 import DevelopmentWrapper from './development/DevelopmentWrapper';
-import ReviewDetailPage from './publish/ReviewDetailPage';
-import AssignDeveloperPage from './publish/AssignDeveloperPage';
 import TrendAnalysisHome from './trendAnalysis/TrendAnalysisHome';
 import LiveTop50Analysis from './trendAnalysis/LiveTop50Analysis';
 import OriginalGameAnalysis from './trendAnalysis/OriginalGameAnalysis';
@@ -105,16 +103,16 @@ const router = createBrowserRouter([
     path: '/user-manage',
     element: <AdminHomePage />
   },
-  {
-    id: 16,
-    path: '/review/:planId',
-    element: <ReviewDetailPage />
-  },
-  {
-    id: 17,// 3. 개발자 배정 페이지 (승인 후 이동)
-    path: '/assign-developer/:projectId',
-    element: <AssignDeveloperPage />
-  },
+  // {
+  //   id: 16,
+  //   path: '/review/:planId',
+  //   element: <ReviewDetailPage />
+  // },
+  // {
+  //   id: 17,// 3. 개발자 배정 페이지 (승인 후 이동)
+  //   path: '/assign-developer/:projectId',
+  //   element: <AssignDeveloperPage />
+  // },
   {
     id: 18,
     path: '/trend',
