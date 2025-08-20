@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './GameDetailModal.css';
 import { fetchLiveGameDetail, formatTrendApiError } from '../services/trendApiService';
 
@@ -20,9 +20,9 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
         fetchGameDetail();
       }
     }
-  }, [isOpen, gameId, cachedGameDetail]);
+  }, [isOpen, gameId, cachedGameDetail]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchGameDetail = async () => {
+  const fetchGameDetail = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -41,7 +41,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
     } finally {
       setLoading(false);
     }
-  };
+  }, [gameId]);
 
   const handleTranslate = async () => {
     if (!gameDetail || !gameDetail.description || translating) return;

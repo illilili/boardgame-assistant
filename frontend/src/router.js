@@ -22,7 +22,6 @@ import AssignDeveloperPage from './publish/AssignDeveloperPage';
 import TrendAnalysisHome from './trendAnalysis/TrendAnalysisHome';
 import LiveTop50Analysis from './trendAnalysis/LiveTop50Analysis';
 import OriginalGameAnalysis from './trendAnalysis/OriginalGameAnalysis';
-import InteractiveDashboard from './trendAnalysis/components/interactive/InteractiveDashboard';
 
 
 const router = createBrowserRouter([
@@ -130,11 +129,6 @@ const router = createBrowserRouter([
     id: 20,
     path: '/trend/original',
     element: <OriginalGameAnalysis />
-  },
-  {
-    id: 21,
-    path: '/trend/interactive',
-    element: <InteractiveDashboard />
   },
 
 

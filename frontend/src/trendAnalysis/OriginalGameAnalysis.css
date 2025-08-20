@@ -1,11 +1,17 @@
-/* OriginalGameAnalysis.css */
+/* OriginalGameAnalysis.css - Plan 디자인 시스템 완전 적용 */
 .original-analysis {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f8fafc;
+  background-color: var(--bg-light, #f9fafb);
+  color: var(--text-primary, #111827);
+  font-family: var(--font-main, 'Inter'), 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 100vh;
+  /* 은은한 그리드 배경 패턴 - 트렌드 홈과 동일 */
+  background-image:
+    linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+  background-size: 50px 50px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 /* Loading State */
@@ -20,21 +26,22 @@
 .loading-container,
 .error-container {
   text-align: center;
-  padding: 40px;
-  background: white;
+  padding: 2.5rem;
+  background: var(--white, #ffffff);
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border: 1px solid var(--border-color, #e5e7eb);
   max-width: 500px;
 }
 
 .loading-spinner.large {
   width: 60px;
   height: 60px;
-  border: 6px solid #e2e8f0;
-  border-top: 6px solid #3b82f6;
+  border: 4px solid var(--border-color, #e5e7eb);
+  border-top: 4px solid var(--accent-warm, #E58A4E);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin: 0 auto 24px;
+  margin: 0 auto 1.5rem;
 }
 
 @keyframes spin {
@@ -44,13 +51,14 @@
 
 .loading-container h2,
 .error-container .error-message {
-  color: #334155;
-  margin: 16px 0;
-  font-size: 20px;
+  color: var(--text-primary, #334155);
+  margin: 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .loading-container p {
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   margin: 0;
 }
 
@@ -60,153 +68,188 @@
 }
 
 .retry-button {
-  background: #3b82f6;
+  background: var(--accent-warm, #E58A4E);
   color: white;
-  border: none;
-  padding: 12px 24px;
+  border: 1px solid var(--accent-warm, #E58A4E);
+  padding: 0.75rem 1.5rem;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 1rem;
   cursor: pointer;
-  margin-top: 16px;
+  margin-top: 1rem;
   transition: all 0.2s;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
 }
 
 .retry-button:hover {
-  background: #2563eb;
+  background: #B8713A;
+  border-color: #B8713A;
   transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.3);
 }
 
-/* Header */
+/* Header - 트렌드 홈과 일치하는 깔끔한 스타일 */
 .analysis-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 40px;
+  background: var(--white, #ffffff);
   border-radius: 16px;
-  margin-bottom: 24px;
+  padding: 3rem 2.5rem 2rem;
+  margin-bottom: 2rem;
   text-align: center;
   position: relative;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border: 1px solid var(--border-color, #e5e7eb);
+  animation: fadeInUp 0.8s 0.2s cubic-bezier(0.25, 0.8, 0.25, 1) backwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .header-navigation {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 1.5rem;
+  left: 1.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 1rem;
 }
 
 .back-button-original {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
+  background: var(--white, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  color: var(--text-primary, #111827);
   padding: 0.75rem 1.5rem;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
 }
 
 .back-button-original:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #f3f4f6;
+  border-color: var(--accent-warm, #E58A4E);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.15);
 }
 
-.lab-button-original {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.lab-button-original:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.header-content {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .analysis-header h1 {
-  margin: 0 0 8px 0;
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: 800;
+  color: var(--text-primary, #111827);
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .header-description {
   font-size: 1.1rem;
-  margin: 0 0 24px 0;
-  opacity: 0.9;
+  color: var(--text-secondary, #6b7280);
+  margin: 0 0 1.5rem 0;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.7;
 }
 
+/* 데이터 정보 - 트렌드 홈과 일치하는 스타일 */
 .data-info {
   display: flex;
   justify-content: center;
-  gap: 32px;
-  margin-top: 20px;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .data-info-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  opacity: 0.9;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #6b7280);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  background: rgba(229, 138, 78, 0.05);
+  border-radius: 20px;
+  border: 1px solid rgba(229, 138, 78, 0.1);
+  transition: all 0.2s ease;
+}
+
+.data-info-item:hover {
+  background: rgba(229, 138, 78, 0.08);
+  border-color: rgba(229, 138, 78, 0.2);
+  transform: translateY(-1px);
 }
 
 .info-icon {
-  font-size: 16px;
+  font-size: 1rem;
+  color: var(--accent-warm, #E58A4E);
 }
 
-/* Tab Navigation */
+/* Tab Navigation - Plan 스타일로 깔끔하게 */
 .tab-navigation {
   display: flex;
-  gap: 4px;
-  margin-bottom: 24px;
-  background: white;
-  padding: 8px;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  background: var(--white, #ffffff);
+  padding: 0.75rem;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border: 1px solid var(--border-color, #e5e7eb);
   overflow-x: auto;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .tab-button {
   background: transparent;
   border: none;
-  padding: 12px 20px;
+  padding: 0.875rem 1.5rem;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   white-space: nowrap;
-  color: #64748b;
+  color: var(--text-secondary, #6b7280);
+  position: relative;
+  min-width: auto;
 }
 
-.tab-button:hover {
-  background: #f1f5f9;
-  color: #334155;
+.tab-button:hover:not(.active) {
+  background: rgba(229, 138, 78, 0.05);
+  color: var(--text-primary, #111827);
+  transform: translateY(-1px);
 }
 
 .tab-button.active {
-  background: #3b82f6;
+  background: var(--accent-warm, #E58A4E);
   color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(229, 138, 78, 0.3);
+  transform: translateY(-1px);
 }
 
-/* Analysis Content */
+/* Analysis Content - Plan 스타일로 깔끔하게 */
 .analysis-content {
-  background: white;
+  background: var(--white, #ffffff);
   border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  margin-bottom: 24px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border: 1px solid var(--border-color, #e5e7eb);
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.6s 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) backwards;
 }
 
 /* Strategic Insight Section */
@@ -216,24 +259,24 @@
 
 .insight-header {
   text-align: center;
-  margin-bottom: 32px;
-  padding: 24px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: rgba(229, 138, 78, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(229, 138, 78, 0.1);
 }
 
 .insight-header h3 {
-  margin: 0 0 8px 0;
-  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary, #1e293b);
   font-size: 1.5rem;
   font-weight: 700;
 }
 
 .insight-header p {
   margin: 0;
-  color: #64748b;
-  font-size: 14px;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.875rem;
 }
 
 .insight-cards {
@@ -930,41 +973,50 @@
   transition: height 0.3s ease;
 }
 
-/* Visualization Section */
+/* Visualization Section - 버블차트 겹침 문제 해결 */
 .visualization-section {
-  margin: 40px 0;
+  margin: 2.5rem 0;
+  position: relative;
+  z-index: 1;
+  clear: both; /* 플로팅 요소의 영향 방지 */
 }
 
 .bubble-chart-section,
 .heatmap-section {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  margin-bottom: 32px;
-  overflow: hidden;
+  background: var(--white, #ffffff);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border: 1px solid var(--border-color, #e5e7eb);
+  margin-bottom: 3rem; /* 여백을 더 크게 */
+  overflow: visible; /* 버블차트 영역 겹침 방지 */
+  min-height: 700px; /* 최소 높이를 더 크게 확보 */
+  padding: 2rem; /* 내부 패딩 확보 */
+  position: relative;
 }
 
 .chart-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 24px 24px 16px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
+  padding: 2rem;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  background: rgba(229, 138, 78, 0.02);
+  border-radius: 16px 16px 0 0;
 }
 
 .chart-title h3 {
-  margin: 0 0 8px 0;
-  color: #1e293b;
-  font-size: 20px;
-  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary, #111827);
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
 .chart-title p {
   margin: 0;
-  color: #64748b;
-  font-size: 14px;
-  line-height: 1.4;
+  color: var(--text-secondary, #6b7280);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .chart-toggle {
@@ -1006,7 +1058,9 @@
 /* 차트 컨테이너 내부 패딩 */
 .bubble-chart-section .bubble-chart-visualization,
 .heatmap-section .heatmap-visualization {
-  padding: 24px;
+  padding: 2rem;
+  min-height: 500px; /* 차트 영역 최소 높이 확보 */
+  overflow: visible; /* 버블이 영역 밖으로 나가도 보이도록 */
 }
 
 /* 히트맵 가이드 섹션 */
@@ -1312,13 +1366,26 @@
 }
 
 /* Data Source Footer */
+/* 푸터 - Plan 스타일로 깔끔하게 */
 .data-source-footer {
   text-align: center;
-  padding: 20px;
-  color: #64748b;
-  font-size: 14px;
-  border-top: 1px solid #e2e8f0;
-  margin-top: 40px;
+  padding: 1.5rem 2rem;
+  margin-top: 2rem;
+  background: var(--white, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+}
+
+.data-source-footer p {
+  color: var(--text-secondary, #6b7280);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 /* Responsive Design */
