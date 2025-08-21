@@ -293,6 +293,33 @@ input[type="file"]::-webkit-file-upload-button {
   cursor: pointer;
   font-weight: 600;
 }
+
+/* 새 버튼 스타일 */
+.reget-button {
+  padding: 10px 20px;
+  background-color: #FFFFFF;          /* 흰색 배경 */
+  color: #2b3a61ff;                     /* 남색 글씨 */
+  border: 1px solid #D1D5DB;          /* 연한 회색 테두리 */
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.reget-button:hover:not(:disabled) {
+  background-color: #F9FAFB;
+  border-color: #9CA3AF;
+  color: #2c3246ff;
+}
+
+.reget-button:disabled {
+  background-color: #F3F4F6;
+  color: #9CA3AF;
+  border-color: #E5E7EB;
+  cursor: not-allowed;
+}
 `;
 
 
@@ -684,7 +711,7 @@ const PlanPage = () => {
             {copyrightResult && (
               <button
                 type="button"
-                className="secondary-button"
+                className="reget-button"
                 onClick={() => setShowCopyright(true)}
                 style={{ marginTop: "12px" }}
               >

@@ -45,6 +45,8 @@ body {
 .plan-page__sidebar-header {
     margin-bottom: 40px;
     padding-left: 12px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px; /* ✅ 밑줄과 글자 간격 확보 */
 }
 
 .plan-page__logo {

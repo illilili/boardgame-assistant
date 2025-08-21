@@ -77,3 +77,10 @@ export const getContentsByProject = (projectId) => request(`/api/projects/${proj
     method: 'GET',
 });
 
+/**
+ * 프로젝트 완료 처리
+ * @param {string|number} projectId - 프로젝트 ID
+ */
+export const completeProject = (projectId) => request(`/api/projects/${projectId}/complete`, {
+    method: 'PUT',
+});
