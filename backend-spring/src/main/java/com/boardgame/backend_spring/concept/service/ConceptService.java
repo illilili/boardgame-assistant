@@ -6,6 +6,7 @@ import com.boardgame.backend_spring.concept.dto.ConceptResponseDto;
 import com.boardgame.backend_spring.concept.dto.RegenerateConceptRequestDto;
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.concept.repository.BoardgameConceptRepository;
+import com.boardgame.backend_spring.plan.repository.PlanRepository;
 import com.boardgame.backend_spring.project.entity.Project;
 import com.boardgame.backend_spring.project.repository.ProjectRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,6 +25,7 @@ public class ConceptService {
     private final RestTemplate restTemplate;
     private final BoardgameConceptRepository boardgameConceptRepository;
     private final ProjectRepository projectRepository;
+    private final PlanRepository planRepository;
 
     @Value("${fastapi.service.url}/api/plans/generate-concept")
     private String generateConceptUrl;
@@ -48,7 +50,7 @@ public class ConceptService {
                 .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + requestDto.getProjectId()));
 
         BoardgameConcept newConcept = new BoardgameConcept();
-        newConcept.setPlanId(responseFromFastAPI.getPlanId());
+//        newConcept.setPlanId(responseFromFastAPI.getPlanId());
         newConcept.setTheme(responseFromFastAPI.getTheme());
         newConcept.setPlayerCount(responseFromFastAPI.getPlayerCount());
         newConcept.setAverageWeight(responseFromFastAPI.getAverageWeight());
@@ -77,9 +79,13 @@ public class ConceptService {
         }
 
         // 🚨 재생성된 컨셉의 projectId를 가져와서 사용
-        Long planId = regeneratedConceptDto.getPlanId();
-        BoardgameConcept existingConcept = boardgameConceptRepository.findByPlanId(planId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 planId를 가진 컨셉을 찾을 수 없습니다: " + planId));
+//        Long planId = regeneratedConceptDto.getPlanId();
+//        BoardgameConcept existingConcept = boardgameConceptRepository.findByPlanId(planId)
+//                .orElseThrow(() -> new EntityNotFoundException("해당 planId를 가진 컨셉을 찾을 수 없습니다: " + planId));
+
+        Long conceptId = requestDto.getOriginalConcept().getConceptId();
+        BoardgameConcept existingConcept = boardgameConceptRepository.findById(conceptId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 conceptId를 가진 컨셉을 찾을 수 없습니다: " + conceptId));
 
         Project project = projectRepository.findById(requestDto.getOriginalConcept().getProjectId())
                 .orElseThrow(() -> new EntityNotFoundException("Project not found with id: " + requestDto.getOriginalConcept().getProjectId()));
@@ -107,7 +113,8 @@ public class ConceptService {
     private ConceptResponseDto mapEntityToDto(BoardgameConcept entity) {
         ConceptResponseDto dto = new ConceptResponseDto();
         dto.setConceptId(entity.getConceptId());
-        dto.setPlanId(entity.getPlanId());
+        planRepository.findByBoardgameConcept(entity)
+                .ifPresent(plan -> dto.setPlanId(plan.getPlanId()));
         dto.setProjectId(entity.getProject().getId());
         dto.setTheme(entity.getTheme());
         dto.setPlayerCount(entity.getPlayerCount());
