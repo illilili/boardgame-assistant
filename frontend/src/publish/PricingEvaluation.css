@@ -1,771 +1,555 @@
-/* PricingEvaluation.css - 가격 책정 관리 */
-
-/* 워크스페이스 레이아웃 */
-.pricing-workspace {
-  display: flex;
-  height: 100vh;
-  background-color: #f8f9fa;
-}
-
-/* 사이드바 - Architect 스타일 적용 */
-.workspace-sidebar {
-  width: 280px;
-  background-color: #FFFFFF;
-  color: #2c2825;
-  padding: 32px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid #EAEAEA;
-}
-
-.sidebar-header {
-  margin-bottom: 40px;
-  border-bottom: none;
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #E58A4E;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-}
-
-.workspace-nav-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.nav-item {
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 12px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  position: relative;
-  color: #374151;
-  transition: color 0.2s, background-color 0.2s;
-  border: none;
-  border-bottom: none;
-}
-
-.nav-item:hover {
-  color: #2c2825;
-  background-color: #F8F8F8;
-}
-
-.nav-item.nav-header {
-  background-color: #E58A4E;
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #FFFFFF;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.nav-item.active {
-  color: #FFFFFF;
-  font-weight: 600;
-  background-color: #E58A4E;
-}
-
-/* 메인 콘텐츠 */
-.workspace-main-content {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-}
-
-/* 크리에이터 컨테이너 */
-.creator-container {
-  display: flex;
-  gap: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-  height: calc(100vh - 40px);
-}
-
-/* 폼 컬럼 (왼쪽) */
-.form-column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  min-width: 350px;
-  max-width: 800px;
-}
-
-.form-section {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: fit-content;
-}
-
-.form-section h2 {
-  margin: 0 0 20px 0;
-  color: #2c3e50;
-  font-size: 24px;
-}
-
-/* 게임 카드 그리드 */
-.game-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.game-card {
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: white;
-}
-
-.game-card:hover {
-  border-color: #3498db;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.game-card.selected {
-  border-color: #3498db;
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-}
-
-.game-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.game-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: bold;
-  color: #2c3e50;
-  flex: 1;
-}
-
-.status-badge {
-  background-color: #f39c12;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-badge.pending {
-  background-color: #f39c12;
-  color: white;
-}
-
-.status-badge.evaluated {
-  background-color: #27ae60;
-  color: white;
-}
-
-.game-card-content p {
-  margin: 8px 0;
-  font-size: 14px;
-  color: #666;
-  line-height: 1.6;
-}
-
-.approval-date {
-  color: #95a5a6 !important;
-  font-size: 12px !important;
-}
-
-/* 결과 컬럼 (오른쪽) */
-.result-column {
-  width: 100%;
-  flex-shrink: 0;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  max-height: calc(100vh - 40px);
-  overflow: hidden;
-}
-
-/* 웰컴 스크린 */
-.welcome-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.welcome-icon {
-  font-size: 64px;
-  margin-bottom: 24px;
-}
-
-.welcome-screen h2 {
-  font-size: 32px;
-  color: #2c3e50;
-  margin-bottom: 16px;
-}
-
-.welcome-screen p {
-  font-size: 16px;
-  color: #7f8c8d;
-  line-height: 1.6;
-}
-
-/* 가격 책정 관리 */
-.pricing-management {
-  width: 100%;
-  padding: 24px;
-  overflow-y: auto;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.selected-game-info {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 24px;
-}
-
-.selected-game-info h3 {
-  margin: 0 0 12px 0;
-  color: #2c3e50;
-  font-size: 20px;
-}
-
-.selected-game-info p {
-  margin: 8px 0;
-  color: #555;
-  font-size: 14px;
-}
-
-/* AI 가격 분석 결과 */
-.ai-pricing-result {
-  background: linear-gradient(135deg, #2c445c 1000%, #a0d4e9 0%);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  color: white;
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-}
-.ai-pricing-result h2{
-  color: #FFFFFF;
-}
-
-.ai-pricing-result h4 {
-  margin: 0 0 16px 0;
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-  color: white;
-}
-
-.price-recommendations {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.price-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
-}
-
-.currency-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.price-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
-}
-
-.price-value.krw {
-  color: #ffd700;
-}
-
-.price-value.usd {
-  color: #00ff88;
-}
-
-/* 개선된 수익성 분석 */
-.pricing-calculations {
-  background: linear-gradient(135deg, #fd945b 0%, #f5576c 100%);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-  color: white;
-  box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);
-}
-.pricing-calculations h2{
-  color: #FFFFFF;
-}
-
-.pricing-calculations h4 {
-  margin: 0 0 20px 0;
-  color: white;
-  font-size: 18px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.calculation-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.calculation-item:last-child {
-  border-bottom: none;
-}
-
-.calculation-item .label {
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
-}
-
-.calculation-item .value {
-  font-weight: 600;
-  font-size: 16px;
-  color: white;
-}
-
-.calculation-item .value.positive {
-  color: #00ff88;
-}
-
-.calculation-item .value.negative {
-  color: #ff0000;
-}
-
-.calculation-item .value.suggested-price {
-  color: #ffd700;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-/* 메모 섹션 */
-.notes-section {
-  margin-bottom: 24px;
-}
-
-.notes-section label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #2c3e50;
-  font-size: 14px;
-}
-
-.notes-section textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-  min-height: 80px;
-  transition: border-color 0.2s ease;
-}
-
-.notes-section textarea:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-}
-
-/* 액션 버튼 */
-.action-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-
-.save-btn {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.save-btn:hover {
-  background-color: #2980b9;
-}
-
-/* 로딩 */
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  font-size: 18px;
-  color: #7f8c8d;
-}
-
-/* 반응형 */
-@media (max-width: 1200px) {
-  .creator-container {
-    flex-direction: column;
-    height: auto;
-  }
-  
-  .result-column {
-    width: 100%;
-    max-height: none;
-  }
-  
-  .game-cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }
-}
-
-@media (max-width: 768px) {
-  .pricing-workspace {
-    flex-direction: column;
-  }
-  
-  .workspace-sidebar {
-    width: 100%;
-    height: auto;
-  }
-  
-  .workspace-main-content {
-    padding: 12px;
-  }
-  
-  .game-cards-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .pricing-management {
-    padding: 16px;
-  }
-}
-
-/* 로딩, 오류, 프로젝트 없음 상태 */
-.loading-container,
-.error-container,
-.no-projects-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.loading-spinner {
-  font-size: 64px;
-  margin-bottom: 24px;
-  animation: spin 2s linear infinite;
-}
-
-.error-icon {
-  font-size: 64px;
-  margin-bottom: 24px;
-}
-
-.no-projects-icon {
-  font-size: 64px;
-  margin-bottom: 24px;
-}
-
-.loading-container h2,
-.error-container h2,
-.no-projects-container h2 {
-  font-size: 32px;
-  color: #2c3e50;
-  margin-bottom: 16px;
-}
-
-.loading-container p,
-.error-container p,
-.no-projects-container p {
-  font-size: 16px;
-  color: #7f8c8d;
-  line-height: 1.6;
-  margin-bottom: 8px;
-}
-
-.error-message {
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 6px;
-  padding: 12px 16px;
-  margin: 16px 0;
-  color: #721c24;
-  font-family: monospace;
-  font-size: 14px;
-  max-width: 600px;
-  word-break: break-word;
-}
-
-.retry-btn {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-top: 20px;
-}
-
-.retry-btn:hover {
-  background-color: #2980b9;
+/* PricingEvaluation.css - Translation 페이지와 동일한 디자인 패턴 적용 */
+
+/* --- ✨ Translation 페이지와 동일한 CSS 변수 --- */
+:root {
+    --accent-blue: #2c3e50;      /* Translation과 동일한 남색 */
+    --accent-warm: #E58A4E;      /* Translation과 동일한 주황 */
+    --accent-warm-dark: #D4753A; /* 주황 어두운 버전 */
+    --text-dark: #1f2328;        /* Translation과 동일한 진한 텍스트 */
+    --text-light: #6e7781;       /* Translation과 동일한 연한 텍스트 */
+    --bg-main: #f6f8fa;          /* Translation과 동일한 배경 */
+    --bg-card: #ffffff;          /* Translation과 동일한 카드 배경 */
+    --border-color: #d8dee4;     /* Translation과 동일한 테두리 */
+    --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.05);  /* Translation과 동일한 그림자 */
+    --shadow-medium: 0 2px 6px rgba(0, 0, 0, 0.08);  /* Translation과 동일한 그림자 */
+    --shadow-heavy: 0 4px 12px rgba(0, 0, 0, 0.1);   /* Translation과 동일한 그림자 */
+    --font-main: 'Inter', sans-serif;
+    --transition-fast: 0.2s ease;  /* Translation과 동일한 전환 */
+    --transition-smooth: 0.3s ease; /* Translation과 동일한 전환 */
+}
+
+/* --- ✨ 애니메이션 (Translation과 동일) --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+    to { transform: rotate(360deg); }
 }
 
-.auto-estimate-btn {
-  background-color: #27ae60;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  margin-top: 16px;
-  width: 100%;
+/* --- ✨ 워크스페이스 레이아웃 (Translation과 동일한 구조) --- */
+.pricing-workspace {
+    display: flex;
+    height: calc(100vh - 120px); /* Translation과 동일한 높이 */
+    background-color: var(--bg-main);
 }
 
-.auto-estimate-btn:hover:not(:disabled) {
-  background-color: #229954;
+.workspace-main-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
 }
 
-.auto-estimate-btn:disabled {
-  background-color: #bdc3c7;
-  cursor: not-allowed;
-  opacity: 0.6;
+/* --- ✨ 전체 레이아웃 (Translation과 동일한 구조) --- */
+.creator-container {
+    display: flex;
+    gap: 20px; /* Translation과 동일한 간격 */
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    animation: fadeIn 0.3s ease-in-out; /* Translation과 동일한 애니메이션 */
 }
 
-/* 썸네일 이미지 스타일 */
-.thumbnail-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 12px 0;
+/* --- ✨ 폼 섹션 (왼쪽) - Translation과 동일한 스타일 --- */
+.form-column {
+    flex: 0 0 440px; /* Translation과 동일한 폭 */
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px; /* Translation과 동일한 패딩 */
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Translation과 동일한 내부 스크롤 */
+    max-height: 100%;
 }
 
-.project-thumbnail {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.form-section h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 16px 0;
+    border-bottom: 3px solid var(--accent-blue); /* Translation과 동일한 남색 밑줄 */
+    padding-bottom: 8px;
 }
 
-.no-thumbnail {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 160px;
-  background-color: #f8f9fa;
-  border: 2px dashed #dee2e6;
-  border-radius: 8px;
-  margin: 12px 0;
+.form-section p {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin: 0 0 32px 0;
+    line-height: 1.6;
 }
 
-.no-image-icon {
-  font-size: 32px;
-  margin-bottom: 8px;
-  color: #adb5bd;
+/* --- ✨ 결과 섹션 (오른쪽) - Translation과 동일한 스타일 --- */
+.result-column {
+    flex: 2; /* Translation과 동일한 flex 비율 */
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px; /* Translation과 동일한 패딩 */
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Translation과 동일한 내부 스크롤 */
+    max-height: 100%;
+    min-height: 500px; /* Translation과 동일한 최소 높이 */
 }
 
-.no-thumbnail p {
-  margin: 0;
-  color: #adb5bd;
-  font-size: 14px;
+/* --- ✨ 프로젝트 정보 스타일 (Translation과 동일한 패턴) --- */
+.selected-game-info {
+    background-color: var(--bg-main);
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
 }
 
-/* 선택된 프로젝트 썸네일 */
+.selected-game-info h3 {
+    margin: 0 0 12px 0;
+    color: var(--text-dark);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
 .selected-thumbnail-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 16px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 16px 0;
 }
 
 .selected-project-thumbnail {
-  width: 100%;
-  max-width: 300px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: var(--shadow-medium);
 }
 
 .selected-no-thumbnail {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  background-color: #f8f9fa;
-  border: 2px dashed #dee2e6;
-  border-radius: 8px;
-  margin: 16px 0;
-  width: 100%;
-  max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    background-color: var(--bg-main);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    margin: 16px 0;
+    width: 100%;
+    max-width: 300px;
 }
 
-
-.pricing-form .form-group {
-  width: 100%;
-  max-width: 450px; /* 입력창 최대 너비 제한 */
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* 중앙 정렬 */
+.no-image-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: var(--text-light);
 }
-/* 개선된 폼 스타일 */
+
+.selected-no-thumbnail p {
+    margin: 0;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+/* --- ✨ AI 가격 분석 결과 카드 (Translation과 동일한 스타일) --- */
+.ai-pricing-result {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    color: var(--text-dark);
+    box-shadow: var(--shadow-subtle);
+}
+
+.ai-pricing-result h2 {
+    color: var(--text-dark);
+    margin: 0 0 16px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border-bottom: 3px solid var(--accent-blue); /* Translation과 동일한 남색 밑줄 */
+    padding-bottom: 8px;
+}
+
+.ai-pricing-result h5 {
+    margin: 0 0 20px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+/* --- ✨ 가격 측정 버튼 (Translation과 동일한 스타일) --- */
+.price-estimate-button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.price-estimate-btn {
+    background: var(--accent-warm); /* Translation과 동일한 주황 */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px; /* Translation과 동일한 패딩 */
+    font-size: 1rem;
+    font-weight: 700; /* Translation과 동일한 굵기 */
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    box-shadow: var(--shadow-subtle);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-estimate-btn:hover {
+    background: #d97706; /* Translation과 동일한 호버 색상 */
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.price-estimate-btn:active {
+    transform: translateY(0);
+}
+
+.price-estimate-btn:disabled {
+    background: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* --- ✨ 가격 추천 (Translation과 동일한 카드 스타일) --- */
+.price-recommendations {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+}
+
+.price-item:hover {
+    background: #f3f3f3;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-subtle);
+}
+
+.currency-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.price-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent-warm); /* Translation과 동일한 주황 */
+}
+
+.price-value.krw {
+    color: var(--accent-warm);
+}
+
+.price-value.usd {
+    color: var(--accent-blue); /* Translation과 동일한 남색 */
+}
+
+/* --- ✨ 비용 입력 폼 (Translation과 동일한 스타일) --- */
 .pricing-form {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* 중앙 정렬 */
+    background-color: var(--bg-card);
+    /* border: 1px solid var(--border-color); 
+    border-radius: 12px;*/
+    padding: 11px; 
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-subtle);
+
 }
 
-.pricing-form h4 {
-  color: #2c3e50;
-  margin-bottom: 20px;
-  font-size: 18px;
-  text-align: center;
-  font-weight: 600;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 10px;
+.pricing-form h2 {
+    margin-top: 0px;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    border-bottom: 3px solid var(--accent-blue); /* Translation과 동일한 남색 밑줄 */
+    padding-bottom: 8px; /* AI 가격 분석 결과와 동일한 높이 */
 }
 
 .form-group {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 14px;
+    display: block;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 8px;
+    font-size: 0.875rem;
 }
 
 .form-group input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  background: #f8f9fa;
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    background-color: white;
+    color: var(--text-dark);
+    transition: all var(--transition-fast);
+    display: block; /* 블록 요소로 설정 */
+    margin: 0 auto; /* 가운데 정렬 */
 }
 
 .form-group input:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-  background: white;
+    outline: none;
+    border-color: var(--accent-blue); /* Translation과 동일한 남색 */
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
 .form-group input::placeholder {
-  color: #95a5a6;
-  font-style: italic;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+/* --- ✨ 수익성 분석 카드 (Translation과 동일한 카드 스타일) --- */
+.pricing-calculations {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    color: var(--text-dark);
+    box-shadow: var(--shadow-subtle);
+    margin-top: 24px;
+
+}
+
+.pricing-calculations h2 {
+    color: var(--text-dark);
+    margin: 0 0 20px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border-bottom: 3px solid var(--accent-blue); /* Translation과 동일한 남색 밑줄 */
+    padding-bottom: 8px;
+}
+
+.calculation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.calculation-item:last-child {
+    border-bottom: none;
+}
+
+.calculation-item .label {
+    font-weight: 500;
+    color: var(--text-dark);
+    font-size: 14px;
+}
+
+.calculation-item .value {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text-dark);
+}
+
+.calculation-item .value.positive {
+    color: #28a745;
+}
+
+.calculation-item .value.negative {
+    color: #dc3545;
+}
+
+.calculation-item .value.suggested-price {
+    color: var(--accent-warm); /* Translation과 동일한 주황 */
+    font-size: 18px;
+    font-weight: 700;
 }
 
 /* 수익성 분석 특별 스타일 */
 .calculation-item.total-cost {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 16px;
-  margin: 16px 0;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+    background: var(--bg-main);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    border: 2px solid var(--border-color);
 }
 
 .calculation-item.total-cost .label {
-  font-weight: 600;
-  font-size: 15px;
+    font-weight: 600;
+    font-size: 15px;
 }
 
 .calculation-item.total-cost .total-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: #ffd700;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent-warm); /* Translation과 동일한 주황 */
 }
 
 .calculation-divider {
-  text-align: center;
-  margin: 20px 0;
-  padding: 10px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    text-align: center;
+    margin: 20px 0;
+    padding: 10px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .calculation-divider span {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: 2px;
+    color: var(--text-light);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 2px;
 }
 
 .calculation-item.profit-difference {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+    background: var(--bg-main);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+    border: 2px solid var(--border-color);
 }
 
 .calculation-item.profit-difference .label {
-  font-weight: 600;
-  font-size: 15px;
+    font-weight: 600;
+    font-size: 15px;
 }
 
 .calculation-item.profit-difference .value {
-  font-size: 18px;
-  font-weight: 700;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.profit-explanation {
+    text-align: center;
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--bg-main);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+/* --- ✨ 로딩, 오류 상태 (Translation과 동일한 스타일) --- */
+.loading-container,
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.loading-spinner {
+    font-size: 64px;
+    margin-bottom: 24px;
+    animation: spin 2s linear infinite;
+}
+
+.error-icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+    color: #dc3545;
+}
+
+.loading-container h2,
+.error-container h2 {
+    font-size: 32px;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+}
+
+.loading-container p,
+.error-container p {
+    font-size: 16px;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.error-message {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    color: #721c24;
+    font-family: monospace;
+    font-size: 14px;
+    max-width: 600px;
+    word-break: break-word;
+}
+
+.retry-btn {
+    background-color: var(--accent-warm); /* Translation과 동일한 주황 */
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-top: 20px;
+}
+
+.retry-btn:hover {
+    background-color: #d97706; /* Translation과 동일한 호버 색상 */
+    transform: translateY(-2px);
+}
+
+/* --- ✨ 반응형 디자인 (Translation과 동일한 패턴) --- */
+@media (max-width: 1200px) {
+    .creator-container {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .form-column {
+        flex: none;
+        width: 100%;
+    }
+    
+    .result-column {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .workspace-main-content {
+        padding: 12px;
+    }
+    
+    .form-column,
+    .result-column {
+        padding: 20px;
+    }
+    
+    .form-section h2 {
+        font-size: 1.5rem;
+    }
+    
+    .pricing-calculations h2 {
+        font-size: 1.25rem;
+    }
 }
