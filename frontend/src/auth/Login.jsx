@@ -40,7 +40,7 @@ const Login = () => {
   return (
     <>
       <Header />
-      <div className="login-container">
+      <div className="login-page">
         <div className="login-card">
           <h2 className="login-title">로그인</h2>
           <form onSubmit={handleSubmit}>
@@ -64,18 +64,13 @@ const Login = () => {
               className="login-input"
             />
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="login-button"
-            >
+            <button type="submit" disabled={isLoading} className="login-button">
               {isLoading ? '로그인 중...' : '로그인'}
             </button>
           </form>
 
           <div className="login-footer">
-            계정이 없으신가요?{' '}
-            <LinkLogin to="/signup">회원가입</LinkLogin>
+            계정이 없으신가요? <LinkLogin to="/signup">회원가입</LinkLogin>
           </div>
         </div>
       </div>

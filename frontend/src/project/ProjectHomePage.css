@@ -15,16 +15,18 @@
 /* --- ✨ 고유 클래스 이름을 사용한 전체 레이아웃 --- */
 .project-home-page__container {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 280px 1fr;
     background-color: var(--bg-main);
     min-height: calc(100vh - 70px);
     font-family: var(--font-main);
 }
 
 .project-home-page__sidebar {
+  width: 280px;
     background-color: #161b22;
     color: #c9d1d9;
     padding: 24px 0;
+    box-sizing: border-box;
 }
 
 .project-home-page__nav-list {

@@ -66,6 +66,8 @@ function Translation({ contentId }) {
         targetLanguages: selectedLangs,
       });
       await fetchTranslations();
+      setSelectedLangs([]);
+      
     } catch (err) {
       console.error(err);
       setError('번역 요청에 실패했습니다.');

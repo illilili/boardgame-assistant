@@ -75,11 +75,11 @@
 }
 
 .project-nav a:hover {
-  color: var(--accent-primary);
+  color: var(--accent-warm); /* hover 시 따뜻한 주황 */
 }
 
 /* ✅ 현재 페이지 활성화 */
 .project-nav a.active {
-  color: var(--accent-primary);
+  color: var(--accent-warm-dark); /* 강조된 따뜻한 주황 */
   font-weight: 700;
 }

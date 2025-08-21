@@ -45,6 +45,8 @@ body {
 .plan-page__sidebar-header {
     margin-bottom: 40px;
     padding-left: 12px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px; /* ✅ 밑줄과 글자 간격 확보 */
 }
 
 .plan-page__logo {
@@ -87,7 +89,7 @@ body {
 
 /* --- ✨ 여기가 수정되었습니다 --- */
 .plan-page__nav-item.active {
-    color: var(--accent-primary); /* ✨ 아이콘과 텍스트 색상을 강조 색상으로 변경 */
+    color: var(--accent-warm); /* ✨ 아이콘과 텍스트 색상을 강조 색상으로 변경 */
     font-weight: 600;
     background-color: #f3f4f6; /* ✨ 연한 회색 배경 적용 */
     box-shadow: none; /* 그림자 제거 */
