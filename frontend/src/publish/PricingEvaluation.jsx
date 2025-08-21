@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getApprovedPlan } from '../api/auth';
+import { getApprovedPlan, getTasksForProject } from '../api/auth';
 import { completeProject } from '../api/publish';
 import { ProjectContext } from '../contexts/ProjectContext';
 import './PricingEvaluation.css';
@@ -25,6 +25,10 @@ function PricingEvaluation() {
   const [projectInfo, setProjectInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [aiPriceResult, setAiPriceResult] = useState(null);
+  const [priceEstimateLoading, setPriceEstimateLoading] = useState(false);
+  const [projectComponents, setProjectComponents] = useState([]);
+  const [currentPlanId, setCurrentPlanId] = useState(null);
 
   // 프로젝트 ID가 있을 때 프로젝트 정보와 승인된 플랜 조회
   useEffect(() => {
@@ -32,8 +36,8 @@ function PricingEvaluation() {
     if (projectId) {
       console.log('프로젝트 ID 확인됨:', projectId);
       fetchProjectInfo();
-      // 자동 가격 추정 제거 - 사용자가 버튼으로 요청하도록 변경
-      // fetchApprovedPlan();
+      fetchProjectComponents();
+      fetchApprovedPlan();
     } else {
       console.log('프로젝트 ID가 없습니다.');
     }
@@ -63,6 +67,25 @@ function PricingEvaluation() {
     }
   };
 
+  const fetchProjectComponents = async () => {
+    if (!projectId) return;
+
+    try {
+      console.log('프로젝트 구성품 조회 시작:', projectId);
+      const components = await getTasksForProject(projectId);
+      console.log('프로젝트 구성품 조회 결과:', components);
+      console.log('구성품 데이터 구조:', {
+        hasComponents: !!components,
+        hasComponentsArray: !!(components && components.components),
+        componentsLength: components?.components?.length || 0,
+        fullData: components
+      });
+      setProjectComponents(components);
+    } catch (error) {
+      console.error('프로젝트 구성품 조회 오류:', error);
+    }
+  };
+
   const fetchApprovedPlan = async () => {
     if (!projectId) return;
 
@@ -73,26 +96,113 @@ function PricingEvaluation() {
 
       if (approvedPlan && approvedPlan.planId) {
         console.log('플랜 ID 찾음:', approvedPlan.planId);
-        // 자동 가격 추정 실행
-        runAutoEstimate(approvedPlan.planId);
+        setCurrentPlanId(approvedPlan.planId);
       } else {
         console.log('승인된 플랜이 없습니다.');
-        alert('이 프로젝트는 승인된 플랜이 없어 가격 추정을 할 수 없습니다.');
       }
     } catch (error) {
       console.error('승인된 플랜 조회 오류:', error);
-      alert(`플랜 조회 실패: ${error.message}`);
     }
   };
 
-  const runAutoEstimate = async (planId) => {
-    if (!planId) {
-      console.log('planId가 없어 자동 가격 추정을 실행할 수 없습니다.');
+  // 구성품 데이터에서 분석 결과 생성
+  const analyzeComponentsFromData = () => {
+    console.log('analyzeComponentsFromData 호출됨:', {
+      projectComponents,
+      hasComponents: !!(projectComponents && projectComponents.components),
+      componentsLength: projectComponents?.components?.length || 0
+    });
+
+    if (!projectComponents || !projectComponents.components || projectComponents.components.length === 0) {
+      console.log('구성품 데이터가 없음 - 기본값 반환');
+      return {
+        totalCards: 0,
+        totalTokens: 0,
+        totalDice: 0,
+        totalBoards: 0,
+        totalComponents: 0,
+        componentBreakdown: {}
+      };
+    }
+
+    let totalCards = 0;
+    let totalTokens = 0;
+    let totalDice = 0;
+    let totalBoards = 0;
+    const componentBreakdown = {};
+
+    // Spring 백엔드에서 반환하는 데이터 구조에 맞춰 수정
+    projectComponents.components.forEach(component => {
+      const componentType = component.type?.toLowerCase() || '';
+      const componentTitle = component.title?.toLowerCase() || '';
+      
+      // 카드 관련
+      if (componentType.includes('카드') || componentTitle.includes('카드') || 
+          componentType.includes('card') || componentTitle.includes('card')) {
+        totalCards += 1;
+        componentBreakdown['카드'] = (componentBreakdown['카드'] || 0) + 1;
+      }
+      // 토큰 관련
+      else if (componentType.includes('토큰') || componentTitle.includes('토큰') ||
+               componentType.includes('token') || componentTitle.includes('token') ||
+               componentType.includes('아이템') || componentTitle.includes('아이템')) {
+        totalTokens += 1;
+        componentBreakdown['토큰'] = (componentBreakdown['토큰'] || 0) + 1;
+      }
+      // 주사위 관련
+      else if (componentType.includes('주사위') || componentTitle.includes('주사위') ||
+               componentType.includes('dice') || componentTitle.includes('dice')) {
+        totalDice += 1;
+        componentBreakdown['주사위'] = (componentBreakdown['주사위'] || 0) + 1;
+      }
+      // 보드 관련
+      else if (componentType.includes('보드') || componentTitle.includes('보드') ||
+               componentType.includes('board') || componentTitle.includes('board') ||
+               componentType.includes('게임판') || componentTitle.includes('게임판')) {
+        totalBoards += 1;
+        componentBreakdown['보드'] = (componentBreakdown['보드'] || 0) + 1;
+      }
+      // 기타 구성품
+      else {
+        const componentName = component.type || '기타';
+        componentBreakdown[componentName] = (componentBreakdown[componentName] || 0) + 1;
+      }
+    });
+
+    const totalComponents = totalCards + totalTokens + totalDice + totalBoards + 
+                          Object.values(componentBreakdown).reduce((sum, count) => sum + count, 0) - 
+                          (totalCards + totalTokens + totalDice + totalBoards);
+
+    return {
+      totalCards,
+      totalTokens,
+      totalDice,
+      totalBoards,
+      totalComponents,
+      componentBreakdown
+    };
+  };
+
+  // AI 가격 측정 요청
+  const handlePriceEstimate = async () => {
+    if (!currentPlanId || !projectId) {
+      alert('프로젝트 정보가 없습니다. 프로젝트를 선택해주세요.');
       return;
     }
 
+    setPriceEstimateLoading(true);
+    setError(null);
+
     try {
-      console.log('자동 가격 추정 시작:', 'Project ID:', projectId, 'Plan ID:', planId);
+      console.log('AI 가격 측정 시작:', { planId: currentPlanId, projectId });
+      
+      // 구성품 분석 결과 생성
+      const componentAnalysis = analyzeComponentsFromData();
+      console.log('구성품 분석 결과:', componentAnalysis);
+
+      // 승인된 플랜의 텍스트 가져오기 (간단한 예시 텍스트 사용)
+      const planText = projectInfo?.projectName || '보드게임 프로젝트';
+
       const response = await fetch('/api/pricing/estimate', {
         method: 'POST',
         headers: {
@@ -100,50 +210,35 @@ function PricingEvaluation() {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
         },
         body: JSON.stringify({
-          planId: planId
+          planId: currentPlanId,
+          planText: planText,
+          componentAnalysis: componentAnalysis
         })
       });
 
-      // if (!response.ok) {
-      //   throw new Error(`가격 추정 실패: ${response.status}`);
-      // }
+      if (!response.ok) {
+        throw new Error(`가격 측정 실패: ${response.status}`);
+      }
 
       const result = await response.json();
-      console.log('자동 가격 추정 결과:', result);
-
-      // 추천 가격을 suggestedPrice에 자동 설정
-      if (result.korPriceAsInt) {
+      console.log('AI 가격 측정 결과:', result);
+      
+      setAiPriceResult(result);
+      
+      // 추천 가격을 suggestedPrice에 설정
+      if (result.kor_price) {
+        const priceWithoutWon = result.kor_price.replace('원', '').replace(/,/g, '');
         setPricingData(prev => ({
           ...prev,
-          suggestedPrice: result.korPriceAsInt.toString()
+          suggestedPrice: priceWithoutWon
         }));
       }
+
     } catch (error) {
-      console.error('자동 가격 추정 오류:', error);
-      alert(`자동 가격 추정 실패: ${error.message}`);
-    }
-  };
-
-  // 가격 측정 요청 함수 추가
-  const handlePriceEstimate = async () => {
-    if (!projectId) {
-      alert('프로젝트를 선택해주세요.');
-      return;
-    }
-
-    try {
-      // 승인된 플랜 조회 후 가격 측정 실행
-      const approvedPlan = await getApprovedPlan(projectId);
-
-      if (approvedPlan && approvedPlan.planId) {
-        console.log('플랜 ID 찾음:', approvedPlan.planId);
-        await runAutoEstimate(approvedPlan.planId);
-      } else {
-        alert('이 프로젝트는 승인된 플랜이 없어 가격 추정을 할 수 없습니다.');
-      }
-    } catch (error) {
-      console.error('가격 측정 요청 오류:', error);
-      alert(`가격 측정 요청 실패: ${error.message}`);
+      console.error('AI 가격 측정 오류:', error);
+      setError(`가격 측정 실패: ${error.message}`);
+    } finally {
+      setPriceEstimateLoading(false);
     }
   };
 
@@ -317,36 +412,92 @@ function PricingEvaluation() {
                 <h2>AI 가격 분석 결과</h2>
                 <h5>아마존 가격 데이터 기준으로 추천 가격을 제시합니다.</h5>
 
-                {/* 가격 측정 버튼 추가 */}
+                {/* 구성품 분석 정보 */}
+                <div className="component-analysis-section">
+                  <h4>구성품 분석</h4>
+                  {projectComponents && projectComponents.components && projectComponents.components.length > 0 ? (
+                    <div className="component-info">
+                      <div className="component-item">
+                        <span>총 구성품:</span>
+                        <span className="component-count">{analyzeComponentsFromData().totalComponents}개</span>
+                      </div>
+                      <div className="component-item">
+                        <span>카드:</span>
+                        <span className="component-count">{analyzeComponentsFromData().totalCards}장</span>
+                      </div>
+                      <div className="component-item">
+                        <span>토큰:</span>
+                        <span className="component-count">{analyzeComponentsFromData().totalTokens}개</span>
+                      </div>
+                      <div className="component-item">
+                        <span>주사위:</span>
+                        <span className="component-count">{analyzeComponentsFromData().totalDice}개</span>
+                      </div>
+                      {/* <div className="component-item">
+                        <span>보드:</span>
+                        <span className="component-count">{analyzeComponentsFromData().totalBoards}개</span>
+                      </div> */}
+                    </div>
+                  ) : (
+                    <p className="no-components">구성품 정보를 불러올 수 없습니다.</p>
+                  )}
+                </div>
+
+                {/* 가격 측정 버튼 */}
                 <div className="price-estimate-button-container">
                   <button
                     className="price-estimate-btn"
                     onClick={handlePriceEstimate}
+                    disabled={priceEstimateLoading}
                   >
-                    AI 가격 측정 요청
+                    {priceEstimateLoading ? '가격 측정 중...' : 'AI 가격 측정 요청'}
                   </button>
                 </div>
 
-                <div className="price-recommendations">
-                  <div className="price-item">
-                    <span className="currency-label">추천 가격 (원)</span>
-                    <span className="price-value krw">
-                      {pricingData.suggestedPrice ?
-                        Math.ceil(parseInt(pricingData.suggestedPrice) / 1000) * 1000 :
-                        '---'
-                      }원
-                    </span>
+                {/* AI 가격 측정 결과 */}
+                {aiPriceResult && (
+                  <div className="ai-price-result">
+                    <h4>AI 가격 측정 결과</h4>
+                    <div className="price-recommendations">
+                      <div className="price-item">
+                        <span className="currency-label">AI 추천 가격 (원)</span>
+                        <span className="price-value krw">
+                          {aiPriceResult.kor_price || '---'}
+                        </span>
+                      </div>
+                      <div className="price-item">
+                        <span className="currency-label">AI 추천 가격 (달러)</span>
+                        <span className="price-value usd">
+                          {aiPriceResult.predicted_price || '---'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="price-item">
-                    <span className="currency-label">추천 가격 (달러)</span>
-                    <span className="price-value usd">
-                      {pricingData.suggestedPrice ?
-                        `$${(parseInt(pricingData.suggestedPrice) / 1300).toFixed(2)}` :
-                        '---'
-                      }
-                    </span>
+                )}
+
+                {/* 기존 추천 가격 (AI 결과가 없을 때) */}
+                {!aiPriceResult && (
+                  <div className="price-recommendations">
+                    <div className="price-item">
+                      <span className="currency-label">추천 가격 (원)</span>
+                      <span className="price-value krw">
+                        {pricingData.suggestedPrice ?
+                          Math.ceil(parseInt(pricingData.suggestedPrice) / 1000) * 1000 :
+                          '---'
+                        }원
+                      </span>
+                    </div>
+                    <div className="price-item">
+                      <span className="currency-label">추천 가격 (달러)</span>
+                      <span className="price-value usd">
+                        {pricingData.suggestedPrice ?
+                          `$${(parseInt(pricingData.suggestedPrice) / 1300).toFixed(2)}` :
+                          '---'
+                        }
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
               <div className="complete-project-container" style={{ marginTop: "20px" }}>
                 <button
@@ -433,12 +584,12 @@ function PricingEvaluation() {
                 <span className={`value ${(calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue)) >= 0 ? 'positive' : 'negative'}`}>
                   {(calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue)).toLocaleString()}원
                 </span>
-                <div className="profit-explanation">
+                {/* <div className="profit-explanation">
                   {calculations.suggestedPrice - (calculations.totalCost + calculations.platformCost + calculations.netRevenue) >= 0 ?
                     '✅ 추천 가격에 비해 총 가격이 낮습니다.' :
                     '❌ 추천 가격에 비해 총 가격이 높습니다.'
-                  }
-                </div>
+                  } 
+                 </div> */}
               </div>
             </div>
           </div>
