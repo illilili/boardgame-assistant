@@ -23,8 +23,9 @@ public class BoardgameConcept {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long conceptId;
 
-    @Column(unique = true)
-    private Long planId;
+//    @Column(unique = true)
+//    private Long planId;
+    //중복으로 되어있어서 삭제함
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)

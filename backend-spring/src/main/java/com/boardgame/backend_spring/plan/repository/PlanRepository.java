@@ -25,4 +25,10 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
 
     void deleteAllByProject(Project project);
     List<Plan> findAllByProject(Project project);
+
+    /**
+     * 특정 컨셉 ID로 기획서를 찾습니다.
+     */
+    @Query("SELECT p FROM Plan p WHERE p.boardgameConcept.conceptId = :conceptId")
+    Optional<Plan> findByConceptId(@Param("conceptId") Long conceptId);
 }
