@@ -60,6 +60,7 @@
     font-weight: 800;
     margin-bottom: 2rem; /* 간격 조정 */
     opacity: 0.9; /* 좀 더 선명하게 */
+    color: #ffffff; /* ✨ 흰색 로고 색상 */
 }
 .inspiration-content h3, .inspiration-content p {
     display: none; /* 문구 제거 */

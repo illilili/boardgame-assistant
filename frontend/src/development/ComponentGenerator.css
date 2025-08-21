@@ -469,6 +469,7 @@ button.rollback:hover {
   text-align: center;
   color: var(--text-light);
   justify-content: center;
+  height: 100%;  
 }
 
 .status-container h3 {

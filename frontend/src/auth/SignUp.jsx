@@ -94,7 +94,7 @@ const SignUp = () => {
             />
 
             <p className="input-hint">
-              비밀번호는 최소 8자 이상, 숫자/영문/특수문자를 포함하여 구성할 수 있습니다.
+              비밀번호는 최소 8자 이상, 숫자/영문/특수문자를 포함해야 합니다.
             </p>
 
             {confirmPassword && (

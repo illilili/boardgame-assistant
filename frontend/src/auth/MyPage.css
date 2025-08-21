@@ -1,13 +1,15 @@
 :root {
-  --accent-primary: #ea580c;
-  --accent-secondary: #f97316;
-  --bg-light: #f9fafb;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --border-color: #e5e7eb;
+  --accent-warm: #E58A4E;       /* 메인 포인트 오렌지 */
+  --accent-warm-dark: #D4753A;  /* hover용 진한 오렌지 */
+  --accent-blue: #2c3e50;       /* 링크용 딥블루 */
+  --bg-light: #f6f8fa;          /* 라이트 그레이 배경 */
+  --text-primary: #1f2328;      /* 기본 글자 */
+  --text-secondary: #6e7781;    /* 보조 글자 */
+  --border-color: #d8dee4;
   --white: #ffffff;
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+  --font-main: 'Inter', sans-serif;
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* 컨테이너 */
@@ -34,7 +36,7 @@
 .mypage-title {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--accent-primary);
+  color: var(--accent-warm);
   margin-bottom: 24px;
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 8px;
