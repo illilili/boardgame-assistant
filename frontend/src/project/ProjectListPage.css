@@ -1,125 +1,191 @@
+/* src/project/ProjectListPage.css */
+
+/* ---------------------------------- */
+/* --- 🎨 디자인 시스템 & 전역 설정 --- */
+/* ---------------------------------- */
+:root {
+  --accent-warm: #E58A4E;
+  --accent-warm-dark: #D4753A;
+  --bg-main: #f0f2f5; /* 뉴모피즘에 어울리는 부드러운 배경 */
+  --bg-card: #ffffff;
+  --text-primary: #1f2328;
+  --text-secondary: #57606a;
+  --border-color: #e4e7eb;
+  --font-primary: 'Inter', sans-serif;
+
+  --spacing-unit: 8px;
+  --border-radius-lg: 16px; /* 더 부드러운 곡선 */
+  --shadow-neumorphic-inset: inset 6px 6px 12px #d9dbde, inset -6px -6px 12px #ffffff;
+  --shadow-neumorphic-outset: 6px 6px 12px #d9dbde, -6px -6px 12px #ffffff;
+  --transition-smooth: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* -------------------------- */
+/* --- 🚀 기본 레이아웃 --- */
+/* -------------------------- */
 .project-list-page__container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 20px;
-  font-family: 'Pretendard', sans-serif;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: calc(var(--spacing-unit) * 5) calc(var(--spacing-unit) * 3);
+  font-family: var(--font-primary);
+  background-color: var(--bg-main);
 }
 
 .project-list-page__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: calc(var(--spacing-unit) * 5);
 }
 
 .project-list-page__title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1a202c;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
 }
 
 .project-list-page__create-button {
-  background-color: #E58A4E;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  background-color: var(--accent-warm);
   color: white;
   font-weight: 600;
   padding: 12px 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--border-radius-lg);
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: all var(--transition-smooth);
+  box-shadow: var(--shadow-neumorphic-outset);
 }
 
 .project-list-page__create-button:hover {
-  background-color: #c06c38;
+  background-color: var(--accent-warm-dark);
   transform: translateY(-2px);
+  box-shadow: 8px 8px 16px #d9dbde, -8px -8px 16px #ffffff;
 }
 
+.project-list-page__create-button:active {
+    box-shadow: var(--shadow-neumorphic-inset);
+    transform: translateY(1px);
+}
+
+/* -------------------------- */
+/* --- 🃏 프로젝트 카드 그리드 --- */
+/* -------------------------- */
 .project-list-page__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  gap: calc(var(--spacing-unit) * 4);
 }
 
 .project-list-page__card {
-  background-color: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 24px;
+  background-color: var(--bg-card);
+  border-radius: var(--border-radius-lg);
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all var(--transition-smooth);
+  box-shadow: var(--shadow-neumorphic-outset);
+  overflow: hidden; /* 내부 요소가 둥근 모서리를 넘지 않도록 */
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .project-list-page__card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  transform: scale(1.03);
+  box-shadow: 10px 10px 20px #d9dbde, -10px -10px 20px #ffffff;
+}
+
+.project-list-page__thumbnail-wrapper {
+    width: 100%;
+    padding-top: 75%; /* 4:3 비율 */
+    position: relative;
+}
+
+.project-list-page__thumbnail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-smooth);
+}
+
+.project-list-page__card:hover .project-list-page__thumbnail {
+    transform: scale(1.1);
+}
+
+.project-list-page__card-content {
+    padding: calc(var(--spacing-unit) * 2.5);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* 콘텐츠 왼쪽 정렬 */
+    gap: var(--spacing-unit);
+    flex-grow: 1; /* 카드의 남은 공간을 채움 */
 }
 
 .project-list-page__card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
 }
 
-.project-list-page__card-id {
-  font-size: 0.875rem;
-  color: #718096;
-  margin-bottom: 16px;
-}
-
+/* -------------------------- */
+/* --- 🏷️ 상태 배지 --- */
+/* -------------------------- */
 .project-list-page__status-badge {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 5px 14px;
   font-size: 0.75rem;
   font-weight: 700;
-  border-radius: 9999px;
+  border-radius: 20px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.project-list-page__error {
-  color: #c53030;
-  background-color: #fed7d7;
-  padding: 1rem;
-  border-radius: 0.5rem;
+/* 상태별 색상 재정의 */
+.status--planning { background-color: #e0f2fe; color: #0284c7; }
+.status--development { background-color: #dcfce7; color: #16a34a; }
+.status--review_pending { background-color: #fef9c3; color: #ca8a04; }
+.status--publishing { background-color: #f3e8ff; color: #8b5cf6; }
+.status--completed { background-color: #f1f5f9; color: #475569; }
+
+/* -------------------------- */
+/* --- 💀 스켈레톤 UI --- */
+/* -------------------------- */
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+.skeleton {
+    background-color: #e2e8f0;
+}
+.skeleton-image, .skeleton-text, .skeleton-badge {
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 2000px 100%;
+    animation: shimmer 1.5s infinite;
+}
+.skeleton-image { width: 100%; padding-top: 75%; }
+.skeleton .project-list-page__card-content { padding: 16px; }
+.skeleton-text { width: 80%; height: 24px; border-radius: 4px; margin-bottom: 8px; }
+.skeleton-badge { width: 40%; height: 20px; border-radius: 20px; }
+
+/* -------------------------- */
+/* --- 📢 피드백 메시지 --- */
+/* -------------------------- */
+.project-list-page__error, .project-list-page__empty-message {
+  grid-column: 1 / -1; /* 그리드 전체 너비 차지 */
   text-align: center;
+  padding: calc(var(--spacing-unit) * 4);
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  background-color: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-neumorphic-inset);
 }
-
-.status--planning {
-  background-color: #ebf8ff;
-  color: #3182ce;
-}
-
-.status--review_pending {
-  background-color: #fefcbf;
-  color: #b7791f;
-}
-
-.status--development {
-  background-color: #e6fffa;
-  color: #2c7a7b;
-}
-
-.status--publishing {
-  background-color: #f0fdf4;
-  color: #166534;
-}
-
-.status--completed {
-  background-color: #f3f4f6;
-  color: #4b5563;
-}
-
-.project-list-page__card img {
-  width: 100%;
-  height: 230px;
-  /* 원하는 높이 */
-  object-fit: cover;
-  /* 비율 유지 + 넘치는 부분 잘라내기 */
-  border-radius: 8px;
+.project-list-page__error {
+    color: #c53030;
+    font-weight: 600;
 }
