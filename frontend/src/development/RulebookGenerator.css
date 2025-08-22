@@ -41,25 +41,31 @@
 /* ============================= */
 /* 룰북 오른쪽 초안 뷰어 */
 .rulebook-preview {
-  flex: 2;
-  background: #fff;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-  max-height: 80vh;
-  /* 화면 높이 제한 */
-  line-height: 1.6;
-}
+    flex: 2;
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    max-height: 80vh;
+    line-height: 1.6;
 
+    /* 👇 이 부분을 추가 및 수정합니다. */
+    display: flex;             /* Flexbox 컨테이너로 설정 */
+    flex-direction: column;    /* 자식 요소들을 세로로 정렬 */
+    justify-content: center;   /* 세로 중앙 정렬 */
+    align-items: center;       /* 가로 중앙 정렬 */
+    text-align: center;        /* 내부 텍스트 중앙 정렬 */
+}
 
 /* 기본은 빈 상태 → 격자 */
 .rulebook-preview.empty {
-  background: #fff;
-  background-image:
-    linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
-  background-size: 40px 40px;
+    /* 이 클래스는 배경 이미지를 담당하며, 레이아웃에 영향을 주지 않도록 유지합니다. */
+    background: #fff;
+    background-image:
+        linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
 }
 
 
