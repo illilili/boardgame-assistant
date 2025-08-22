@@ -101,6 +101,8 @@ def _translate_with_openai(
         "OUTPUT LANGUAGE REQUIREMENT:\n"
         f"- You MUST write the final answer ONLY in [{target_language}].\n"
         "- Do NOT include source-language sentences except proper nouns.\n"
+        "- Do NOT include any markers like '====', 'BEGIN/END', or '번역 시작/끝'.\n"
+        "- Output must be CLEAN plain text only.\n"
         "- Preserve headings and list structure, but translate their text as well.\n"
     )
 
@@ -115,9 +117,10 @@ def _translate_with_openai(
         f"5) Target language code: {target_language}\n"
         f"{fb}\n"
         f"{hard_rule}\n"
-        "===== SOURCE BEGIN =====\n"
+        "===== SOURCE TEXT BELOW =====\n"
         f"{source_text}\n"
-        "===== SOURCE END =====\n"
+        "===== END OF SOURCE TEXT =====\n"
+        "\nFINAL OUTPUT (translated text only, no extra markers):\n"
     )
 
     translated_text = call_openai(
@@ -127,13 +130,17 @@ def _translate_with_openai(
         max_tokens=3000,
     )
 
-    # 언어 검증 → 실패 시 1회 재시도(더 강하게)
+    # 후처리: 혹시라도 남은 ====, BEGIN, END 같은 패턴 삭제
+    translated_text = re.sub(r"={2,}.*={2,}", "", translated_text)
+    translated_text = re.sub(r"(BEGIN|END|번역 시작|번역 끝|翻译开始|翻译结束|输出开始|输出结束)", "", translated_text)
+    translated_text = translated_text.strip()
+
+    # 언어 검증 → 실패 시 1회 재시도
     if not _looks_like_lang(translated_text, target_language):
-        retry_prompt = (
-            prompt
-            + "\nIMPORTANT: The previous attempt did not use the target language.\n"
-              "Rewrite the entire output strictly in the target language only.\n"
-              "Do not include any source-language sentences.\n"
+        retry_prompt = prompt + (
+            "\nIMPORTANT: The previous attempt included unwanted markers.\n"
+            "Rewrite the entire output strictly in the target language only,\n"
+            "with NO markers, NO ====, NO BEGIN/END. Just clean translated text.\n"
         )
         translated_text = call_openai(
             retry_prompt,
@@ -141,7 +148,6 @@ def _translate_with_openai(
             temperature=0.1,
             max_tokens=3000,
         )
+        translated_text = re.sub(r"={2,}.*={2,}", "", translated_text).strip()
 
-    # 타입별 결과 구조는 일단 단순 text로 반환
-    t = (content_type or meta.get("type") or "").lower()
     return {"text": translated_text}
