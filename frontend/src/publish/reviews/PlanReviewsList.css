@@ -1,91 +1,170 @@
+/* --- ✨ 디자인 시스템 변수 (ComponentGenerator.css 기반) --- */
+:root {
+  --plan-review-accent: #E58A4E;
+  --plan-review-accent-light: #fef4e8;
+  --plan-review-bg-page: #f6f8fa;
+  --plan-review-bg-card: #ffffff;
+  --plan-review-text-primary: #1f2328;
+  --plan-review-text-secondary: #6e7781;
+  --plan-review-border-color: #d8dee4;
+  --plan-review-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --plan-review-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.15);
+  --plan-review-transition: all 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+}
+
+/* --- ✨ 페이지 레이아웃 --- */
 .plan-reviews-wrapper {
-  padding: 2rem;
+  background-color: var(--plan-review-bg-page);
+  padding: 40px;
   max-width: 900px;
+  min-height: 100vh;
   margin: auto;
+  font-family: 'Pretendard', sans-serif;
 }
 
-.plan-reviews-wrapper h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin: 0 0 0.5rem;
+.plan-reviews-page-header {
+  margin-bottom: 32px;
 }
 
-.plan-reviews-wrapper p {
-  font-size: 0.95rem;
-  color: var(--text-light);
-  margin: 0 0 1.5rem;
+.plan-reviews-page-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--plan-review-text-primary);
+  margin-bottom: 8px;
 }
 
+.plan-reviews-page-header p {
+  font-size: 1rem;
+  color: var(--plan-review-text-secondary);
+}
+
+/* --- ✨ 로딩, 에러, 빈 상태 --- */
+.plan-reviews-state-info {
+  padding: 4rem 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--plan-review-text-secondary);
+}
+.plan-reviews-state-info--error {
+  /* ComponentGenerator의 에러 스타일 적용 */
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 16px;
+  font-weight: 500;
+}
+
+.plan-reviews-empty {
+  background-color: var(--plan-review-bg-card);
+  border: 1px dashed var(--plan-review-border-color);
+  border-radius: 12px;
+  padding: 48px;
+  text-align: center;
+}
+
+.plan-reviews-empty__icon {
+  font-size: 3rem;
+  color: #aeb8c2;
+  margin-bottom: 16px;
+}
+
+.plan-reviews-empty__text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--plan-review-text-secondary);
+}
+
+/* --- ✨ 기획안 목록 --- */
 .plan-reviews-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .plan-reviews-item {
-  background: var(--white);
-  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background: var(--plan-review-bg-card);
+  border: 1px solid var(--plan-review-border-color);
   border-radius: 12px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
+  padding: 24px;
   cursor: pointer;
-  transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  transition: var(--plan-review-transition);
+  box-shadow: var(--plan-review-shadow);
 }
 
-.plan-reviews-item:hover {
-  background: var(--gray-100);
-  box-shadow: var(--shadow-subtle);
-  transform: translateY(-2px);
+.plan-reviews-item:hover, .plan-reviews-item:focus {
+  outline: none;
+  transform: translateY(-4px);
+  box-shadow: var(--plan-review-shadow-lg);
+  border-color: var(--plan-review-accent);
 }
 
-.plan-reviews-header {
+.plan-reviews-item__icon-wrapper {
+  background-color: var(--plan-review-accent-light);
+  color: var(--plan-review-accent);
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.25rem;
+}
+
+.plan-reviews-item__content {
+  flex-grow: 1;
+}
+
+.plan-reviews-item__header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
+  margin-bottom: 4px;
 }
 
-.plan-reviews-header h3 {
+.plan-reviews-item__header h3 {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-dark);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--plan-review-text-primary);
 }
 
-.plan-status-badge {
+.plan-reviews-item__status-badge {
   font-size: 0.75rem;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #3730a3;
+  background: var(--plan-review-bg-page);
+  color: var(--plan-review-text-secondary);
+  border: 1px solid var(--plan-review-border-color);
   font-weight: 600;
   white-space: nowrap;
 }
 
-.plan-reviews-sub {
-  font-size: 0.85rem;
-  color: var(--text-light);
-  margin: 0.3rem 0 0.6rem;
+.plan-reviews-item__sub {
+  font-size: 0.9rem;
+  color: var(--plan-review-text-secondary);
+  margin: 0 0 16px;
 }
 
-.plan-reviews-meta {
+.plan-reviews-item__meta {
   display: flex;
-  gap: 16px;
+  gap: 24px;
   flex-wrap: wrap;
   font-size: 0.85rem;
-  color: #4b5563;
-}
-.plan-reviews-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center; /* start → center */
-  gap: 12px;
+  color: var(--plan-review-text-secondary);
+  padding-top: 12px;
+  border-top: 1px solid var(--plan-review-border-color);
 }
 
-.plan-reviews-sub {
-  font-size: 0.9rem;
-  color: var(--text-light);
-  margin: 0.3rem 0 0.4rem;
-  text-align: left; /* ✅ 항상 왼쪽 정렬 */
+.plan-reviews-item__meta b {
+  color: var(--plan-review-text-primary);
+  font-weight: 600;
 }
