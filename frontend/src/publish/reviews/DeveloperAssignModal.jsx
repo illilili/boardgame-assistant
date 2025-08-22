@@ -45,21 +45,22 @@ const DeveloperAssignModal = ({ project, onClose }) => {
     }
   };
 
+  const selectedOption = developers.find(d => d.userId === selectedDev);
+  const selectValue = selectedOption ? {
+    value: selectedOption.userId,
+    label: `${maskName(selectedOption.name)} (${maskEmail(selectedOption.email)})`
+  } : null;
+
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>{project.projectName} - 개발자 배정</h2>
+        <h2>{project?.projectName || '프로젝트'} - 개발자 배정</h2>
         <Select
           options={developers.map(d => ({
             value: d.userId,
             label: `${maskName(d.name)} (${maskEmail(d.email)})`
           }))}
-          value={developers.find(d => d.userId === selectedDev) 
-            ? {
-                value: selectedDev,
-                label: `${maskName(developers.find(d => d.userId === selectedDev).name)} (${maskEmail(developers.find(d => d.userId === selectedDev).email)})`
-              }
-            : null}
+          value={selectValue}
           onChange={(opt) => setSelectedDev(opt.value)}
           placeholder="개발자 선택..."
           styles={{
