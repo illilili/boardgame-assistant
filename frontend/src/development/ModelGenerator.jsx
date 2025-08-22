@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import './ComponentGenerator.css';   // 카드랑 동일한 레이아웃 CSS 사용
-import './ModelGenerator.css';
+import './ModelGenerator.css'; // ✨ 이 파일 하나만 사용합니다.
 import {
   getModel3DPreview,
   generate3DModel,
@@ -12,6 +11,7 @@ import {
   submitComponent
 } from '../api/development';
 import Select from "react-select";
+import { FiDownload, FiRotateCcw } from 'react-icons/fi';
 
 function ModelGenerator({ contentId, componentId }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -42,29 +42,20 @@ function ModelGenerator({ contentId, componentId }) {
     try {
       const list = await getContentVersions(finalContentId);
       setVersions(list);
-      if (list.length > 0) setSelectedVersion(list[0].versionId);
-    } catch {
-      setError('버전 목록 불러오기 실패');
-    }
+    } catch { setError('버전 목록을 불러오는데 실패했습니다.'); }
   }, [finalContentId]);
 
   const refreshGlbFromDetail = useCallback(async () => {
     if (!finalContentId) return;
     try {
       const detail = await getContentDetail(finalContentId);
-      if (detail?.contentData?.endsWith('.glb')) {
-        setGlbUrl(detail.contentData);
-      } else {
-        setGlbUrl('');
-      }
-    } catch {
-      setError('3D 모델 상세 불러오기 실패');
-    }
+      setGlbUrl(detail?.contentData?.endsWith('.glb') ? detail.contentData : '');
+    } catch { setError('3D 모델 상세 정보를 불러오는데 실패했습니다.'); }
   }, [finalContentId]);
 
   const styleOptions = [
-    { value: "realistic", label: "Realistic(사실적)" },
-    { value: "sculpture", label: "Sculpture(조형적)" },
+    { value: "realistic", label: "Realistic (사실적인 스타일)" },
+    { value: "sculpture", label: "Sculpture (조형물 스타일)" },
   ];
 
   useEffect(() => {
@@ -75,15 +66,12 @@ function ModelGenerator({ contentId, componentId }) {
         if (preview) {
           setName(preview.name || '');
           setDescription(preview.description || '');
-          // setComponentInfo(preview.artConcept || '');
           setTheme(preview.theme || '');
           setStoryline(preview.storyline || '');
         }
         await refreshGlbFromDetail();
         await fetchVersions();
-      } catch {
-        setError('초기 데이터 불러오기 실패');
-      }
+      } catch { setError('초기 데이터를 불러오는데 실패했습니다.'); }
     })();
   }, [finalContentId, fetchVersions, refreshGlbFromDetail]);
 
@@ -158,177 +146,121 @@ function ModelGenerator({ contentId, componentId }) {
       setIsLoading(false);
     }
   };
-
+  
   return (
-    <div className="generator-layout">
-      {/* ------------------- 왼쪽: 입력 및 버전관리 ------------------- */}
-      <div className="generator-form-section">
-        <div className="form-section-header">
+    <div className="model-gen-layout">
+      {/* 왼쪽: 입력 및 버전관리 */}
+      <div className="model-gen-panel model-gen-panel--form">
+        <header className="model-gen-header">
           <h2>3D 모델 생성</h2>
-          <p>모델 정보를 입력하고 GLB 파일을 생성/관리합니다.</p>
-        </div>
+          <p>모델 정보를 입력하고 GLB 파일을 생성 및 관리합니다.</p>
+        </header>
 
-        {/* 입력 폼 */}
-        <div className="card-gen-form">
+        <form className="model-gen-form">
           {!isFromList && (
-            <div className="form-group">
+            <div className="model-gen-form-group">
               <label>콘텐츠 ID</label>
               <input value={manualId} onChange={(e) => setManualId(e.target.value)} />
             </div>
           )}
-          {/* 기본 컨셉 정보 */}
-          <div className="concept-info">
+          <div className="model-gen-concept-info">
             <h3>기본 컨셉 정보</h3>
-            <p><strong>테마:</strong> {theme}</p>
-            <p><strong>스토리라인:</strong> {storyline}</p>
+            <p><strong>테마:</strong> {theme || 'N/A'}</p>
+            <p><strong>스토리라인:</strong> {storyline || 'N/A'}</p>
           </div>
 
-          <div className="form-group">
-            <label>아이템 이름</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} />
+          <div className="model-gen-form-group">
+            <label htmlFor="modelName">아이템 이름</label>
+            <input id="modelName" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-
-          <div className="form-group">
-            <label>설명</label>
-            <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+          <div className="model-gen-form-group">
+            <label htmlFor="modelDesc">설명</label>
+            <textarea id="modelDesc" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
-          <div className="form-group">
-            <label>아트 컨셉 (옵션)</label>
-            <input
-              value={componentInfo}
-              onChange={(e) => setComponentInfo(e.target.value)}
-              placeholder="추가 아트 컨셉 입력"
-            />
+          <div className="model-gen-form-group">
+            <label htmlFor="modelArtConcept">아트 컨셉 (선택)</label>
+            <input id="modelArtConcept" value={componentInfo} onChange={(e) => setComponentInfo(e.target.value)} placeholder="추가적인 아트 컨셉이나 키워드를 입력하세요" />
           </div>
-
-          <div className="form-group">
+          <div className="model-gen-form-group">
             <label>스타일</label>
             <Select
               value={styleOptions.find(opt => opt.value === style)}
               onChange={(selected) => setStyle(selected.value)}
               options={styleOptions}
-              placeholder="스타일 선택"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  borderRadius: "8px",
-                  padding: "2px",
-                  borderColor: "#d1d5db",
-                  boxShadow: "none",
-                  "&:hover": { borderColor: "#E58A4E" },
-                }),
-              }}
+              placeholder="생성할 모델의 스타일을 선택하세요"
+              classNamePrefix="model-gen-select"
             />
           </div>
-        </div>
+        </form>
 
-        {/* 생성 버튼 */}
         {!glbUrl && (
-          <div className="initial-generate-buttons">
-            <button onClick={handleGenerateClick} className="generate-button text-btn">
+          <div className="model-gen-action-group">
+            <button onClick={handleGenerateClick} className="model-gen-button model-gen-button--primary">
               3D 모델 생성하기
             </button>
           </div>
         )}
 
-        {/* 버전관리 */}
         {glbUrl && (
-          <div className="model-version-manager">
+          <div className="model-gen-version-manager">
             <h4>버전 관리</h4>
-
-            {/* 버전 메모 + 저장 버튼 */}
-            <div className="model-version-note">
-              <label>버전 메모:</label>
+            <div className="model-gen-version-group">
               <input
                 value={versionNote}
                 onChange={(e) => setVersionNote(e.target.value)}
-                placeholder="모델 스냅샷"
+                placeholder="버전 메모 (예: 초기 모델)"
               />
-              <button className="save" onClick={handleSaveVersion}>
+              <button className="model-gen-button model-gen-button--secondary" onClick={handleSaveVersion}>
                 버전 저장
               </button>
             </div>
-
-            {/* 버전 선택바 + 롤백 버튼 */}
-            <div className="model-version-select-row">
-              {versions.length > 0 ? (
-                <Select
-                  className="version-select"
-                  classNamePrefix="react-select"
-                  value={selectedVersion}
-                  onChange={(selected) => setSelectedVersion(selected)}
-                  options={versions.map((v) => {
-                    const date = new Date(v.createdAt);
-                    const formattedDate = `${date.getFullYear()}-${String(
-                      date.getMonth() + 1
-                    ).padStart(2, "0")}-${String(date.getDate()).padStart(
-                      2,
-                      "0"
-                    )} ${String(date.getHours()).padStart(2, "0")}:${String(
-                      date.getMinutes()
-                    ).padStart(2, "0")}`;
-
-                    return {
-                      value: v.versionId,
-                      label: `v${v.versionNo} - ${v.note} (${formattedDate})`,
-                    };
-                  })}
-                  placeholder="버전 선택"
-                />
-              ) : (
-                <Select
-                  className="version-select"
-                  classNamePrefix="react-select"
-                  isDisabled
-                  placeholder="저장된 버전 없음"
-                />
-              )}
-
-              {selectedVersion && (
-                <button
-                  className="rollback"
-                  onClick={handleRollbackVersion}
-                  disabled={isLoading}
-                >
-                  롤백
-                </button>
-              )}
+            <div className="model-gen-version-group">
+              <Select
+                className="model-gen-version-select"
+                classNamePrefix="model-gen-select"
+                value={selectedVersion}
+                onChange={(selected) => setSelectedVersion(selected)}
+                options={versions.map(v => ({
+                    value: v.versionId,
+                    label: `v${v.versionNo} - ${v.note} (${new Date(v.createdAt).toLocaleString()})`,
+                }))}
+                placeholder={versions.length > 0 ? "버전 선택" : "저장된 버전 없음"}
+                isDisabled={versions.length === 0}
+              />
+              <button className="model-gen-button model-gen-button--secondary" onClick={handleRollbackVersion} disabled={!selectedVersion}>
+                롤백
+              </button>
             </div>
-
-            {/* 완료/제출 버튼 */}
-            <div className="submit-complete-section">
-              <button onClick={handleComplete}>완료(확정)</button>
-              <button onClick={handleSubmit}>제출</button>
+            
+            <div className="model-gen-final-actions">
+              <button onClick={handleComplete} className="model-gen-button model-gen-button--secondary">완료(확정)</button>
+              <button onClick={handleSubmit} className="model-gen-button model-gen-button--primary">컴포넌트 제출</button>
             </div>
-
-            {message && <p className="upload-message">{message}</p>}
           </div>
         )}
+         {message && <p className="model-gen-status-message">{message}</p>}
       </div>
 
-      {/* ------------------- 오른쪽: 결과 뷰어 ------------------- */}
-      <div className="generator-result-section">
+      {/* 오른쪽: 결과 뷰어 */}
+      <div className="model-gen-panel model-gen-panel--result">
         {isLoading ? (
-          <div className="status-container"><div className="loader"></div><h3>처리 중...</h3></div>
+          <div className="model-gen-status-display"><div className="model-gen-spinner"></div><h3>처리 중...</h3></div>
         ) : error ? (
-          <div className="error-message">{error}</div>
+          <div className="model-gen-status-display model-gen-status-display--error">{error}</div>
         ) : glbUrl ? (
-          <div className="card-result-container">
-            <model-viewer src={glbUrl} alt={name || '3D Model'} auto-rotate camera-controls style={{ width: '100%', height: '500px' }}></model-viewer>
-            <div className="result-actions">
-              <a
-                href={glbUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="glb-download-button"
-              >
-                GLB 다운로드
+          <div className="model-gen-viewer-container">
+            <model-viewer src={glbUrl} alt={name || '3D Model'} auto-rotate camera-controls></model-viewer>
+            <div className="model-gen-viewer-actions">
+              <a href={glbUrl} target="_blank" rel="noreferrer" className="model-gen-button model-gen-button--primary">
+                <FiDownload /> GLB 다운로드
               </a>
-              <button onClick={() => setGlbUrl('')} className="reset-button-bottom">다시 생성</button>
+              <button onClick={() => setGlbUrl('')} className="model-gen-button model-gen-button--secondary">
+                <FiRotateCcw /> 다시 생성
+              </button>
             </div>
           </div>
         ) : (
-          <div className="placeholder-message"><p>아이템 정보를 입력하고 '3D 모델 생성하기' 버튼을 눌러주세요.</p></div>
+          <div className="model-gen-status-display">정보를 입력하고 모델 생성을 시작해주세요.</div>
         )}
       </div>
     </div>

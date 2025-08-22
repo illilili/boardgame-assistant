@@ -1,79 +1,276 @@
-/* --- 모델 버전 관리 영역 --- */
-.model-version-manager {
-  margin-top: 32px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color);
+/* --- ✨ 디자인 시스템 변수 (고유 스코프) --- */
+:root {
+  --model-gen-accent: #E58A4E;
+  --model-gen-accent-dark: #D4753A;
+  --model-gen-text-primary: #1f2328;
+  --model-gen-text-secondary: #6e7781;
+  --model-gen-bg-page: #f6f8fa;
+  --model-gen-bg-panel: #ffffff;
+  --model-gen-border-color: #d8dee4;
+  --model-gen-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --model-gen-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.15);
+  --model-gen-transition: all 0.2s ease-in-out;
 }
 
-.model-version-manager h4 {
-  font-size: 1.25rem;
-  margin-bottom: 20px;
-  color: var(--text-dark);
-}
-
-/* 1️⃣ 버전 메모 + 저장 버튼 */
-.model-version-note {
+/* --- ✨ 전체 레이아웃 --- */
+.model-gen-layout {
   display: flex;
+  gap: 24px;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: var(--model-gen-bg-page);
+  font-family: 'Pretendard', sans-serif;
+}
+
+.model-gen-panel {
+  background-color: var(--model-gen-bg-panel);
+  border: 1px solid var(--model-gen-border-color);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: var(--model-gen-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.model-gen-panel--form {
+  flex: 0 0 450px;
+  overflow-y: auto;
+}
+.model-gen-panel--result {
+  flex: 1;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  background-image:
+    linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* --- ✨ 왼쪽 패널 --- */
+.model-gen-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--model-gen-border-color);
+}
+.model-gen-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--model-gen-text-primary);
+  margin-bottom: 8px;
+}
+.model-gen-header p {
+  font-size: 1rem;
+  color: var(--model-gen-text-secondary);
+}
+
+.model-gen-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.model-gen-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.model-gen-form-group label {
+  font-weight: 600;
+  color: var(--model-gen-text-primary);
+  font-size: 0.875rem;
+}
+.model-gen-form-group input,
+.model-gen-form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1px solid var(--model-gen-border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--model-gen-bg-page);
+  transition: var(--model-gen-transition);
+}
+.model-gen-form-group input:focus,
+.model-gen-form-group textarea:focus {
+  outline: none;
+  border-color: var(--model-gen-accent);
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+  background-color: white;
+}
+.model-gen-form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.model-gen-concept-info {
+  background-color: var(--model-gen-bg-page);
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--model-gen-accent);
+}
+.model-gen-concept-info h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.model-gen-concept-info p {
+  font-size: 0.9rem;
+  color: var(--model-gen-text-secondary);
+  line-height: 1.6;
+}
+.model-gen-concept-info p strong {
+  color: var(--model-gen-text-primary);
+}
+
+/* 버전 관리 */
+.model-gen-version-manager {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--model-gen-border-color);
+}
+.model-gen-version-manager h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
   margin-bottom: 16px;
 }
-
-.model-version-note label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  white-space: nowrap;
+.model-gen-version-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
 }
-
-.model-version-note input {
-  flex: 1;
+.model-gen-version-group input {
+  flex-grow: 1;
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-main);
+  border: 1px solid var(--model-gen-border-color);
+  background-color: var(--model-gen-bg-page);
   font-size: 0.9rem;
 }
-
-.model-version-note button.save {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  background-color: #8896a5;
-  color: #fff;
-  transition: background-color var(--transition-fast);
+.model-gen-version-select {
+  flex-grow: 1;
 }
 
-.model-version-note button.save:hover {
-  background-color: #6B7A8F;
-}
-
-/* 2️⃣ 버전 선택바 + 롤백 버튼 */
-.model-version-select-row {
-  display: flex;
+/* --- ✨ 버튼 --- */
+.model-gen-button {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-}
-.model-version-select-row .version-select {
-  flex: 1; /* ✅ Select 박스 가로 꽉 채우기 */
-}
-
-
-.model-version-select-row .rollback {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  background-color: var(--text-light);
-  color: #fff;
-  transition: background-color var(--transition-fast);
+  transition: var(--model-gen-transition);
+  white-space: nowrap;
+}
+.model-gen-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+.model-gen-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none !important;
 }
 
-.model-version-select-row .rollback:hover {
-  background-color: var(--text-dark);
+.model-gen-button--primary {
+  background: linear-gradient(90deg, var(--model-gen-accent), var(--model-gen-accent-dark));
+  color: white;
+  box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
+}
+.model-gen-button--primary:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(229, 138, 78, 0.3);
+}
+
+.model-gen-button--secondary {
+  background-color: var(--model-gen-bg-page);
+  color: var(--model-gen-text-secondary);
+  border-color: var(--model-gen-border-color);
+}
+.model-gen-button--secondary:hover:not(:disabled) {
+  background-color: #eef1f4;
+  color: var(--model-gen-text-primary);
+  border-color: #c8d1dc;
+}
+
+.model-gen-action-group, .model-gen-final-actions {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--model-gen-border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* --- ✨ 오른쪽 패널 --- */
+.model-gen-status-display {
+  text-align: center;
+  color: var(--model-gen-text-secondary);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.model-gen-status-display--error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 80%;
+}
+.model-gen-spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(229, 138, 78, 0.2);
+  border-top-color: var(--model-gen-accent);
+  border-radius: 50%;
+  animation: model-gen-spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+@keyframes model-gen-spin { to { transform: rotate(360deg); } }
+
+.model-gen-viewer-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.model-gen-viewer-container model-viewer {
+  width: 100%;
+  height: 100%;
+  flex-grow: 1;
+  border: 1px solid var(--model-gen-border-color);
+  border-radius: 8px;
+  background-color: #eef1f4;
+}
+.model-gen-viewer-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}
+.model-gen-status-message {
+  text-align: center;
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+/* --- ✨ react-select 커스텀 --- */
+.model-gen-select__control {
+  padding: 2px;
+  border-color: var(--model-gen-border-color) !important;
+  box-shadow: none !important;
+  transition: var(--model-gen-transition) !important;
+}
+.model-gen-select__control--is-focused {
+  border-color: var(--model-gen-accent) !important;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2) !important;
+}
+.model-gen-select__option--is-focused {
+  background-color: var(--model-gen-accent-light) !important;
+}
+.model-gen-select__option--is-selected {
+  background-color: var(--model-gen-accent) !important;
 }
