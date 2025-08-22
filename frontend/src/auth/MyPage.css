@@ -1,158 +1,282 @@
+/* src/mypage/MyPage.css */
+
+/* ---------------------------------- */
+/* --- 🎨 디자인 시스템 & 전역 설정 --- */
+/* ---------------------------------- */
 :root {
-  --accent-warm: #E58A4E;       /* 메인 포인트 오렌지 */
-  --accent-warm-dark: #D4753A;  /* hover용 진한 오렌지 */
-  --accent-blue: #2c3e50;       /* 링크용 딥블루 */
-  --bg-light: #f6f8fa;          /* 라이트 그레이 배경 */
-  --text-primary: #1f2328;      /* 기본 글자 */
-  --text-secondary: #6e7781;    /* 보조 글자 */
-  --border-color: #d8dee4;
-  --white: #ffffff;
-  --font-main: 'Inter', sans-serif;
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --accent-warm: #E58A4E;
+  --accent-warm-dark: #D4753A;
+  --bg-main: #f6f8fa;
+  --bg-card: #ffffff;
+  --text-primary: #1f2328;
+  --text-secondary: #57606a;
+  --border-color: #d0d7de;
+  --font-primary: 'Inter', sans-serif;
+
+  --spacing-unit: 8px;
+  --border-radius-sm: 6px;
+  --border-radius-md: 12px;
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-medium: 0 8px 24px rgba(140, 149, 159, 0.2);
+  --transition-smooth: 0.2s ease-in-out;
 }
 
-/* 컨테이너 */
-.mypage-container {
-  min-height: 100vh;
-  background-color: var(--bg-light);
+/* -------------------------------- */
+/* --- 🌀 로딩 & 에러 상태 스타일 --- */
+/* -------------------------------- */
+.status-container {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-  padding: 48px 16px;
+  min-height: calc(100vh - 140px);
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--accent-warm-dark);
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.error-container {
+  color: #d73a49;
+  font-weight: 600;
 }
 
-/* 카드 */
-.mypage-card {
-  background-color: var(--white);
-  padding: 32px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 800px;
+
+/* -------------------------- */
+/* --- 🚀 기본 레이아웃 --- */
+/* -------------------------- */
+.mypage-background {
+  background-color: var(--bg-main);
+  padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 2);
 }
 
-/* 제목 */
-.mypage-title {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--accent-warm);
-  margin-bottom: 24px;
+.mypage-layout {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: calc(var(--spacing-unit) * 4);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* -------------------------------- */
+/* --- 👤 왼쪽 프로필 사이드바 --- */
+/* -------------------------------- */
+.mypage-sidebar {
+  position: sticky;
+  top: calc(var(--spacing-unit) * 10);
+  align-self: start;
+}
+
+.sidebar-profile-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: calc(var(--spacing-unit) * 4);
+  /* ✨ flexbox로 변경하여 내부 아이템 정렬 제어 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: calc(var(--spacing-unit) * 3);
+  box-shadow: var(--shadow-subtle);
+}
+
+.profile-avatar {
+  font-size: 80px;
+  color: var(--border-color);
+  margin-bottom: var(--spacing-unit);
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  /* ✨ 아바타와의 간격 조정을 위해 margin-bottom 감소 */
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+/* --- ✨ 프로필 정보 그룹 스타일 --- */
+.profile-info-group {
+    margin-bottom: calc(var(--spacing-unit) * 2);
+    border-top: 1px solid var(--border-color);
+    padding-top: calc(var(--spacing-unit) * 2);
+    /* ✨ 그룹 자체는 가운데, 내부 아이템은 왼쪽 정렬되도록 너비 설정 */
+    width: fit-content; 
+}
+
+.profile-info-item {
+    display: flex;
+    align-items: center;
+    /* ✨ justify-content 제거하여 왼쪽 정렬 유지 */
+    gap: var(--spacing-unit);
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.profile-info-item:not(:last-child) {
+    margin-bottom: calc(var(--spacing-unit)); /* 간격 조정 */
+}
+
+.info-icon {
+    font-size: 0.9rem;
+}
+
+/* --- ✨ 역할(Role) 뱃지 스타일 --- */
+.profile-role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing-unit) / 2);
+    background-color: var(--accent-warm);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+.role-icon {
+    font-size: 0.8rem;
+}
+
+
+/* -------------------------------- */
+/* --- 🧭 사이드바 네비게이션 --- */
+/* -------------------------------- */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-unit);
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-unit);
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background-color var(--transition-smooth);
+}
+
+.sidebar-link:hover {
+  background-color: #e8eaed;
+}
+
+.sidebar-link.active {
+  background-color: var(--accent-warm);
+  color: white;
+}
+
+/* -------------------------------- */
+/* --- 📋 오른쪽 메인 콘텐츠 --- */
+/* -------------------------------- */
+.mypage-main-content {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 4);
+  min-height: 500px;
+}
+
+.mypage-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--spacing-unit);
   border-bottom: 2px solid var(--border-color);
-  padding-bottom: 8px;
-}
-
-/* 로딩/에러 */
-.mypage-loading,
-.mypage-error {
-  text-align: center;
-  font-size: 1rem;
-  padding: 20px;
-}
-.mypage-error {
-  color: red;
-}
-
-/* 섹션 */
-.mypage-section {
-  margin-bottom: 32px;
+  margin-bottom: calc(var(--spacing-unit) * 3);
 }
 
 .mypage-section-title {
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.8rem;
+  font-weight: 800;
   color: var(--text-primary);
-  margin-bottom: 12px;
 }
 
-/* 정보 박스 */
-.mypage-info-box {
-  background-color: var(--bg-light);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px;
-  line-height: 1.6;
-}
-
-/* 프로젝트 리스트 */
-.mypage-project-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.mypage-project-card {
-  background-color: var(--white);
-  border: 1px solid var(--border-color);
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: box-shadow 0.2s ease;
-}
-
-.mypage-project-card:hover {
-  box-shadow: var(--shadow-lg);
-}
-
-/* 프로젝트명 */
-.mypage-project-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--accent-primary);
-  margin-bottom: 4px;
-}
-
-/* 상태 배지 */
-.mypage-status-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-.status-draft {
-  background-color: #fef3c7;
-  color: #92400e;
-}
-.status-active {
-  background-color: #d1fae5;
-  color: #065f46;
-}
-.status-completed {
-  background-color: #e0e7ff;
-  color: #3730a3;
-}
-
-/* 이름 수정 버튼 */
-.mypage-rename-btn {
-  background-color: var(--accent-primary);
-  color: var(--white);
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-}
-.mypage-rename-btn:hover {
-  background-color: var(--accent-secondary);
-}
-
-/* 빈 상태 */
-.mypage-empty-text {
-  color: var(--text-secondary);
+.project-count-badge {
+  background-color: var(--accent-warm);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
   font-size: 0.9rem;
+  font-weight: 600;
 }
 
-.mypage-project-card.clickable {
-  cursor: pointer;
-  transition: box-shadow 0.2s ease, transform 0.1s ease;
+/* -------------------------------- */
+/* --- 📭 빈 프로젝트 상태 --- */
+/* -------------------------------- */
+.mypage-empty-state {
+    text-align: center;
+    padding: calc(var(--spacing-unit) * 8) 0;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
 }
 
-.mypage-project-card.clickable:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+.create-project-button {
+    margin-top: calc(var(--spacing-unit) * 2);
+    background-color: var(--accent-warm);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: background-color var(--transition-smooth);
+}
+
+.create-project-button:hover {
+    background-color: var(--accent-warm-dark);
+}
+
+/* ---------------------------------- */
+/* --- 📱 반응형 디자인 --- */
+/* ---------------------------------- */
+@media (max-width: 992px) {
+  .mypage-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mypage-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 576px) {
+  .mypage-background {
+    padding: var(--spacing-unit) 0;
+  }
+  .mypage-layout {
+    gap: 0;
+  }
+  .mypage-main-content, .sidebar-profile-card {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  .mypage-main-content {
+      padding: var(--spacing-unit) var(--spacing-unit) * 2;
+  }
+}
+
+/* ProjectListPage.css 와의 호환성을 위한 스타일 */
+.project-list-page__card-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 var(--spacing-unit);
 }

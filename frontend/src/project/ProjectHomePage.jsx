@@ -8,6 +8,20 @@ import './ProjectHomePage.css';
 
 const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/%EC%95%84%EC%B9%B4%EC%9E%90.png';
 
+const maskName = (name) => {
+  if (typeof name !== 'string' || name.length <= 1) {
+    return name; // 이름이 문자열이 아니거나 한 글자 이하면 그대로 반환
+  }
+  
+  if (name.length === 2) {
+    return name[0] + '*'; // 이름이 두 글자면 '길*' 형식으로 반환
+  }
+  
+  // 이름이 세 글자 이상이면 첫 글자와 마지막 글자만 빼고 마스킹
+  const middle = '*'.repeat(name.length - 2);
+  return name[0] + middle + name[name.length - 1];
+};
+
 const ProjectHomePage = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();

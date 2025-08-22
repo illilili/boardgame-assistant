@@ -1,7 +1,7 @@
 :root {
-  --accent-warm: #E58A4E;       /* 로그인과 동일 */
-  --accent-warm-dark: #D4753A;  /* 로그인과 동일 */
-  --accent-blue: #2c3e50;       /* 하단 링크용 */
+  --accent-warm: #E58A4E;
+  --accent-warm-dark: #D4753A;
+  --accent-blue: #2c3e50;
   --bg-light: #f6f8fa;
   --text-primary: #1f2328;
   --text-secondary: #6e7781;
@@ -11,7 +11,6 @@
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* 전체 레이아웃 */
 html, body {
   height: 100%;
   margin: 0;
@@ -26,7 +25,6 @@ body {
   background-color: var(--bg-light);
 }
 
-/* 메인 컨텐츠 */
 .signup-container {
   flex: 1;
   display: flex;
@@ -34,29 +32,66 @@ body {
   align-items: center;
   background-color: var(--bg-light);
   padding: 40px 16px;
+  /* --- 🎨 스타일 추가 --- */
+  position: relative;
+  overflow: hidden;
 }
 
-/* 카드 */
+/* --- 🎨 배경 애니메이션 요소 추가 --- */
+.signup-container::before,
+.signup-container::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0.15;
+  filter: blur(50px);
+  animation: moveAndFloat 25s linear infinite;
+}
+
+.signup-container::before {
+  width: 400px;
+  height: 400px;
+  background: var(--accent-warm);
+  top: -150px;
+  left: -150px;
+}
+
+.signup-container::after {
+  width: 500px;
+  height: 500px;
+  background: var(--accent-blue);
+  bottom: -200px;
+  right: -200px;
+  animation-duration: 30s;
+}
+/* --- 🎨 여기까지 추가된 부분 --- */
+
+
 .signup-card {
-  background-color: var(--white);
+  /* --- 🎨 스타일 수정 --- */
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  z-index: 1;
+  /* --- 🎨 여기까지 수정된 부분 --- */
+
   padding: 32px;
-  border-radius: 12px;
   box-shadow: var(--shadow-lg);
   max-width: 400px;
   width: 100%;
   animation: fadeIn 0.4s ease-in-out;
 }
 
-/* 제목 */
 .signup-title {
   font-size: 1.8rem;
   font-weight: 800;
   text-align: center;
-  color: var(--accent-warm); /* 로그인과 동일 */
+  color: var(--accent-warm);
   margin-bottom: 24px;
 }
 
-/* 에러 메시지 */
 .error-message {
   background-color: #fef2f2;
   color: #991b1b;
@@ -67,42 +102,39 @@ body {
   border: 1px solid #fca5a5;
 }
 
-/* 입력 필드 */
 .signup-input {
-  display: block;            /* ✅ inline 요소 차단 */
-  width: 100%;               /* ✅ 카드 너비에 맞게 꽉 차게 */
+  display: block;
+  width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.95rem;
-  margin-bottom: 14px;       /* ✅ 아래 여백 일정 */
+  margin-bottom: 14px;
   background-color: var(--bg-light);
-  box-sizing: border-box;    /* ✅ padding 포함 정렬 */
+  box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .signup-input:focus {
   outline: none;
   border-color: var(--accent-warm);
-  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2); /* 로그인과 동일 */
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
   background-color: white;
 }
 
-/* 안내 텍스트 */
 .input-hint {
   font-size: 0.8rem;
   color: var(--text-secondary);
   margin-bottom: 8px;
+  margin-top: -8px; /* 입력 필드와 간격 조정 */
 }
 
-/* 비밀번호 확인 상태 */
 .password-match {
   font-size: 0.85rem;
   margin-top: -4px;
   margin-bottom: 8px;
 }
 
-/* 약관 동의 */
 .terms-label {
   display: flex;
   align-items: center;
@@ -115,19 +147,18 @@ body {
 .terms-button {
   background: none;
   border: none;
-  color: var(--accent-warm); /* 로그인 버튼 색상과 통일 */
+  color: var(--accent-warm);
   font-size: 0.85rem;
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
 }
 
-/* 버튼 */
 .signup-button {
   all: unset;
   display: block;
   width: 100%;
-  background: linear-gradient(90deg, var(--accent-warm), var(--accent-warm-dark)); /* 로그인과 동일 */
+  background: linear-gradient(90deg, var(--accent-warm), var(--accent-warm-dark));
   color: var(--white);
   padding: 12px 0;
   font-size: 1rem;
@@ -150,7 +181,6 @@ body {
   transform: none;
 }
 
-/* 하단 링크 */
 .signup-footer {
   text-align: center;
   margin-top: 16px;
@@ -159,7 +189,7 @@ body {
 }
 
 .signup-footer a {
-  color: var(--accent-blue); /* 로그인과 동일 */
+  color: var(--accent-blue);
   font-weight: 600;
   text-decoration: none;
 }
@@ -168,7 +198,16 @@ body {
   text-decoration: underline;
 }
 
-/* 애니메이션 */
+/* --- 🎨 배경 애니메이션 키프레임 추가 --- */
+@keyframes moveAndFloat {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(30px) translateX(20px) rotate(20deg);
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
