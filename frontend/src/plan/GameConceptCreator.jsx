@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
-import './GameConceptCreator.css'; 
-import { generateConcept, regenerateConcept, getAllConcepts } from '../api/auth'; 
+// 1. React에서 useRef를 추가로 import 합니다.
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import './GameConceptCreator.css';
+import { generateConcept, regenerateConcept, getAllConcepts } from '../api/auth';
 import { ProjectContext } from '../contexts/ProjectContext';
 
 const GameConceptCreator = () => {
@@ -17,7 +18,34 @@ const GameConceptCreator = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isInitialState, setIsInitialState] = useState(true);
-    
+
+    // 2. 페이지 첫 로드 시 데이터를 복원했는지 추적하기 위한 ref를 추가합니다.
+    const restoredOnLoad = useRef(false);
+
+    // 3. (새로 추가) concept 데이터가 변경될 때마다 sessionStorage에 자동으로 저장합니다.
+    useEffect(() => {
+        if (concept) {
+            sessionStorage.setItem('gcc_last_concept', JSON.stringify(concept));
+        }
+    }, [concept]);
+
+    // 4. (새로 추가) 페이지에 처음 들어왔을 때 sessionStorage에서 데이터를 불러옵니다.
+    useEffect(() => {
+        const savedConceptJSON = sessionStorage.getItem('gcc_last_concept');
+        if (savedConceptJSON) {
+            try {
+                const savedConcept = JSON.parse(savedConceptJSON);
+                setConcept(savedConcept);
+                setIsInitialState(false);
+                restoredOnLoad.current = true; // 데이터를 복원했다고 표시합니다.
+            } catch (e) {
+                console.error("저장된 컨셉을 불러오는 데 실패했습니다:", e);
+                sessionStorage.removeItem('gcc_last_concept');
+            }
+        }
+    }, []); // []는 이 코드가 단 한 번, 첫 렌더링 시에만 실행되게 합니다.
+
+    // 5. 기존 useEffect 로직을 수정합니다.
     useEffect(() => {
         if (activeTab === 'regenerate' && projectId) {
             const fetchListForDropdown = async () => {
@@ -42,8 +70,17 @@ const GameConceptCreator = () => {
             };
             fetchListForDropdown();
         } else {
-             setConcept(null);
-             setIsInitialState(true);
+            // '새로 만들기' 탭 로직입니다.
+            // 페이지 첫 로드 시 데이터를 복원한 경우에는 아래 코드를 실행하지 않고 건너뜁니다.
+            if (restoredOnLoad.current) {
+                restoredOnLoad.current = false; // 다음 탭 클릭부터는 정상 작동하도록 플래그를 리셋합니다.
+                return;
+            }
+            
+            // 사용자가 직접 '새로 만들기' 탭을 클릭한 경우, 기존처럼 컨셉을 초기화합니다.
+            setConcept(null);
+            setIsInitialState(true);
+            sessionStorage.removeItem('gcc_last_concept');
         }
     }, [activeTab, projectId]);
 
@@ -80,7 +117,7 @@ const GameConceptCreator = () => {
             setError('재생성할 컨셉과 피드백을 모두 입력해주세요.');
             return;
         }
-        
+
         const selectedConceptId = parseInt(selectedConceptInfo.split(',')[0], 10);
         const originalConceptData = regenerateConceptList.find(c => c.conceptId === selectedConceptId);
 
@@ -114,12 +151,12 @@ const GameConceptCreator = () => {
         const conceptToPreview = regenerateConceptList.find(c => c.conceptId === selectedConceptId);
 
         if (conceptToPreview) {
-            setConcept(conceptToPreview); 
+            setConcept(conceptToPreview);
             setIsInitialState(false);
             setError(null);
         }
     };
-    
+
     return (
         <div className="gcc__container">
             <div className="gcc__form-column">
@@ -214,7 +251,14 @@ const GameConceptCreator = () => {
                             <span><strong>난이도:</strong> {concept.averageWeight.toFixed(1)}</span>
                         </div>
                         <div className="gcc__concept-section"><h4>핵심 아이디어</h4><p>{concept.ideaText}</p></div>
-                        <div className="gcc__concept-section"><h4>주요 메커니즘</h4><p>{concept.mechanics}</p></div>
+                        <div className="gcc__concept-section">
+                            <h4>주요 메커니즘</h4>
+                            <div className="gcc__mechanics-list">
+                                {concept.mechanics && (concept.mechanics.match(/\d+\..*?(?=\d+\.|$)/gs) || [concept.mechanics]).map((mechanic, index) => (
+                                    <p key={index}>{mechanic.trim()}</p>
+                                ))}
+                            </div>
+                        </div>
                         <div className="gcc__concept-section"><h4>배경 스토리</h4><p>{concept.storyline}</p></div>
                         <div className="gcc__card-footer">생성 시간: {new Date(concept.createdAt).toLocaleString('ko-KR')}</div>
                     </div>
