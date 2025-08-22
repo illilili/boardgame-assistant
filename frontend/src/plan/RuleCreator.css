@@ -279,7 +279,7 @@
 }
 
 /* --- 공용 상태 표시 (로딩, 에러, 초기화면) --- */
-.initial-state, .loading-state {
+.initial-states, .loading-state {
     text-align: center;
     color: var(--text-light);
     padding: 32px;
