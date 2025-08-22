@@ -62,7 +62,7 @@ const MyPage = () => {
                                 <div className="mypage__info-item">
                                     <FaEnvelope className="mypage__info-icon" />
                                     <span>{userData.email}</span>
-                                जिस    </div>
+                                </div>
                                 <div className="mypage__info-item">
                                     <FaBuilding className="mypage__info-icon" />
                                     <span>{userData.company || '회사 정보 미입력'}</span>

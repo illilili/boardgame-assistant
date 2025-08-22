@@ -1,144 +1,221 @@
+/* ComponentReviewDetail.css (Goal.css 스타일 시스템 기반으로 개선) */
+
+/* --- ✨ 디자인 시스템 변수 (일관성 유지) --- */
+:root {
+  --accent-warm: #E58A4E;     /* ✨ 승인 (주황) */
+  --accent-warm-dark: #D4753A;
+  --accent-neutral: #2D3748;  /* ✨ 반려 (어두운 회색) */
+  --accent-neutral-dark: #1A202C;
+  --accent-negative: #e5484d; /* 에러 (빨강) */
+  --text-dark: #1f2328;
+  --text-light: #6e7781;
+  --bg-main: #f6f8fa;
+  --bg-card: #ffffff;
+  --border-color: #d8dee4;
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-medium: 0 8px 24px rgba(140, 149, 159, 0.15);
+  --transition-fast: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+}
+
+/* --- ✨ 애니메이션 --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- ✨ 전체 레이아웃 --- */
 .review-detail-container {
-  padding: 2rem;
+  padding: 32px;
   max-width: 900px;
-  margin: auto;
-  background: #fff;
+  margin: 32px auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-medium);
+  animation: fadeIn 0.5s ease-out;
 }
 
 .detail-title {
   text-align: center;
-  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 24px;
 }
 
-.section-title {
-  margin: 1.5rem 0 1rem;
-  font-size: 1.3rem;
-  font-weight: 700;       /* ✅ 더 굵게 */
+.detail-header h3 {
   text-align: center;
-  color: #111;            /* ✅ 더 진한 색 */
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.detail-header {
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
+/* --- ✨ 콘텐츠 목록 --- */
 .item-list {
   list-style: none;
   padding: 0;
+  margin-top: 32px;
 }
 
 .item-row {
-  margin-bottom: 1.5rem;
+  margin-bottom: 32px;
   text-align: center;
 }
 
+/* 콘텐츠 타입 태그 (개선된 색상 팔레트) */
 .comp-type {
   display: inline-block;
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
+  padding: 4px 10px;
+  border-radius: 16px; /* 둥근 알약 모양 */
   font-size: 0.8rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 12px;
+  border: 1px solid transparent;
 }
 
-.comp-type.card { background: #fff3e0; color: #e65100; }
-.comp-type.rulebook, .comp-type.document { background: #ede7f6; color: #4527a0; }
-.comp-type.token, .comp-type.model, .comp-type.pawn, .comp-type.dice { background: #f1f8e9; color: #33691e; }
-.comp-type.image, .comp-type.thumbnail { background: #fce4ec; color: #ad1457; }
-.comp-type.text { background: #e3f2fd; color: #1565c0; }
+.comp-type.image { background-color: #fce4ec; color: #ad1457; border-color: #f8bbd0; }
+.comp-type.text { background-color: #e3f2fd; color: #1565c0; border-color: #bbdefb; }
+.comp-type.pdf { background-color: #fff3e0; color: #e65100; border-color: #ffe0b2; }
+.comp-type.model { background-color: #ede7f6; color: #4527a0; border-color: #d1c4e9; }
 
-.content-preview img {
-  max-width: 400px;
+
+/* 콘텐츠 미리보기 */
+.content-preview img, .content-preview model-viewer, .content-preview iframe {
+  max-width: 100%;
+  width: 500px; /* 고정 너비 지정 */
   margin: auto;
   display: block;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-subtle);
 }
 
 .content-text {
-  max-width: 400px;      
-  margin: 1rem auto;      
-  background: #f5f5f5;
-  padding: 0.8rem 1rem;   
-  border-radius: 6px;
-  text-align: center;     
-  white-space: pre-wrap;  
-  word-break: break-word; 
-  line-height: 1.4;
+  max-width: 500px;
+  margin: 1rem auto;
+  background: var(--bg-main);
+  padding: 16px 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  color: var(--text-dark);
 }
 
+/* --- ✨ 반려 사유 입력 및 버튼 --- */
 .reject-textarea {
   width: 100%;
-  margin-top: 1.5rem;
-  padding: 0.5rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  resize: none;
+  margin-top: 24px;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  background-color: #f6f8fa;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.reject-textarea:focus {
+  outline: none;
+  border-color: var(--accent-warm);
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+  background-color: white;
 }
 
 .action-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 1rem;
+  align-items: center;
+  margin-top: 24px;
 }
 
 .left-buttons {
   display: flex;
-  gap: 0.8rem;
+  gap: 12px;
 }
 
-.approve-btn {
-  background: #4CAF50;
-  color: white;
-  padding: 0.7rem 1.2rem;
+/* 공통 버튼 스타일 */
+.approve-btn, .reject-btn, .back-btn {
+  padding: 10px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-}
-.approve-btn:disabled {
-  background: #A5D6A7;
-  cursor: not-allowed;
+  transition: all var(--transition-fast);
 }
 
-.reject-btn {
-  background: #f44336;
-  color: white;
-  padding: 0.7rem 1.2rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.approve-btn:hover, .reject-btn:hover, .back-btn:hover {
+  transform: translateY(-2px);
 }
-.reject-btn:disabled {
-  background: #9ca3af; /* Tailwind gray-400 느낌 */
-  color: #f5f5f5;      /* 글자는 연한 흰색 */
-  cursor: not-allowed;
-  transform: none;
+
+/* 개별 버튼 스타일 */
+.approve-btn { /* ✨ 변경된 부분 */
+  background-color: var(--accent-warm);
+  color: white;
+  box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
+}
+.approve-btn:hover { /* ✨ 변경된 부분 */
+  background-color: var(--accent-warm-dark);
+  box-shadow: 0 6px 20px rgba(229, 138, 78, 0.3);
+}
+
+.reject-btn { /* ✨ 변경된 부분 */
+  background-color: var(--accent-neutral);
+  color: white;
+  box-shadow: 0 4px 15px rgba(45, 55, 72, 0.2);
+}
+.reject-btn:hover { /* ✨ 변경된 부분 */
+  background-color: var(--accent-neutral-dark);
+  box-shadow: 0 6px 20px rgba(45, 55, 72, 0.3);
 }
 
 .back-btn {
-  background: #e0e0e0;
-  color: #333;
-  padding: 0.7rem 1.2rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  background: none;
+  color: var(--text-light);
+  border: 1px solid var(--border-color);
+}
+.back-btn:hover {
+  background: var(--bg-main);
+  color: var(--text-dark);
+  border-color: #c8d1dc;
 }
 
+/* 비활성화 버튼 스타일 */
+.approve-btn:disabled, .reject-btn:disabled {
+  background: #e0e0e0;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  color: #a0a0a0;
+}
+
+
+/* --- ✨ 상태 메시지 --- */
 .status-message {
-  margin: 1rem 0;
-  padding: 0.6rem;
-  border-radius: 6px;
+  margin-bottom: 24px;
+  padding: 12px;
+  border-radius: 8px;
   font-weight: 600;
   text-align: center;
+  border: 1px solid transparent;
 }
-.status-message.success {
-  background: #e8f5e9;
-  color: #2e7d32;
+
+.status-message.success { /* ✨ 변경된 부분 */
+  background: #fff4e8;
+  color: #c25a1f;
+  border-color: #ffe0b2;
 }
+
 .status-message.error {
   background: #ffebee;
   color: #c62828;
+  border-color: #ef9a9a;
 }

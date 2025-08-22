@@ -3,15 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { getAllProjects } from '../api/project';
 import Header from '../mainPage/Header';
 import Footer from '../mainPage/Footer';
-import { FaPlus } from 'react-icons/fa'; // 아이콘 추가
+import { FaPlus } from 'react-icons/fa';
 import './ProjectListPage.css';
 
 const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/%EC%95%84%EC%B9%B4%EC%9E%90.png';
 
 const ProjectListPage = () => {
     const [projects, setProjects] = useState([]);
-    const [loading, setLoading] = useState(true); // ✨ 로딩 상태 추가
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -23,7 +24,7 @@ const ProjectListPage = () => {
                 console.error('프로젝트 목록 불러오기 실패:', err);
                 setError('프로젝트 목록을 불러오는 데 실패했습니다.');
             } finally {
-                setLoading(false); // ✨ 데이터 로드 완료 후 로딩 상태 변경
+                setLoading(false);
             }
         };
         fetchProjects();
@@ -36,6 +37,10 @@ const ProjectListPage = () => {
     const handleCreateClick = () => {
         navigate('/project/create');
     };
+
+    const filteredProjects = projects.filter(p =>
+        filterStatus === 'all' || p.status.toLowerCase() === filterStatus
+    );
 
     return (
         <>
@@ -54,8 +59,30 @@ const ProjectListPage = () => {
 
                 {error && <p className="project-list-page__error">{error}</p>}
 
+                <div className="project-list-page__filter-bar">
+                    <button
+                        className={`filter-button ${filterStatus === 'all' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('all')}>
+                        모두 보기
+                    </button>
+                    <button
+                        className={`filter-button ${filterStatus === 'planning' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('planning')}>
+                        기획중
+                    </button>
+                    <button
+                        className={`filter-button ${filterStatus === 'development' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('development')}>
+                        개발중
+                    </button>
+                    <button
+                        className={`filter-button ${filterStatus === 'completed' ? 'active' : ''}`}
+                        onClick={() => setFilterStatus('completed')}>
+                        완료됨
+                    </button>
+                </div>
+
                 {loading ? (
-                    // ✨ 로딩 중일 때 스켈레톤 UI 표시
                     <div className="project-list-page__grid">
                         {Array.from({ length: 8 }).map((_, index) => (
                             <div key={index} className="project-list-page__card skeleton">
@@ -66,9 +93,9 @@ const ProjectListPage = () => {
                         ))}
                     </div>
                 ) : (
-                    <div className="project-list-page__grid">
-                        {projects.length > 0 ? (
-                            projects.map((p) => (
+                    <div className={`project-list-page__grid ${filterStatus === 'completed' ? 'completed-view' : ''}`}>
+                        {filteredProjects.length > 0 ? (
+                            filteredProjects.map((p) => (
                                 <div
                                     key={p.projectId}
                                     className="project-list-page__card"
