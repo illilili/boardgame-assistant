@@ -1,230 +1,265 @@
-/* ===== 공통 컨테이너 ===== */
-.trans__container {
-  display: flex;
-  gap: 20px;
-  width: 100%;
-  height: calc(100vh - 120px); /* 상단 헤더 고려 */
-  box-sizing: border-box;
+/* --- ✨ 디자인 시스템 변수 --- */
+:root {
+  --trans-accent: #E58A4E;
+  --trans-accent-dark: #D4753A;
+  --trans-accent-light: #fef4e8;
+  --trans-bg-page: #f6f8fa;
+  --trans-bg-panel: #ffffff;
+  --trans-text-primary: #1f2328;
+  --trans-text-secondary: #6e7781;
+  --trans-border-color: #d8dee4;
+  --trans-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --trans-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.15);
+  --trans-transition: all 0.2s cubic-bezier(0.3, 0, 0.5, 1);
 }
 
-/* ===== 레이아웃 ===== */
-.trans__left-panel,
-.trans__right-panel {
-  background-color: #fff;
-  border: 1px solid #d8dee4;
+/* --- ✨ 전체 레이아웃 --- */
+.trans-page-layout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  height: calc(100vh - 120px);
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: var(--trans-bg-page);
+  font-family: 'Pretendard', sans-serif;
+}
+
+.trans-panel {
+  background-color: var(--trans-bg-panel);
+  border: 1px solid var(--trans-border-color);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: var(--trans-shadow);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;       /* 내부 스크롤 */
+  overflow-y: auto;
   max-height: 100%;
 }
 
-/* 우측 패널: 번역 결과 */
-.trans__right-panel {
-  flex: 2;              /* ✅ 항상 오른쪽으로 넓게 차지 */
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 20px;
-  min-height: 500px;
-
-  display: flex;         /* 비었을 때 중앙정렬을 위해 flex */
-  flex-direction: column;
-}
-
-/* 기본 (rulebook 아닌 경우) 왼쪽 폭 400px */
-.trans__left-panel {
+.trans-panel--left {
   flex: 0 0 440px;
 }
-
-/* 룰북일 때는 좌우 반반 */
-.trans__container.rulebook-layout .trans__left-panel,
-.trans__container.rulebook-layout .trans__right-panel {
+.trans-panel--right {
+  flex: 1;
+}
+.trans-page-layout--rulebook .trans-panel--left,
+.trans-page-layout--rulebook .trans-panel--right {
   flex: 1;
 }
 
-/* ===== 헤더 스타일 ===== */
-.trans__right-panel h2,
-.trans__left-panel h2 {
+.trans-panel__header {
   margin-bottom: 16px;
-  border-bottom: 3px solid var(--accent-blue); /* 🔵 남색 밑줄 */
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--trans-border-color);
+}
+.trans-panel__header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--trans-text-primary);
 }
 
-.trans__subtitle {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 12px;
-}
-
-
-/* ===== 원문 영역 ===== */
-.trans__original {
+/* --- ✨ 왼쪽 패널: 원문 & 요청 --- */
+.trans-original-content {
   margin-bottom: 24px;
+  background-color: var(--trans-bg-page);
+  border: 1px solid var(--trans-border-color);
+  border-radius: 8px;
   padding: 16px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background-color: #fafafa;
 }
-
-/* ===== PDF 뷰어 ===== */
-.trans__pdf-viewer {
-  width: 100%;
-  height: 70vh;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-/* ===== 언어 선택 체크박스 ===== */
-.trans__options {
-  text-align: center; /* 가운데 정렬 */
-}
-
-.trans__options label {
-  display: block;
-  margin-bottom: 8px;
+.trans-original-content h3 {
+  font-size: 0.875rem;
   font-weight: 600;
+  color: var(--trans-text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.trans-original-content__text {
+  line-height: 1.6;
+  color: var(--trans-text-primary);
+  white-space: pre-wrap;
 }
 
-.trans__checkbox-group {
+.trans-pdf-viewer {
+  width: 100%;
+  height: 60vh;
+  border: 1px solid var(--trans-border-color);
+  border-radius: 8px;
+}
+
+.trans-request-section {
+  margin-top: auto; /* 하단에 고정 */
+  padding-top: 24px;
+  border-top: 1px solid var(--trans-border-color);
+}
+.trans-request-section__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--trans-text-secondary);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.trans-lang-selector {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* 가운데 정렬 */
-  gap: 12px;
+  justify-content: center;
+  gap: 8px;
   margin-bottom: 16px;
 }
-
-.trans__checkbox {
-  cursor: pointer;
-}
-
-.trans__checkbox input {
-  display: none; /* 기본 체크박스 숨김 */
-}
-
-.trans__checkbox span {
-  display: inline-block;
+.trans-lang-selector__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 8px 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  border: 1px solid var(--trans-border-color);
+  border-radius: 20px;
+  background-color: var(--trans-bg-panel);
+  color: var(--trans-text-secondary);
   font-weight: 600;
-  background: #fff;
-  color: #222;
-  transition: all 0.2s ease;
+  cursor: pointer;
+  transition: var(--trans-transition);
 }
-
-.trans__checkbox span:hover {
-  background: #f3f3f3;
+.trans-lang-selector__tag:hover {
+  background-color: var(--trans-bg-page);
+  color: var(--trans-text-primary);
 }
-
-/* ✅ 선택된 경우 → 버튼 전체 색상 변경 */
-.trans__checkbox input:checked + span {
-  background: var(--accent-blue);
+.trans-lang-selector__tag--selected {
+  background-color: var(--trans-accent);
   color: white;
-  border-color: var(--accent-blue);
+  border-color: var(--trans-accent);
 }
 
-/* ===== 번역 요청 버튼 ===== */
-.trans__options button {
-  display: block;
-  margin: 0 auto;   /* 가운데 정렬 */
-  padding: 12px 20px;
-  background: var(--accent-warm); /* 🟠 주황 */
+.trans-request-button {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--trans-accent);
   color: white;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: var(--trans-transition);
+  box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
+}
+.trans-request-button:hover:not(:disabled) {
+  background-color: var(--trans-accent-dark);
+  transform: translateY(-2px);
+}
+.trans-request-button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
-.trans__options button:hover {
-  background: #d97706;
-}
-
-/* ===== 번역 카드 ===== */
-.trans__results {
+/* --- ✨ 오른쪽 패널: 결과 --- */
+.trans-results-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 20px;
 }
-
-.trans__result-card {
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 12px;
+.trans-result-card {
+  background: var(--trans-bg-panel);
+  border: 1px solid var(--trans-border-color);
+  border-radius: 8px;
+  transition: var(--trans-transition);
+}
+.trans-result-card:hover {
+  border-color: #c8d1dc;
+  box-shadow: var(--trans-shadow);
+}
+.trans-result-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  transition: all 0.3s ease;
-  animation: fadeIn 0.3s ease-in-out;
+  cursor: pointer;
 }
-
-.trans__result-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.trans__lang {
+.trans-result-card__lang {
   font-size: 1rem;
-  font-weight: 600;
-  color: var(--accent-warm, #E58A4E);
+  font-weight: 700;
+  color: var(--trans-accent-dark);
+}
+.trans-result-card__chevron {
+  color: var(--trans-text-secondary);
+  transition: transform 0.2s ease-in-out;
+}
+.trans-result-card__chevron--expanded {
+  transform: rotate(180deg);
 }
 
-.trans__text {
+.trans-result-card__body {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--trans-border-color);
+}
+.trans-result-card__text {
   font-size: 0.95rem;
-  line-height: 1.6;
-  color: var(--text-dark, #333);
+  line-height: 1.7;
+  color: var(--trans-text-primary);
   white-space: pre-wrap;
+  word-break: break-word;
 }
 
-.trans__result-main.clickable {
-  cursor: pointer;
+/* 피드백 폼 */
+.trans-feedback-form {
+  padding: 16px;
+  background-color: var(--trans-bg-page);
+  border-top: 1px solid var(--trans-border-color);
+  border-radius: 0 0 8px 8px;
 }
-
-.trans__result-main:hover {
-  background: #fafafa;
-}
-
-/* ===== 재요청 박스 ===== */
-.trans__feedback-box {
-  margin-top: 12px;
-  padding: 12px;
-  border-top: 1px solid #ddd;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.trans__feedback-box textarea {
+.trans-feedback-form textarea {
   width: 100%;
-  min-height: 40px;
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color, #ccc);
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1px solid var(--trans-border-color);
+  border-radius: 6px;
   resize: vertical;
-  font-size: 0.9rem;
+  min-height: 60px;
+  margin-bottom: 8px;
 }
-
-.trans__feedback-box button {
-  margin-top: 8px;
-  background-color: #f59e0b;
+.trans-feedback-form button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: var(--trans-text-secondary);
   color: white;
-  padding: 6px 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
+  transition: var(--trans-transition);
+}
+.trans-feedback-form button:hover:not(:disabled) {
+  background-color: var(--trans-text-primary);
 }
 
-.trans__feedback-box button:hover {
-  background-color: #d97706;
+/* --- ✨ 플레이스홀더 및 상태 메시지 --- */
+.trans-placeholder {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--trans-text-secondary);
 }
-
-/* ===== 애니메이션 ===== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+.trans-placeholder svg {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+.trans-placeholder p {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.trans-status-message {
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.trans-status-message--error {
+  background-color: #fef2f2;
+  color: #991b1b;
 }

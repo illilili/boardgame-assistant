@@ -171,7 +171,7 @@
 }
 
 .dev-assign-action-button:hover {
-  background: #D4753A;
+  background: var(--assign-accent-dark);
   transform: translateY(-2px);
 }
 

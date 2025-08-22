@@ -4,11 +4,12 @@ import DeveloperAssignModal from './DeveloperAssignModal';
 import './DeveloperAssignList.css';
 
 // 필터링할 상태 정의
-const STATUS_FILTERS = ['ALL', 'PLANNING', 'DEVELOPMENT', 'COMPLETED', 'REVIEW_PENDING'];
+const STATUS_FILTERS = ['ALL', 'PLANNING', 'DEVELOPMENT', 'PUBLISHING', 'COMPLETED', 'REVIEW_PENDING'];
 const STATUS_KO = {
   ALL: '전체',
   PLANNING: '기획',
   DEVELOPMENT: '개발',
+  PUBLISHING: '출시',
   COMPLETED: '완료',
   REVIEW_PENDING: '검토 대기',
 };
