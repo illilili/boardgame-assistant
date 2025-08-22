@@ -154,3 +154,18 @@ export const generateCardImage = (cardData) => request('/api/content/generate-im
     method: 'POST',
     body: JSON.stringify(cardData),
 });
+
+/**
+ * [신규] 기획안 저작권 검사 실행
+ */
+export const checkPlanCopyright = (planId, summaryText) =>
+    request('/api/copyright/check', {
+        method: 'POST',
+        body: JSON.stringify({ planId, summaryText }),
+    });
+
+/**
+ * [신규] 저장된 저작권 검사 결과 조회
+ */
+export const getPlanCopyrightResult = (planId) =>
+    request(`/api/copyright/${planId}`);

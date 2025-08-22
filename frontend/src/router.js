@@ -10,17 +10,16 @@ import Login from './auth/Login';
 import SignUp from './auth/SignUp';
 import MyPage from './auth/Mypage';
 import ProjectRenamePage from './plan/ProjectRenamePage';
-import PlanReview from './publish/PlanReview';
-import TranslationWrapper from './publish/TranslationWrapper';
+import ReviewsHome from './publish/reviews/ReviewsHome';
 
 import Publish from './publish/Publish';
 import ProjectListPage from './project/ProjectListPage';
 import ProjectHomePage from './project/ProjectHomePage';
-import AdminUserManagePage from './admin/UserManagePage'
+import AdminHomePage from './admin/AdminHomePage'
 import DevelopmentWrapper from './development/DevelopmentWrapper';
-import PendingReviewPage from './publish/PendingReviewPage';
-import ReviewDetailPage from './publish/ReviewDetailPage';
-import AssignDeveloperPage from './publish/AssignDeveloperPage';
+import TrendAnalysisHome from './trendAnalysis/TrendAnalysisHome';
+import LiveTop50Analysis from './trendAnalysis/LiveTop50Analysis';
+import OriginalGameAnalysis from './trendAnalysis/OriginalGameAnalysis';
 
 
 const router = createBrowserRouter([
@@ -42,7 +41,7 @@ const router = createBrowserRouter([
   {
     id: 3,
     path: '/footer',
-    elment: <Footer />
+    element: <Footer />
   },
   {
     id: 4,
@@ -82,7 +81,7 @@ const router = createBrowserRouter([
   {
     id: 11,
     path: '/plan-review',
-    element: <PendingReviewPage />
+    element: <ReviewsHome />
   },
   {
     id: 12,
@@ -102,17 +101,32 @@ const router = createBrowserRouter([
   {
     id: 15,
     path: '/user-manage',
-    element: <AdminUserManagePage />
+    element: <AdminHomePage />
+  },
+  // {
+  //   id: 16,
+  //   path: '/review/:planId',
+  //   element: <ReviewDetailPage />
+  // },
+  // {
+  //   id: 17,// 3. 개발자 배정 페이지 (승인 후 이동)
+  //   path: '/assign-developer/:projectId',
+  //   element: <AssignDeveloperPage />
+  // },
+  {
+    id: 18,
+    path: '/trend',
+    element: <TrendAnalysisHome />
   },
   {
-    id: 16,
-    path: '/review/:planId',
-    element: <ReviewDetailPage />
+    id: 19,
+    path: '/trend/live-top50',
+    element: <LiveTop50Analysis />
   },
   {
-    id: 17,// 3. 개발자 배정 페이지 (승인 후 이동)
-    path: '/assign-developer/:projectId',
-    element: <AssignDeveloperPage />
+    id: 20,
+    path: '/trend/original',
+    element: <OriginalGameAnalysis />
   },
 
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { logout } from '../api/auth.js';
 
 const Header = ({ projectMode = false }) => {
@@ -19,7 +19,7 @@ const Header = ({ projectMode = false }) => {
     e.preventDefault();
     try {
       const result = await logout();
-      alert(result.message);
+      alert(result?.message || "로그아웃 되었습니다.");
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('role');
@@ -34,32 +34,32 @@ const Header = ({ projectMode = false }) => {
 
   return (
     <header className={projectMode ? 'project-header' : 'minimalist-header'}>
-      <Link
+      <NavLink
         to="/"
         className={projectMode ? 'logo-project' : 'logo-minimalist'}
       >
         BOARD.CO
-      </Link>
+      </NavLink>
 
       <nav className={projectMode ? 'project-nav' : 'main-nav'}>
         {!isLoggedIn && (
           <>
-            <Link to="/login">로그인</Link>
-            <Link to="/signup">회원가입</Link>
+            <NavLink to="/login">로그인</NavLink>
+            <NavLink to="/signup">회원가입</NavLink>
           </>
         )}
 
         {isLoggedIn && (
           <>
-            <Link to="/trend">트렌드분석</Link>
-            <Link to="/projects">프로젝트</Link>
-            <Link to="/mypage">마이페이지</Link>
+            <NavLink to="/trend">트렌드분석</NavLink>
+            <NavLink to="/projects">프로젝트</NavLink>
+            <NavLink to="/mypage">마이페이지</NavLink>
 
             {role && role.toUpperCase().includes('ADMIN') && (
-              <Link to="/user-manage">회원관리</Link>
+              <NavLink to="/user-manage">관리자 페이지</NavLink>
             )}
             {role === 'PUBLISHER' && (
-              <Link to="/plan-review">승인관리</Link>
+              <NavLink to="/plan-review">승인관리</NavLink>
             )}
 
             <a href="/" onClick={handleLogout}>로그아웃</a>

@@ -1,0 +1,105 @@
+/* 번역 대기 목록 전체 컨테이너 */
+.translation-list {
+  animation: fadeIn 0.5s ease-in-out;
+  background-color: #ffffff;
+  padding: 32px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
+}
+
+.translation-list h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+/* --- 목록 헤더 스타일 --- */
+.translation-list-header {
+  display: flex;
+  padding: 0.75rem 1.5rem;
+  background-color: #343f49;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+/* --- 목록(ul) 및 항목(li) 스타일 --- */
+.translation-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.translation-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.translation-list-item:first-child {
+  border-top: none;
+}
+
+.translation-list-item:hover {
+  background-color: #f9fafb;
+}
+
+/* --- 컬럼 스타일 --- */
+.translation-list-item span {
+  font-size: 0.95rem;
+  font-weight: 600;
+  /* ✅ 글자를 두껍게 */
+}
+
+.translation-list-item .status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+  min-width: 70px;
+  text-align: center;
+}
+
+/* ID 컬럼만 주황색 */
+.translation-list-item span.id-col {
+  color: var(--accent-warm, #E58A4E); /* 주황 */
+  font-weight: 700; /* 조금 더 두껍게 */
+}
+
+/* --- 타입 뱃지 공통 --- */
+.type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 70px;
+  text-align: center;
+  color: #fff;
+}
+
+/* 카드 = 파랑, 룰북 = 주황 */
+.type-card {
+  background-color: #424c5b;
+  /* 파랑 */
+}
+
+/* 혹시 모르는 기본값 */
+.type-default {
+  background-color: #787878;
+  /* 회색 */
+}

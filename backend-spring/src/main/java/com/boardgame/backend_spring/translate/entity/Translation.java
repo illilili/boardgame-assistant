@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -40,6 +42,7 @@ public class Translation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Content content;
 
     @Column(name = "target_language", nullable = false, length = 32)

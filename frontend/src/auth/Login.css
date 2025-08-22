@@ -1,106 +1,122 @@
 :root {
-  --accent-primary: #ea580c;
-  --accent-secondary: #f97316;
-  --bg-light: #f9fafb;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --border-color: #e5e7eb;
+  --accent-warm: #E58A4E;
+  --accent-warm-dark: #D4753A;
+  --accent-blue: #2c3e50;
+  --bg-light: #f6f8fa;
+  --text-primary: #1f2328;
+  --text-secondary: #6e7781;
+  --border-color: #d8dee4;
   --white: #ffffff;
   --font-main: 'Inter', sans-serif;
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 전체 레이아웃 */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  font-family: var(--font-main);
-  background-color: var(--bg-light);
-  margin: 0;
-}
-
-/* 로그인 컨테이너 */
-.login-container {
-  min-height: 100vh;
-  background-color: var(--bg-light);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 48px 16px;
+  min-height: 100vh;
 }
 
-/* 카드 형태 */
+/* 메인 컨텐츠 */
+.main-content {
+  flex: 1; /* ✅ 남은 공간 채움 */
+  display: flex;
+  justify-content: center;
+  align-items: center; /* ✅ 세로 중앙 */
+  background-color: var(--bg-light);
+  padding: 20px;
+}
+
+/* login-page: 헤더/푸터 제외한 화면 높이 채우기 */
+.login-page {
+  min-height: calc(100vh - 240px); /* 헤더+푸터 합친 예상 높이만큼 빼줌 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-light);
+  padding: 20px;
+}
+
+/* 로그인 카드 */
 .login-card {
   background-color: var(--white);
   padding: 32px;
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
-  max-width: 400px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: 380px;
   animation: fadeIn 0.4s ease-in-out;
 }
 
-/* 제목 */
 .login-title {
-  font-size: 1.8rem;
-  font-weight: 800;
+  font-size: 1.6rem;
+  font-weight: 700;
   text-align: center;
-  color: var(--accent-primary);
-  margin-bottom: 24px;
+  color: var(--accent-warm);
+  margin-bottom: 20px;
 }
 
-/* 에러 메시지 */
 .error-message {
-  background-color: #fee2e2;
-  color: #b91c1c;
+  background-color: #fef2f2;
+  color: #991b1b;
   font-size: 0.9rem;
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 16px;
+  border: 1px solid #fca5a5;
 }
 
-/* 입력 필드 */
 .login-input {
   width: 100%;
-  box-sizing: border-box; /* padding 포함 폭 고정 */
+  box-sizing: border-box;
   padding: 10px 14px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.95rem;
   margin-bottom: 12px;
+  background-color: var(--bg-light);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .login-input:focus {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+  border-color: var(--accent-warm);
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+  background-color: white;
 }
 
-/* 버튼 */
 .login-button {
-  width: 100%;               /* 입력창과 동일 폭 */
-  box-sizing: border-box;    /* padding 포함 폭 고정 */
-  background-color: var(--accent-primary);
-  color: var(--white);
+  width: 100%;
+  background: linear-gradient(90deg, var(--accent-warm), var(--accent-warm-dark));
+  color: white;
   padding: 12px 0;
   font-size: 1rem;
   font-weight: 600;
   text-align: center;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
   border: none;
+  transition: all 0.2s ease;
 }
 
 .login-button:hover {
-  background-color: var(--accent-secondary);
-  transform: translateY(-1px);
+  background: linear-gradient(90deg, var(--accent-warm-dark), var(--accent-warm));
+  transform: translateY(-2px);
 }
 
 .login-button:disabled {
   background-color: #d1d5db;
   cursor: not-allowed;
+  transform: none;
 }
 
-/* 하단 링크 */
 .login-footer {
   text-align: center;
   margin-top: 16px;
@@ -109,7 +125,7 @@ body {
 }
 
 .login-footer a {
-  color: var(--accent-primary);
+  color: var(--accent-blue);
   font-weight: 600;
   text-decoration: none;
 }
@@ -118,14 +134,7 @@ body {
   text-decoration: underline;
 }
 
-/* 애니메이션 */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

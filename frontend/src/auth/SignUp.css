@@ -1,42 +1,49 @@
-/* SignUp.css (Orange Theme) */
 :root {
-  --accent-primary: #ea580c; /* 진한 주황 */
-  --accent-secondary: #f97316; /* 밝은 주황 */
-  --bg-light: #f9fafb; /* 페이지 배경 */
-  --text-primary: #111827; /* 진한 글씨 */
-  --text-secondary: #6b7280; /* 부드러운 회색 */
-  --border-color: #e5e7eb;
+  --accent-warm: #E58A4E;       /* 로그인과 동일 */
+  --accent-warm-dark: #D4753A;  /* 로그인과 동일 */
+  --accent-blue: #2c3e50;       /* 하단 링크용 */
+  --bg-light: #f6f8fa;
+  --text-primary: #1f2328;
+  --text-secondary: #6e7781;
+  --border-color: #d8dee4;
   --white: #ffffff;
   --font-main: 'Inter', sans-serif;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 전체 레이아웃 */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  font-family: var(--font-main);
-  background-color: var(--bg-light);
-  margin: 0;
-}
-
-/* 회원가입 컨테이너 */
-.signup-container {
-  min-height: 100vh;
-  background-color: var(--bg-light);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 48px 16px;
+  min-height: 100vh;
+  font-family: var(--font-main);
+  background-color: var(--bg-light);
 }
 
-/* 카드 형태 */
+/* 메인 컨텐츠 */
+.signup-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-light);
+  padding: 40px 16px;
+}
+
+/* 카드 */
 .signup-card {
   background-color: var(--white);
   padding: 32px;
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
   max-width: 400px;
-  margin: 0 auto;
+  width: 100%;
   animation: fadeIn 0.4s ease-in-out;
 }
 
@@ -45,35 +52,40 @@ body {
   font-size: 1.8rem;
   font-weight: 800;
   text-align: center;
-  color: var(--accent-primary);
+  color: var(--accent-warm); /* 로그인과 동일 */
   margin-bottom: 24px;
 }
 
 /* 에러 메시지 */
 .error-message {
-  background-color: #fee2e2;
-  color: #b91c1c;
+  background-color: #fef2f2;
+  color: #991b1b;
   font-size: 0.9rem;
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 16px;
+  border: 1px solid #fca5a5;
 }
 
 /* 입력 필드 */
 .signup-input {
-  width: 100%;
-  padding: 10px 14px;
+  display: block;            /* ✅ inline 요소 차단 */
+  width: 100%;               /* ✅ 카드 너비에 맞게 꽉 차게 */
+  padding: 12px 14px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.95rem;
-  margin-bottom: 12px;
+  margin-bottom: 14px;       /* ✅ 아래 여백 일정 */
+  background-color: var(--bg-light);
+  box-sizing: border-box;    /* ✅ padding 포함 정렬 */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .signup-input:focus {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+  border-color: var(--accent-warm);
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2); /* 로그인과 동일 */
+  background-color: white;
 }
 
 /* 안내 텍스트 */
@@ -103,7 +115,7 @@ body {
 .terms-button {
   background: none;
   border: none;
-  color: var(--accent-secondary);
+  color: var(--accent-warm); /* 로그인 버튼 색상과 통일 */
   font-size: 0.85rem;
   text-decoration: underline;
   cursor: pointer;
@@ -112,26 +124,30 @@ body {
 
 /* 버튼 */
 .signup-button {
+  all: unset;
+  display: block;
   width: 100%;
-  background-color: var(--accent-primary);
+  background: linear-gradient(90deg, var(--accent-warm), var(--accent-warm-dark)); /* 로그인과 동일 */
   color: var(--white);
   padding: 12px 0;
   font-size: 1rem;
   font-weight: 600;
-  border: none;
+  text-align: center;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .signup-button:hover {
-  background-color: var(--accent-secondary);
-  transform: translateY(-1px);
+  background: linear-gradient(90deg, var(--accent-warm-dark), var(--accent-warm));
+  transform: translateY(-2px);
 }
 
 .signup-button:disabled {
   background-color: #d1d5db;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* 하단 링크 */
@@ -143,7 +159,7 @@ body {
 }
 
 .signup-footer a {
-  color: var(--accent-primary);
+  color: var(--accent-blue); /* 로그인과 동일 */
   font-weight: 600;
   text-decoration: none;
 }
@@ -152,42 +168,8 @@ body {
   text-decoration: underline;
 }
 
-.signup-button {
-  all: unset; /* 브라우저 기본 스타일 제거 */
-  display: block;
-  width: 100%;
-  background-color: var(--accent-primary); /* 주황색 */
-  color: var(--white);
-  padding: 12px 0;
-  font-size: 1rem;
-  font-weight: 600;
-  text-align: center;
-  border-radius: 8px;
-  cursor: pointer;
-  box-sizing: border-box;
-  transition: background-color 0.2s ease, transform 0.15s ease;
-}
-
-.signup-button:hover {
-  background-color: var(--accent-secondary); /* hover 시 밝은 주황 */
-  transform: translateY(-1px);
-}
-
-.signup-button:disabled {
-  background-color: #d1d5db;
-  cursor: not-allowed;
-}
-
-/* 등장 애니메이션 */
+/* 애니메이션 */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.time.LocalDateTime;
 
 /**
@@ -29,6 +32,7 @@ public class ContentVersion {
     /** 어떤 콘텐츠의 버전인지 */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Content content; // ← 필드명을 content로 변경(원래 contentId였음)
 
     /** 1,2,3 ... */

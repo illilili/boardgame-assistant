@@ -3,6 +3,8 @@ package com.boardgame.backend_spring.copyright.entity;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +23,7 @@ public class Copyright {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Plan plan;
 
     @Column(name = "risk_level", nullable = false)

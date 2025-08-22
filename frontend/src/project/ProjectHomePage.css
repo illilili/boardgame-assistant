@@ -15,16 +15,18 @@
 /* --- ✨ 고유 클래스 이름을 사용한 전체 레이아웃 --- */
 .project-home-page__container {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 280px 1fr;
     background-color: var(--bg-main);
     min-height: calc(100vh - 70px);
     font-family: var(--font-main);
 }
 
 .project-home-page__sidebar {
+  width: 280px;
     background-color: #161b22;
     color: #c9d1d9;
     padding: 24px 0;
+    box-sizing: border-box;
 }
 
 .project-home-page__nav-list {
@@ -50,11 +52,11 @@
 .project-home-page__main-content {
     padding: 32px 48px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 3fr 2fr; /* ✅ 기존 1fr 1fr → 3:2 비율 */
     grid-template-rows: auto 1fr;
     grid-template-areas:
         "header header"
-        "members logs";
+        "members logs"; /* ✅ 최근작업 왼쪽(넓게), 멤버 오른쪽(좁게) */
     gap: 32px;
     align-content: start;
 }
@@ -79,6 +81,11 @@
     margin: 0 0 10px 0;
 }
 
+.project-home-page__info {
+  flex: 1;       /* 남는 공간 전부 차지 */
+  min-width: 0;  /* flex item 잘림 방지 */
+}
+
 .project-home-page__description {
     font-size: 1.1rem;
     color: var(--text-light);
@@ -90,12 +97,11 @@
 }
 
 .project-home-page__thumbnail {
-    width: 280px;
-    height: 180px;
-    border-radius: 8px;
+    width: 340px;   /* 280 → 320 */
+    height: 240px;  /* 180 → 200 */
+    border-radius: 10px;
     object-fit: cover;
 }
-
 .project-home-page__status-badge {
     padding: 6px 12px;
     font-size: 0.8rem;
@@ -199,8 +205,13 @@
     gap: 16px;
 }
 
-.project-home-page__modal-content h3 { font-size: 1.5rem; margin: 0 0 8px 0; }
-.project-home-page__modal-content input, .project-home-page__modal-content textarea {
+.project-home-page__modal-content h3 {
+    font-size: 1.5rem;
+    margin: 0 0 8px 0;
+}
+
+.project-home-page__modal-content input,
+.project-home-page__modal-content textarea {
     width: 100%;
     padding: 12px 16px;
     border-radius: 8px;

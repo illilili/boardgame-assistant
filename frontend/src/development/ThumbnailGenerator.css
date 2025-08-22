@@ -1,98 +1,23 @@
-/* ThumbnailGenerator.css */
-
-/* --- 상태 표시 컨테이너 (로딩) --- */
-.status-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-    text-align: center;
-}
-.status-container h3 { font-size: 1.5rem; color: var(--text-primary); margin-top: 1.5rem; margin-bottom: 0.5rem; }
-.status-container p { color: var(--text-secondary); max-width: 400px; }
-
-/* --- 결과 표시 컨테이너 --- */
-.thumbnail-result-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    animation: fadeIn 0.5s ease-in-out;
-}
-.thumbnail-result-container h3 {
-    font-size: 1.5rem;
-    color: #166534; /* Success Green */
-    margin: 0 0 2rem 0;
-    text-align: center;
+/* --- 썸네일 전용 입력폼 --- */
+.thumbnail-concept .form-group input,
+.thumbnail-concept .form-group textarea {
+  background-color: #fff; /* ✅ 흰색으로 변경 */
+  border: 1px solid var(--border-color);
 }
 
-/* 썸네일 이미지 */
-.thumbnail-image-wrapper {
-    max-width: 600px;
-    width: 100%;
-    margin-bottom: 1.5rem;
+.thumbnail-concept .form-group textarea {
+  min-height: 150px; /* ✅ 높이 늘리기 (기본 80px → 150px) */
+  resize: vertical;  /* ✅ 유저가 드래그로도 조절 가능 */
 }
+
+/* 썸네일 결과 이미지 크기 제한 */
 .thumbnail-image {
-    width: 100%;
-    height: auto;
-    border-radius: 12px;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border-color);
+  max-width: 100%;   /* 부모 영역 너비를 넘지 않음 */
+  max-height: 600px; /* 필요시 세로도 제한 */
+  height: auto;
+  width: auto;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-medium);
+  object-fit: contain; /* 비율 유지하면서 박스 안에 맞춤 */
 }
-
-/* 썸네일 정보 및 다운로드 */
-.thumbnail-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 600px;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-}
-.thumbnail-info span {
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-.download-button {
-    background: var(--accent-primary);
-    color: var(--white);
-    text-decoration: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: background-color 0.2s;
-}
-.download-button:hover {
-    background-color: #4338ca;
-}
-
-.reset-button-bottom {
-    background-color: var(--white);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-    padding: 0.8rem 2rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.reset-button-bottom:hover {
-    background-color: #f9fafb;
-    border-color: #d1d5db;
-}
-
-/* --- 기존 스타일 재활용 --- */
-.source-data-preview { margin-top: 2rem; padding: 1.5rem; background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; }
-.source-data-preview h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem; color: var(--text-primary); }
-.source-data-preview p { font-size: 1rem; line-height: 1.6; color: var(--text-secondary); }
-.source-data-preview p strong { color: var(--text-primary); }
-.generate-button-container { text-align: center; margin-top: 2rem; }
-.generate-button { background: var(--accent-primary); color: var(--white); border: none; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s ease-in-out; box-shadow: var(--shadow-md); }
-
-.loader { border: 5px solid #f3f3f3; border-top: 5px solid var(--accent-primary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

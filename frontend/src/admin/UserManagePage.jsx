@@ -1,103 +1,142 @@
-import React, { useEffect, useState } from 'react';
+// src/admin/UserManagePage.jsx
+import React, { useEffect, useState, useCallback } from 'react';
 import { fetchAllUsers, unlockUser, assignRole } from '../api/admin';
+import { useNavigate } from 'react-router-dom';
+import './UserManagePage.css';
 
-const AdminUserManagePage = ({ token }) => {
+const AdminUserManagePage = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  
-  const loadUsers = async () => {
+  const token = localStorage.getItem('accessToken');
+
+  const loadUsers = useCallback(async () => {
     try {
-    // console.log(localStorage.getItem('accessToken')); 토큰 가져오기
       const response = await fetchAllUsers();
       setUsers(response.data);
     } catch (error) {
       console.error('유저 불러오기 실패:', error);
+      alert('사용자 목록을 불러오는 데 실패했습니다. 다시 로그인해주세요.');
+      navigate('/login');
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
 
   useEffect(() => {
+    if (!token) {
+      alert('관리자 권한이 필요합니다. 로그인 페이지로 이동합니다.');
+      setLoading(false);
+      navigate('/login');
+      return;
+    }
     loadUsers();
-  }, []);
+  }, [token, loadUsers, navigate]);
 
   const handleUnlock = async (email) => {
     try {
       await unlockUser(email, token);
       alert(`${email} 계정이 잠금 해제되었습니다.`);
-      loadUsers(); // 해제 후 목록 리프레시
+      loadUsers();
     } catch (error) {
       console.error('잠금 해제 실패:', error);
+      alert('계정 잠금 해제에 실패했습니다.');
     }
   };
 
-  //역할배정
   const handleAssignRole = async (userId, newRole) => {
-  if (!newRole) return alert("역할을 선택해주세요!");
+    if (!newRole) return alert("역할을 선택해주세요!");
+    try {
+      const res = await assignRole(userId, newRole);
+      alert(res.data.message);
+      loadUsers();
+    } catch (error) {
+      console.error('역할 부여 실패:', error);
+      alert(error.response?.data?.message || "역할 부여에 실패했습니다.");
+    }
+  };
 
-  try {
-    const res = await assignRole(userId, newRole);
-    alert(res.data.message); // 백엔드 메시지 출력!
-    loadUsers(); // 역할 변경 후 목록 새로고침
-  } catch (error) {
-    console.error('역할 부여 실패:', error);
-    alert(error.response?.data?.message || "역할 부여에 실패했습니다. 다시 시도해주세요."); //
+  // 이름: 가운데 한 글자만 * 처리
+  const maskName = (name) => {
+    if (!name) return "-";
+    if (name.length === 2) return name[0] + "*";
+    if (name.length > 2) {
+      return name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
+    }
+    return name;
+  };
+
+  // 이메일: @ 앞 두 글자만 보이게 처리
+  const maskEmail = (email) => {
+    if (!email) return "-";
+    const [local, domain] = email.split("@");
+    if (!domain) return email;
+    const visible = local.slice(0, 2);
+    const hiddenCount = Math.max(0, local.length - 2);
+    return `${visible}${"*".repeat(hiddenCount)}@${domain}`;
+  };
+
+  if (loading) {
+    return <div className="admin-loading">로딩 중...</div>;
   }
-    };
 
   return (
-    <div>
-      <h2>관리자 유저 관리</h2>
-      {loading ? (
-        <p>로딩 중...</p>
-      ) : (
-        <table border="1">
-          <thead>
-            <tr>
-                <th>이메일</th>
-                <th>아이디</th>
-                <th>상태</th>
-                <th>잠금 해제</th>
-                <th>역할 부여</th>
+    <main className="admin-page__container">
+      <h2 className="admin-page__title">유저 관리</h2>
+      <table className="admin-page__table">
+        <thead>
+          <tr>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>상태</th>
+            <th>잠금 해제</th>
+            <th>역할 부여</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((u) => (
+            <tr key={u.userId}>
+              <td>{u.userId}</td>
+              <td>{maskName(u.name)}</td>
+              <td>{maskEmail(u.email)}</td>
+              <td>
+                <span
+                  className={`status-badge ${u.accountLocked ? 'status-locked' : 'status-normal'}`}
+                >
+                  {u.accountLocked ? '잠김' : '정상'}
+                </span>
+              </td>
+              <td>
+                {u.accountLocked && (
+                  <button
+                    onClick={() => handleUnlock(u.email)}
+                    className="admin-btn admin-btn--unlock"
+                  >
+                    Unlock
+                  </button>
+                )}
+              </td>
+              <td>
+                <select
+                  defaultValue={u.role}
+                  onChange={(e) => handleAssignRole(u.userId, e.target.value)}
+                  className="admin-select"
+                  disabled={u.role === 'ADMIN'}
+                >
+                  {u.role === "ADMIN" && <option value="ADMIN">ADMIN</option>}
+                  <option value="USER">USER</option>
+                  <option value="PLANNER">PLANNER</option>
+                  <option value="DEVELOPER">DEVELOPER</option>
+                  <option value="PUBLISHER">PUBLISHER</option>
+                </select>
+              </td>
             </tr>
-            </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.userId}>
-                <td>{u.email}</td>
-                <td>{u.userId}</td>
-                <td>{u.accountLocked ? '잠김' : '정상'}</td>
-                
-                {/* 잠금여부 */}
-                <td>
-                  {u.accountLocked && (
-                    <button onClick={() => handleUnlock(u.email)}>Unlock</button>
-                  )}
-                </td>
-                
-                {/* 유저권한 */}
-                <td>
-                    <select
-                    defaultValue={u.role} // 현재 유저의 역할이 기본값으로 보이도록 설정
-                    onChange={(e) => handleAssignRole(u.userId, e.target.value)}
-                    >
-                        {/* 관리자의 경우 표시는 하기 위해 이렇게 작성함(선택란에 admin이 없기때문에  disabled로 구성) */}
-                        {u.role === "ADMIN" && ( <option value="ADMIN" disabled> ADMIN </option>)}
-                        {/* 관리자는 선택에서 빼버림 */}
-                        <option value="USER">USER</option>
-                        <option value="PLANNER">PLANNER</option>
-                        <option value="DEVELOPER">DEVELOPER</option>
-                        <option value="PUBLISHER">PUBLISHER</option>
-                        
-                    </select>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+          ))}
+        </tbody>
+      </table>
+    </main>
   );
 };
 

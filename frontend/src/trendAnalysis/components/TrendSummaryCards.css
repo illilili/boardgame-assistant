@@ -1,0 +1,297 @@
+/* 실시간 트렌드 요약 카드 스타일 - Plan 디자인 시스템 적용 */
+.trend-summary-cards {
+  margin: 2rem 0;
+  position: relative;
+  z-index: 2;
+}
+
+.trend-summary-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  background: var(--white, #ffffff);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.trend-summary-header .section-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text-primary, #111827);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
+}
+
+.trend-summary-header .section-subtitle {
+  font-size: 1rem;
+  color: var(--text-primary, #374151);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* 트렌드 카드 그리드 */
+.trend-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* 개별 트렌드 카드 - Plan 스타일 */
+.trend-card {
+  background: var(--white, #ffffff);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  border: 1px solid var(--border-color, #e5e7eb);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.trend-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.15);
+  border-color: var(--accent-warm, #E58A4E);
+}
+
+/* 카드 아이콘 - 깔끔하게 */
+.card-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  color: var(--accent-warm, #E58A4E);
+}
+
+/* 카드 콘텐츠 */
+.card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary, #1f2937);
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.card-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #4b5563);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.card-description {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* 카드별 색상 테마 - Plan 스타일로 통일 */
+.complexity-card {
+  background: var(--white, #ffffff);
+  border-left: 4px solid var(--accent-warm, #E58A4E);
+}
+
+.complexity-card .card-icon {
+  color: var(--accent-warm, #E58A4E);
+}
+
+.players-card {
+  background: var(--white, #ffffff);
+  border-left: 4px solid #B8713A;
+}
+
+.players-card .card-icon {
+  color: #B8713A;
+}
+
+.genre-card {
+  background: var(--white, #ffffff);
+  border-left: 4px solid #8F5A2B;
+}
+
+.genre-card .card-icon {
+  color: #8F5A2B;
+}
+
+.mechanic-card {
+  background: var(--white, #ffffff);
+  border-left: 4px solid #D69E2E;
+}
+
+.mechanic-card .card-icon {
+  color: #D69E2E;
+}
+
+/* 추가 통계 - Plan 스타일 */
+.trend-summary-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1.5rem;
+  background: var(--white, #ffffff);
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
+  margin-top: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+}
+
+/* 로딩 상태 - Plan 스타일 */
+.loading-card {
+  background: var(--white, #ffffff);
+  animation: pulse 2s ease-in-out infinite;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color, #e5e7eb);
+}
+
+.loading-shimmer {
+  width: 80%;
+  height: 60%;
+  background: linear-gradient(90deg, var(--border-color, #e5e7eb) 25%, #d1d5db 50%, var(--border-color, #e5e7eb) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 8px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.9; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* TOP3 리스트 스타일 */
+.card-value-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.card-value-list li {
+  margin-bottom: 0.25rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(229, 138, 78, 0.1);
+}
+
+.card-value-list li:last-child {
+  border-bottom: none;
+}
+
+/* 카드 값 아이템 (랭킹 + 텍스트) */
+.card-value-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+/* 랭킹 번호 스타일 - 깔끔하고 현대적으로 */
+.rank-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  background: var(--accent-warm, #E58A4E);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 50%;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* 장르/메카닉 이름 */
+.genre-name,
+.mechanic-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+  line-height: 1.3;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .trend-summary-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  
+  .trend-card {
+    padding: 1.25rem;
+    gap: 0.75rem;
+  }
+  
+  .card-icon {
+    font-size: 2rem;
+  }
+  
+  .card-value {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .trend-summary-header {
+    padding: 1.5rem;
+  }
+  
+  .trend-summary-header .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .trend-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .trend-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  
+  .trend-summary-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

@@ -21,8 +21,9 @@ public class ComponentSubmitService {
         Component comp = componentRepository.findById(componentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 컴포넌트입니다."));
 
-        if (comp.getStatus() != ComponentStatus.READY_TO_SUBMIT) {
-            throw new IllegalStateException("모든 콘텐츠가 완료되어 제출 가능한 상태(READY_TO_SUBMIT)여야 합니다.");
+        if (comp.getStatus() != ComponentStatus.READY_TO_SUBMIT
+                && comp.getStatus() != ComponentStatus.REJECTED) {
+            throw new IllegalStateException("제출 가능한 상태(READY_TO_SUBMIT or REJECTED)가 아닙니다.");
         }
         comp.setStatus(ComponentStatus.PENDING_REVIEW);
         componentRepository.save(comp);

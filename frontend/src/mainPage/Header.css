@@ -32,18 +32,25 @@
 }
 
 .main-nav a:hover {
-  color: #ea580c; /* 민트 대신 주황 */
+  color: #ea580c; /* hover 시 주황 */
 }
+
+/* ✅ 현재 페이지 활성화 */
+.main-nav a.active {
+  color: #E58A4E;   /* 강조 주황 */
+  font-weight: 700;
+}
+
 
 /* ===== 프로젝트 내부 전용 헤더 ===== */
 .project-header {
-  background-color: var(--bg-dark); /* 사이드바와 동일 */
+  background-color: var(--bg-dark);
   color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px 32px;
-  border-bottom: none
+  border-bottom: none;
 }
 
 .logo-project {
@@ -68,5 +75,11 @@
 }
 
 .project-nav a:hover {
-  color: var(--accent-primary); /* 주황 hover */
+  color: var(--accent-warm); /* hover 시 따뜻한 주황 */
+}
+
+/* ✅ 현재 페이지 활성화 */
+.project-nav a.active {
+  color: var(--accent-warm-dark); /* 강조된 따뜻한 주황 */
+  font-weight: 700;
 }
