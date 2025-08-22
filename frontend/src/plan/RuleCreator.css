@@ -1,5 +1,3 @@
-/* RuleCreator.css (전문가 버전 - 사용자 친화적 UI) */
-
 /* --- ✨ 디자인 시스템 변수 (일관성 유지) --- */
 :root {
     --accent-warm: #E58A4E;
@@ -58,6 +56,7 @@
     align-items: center;
     justify-content: center;
     padding: 0;
+    position: relative; /* 로딩 오버레이를 위해 추가 */
     background-image:
         linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
         linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
@@ -258,11 +257,10 @@
     top: -4px;
 }
 
-/* --- ✨ 턴 순서 목록 스타일 (신규 추가) --- */
 .turn-structure-list {
     display: flex;
     flex-direction: column;
-    gap: 12px; /* 항목 간 간격 */
+    gap: 12px;
 }
 .turn-structure-item {
     display: flex;
@@ -278,21 +276,27 @@
     color: #374151;
 }
 
-/* --- 공용 상태 표시 (로딩, 에러, 초기화면) --- */
-.initial-states, .loading-state {
+/* --- ✨ [수정] 공용 상태 표시 (로딩, 에러, 초기화면) --- */
+.rule-creator__initial-state, 
+.rule-creator__loading-state {
     text-align: center;
     color: var(--text-light);
     padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 
-.spinner {
+.rule-creator__spinner {
     width: 48px;
     height: 48px;
     border: 5px solid rgba(229, 138, 78, 0.2);
     border-top-color: var(--accent-warm);
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin: 0 auto 24px;
+    margin-bottom: 24px;
 }
 
 .error-message {

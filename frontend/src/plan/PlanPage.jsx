@@ -2,16 +2,19 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import { saveAs } from 'file-saver';
 import {
-  getConceptsForSummary, generateSummary,
-  savePlanVersion, getPlanVersions, rollbackPlanVersion,
-  submitPlan, checkPlanCopyright, getPlanCopyrightResult, getPlanDetail
+    getConceptsForSummary, generateSummary,
+    savePlanVersion, getPlanVersions, rollbackPlanVersion,
+    submitPlan, checkPlanCopyright, getPlanDetail
 } from '../api/auth';
 import PlanReport from './PlanReport';
 import { ProjectContext } from '../contexts/ProjectContext';
 import CopyrightModal from './CopyrightModal';
+import VersionHistoryModal from './VersionHistoryModal';
+import SubmissionModal from './SubmissionModal';
 
 // 컴포넌트의 모든 스타일을 포함하는 템플릿 리터럴
 const PlanPageStyles = `
+/* --- 전체 레이아웃 (2단 구조) --- */
 /* --- 전체 레이아웃 (2단 구조) --- */
 .summary-page-container {
     display: flex;
@@ -37,18 +40,19 @@ const PlanPageStyles = `
 }
 
 /* 왼쪽 컬럼 */
+/* 왼쪽 컬럼 */
 .form-column {
-    flex: 1;
-    min-width: 400px;
+    /* flex: 1.2; -> flex: 1.5; 로 수정 */
+    flex: 1.5;
+    min-width: 300px; /* 최소 너비를 확보하여 내용이 깨지지 않게 함 */
     overflow-y: auto;
     min-height: 0;  
 }
-
 /* 오른쪽 컬럼 */
 .result-column {
-    flex: 2;
+    /* flex: 2; -> flex: 4; 로 수정 */
+    flex: 4;
 }
-
 /* --- 폼(왼쪽) 컬럼 --- */
 .summary-header {
     margin-bottom: 32px;
@@ -109,7 +113,6 @@ select:focus, input[type="text"]:focus, input[type="file"]:focus {
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s;
-    margin-top: 16px;
 }
 
 .primary-button:hover:not(:disabled) {
@@ -150,12 +153,12 @@ select:focus, input[type="text"]:focus, input[type="file"]:focus {
 }
 
 .secondary-button {
-    padding: 10px 20px;
+    padding: 14px 20px;
     background-color: #4A5568;
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -194,35 +197,6 @@ select:focus, input[type="text"]:focus, input[type="file"]:focus {
     box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
 }
 
-/* --- 버전 관리 섹션 (왼쪽 컬럼 내부) --- */
-.version-management-section {
-    margin-top: 32px;
-    padding-top: 32px;
-    border-top: 1px solid #eaeaea;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    min-height: 0;
-}
-
-.version-header {
-    margin-bottom: 24px;
-    flex-shrink: 0;
-}
-.version-header h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #2c2825;
-    margin: 0;
-}
-.save-version-form {
-    background-color: #f8f8f8;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    flex-shrink: 0;
-}
-
 .spinner-container {
     flex-grow: 1;
     display: flex;
@@ -249,7 +223,7 @@ select:focus, input[type="text"]:focus, input[type="file"]:focus {
     border-radius: 8px;
     text-align: center;
     font-weight: 500;
-    margin-top: 1rem;
+    margin: 1rem 0;
 }
 
 .success-message {
@@ -260,11 +234,12 @@ select:focus, input[type="text"]:focus, input[type="file"]:focus {
     border-radius: 8px;
     text-align: center;
     font-weight: 500;
-    margin-top: 1rem;
-    }
-/* 기본 파일 선택 버튼 스타일 재정의 */
-input[type="file"]::file-selector-button {
-  background: #374151;  /* 세미콜론 추가 */
+    margin: 1rem 0;
+}
+/* 파일 선택 버튼 스타일 */
+input[type="file"]::file-selector-button,
+input[type="file"]::-webkit-file-upload-button {
+  background: #374151;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -283,584 +258,546 @@ input[type="file"]::file-selector-button:active {
   transform: translateY(0) scale(0.95);
 }
 
-/* 크로스 브라우저 (웹킷 계열) */
-input[type="file"]::-webkit-file-upload-button {
-  background: #374151;  /* 세미콜론 추가 */
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
 /* 새 버튼 스타일 */
 .reget-button {
-  padding: 10px 20px;
-  background-color: #FFFFFF;          /* 흰색 배경 */
-  color: #2b3a61ff;                     /* 남색 글씨 */
-  border: 1px solid #D1D5DB;          /* 연한 회색 테두리 */
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-  white-space: nowrap;
+    padding: 14px 20px;
+    background-color: #FFFFFF;
+    color: #2b3a61ff;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    white-space: nowrap;
 }
 
 .reget-button:hover:not(:disabled) {
-  background-color: #F9FAFB;
-  border-color: #9CA3AF;
-  color: #2c3246ff;
+    background-color: #F9FAFB;
+    border-color: #9CA3AF;
+    color: #2c3246ff;
 }
 
-.reget-button:disabled {
-  background-color: #F3F4F6;
-  color: #9CA3AF;
-  border-color: #E5E7EB;
-  cursor: not-allowed;
+/* --- 모달 스타일 --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #4A5568, #2D3748); /* 남색 그라데이션 */
+  color: #FFFFFF; /* 글자색을 흰색으로 변경 */
+  border: none; /* 테두리 제거 */
+}
+
+.modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2c2825;
+    margin: 0;
+}
+
+.modal-close-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  font-weight: 300;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.save-version-form {
+  background-color: #f8f8f8;
+  padding: 20px;
+  border-radius: 8px;
 }
 `;
 
-
 const PlanPage = () => {
-  const { projectId } = useContext(ProjectContext);
+    const { projectId } = useContext(ProjectContext);
 
-  const [conceptList, setConceptList] = useState([]);
-  const [filteredConceptList, setFilteredConceptList] = useState([]);
-  const [conceptId, setConceptId] = useState('');
-  const [planId, setPlanId] = useState(null);
-  const [planContent, setPlanContent] = useState('');
-  const [versions, setVersions] = useState([]);
-  const [versionName, setVersionName] = useState('');
-  const [versionMemo, setVersionMemo] = useState('');
-  const [selectedVersionId, setSelectedVersionId] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [downloadFormat, setDownloadFormat] = useState('md');
-  const [submissionFile, setSubmissionFile] = useState(null);
-  const [isChecking, setIsChecking] = useState(false);
-  const [showCopyright, setShowCopyright] = useState(false);
-  const [copyrightResult, setCopyrightResult] = useState(null);
+    const [conceptList, setConceptList] = useState([]);
+    const [filteredConceptList, setFilteredConceptList] = useState([]);
+    const [conceptId, setConceptId] = useState('');
+    const [planId, setPlanId] = useState(null);
+    const [planContent, setPlanContent] = useState('');
+    const [versions, setVersions] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [downloadFormat, setDownloadFormat] = useState('md');
+    const [isChecking, setIsChecking] = useState(false);
+    const [showCopyright, setShowCopyright] = useState(false);
+    const [copyrightResult, setCopyrightResult] = useState(null);
 
-  useEffect(() => {
-    const fetchAllConcepts = async () => {
-      try {
-        const data = await getConceptsForSummary();
-        setConceptList(data);
-      } catch (err) {
-        setError(err.message || '컨셉 목록 로딩 실패');
-      }
+    // 모달 상태 분리
+    const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+    const [isSubmissionModalOpen, setIsSubmissionModalOpen] = useState(false);
+
+    const clearMessages = () => {
+        setError(null);
+        setSuccessMessage('');
     };
-    fetchAllConcepts();
-  }, []);
 
-  useEffect(() => {
-    if (!projectId || conceptList.length === 0) {
-      setFilteredConceptList([]);
-      setConceptId('');
-      setPlanContent('');
-      setVersions([]);
-      setPlanId(null);
-      return;
-    }
+    useEffect(() => {
+        const fetchAllConcepts = async () => {
+            try {
+                const data = await getConceptsForSummary();
+                setConceptList(data);
+            } catch (err) {
+                setError(err.message || '컨셉 목록 로딩 실패');
+            }
+        };
+        fetchAllConcepts();
+    }, []);
 
-    const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(projectId));
-    setFilteredConceptList(conceptsForProject.sort((a, b) => b.conceptId - a.conceptId));
-    if (conceptsForProject.length > 0) {
-      setConceptId(conceptsForProject[0].conceptId.toString());
-    } else {
-      setConceptId('');
-    }
-  }, [projectId, conceptList]);
+    useEffect(() => {
+        if (!projectId || conceptList.length === 0) {
+            setFilteredConceptList([]);
+            setConceptId('');
+            setPlanContent('');
+            setVersions([]);
+            setPlanId(null);
+            return;
+        }
 
-  // Plan 자동 불러오기
-  useEffect(() => {
-    if (!conceptId) return;
-
-    const selectedConcept = conceptList.find(c => c.conceptId.toString() === conceptId);
-    if (!selectedConcept) return;
-
-    if (selectedConcept.planId) {
-      setPlanId(selectedConcept.planId);
-      getPlanDetail(selectedConcept.planId).then((data) => {
-        // ✅ currentContent가 있으면 세팅, 없으면 빈 상태 유지
-        if (data.currentContent && data.currentContent.trim() !== "") {
-          setPlanContent(data.currentContent);
+        const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(projectId));
+        setFilteredConceptList(conceptsForProject.sort((a, b) => b.conceptId - a.conceptId));
+        if (conceptsForProject.length > 0) {
+            setConceptId(conceptsForProject[0].conceptId.toString());
         } else {
-          setPlanContent(""); // → 오른쪽에 "내용 없음" 표시, 생성 버튼만 활성화
+            setConceptId('');
         }
-      });
-    } else {
-      setPlanId(null);
-      setPlanContent("");
-    }
-  }, [conceptId, conceptList]);
+    }, [projectId, conceptList]);
 
-  // ✅ PlanId 있을 때 저장된 저작권 검사 결과 불러오기
-  useEffect(() => {
-    if (!planId) return;
-    const saved = localStorage.getItem(`copyright-${planId}`);
-    if (saved) {
-      setCopyrightResult(JSON.parse(saved));
-    }
-  }, [planId]);
+    useEffect(() => {
+        if (!conceptId) return;
 
-  const handleGenerateSummary = async (e) => {
-    e.preventDefault();
-    if (!conceptId) {
-      setError('먼저 컨셉을 선택해야 합니다.');
-      return;
-    }
+        const selectedConcept = conceptList.find(c => c.conceptId.toString() === conceptId);
+        if (!selectedConcept) return;
 
-    setIsLoading(true);
-    setError(null);
-    setSuccessMessage('');
-    setIsEditMode(false);
-    setPlanContent('');
-    setVersions([]);
-    setPlanId(null);
-
-    try {
-      const data = await generateSummary(conceptId);
-
-      let finalSummaryText = data.summaryText;
-      try {
-        const nestedData = JSON.parse(finalSummaryText);
-        if (nestedData && typeof nestedData.summaryText === 'string') {
-          finalSummaryText = nestedData.summaryText;
+        if (selectedConcept.planId) {
+            setPlanId(selectedConcept.planId);
+            getPlanDetail(selectedConcept.planId).then((data) => {
+                setPlanContent(data.currentContent || "");
+                fetchVersions(data.planId);
+            });
+        } else {
+            setPlanId(null);
+            setPlanContent("");
+            setVersions([]);
         }
-      } catch (e) {
-        // 파싱 실패 시 원본 텍스트 사용
-      }
+    }, [conceptId, conceptList]);
 
-      setPlanId(data.planId);
-      setPlanContent(finalSummaryText);
+    useEffect(() => {
+        if (!planId) return;
+        const saved = localStorage.getItem(`copyright-${planId}`);
+        if (saved) {
+            setCopyrightResult(JSON.parse(saved));
+        }
+    }, [planId]);
 
-      const autoSaveData = {
-        planId: data.planId,
-        versionName: "AI 기획서 초안",
-        memo: "AI가 생성한 기획서 초안입니다.",
-        planContent: finalSummaryText
-      };
-      await savePlanVersion(autoSaveData);
-      await fetchVersions(data.planId);
-      setSuccessMessage('새로운 기획서가 생성되고 초안이 저장되었습니다.');
+    const handleGenerateSummary = async (e) => {
+        e.preventDefault();
+        if (!conceptId) {
+            setError('먼저 컨셉을 선택해야 합니다.');
+            return;
+        }
 
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        setIsLoading(true);
+        clearMessages();
+        setIsEditMode(false);
+        setPlanContent('');
+        setVersions([]);
+        setPlanId(null);
 
-  const fetchVersions = async (currentPlanId) => {
-    if (!currentPlanId) return;
-    try {
-      const data = await getPlanVersions(currentPlanId);
-      setVersions(data.versions);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
+        try {
+            const data = await generateSummary(conceptId);
+            let finalSummaryText = data.summaryText;
+            try {
+                const nestedData = JSON.parse(finalSummaryText);
+                if (nestedData && typeof nestedData.summaryText === 'string') {
+                    finalSummaryText = nestedData.summaryText;
+                }
+            } catch (e) { /* 파싱 실패 시 원본 사용 */ }
 
-  const handleSaveVersion = async (e) => {
-    e.preventDefault();
-    if (!planId) {
-      setError('기획서가 먼저 생성되어야 합니다.');
-      return;
-    }
-    if (!versionName.trim()) {
-      setError('버전 이름을 입력해주세요.');
-      return;
-    }
-    setIsSaving(true);
-    setError(null);
-    setSuccessMessage('');
-    try {
-      const requestBody = {
-        planId,
-        versionName,
-        memo: versionMemo,
-        planContent,
-      };
-      const result = await savePlanVersion(requestBody);
-      setSuccessMessage(result.message);
-      setVersionName('');
-      setVersionMemo('');
-      await fetchVersions(planId);
-      setIsEditMode(false);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+            setPlanId(data.planId);
+            setPlanContent(finalSummaryText);
 
-  const handleRollback = async (versionId, versionName) => {
-    if (!window.confirm(`'${versionName}' 버전으로 기획서를 되돌리시겠습니까? 현재 수정 중인 내용은 사라집니다.`)) {
-      setSelectedVersionId('');
-      return;
-    }
-    setError(null);
-    setSuccessMessage('');
-    try {
-      const requestBody = { versionId };
-      const result = await rollbackPlanVersion(planId, requestBody);
-      setPlanContent(result.rolledBackContent);
-      setIsEditMode(false);
-      setSuccessMessage(result.message);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSelectedVersionId('');
-    }
-  };
+            await savePlanVersion({
+                planId: data.planId,
+                versionName: "AI 기획서 초안",
+                memo: "AI가 생성한 기획서 초안입니다.",
+                planContent: finalSummaryText
+            });
+            await fetchVersions(data.planId);
+            setSuccessMessage('새로운 기획서가 생성되고 초안이 저장되었습니다.');
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-  const handleVersionSelect = (e) => {
-    const selectedId = e.target.value;
-    if (!selectedId) return;
+    const fetchVersions = async (currentPlanId) => {
+        if (!currentPlanId) return;
+        try {
+            const data = await getPlanVersions(currentPlanId);
+            setVersions(data.versions);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
 
-    const selectedVersion = versions.find(v => v.versionId.toString() === selectedId);
-    if (selectedVersion) {
-      setSelectedVersionId(selectedId);
-      handleRollback(selectedVersion.versionId, selectedVersion.versionName);
-    }
-  };
+    const handleSaveVersion = async ({ versionName, versionMemo }) => {
+        if (!planId) {
+            setError('기획서가 먼저 생성되어야 합니다.');
+            return;
+        }
+        if (!versionName.trim()) {
+            setError('버전 이름을 입력해주세요.');
+            return;
+        }
+        setIsSaving(true);
+        clearMessages();
+        try {
+            const result = await savePlanVersion({ planId, versionName, memo: versionMemo, planContent });
+            setSuccessMessage(result.message);
+            await fetchVersions(planId);
+            setIsEditMode(false);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
+    const handleRollback = async (versionId, versionName) => {
+        if (!window.confirm(`'${versionName}' 버전으로 기획서를 되돌리시겠습니까? 현재 수정 중인 내용은 사라집니다.`)) {
+            return;
+        }
+        clearMessages();
+        try {
+            const result = await rollbackPlanVersion(planId, { versionId });
+            setPlanContent(result.rolledBackContent);
+            setIsEditMode(false);
+            setSuccessMessage(result.message);
+            setIsVersionModalOpen(false); // 성공 시 모달 닫기
+        } catch (err) {
+            setError(err.message);
+        }
+    };
 
+    const formatToReport = (rawText) => {
+        if (!rawText) return '';
+        let processedText = rawText.replace(/\*\*/g, '');
+        let sectionCounter = 1;
+        const lines = processedText.split('\n');
+        const formattedLines = lines.map(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith('## ')) {
+                const content = trimmedLine.replace(/^##\s*\d*\.?\s*/, '');
+                return `${sectionCounter++}. ${content}`;
+            }
+            if (trimmedLine.startsWith('* ')) {
+                return `    - ${trimmedLine.substring(2)}`;
+            }
+            if (trimmedLine.startsWith('# ')) {
+                return `[ ${trimmedLine.substring(2)} ]`;
+            }
+            return line;
+        });
+        return formattedLines.join('\n');
+    };
 
-  const formatToReport = (rawText) => {
-    if (!rawText) return '';
-    let processedText = rawText.replace(/\*\*/g, '');
-    let sectionCounter = 1;
-    const lines = processedText.split('\n');
-    const formattedLines = lines.map(line => {
-      const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('## ')) {
-        const content = trimmedLine.replace(/^##\s*\d*\.?\s*/, '');
-        return `${sectionCounter++}. ${content}`;
-      }
-      if (trimmedLine.startsWith('* ')) {
-        return `   - ${trimmedLine.substring(2)}`;
-      }
-      if (trimmedLine.startsWith('# ')) {
-        return `[ ${trimmedLine.substring(2)} ]`;
-      }
-      return line;
-    });
-    return formattedLines.join('\n');
-  };
+    const downloadAsMarkdown = () => {
+        const blob = new Blob([planContent], { type: 'text/markdown;charset=utf-8' });
+        saveAs(blob, 'boardgame-plan.md');
+    };
 
-  const downloadAsMarkdown = () => {
-    const blob = new Blob([planContent], { type: 'text/markdown;charset=utf-8' });
-    saveAs(blob, 'boardgame-plan.md');
-  };
+    const downloadAsDocx = () => {
+        const reportText = formatToReport(planContent);
+        const paragraphs = reportText.split('\n').map(line => {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith('[') && trimmedLine.endsWith(']')) {
+                return new Paragraph({ text: trimmedLine.slice(2, -2).trim(), heading: HeadingLevel.HEADING_1, style: "Heading1" });
+            }
+            if (/^\d+\.\s/.test(trimmedLine)) {
+                return new Paragraph({ text: trimmedLine.substring(trimmedLine.indexOf(' ') + 1), heading: HeadingLevel.HEADING_2, style: "Heading2" });
+            }
+            if (trimmedLine.startsWith('- ')) {
+                return new Paragraph({ text: trimmedLine.substring(2), bullet: { level: 0 } });
+            }
+            return new Paragraph(line);
+        });
 
-  const downloadAsDocx = () => {
-    const reportText = formatToReport(planContent);
-    const paragraphs = reportText.split('\n').map(line => {
-      const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('[') && trimmedLine.endsWith(']')) {
-        return new Paragraph({ text: trimmedLine.slice(2, -2).trim(), heading: HeadingLevel.HEADING_1, style: "Heading1" });
-      }
-      if (/^\d+\.\s/.test(trimmedLine)) {
-        return new Paragraph({ text: trimmedLine.substring(trimmedLine.indexOf(' ') + 1), heading: HeadingLevel.HEADING_2, style: "Heading2" });
-      }
-      if (trimmedLine.startsWith('- ')) {
-        return new Paragraph({ text: trimmedLine.substring(2), bullet: { level: 0 } });
-      }
-      return new Paragraph(line);
-    });
+        const doc = new Document({
+            sections: [{ properties: {}, children: paragraphs }],
+            styles: {
+                paragraphStyles: [
+                    { id: "Heading1", name: "Heading 1", run: { size: 32, bold: true }, paragraph: { spacing: { before: 240, after: 120 } } },
+                    { id: "Heading2", name: "Heading 2", run: { size: 26, bold: true }, paragraph: { spacing: { before: 200, after: 100 } } }
+                ]
+            }
+        });
 
-    const doc = new Document({
-      sections: [{ properties: {}, children: paragraphs }],
-      styles: {
-        paragraphStyles: [
-          { id: "Heading1", name: "Heading 1", run: { size: 32, bold: true }, paragraph: { spacing: { before: 240, after: 120 } } },
-          { id: "Heading2", name: "Heading 2", run: { size: 26, bold: true }, paragraph: { spacing: { before: 200, after: 100 } } }
-        ]
-      }
-    });
+        Packer.toBlob(doc).then(blob => saveAs(blob, 'boardgame-plan.docx'));
+    };
 
-    Packer.toBlob(doc).then(blob => saveAs(blob, 'boardgame-plan.docx'));
-  };
+    const handleDownload = () => {
+        if (!planContent) {
+            setError('다운로드할 내용이 없습니다.');
+            return;
+        }
+        switch (downloadFormat) {
+            case 'md': downloadAsMarkdown(); break;
+            case 'docx': downloadAsDocx(); break;
+            default: setError('지원하지 않는 형식입니다.');
+        }
+    };
 
-  const handleDownload = () => {
-    if (!planContent) {
-      setError('다운로드할 내용이 없습니다.');
-      return;
-    }
-    switch (downloadFormat) {
-      case 'md': downloadAsMarkdown(); break;
-      case 'docx': downloadAsDocx(); break;
-      default: setError('지원하지 않는 형식입니다.');
-    }
-  };
+    const handleCheckCopyright = async () => {
+        if (!planId || !planContent) {
+            setError("먼저 기획서를 생성하세요.");
+            return;
+        }
+        setIsChecking(true);
+        clearMessages();
+        try {
+            const result = await checkPlanCopyright(planId, planContent);
+            setCopyrightResult(result);
+            localStorage.setItem(`copyright-${planId}`, JSON.stringify(result));
+            setShowCopyright(true);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsChecking(false);
+        }
+    };
 
-  const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
-      setSubmissionFile(e.target.files[0]);
-      setSuccessMessage('');
-      setError(null);
-    }
-  };
+    const handleSubmit = async (submissionFile, onReset) => {
+        if (!planId) {
+            setError('제출할 기획안을 먼저 생성해야 합니다.');
+            return;
+        }
+        if (!submissionFile) {
+            setError('제출할 파일을 선택해야 합니다.');
+            return;
+        }
+        setIsSubmitting(true);
+        clearMessages();
+        try {
+            const result = await submitPlan(planId, submissionFile);
+            setSuccessMessage(`기획안 ID ${result.planId}이 성공적으로 제출되었습니다!`);
+            onReset(); // 성공 시 모달 폼 리셋
+        } catch (err) {
+            setError(`제출 실패: ${err.message}`);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
-  // ✅ 저작권 분석
-  const handleCheckCopyright = async () => {
-    if (!planId || !planContent) {
-      setError("먼저 기획서를 생성하세요.");
-      return;
-    }
-    setIsChecking(true);
-    setError(null);
-    try {
-      const result = await checkPlanCopyright(planId, planContent);
-      setCopyrightResult(result);
-      localStorage.setItem(`copyright-${planId}`, JSON.stringify(result));
-      setShowCopyright(true);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsChecking(false);
-    }
-  };
+    return (
+        <>
+            <style>{PlanPageStyles}</style>
+            <div className="summary-page-container">
+                {/* ---------------- 왼쪽 컬럼 ---------------- */}
+                <div className="form-column">
+                    <header className="summary-header">
+                        <h1>AI 게임 기획서 생성</h1>
+                        <p>컨셉을 선택하면, AI가 데이터를 종합하여 기획서를 작성합니다.</p>
+                    </header>
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!planId) {
-      setError('제출할 기획안을 먼저 생성해야 합니다.');
-      return;
-    }
-    if (!submissionFile) {
-      setError('제출할 파일을 선택해야 합니다.');
-      return;
-    }
-    setIsSubmitting(true);
-    setError(null);
-    setSuccessMessage('');
+                    {successMessage && !isVersionModalOpen && !isSubmissionModalOpen && <p className="success-message">{successMessage}</p>}
+                    {error && !isVersionModalOpen && !isSubmissionModalOpen && <p className="error-message">{error}</p>}
 
-    try {
-      const result = await submitPlan(planId, submissionFile);
-      setSuccessMessage(`기획안 ID ${result.planId}이 성공적으로 제출되었습니다!`);
-      setSubmissionFile(null);
-      e.target.reset(); // 폼 리셋
-    } catch (err) {
-      setError(`제출 실패: ${err.message}`);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+                    <form onSubmit={handleGenerateSummary} id="generate-plan-form" style={{ marginBottom: '24px' }}>
+                        <div className="form-group">
+                            <label htmlFor="conceptId">컨셉 선택</label>
+                            <select
+                                id="conceptId"
+                                value={conceptId}
+                                onChange={(e) => setConceptId(e.target.value)}
+                                disabled={filteredConceptList.length === 0 || isLoading}
+                                required
+                            >
+                                {filteredConceptList.length > 0 ? (
+                                    filteredConceptList.map(concept => (
+                                        <option key={concept.conceptId} value={concept.conceptId}>
+                                            ID: {concept.conceptId} - {concept.theme}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option value="" disabled>
+                                        -- 이 프로젝트에 생성된 컨셉이 없습니다 --
+                                    </option>
+                                )}
+                            </select>
+                        </div>
 
-  return (
-    <>
-      <style>{PlanPageStyles}</style>
-      <div className="summary-page-container">
-        {/* ---------------- 왼쪽 컬럼 ---------------- */}
-        <div className="form-column">
-          {/* 헤더 */}
-          <header className="summary-header">
-            <h1>AI 게임 기획서 생성</h1>
-            <p>컨셉을 선택하면, AI가 데이터를 종합하여 기획서를 작성합니다.</p>
-          </header>
+                        <button type="submit" form="generate-plan-form" className="primary-button" style={{ marginTop: 0 }} disabled={isLoading || !conceptId}>
+                            {isLoading ? "생성 중..." : planId ? "기획서 재생성" : "AI 기획서 생성"}
+                        </button>
+                    </form>
 
-          {/* 컨셉 선택 + AI 기획서 생성 */}
-          <form onSubmit={handleGenerateSummary}>
-            <div className="form-group">
-              <label htmlFor="conceptId">컨셉 선택</label>
-              <select
-                id="conceptId"
-                value={conceptId}
-                onChange={(e) => setConceptId(e.target.value)}
-                disabled={filteredConceptList.length === 0 || isLoading}
-                required
-              >
-                {filteredConceptList.length > 0 ? (
-                  filteredConceptList.map(concept => (
-                    <option key={concept.conceptId} value={concept.conceptId}>
-                      ID: {concept.conceptId} - {concept.theme}
-                    </option>
-                  ))
-                ) : (
-                  <option value="" disabled>
-                    -- 이 프로젝트에 생성된 컨셉이 없습니다 --
-                  </option>
-                )}
-              </select>
+                    {planId && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid #eaeaea', paddingTop: '24px' }}>
+                            <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#2c2825', margin: 0 }}>부가 기능 및 제출</h2>
+
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button
+                                    type="button"
+                                    className="secondary-button"
+                                    style={{ flex: 1, width: 'auto' }}
+                                    onClick={handleCheckCopyright}
+                                    disabled={isChecking || !planContent}
+                                >
+                                    {isChecking ? "검사 중..." : "저작권 검사"}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="secondary-button"
+                                    style={{ flex: 1, width: 'auto' }}
+                                    onClick={() => { clearMessages(); setIsVersionModalOpen(true); }}
+                                >
+                                    버전 관리
+                                </button>
+                            </div>
+
+                            {copyrightResult && (
+                                <button
+                                    type="button"
+                                    className="reget-button"
+                                    onClick={() => setShowCopyright(true)}
+                                >
+                                    저작권 분석 결과 다시보기
+                                </button>
+                            )}
+
+                            <button
+                                type="button"
+                                className="primary-button"
+                                onClick={() => { clearMessages(); setIsSubmissionModalOpen(true); }}
+                            >
+                                최종 제출
+                            </button>
+                        </div>
+                    )}
+
+                </div>
+
+                {/* ---------------- 오른쪽 컬럼 ---------------- */}
+                <div className="result-column">
+                    <div className="result-header">
+                        <h2>생성된 기획서</h2>
+                        <div className="download-controls">
+                            <button
+                                type="button"
+                                className="secondary-button"
+                                style={{ width: 'auto' }}
+                                onClick={() => setIsEditMode(!isEditMode)}
+                                disabled={!planContent}
+                            >
+                                {isEditMode ? "완료" : "수정하기"}
+                            </button>
+                            <select value={downloadFormat} onChange={(e) => setDownloadFormat(e.target.value)}>
+                                <option value="md">Markdown (.md)</option>
+                                <option value="docx">Word (.docx)</option>
+                            </select>
+                            <button
+                                type="button"
+                                className="secondary-button"
+                                style={{ width: 'auto' }}
+                                onClick={handleDownload}
+                                disabled={!planContent || isLoading}
+                            >
+                                다운로드
+                            </button>
+                        </div>
+                    </div>
+
+                    {isLoading ? (
+                        <div className="spinner-container"><div className="spinner"></div></div>
+                    ) : (
+                        isEditMode ? (
+                            <textarea
+                                id="documentEditor"
+                                className="document-editor"
+                                value={planContent}
+                                onChange={(e) => setPlanContent(e.target.value)}
+                                placeholder="기획서 내용을 자유롭게 수정하세요."
+                            />
+                        ) : (
+                            <div style={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
+                                <PlanReport content={planContent} />
+                            </div>
+                        )
+                    )}
+                </div>
             </div>
 
-            <button type="submit" className="primary-button" disabled={isLoading || !conceptId}>
-              {isLoading ? "생성 중..." : "AI 기획서 생성"}
-            </button>
+            <CopyrightModal
+                isOpen={showCopyright}
+                onClose={() => setShowCopyright(false)}
+                result={copyrightResult}
+            />
 
-            {/* 저작권 검사 */}
-            <button
-              type="button"
-              className="primary-button"
-              onClick={handleCheckCopyright}
-              disabled={isChecking}
-              style={{ marginTop: "12px", backgroundColor: "#4A5568" }}
-            >
-              {isChecking ? "검사 중..." : "저작권 검사"}
-            </button>
+            <VersionHistoryModal
+                isOpen={isVersionModalOpen}
+                onClose={() => setIsVersionModalOpen(false)}
+                versions={versions}
+                planContent={planContent}
+                onSaveVersion={handleSaveVersion}
+                onRollback={handleRollback}
+                isSaving={isSaving}
+                successMessage={successMessage}
+                error={error}
+            />
 
-            {copyrightResult && (
-              <button
-                type="button"
-                className="reget-button"
-                onClick={() => setShowCopyright(true)}
-                style={{ marginTop: "12px" }}
-              >
-                저작권 분석 결과 다시보기
-              </button>
-            )}
-          </form>
-
-          {/* 버전 관리 + 최종 제출 (planId 있을 때만 표시) */}
-          {planId && (
-            <div className="version-management-section">
-              {/* 버전 관리 */}
-              <div className="version-header"><h2>버전 관리</h2></div>
-              {successMessage && <p className="success-message">{successMessage}</p>}
-              {error && <p className="error-message">{error}</p>}
-              <form className="save-version-form" onSubmit={handleSaveVersion}>
-                <div className="form-group">
-                  <label htmlFor="versionName">버전 이름</label>
-                  <input
-                    type="text"
-                    id="versionName"
-                    value={versionName}
-                    onChange={e => setVersionName(e.target.value)}
-                    placeholder="예: v1.1 - 밸런스 수정"
-                    required
-                  />
-                </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label htmlFor="versionMemo">메모 (선택)</label>
-                  <input
-                    type="text"
-                    id="versionMemo"
-                    value={versionMemo}
-                    onChange={e => setVersionMemo(e.target.value)}
-                    placeholder="수정 내용 요약"
-                  />
-                </div>
-                <button type="submit" className="primary-button" disabled={isSaving}>
-                  {isSaving ? "저장 중..." : "현재 내용 버전으로 저장"}
-                </button>
-              </form>
-
-              {/* 롤백 */}
-              {versions.length > 0 && (
-                <div className="form-group" style={{ marginTop: "24px" }}>
-                  <label htmlFor="version-select">저장된 버전 불러오기 (롤백)</label>
-                  <select
-                    id="version-select"
-                    value={selectedVersionId}
-                    onChange={handleVersionSelect}
-                  >
-                    <option value="">-- 롤백할 버전을 선택하세요 --</option>
-                    {versions.map(v => (
-                      <option key={v.versionId} value={v.versionId}>
-                        {v.versionName} ({new Date(v.createdAt).toLocaleDateString("ko-KR")})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-              )}
-
-              {/* 최종 제출 */}
-              <div className="version-header" style={{ marginTop: "32px" }}>
-                <h2>기획안 최종 제출</h2>
-              </div>
-              <form className="save-version-form" onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label htmlFor="submissionFile">제출할 기획서 파일</label>
-                  <input
-                    type="file"
-                    id="submissionFile"
-                    accept="application/pdf"
-                    onChange={handleFileChange}
-                    required
-                  />
-
-                </div>
-                <button
-                  type="submit"
-                  className="primary-button"
-                  disabled={isSubmitting || !planId || !submissionFile}
-                >
-                  {isSubmitting ? "제출 중..." : "최종 제출하기"}
-                </button>
-              </form>
-              {successMessage && <p className="success-message">{successMessage}</p>}
-              {error && <p className="error-message">{error}</p>}
-            </div>
-          )}
-        </div>
-
-        {/* ---------------- 오른쪽 컬럼 ---------------- */}
-        <div className="result-column">
-          <div className="result-header">
-            <h2>생성된 기획서</h2>
-            <div className="download-controls">
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={() => setIsEditMode(!isEditMode)}
-                disabled={!planContent}
-              >
-                {isEditMode ? "완료" : "수정하기"}
-              </button>
-              <select value={downloadFormat} onChange={(e) => setDownloadFormat(e.target.value)}>
-                <option value="md">Markdown (.md)</option>
-                <option value="docx">Word (.docx)</option>
-              </select>
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={handleDownload}
-                disabled={!planContent || isLoading}
-              >
-                다운로드
-              </button>
-            </div>
-          </div>
-
-          {isLoading ? (
-            <div className="spinner-container"><div className="spinner"></div></div>
-          ) : (
-            isEditMode ? (
-              <textarea
-                id="documentEditor"
-                className="document-editor"
-                value={planContent}
-                onChange={(e) => setPlanContent(e.target.value)}
-                placeholder="기획서 내용을 자유롭게 수정하세요."
-              />
-            ) : (
-              <div style={{ flexGrow: 1, overflowY: "auto", minHeight: 0 }}>
-                <PlanReport content={planContent} />
-              </div>
-            )
-          )}
-        </div>
-      </div>
-
-      {/* 모달 */}
-      <CopyrightModal
-        isOpen={showCopyright}
-        onClose={() => setShowCopyright(false)}
-        result={copyrightResult}
-      />
-    </>
-  );
-
+            <SubmissionModal
+                isOpen={isSubmissionModalOpen}
+                onClose={() => setIsSubmissionModalOpen(false)}
+                onSubmit={handleSubmit}
+                isSubmitting={isSubmitting}
+                successMessage={successMessage}
+                error={error}
+            />
+        </>
+    );
 };
 
 export default PlanPage;
