@@ -1,4 +1,4 @@
-/* ComponentGenerator.css (새로운 버전) */
+/* ComponentGenerator.css */
 
 /* --- ✨ 디자인 시스템 변수 --- */
 :root {
@@ -57,10 +57,8 @@
 
 .generator-form-section {
   flex: 0 0 500px;
-  /* 왼쪽 폼 고정 너비 */
   padding: 32px;
   overflow-y: auto;
-  /* 내용 길어지면 스크롤 */
 }
 
 .generator-result-section {
@@ -69,16 +67,16 @@
   border: 1px solid var(--border-color);
   border-radius: 12px;
   background-color: var(--bg-card);
-  background-image:
-    linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+  background-image: linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
     linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
   background-size: 40px 40px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
 
-  /* 👇 기존 hidden 제거 후 스크롤 허용 */
   overflow-y: auto;
   max-height: 100vh;
 }
@@ -126,12 +124,10 @@
   color: #d3702e;
 }
 
-/* --- 카드 정보 입력 폼 --- */
 .card-gen-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  /* 👈 폼 사이 간격 (기존 18px → 12px) */
 }
 
 .form-group {
@@ -139,7 +135,6 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 0;
-  /* 👈 불필요한 margin-bottom 제거 */
 }
 
 .form-group label {
@@ -147,7 +142,6 @@
   font-weight: 600;
   color: var(--text-dark);
   margin-bottom: 6px;
-  /* 👈 라벨과 인풋 사이 간격 살짝 줄임 */
   font-size: 0.875rem;
 }
 
@@ -155,7 +149,6 @@
 .form-group textarea {
   width: 100%;
   box-sizing: border-box;
-  /* ✅ padding 포함 계산 */
   padding: 12px 16px;
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -178,7 +171,7 @@
   min-height: 80px;
 }
 
-/* --- ✨ 2. 버전 관리 섹션 (왼쪽) --- */
+/* --- ✨ 2. 버전 관리 섹션 (개선된 스타일) --- */
 .content-version-manager {
   margin-top: 40px;
   padding-top: 24px;
@@ -191,16 +184,15 @@
   color: var(--text-dark);
 }
 
-/* ✅ 버전 메모 한 줄 정렬 */
 .version-note-inline {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .version-note-inline label {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-dark);
   white-space: nowrap;
@@ -208,45 +200,89 @@
 
 .version-note-inline input {
   flex: 1;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
   background-color: var(--bg-main);
   font-size: 0.9rem;
 }
 
-
-.version-block-row {
-  display: flex;
-  gap: 20px;
+.version-block {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
   margin-bottom: 16px;
 }
 
-.version-block {
-  flex: 1;
+.version-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
-.version-block label {
-  display: block;
+.version-block-header label {
   font-weight: 600;
+  font-size: 1rem;
   color: var(--text-dark);
-  margin-bottom: 8px;
-  font-size: 0.875rem;
 }
 
-.no-version-text {
-  font-size: 0.9rem;
-  color: var(--text-light);
-  margin-top: 8px;
+.version-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-/* React-select 커스텀 */
+.version-select-wrapper {
+  flex-grow: 1;
+}
+
 .version-select {
   font-size: 0.9rem;
 }
 
+.version-block button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.version-block button:disabled {
+  background-color: #ccc !important;
+  color: #888 !important;
+  cursor: not-allowed;
+  border-color: transparent !important;
+}
+
+button.save {
+  background-color: #8896a5;
+  color: white;
+  border: 1px solid transparent;
+}
+
+button.save:hover {
+  background-color: #6B7A8F;
+}
+
+button.rollback {
+  background-color: #f6f8fa;
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
+}
+
+button.rollback:hover:not(:disabled) {
+  background-color: #eef1f4;
+  border-color: #bbb;
+}
+
 .react-select__control {
-  background-color: var(--bg-main) !important;
+  background-color: var(--bg-card) !important;
   border-color: var(--border-color) !important;
   box-shadow: none !important;
 }
@@ -255,61 +291,6 @@
   border-color: var(--accent-warm) !important;
   box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2) !important;
 }
-
-.version-note {
-  margin-bottom: 24px;
-}
-
-.version-note label {
-  margin-right: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.version-note input {
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-main);
-  font-size: 0.9rem;
-}
-
-.version-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.version-buttons button {
-  padding: 6px 14px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-button.save {
-  background-color: #8896a5;
-  color: white;
-}
-
-button.save:hover {
-  background-color: #6B7A8F;
-}
-
-button.rollback {
-  background-color: var(--text-light);
-  color: white;
-}
-
-button.rollback:hover {
-  background-color: var(--text-dark);
-}
-
 
 /* --- ✨ 3. 버튼 스타일 (공통 및 개별) --- */
 .initial-generate-buttons,
@@ -406,11 +387,11 @@ button.rollback:hover {
 }
 
 /* --- ✨ 4. 오른쪽 결과 섹션 --- */
+/* --- ✨ 4. 오른쪽 결과 섹션 --- */
 .card-result-container {
   width: 100%;
   max-width: 600px;
   animation: fadeIn 0.5s ease-in-out;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -419,32 +400,38 @@ button.rollback:hover {
 .card-result-container h3 {
   font-size: 1.75rem;
   color: #166534;
-  /* Success Green */
   margin: 0 0 2rem 0;
   text-align: center;
 }
 
+/* 🎨 변경된 부분 시작 */
 .generated-card-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  /* 이 컨테이너가 카드 전체의 틀이 됩니다. */
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-medium);
+  overflow: hidden;
+  /* 내부 요소가 둥근 모서리를 넘어가지 않도록 설정 */
   margin-bottom: 24px;
+  width: 100%;
 }
 
 .card-image {
   width: 100%;
-  border-radius: 12px;
-  box-shadow: var(--shadow-medium);
-  border: 1px solid var(--border-color);
+  display: block;
+  /* 이미지 아래 작은 여백 제거 */
+  /* 개별 테두리, 그림자, 둥근 모서리 제거 */
 }
 
 .card-text-area {
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
+  /* 개별 배경, 테두리, 둥근 모서리 제거 */
+  padding: 20px;
   line-height: 1.6;
+  text-align: center;
 }
+
+/* 🎨 변경된 부분 끝 */
 
 .image-placeholder,
 .text-placeholder {
@@ -452,34 +439,33 @@ button.rollback:hover {
   align-items: center;
   justify-content: center;
   min-height: 150px;
-  border-radius: 8px;
   background-color: var(--bg-main);
-  border: 2px dashed var(--border-color);
   color: var(--text-light);
   font-weight: 500;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .image-placeholder {
   min-height: 300px;
+  border-bottom: 2px dashed var(--border-color);
 }
 
 /* --- ✨ 5. 상태 표시 (로딩, 에러, 초기) --- */
 .status-container,
-.initial-state {
-  text-align: center;
-  color: var(--text-light);
+.placeholder-message,
+.error-message {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  height: 100%;  
 }
 
-.status-container h3 {
+.status-container h3,
+.placeholder-message h3 {
   font-size: 1.25rem;
   margin-top: 1rem;
-}
-
-.initial-state p {
-  max-width: 400px;
-  line-height: 1.6;
 }
 
 .loader {
@@ -512,40 +498,6 @@ button.rollback:hover {
   font-weight: 500;
 }
 
-/* GLB 다운로드 버튼 (남색 톤) */
-.glb-download-button {
-  display: inline-flex;
-  align-items: center;
-  /* ✅ 수직 중앙 정렬 */
-  justify-content: center;
-  padding: 12px 24px;
-  /* reset-button-bottom 과 동일 */
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.2;
-  /* ✅ 글자 baseline 보정 */
-  border-radius: 8px;
-  cursor: pointer;
-  background-color: var(--accent-warm);
-  /* 주황 */
-  color: #fff;
-  border: none;
-  text-decoration: none;
-  /* ✅ 밑줄 제거 */
-  transition: all var(--transition-fast);
-}
-
-.glb-download-button:hover {
-  background-color: #e58a4e;
-  /* hover 주황 */
-}
-
-.glb-download-button:active {
-  background-color: #d67132;
-  transform: translateY(0) scale(0.95);
-}
-
-/* 안내 문구 스타일 */
 .placeholder-message {
   display: flex;
   flex-direction: column;
@@ -555,11 +507,19 @@ button.rollback:hover {
   height: 100%;
   text-align: center;
 }
-.placeholder-message h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
+
 .placeholder-message p {
   font-size: 0.9rem;
   color: #999;
+}
+
+.react-select__option--is-focused {
+  background-color: rgba(229, 138, 78, 0.15) !important;
+  color: var(--text-dark) !important;
+}
+
+/* 현재 선택된 옵션 */
+.react-select__option--is-selected {
+  background-color: var(--accent-warm) !important;
+  color: white !important;
 }

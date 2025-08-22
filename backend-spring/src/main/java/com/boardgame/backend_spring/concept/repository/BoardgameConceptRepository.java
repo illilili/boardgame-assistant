@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BoardgameConceptRepository extends JpaRepository<BoardgameConcept, Long> {
-    Optional<BoardgameConcept> findByPlanId(Long planId);
+//    Optional<BoardgameConcept> findByPlanId(Long planId);
 
     List<BoardgameConcept> findByProjectId(Long projectId);
 

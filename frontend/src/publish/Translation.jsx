@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { getTranslationsByContent, requestTranslations } from '../api/publish';
 import { getContentDetail } from '../api/development';
+import { FiChevronDown, FiFileText, FiSend, FiPlus } from 'react-icons/fi'; // 아이콘 추가
 import './Translation.css';
 
 const SUPPORTED_LANGS = [
@@ -20,38 +21,43 @@ function Translation({ contentId }) {
   const [error, setError] = useState('');
   const [expandedId, setExpandedId] = useState(null);
 
-  // ✅ 원문 불러오기
-  useEffect(() => {
-    if (!contentId) {
-      setContent(null);
-      return;
-    }
-    const fetchContent = async () => {
-      try {
-        const data = await getContentDetail(contentId);
-        setContent(data);
-        setError('');
-      } catch (err) {
-        console.error(err);
-        setError('원문을 불러오지 못했습니다.');
-      }
-    };
-    fetchContent();
-  }, [contentId]);
-
-  // ✅ 번역 결과 불러오기
-  const fetchTranslations = async () => {
+  const fetchContent = async (id) => {
     try {
-      const data = await getTranslationsByContent(contentId);
-      setTranslations(data);
+      const data = await getContentDetail(id);
+      setContent(data);
       setError('');
     } catch (err) {
       console.error(err);
-      setError('번역 결과 조회 실패');
+      setError('원문을 불러오지 못했습니다.');
+    }
+  };
+  
+  const fetchTranslations = async (id) => {
+    try {
+      const data = await getTranslationsByContent(id);
+      setTranslations(data.map(item => ({ ...item, feedback: '' })));
+      setError('');
+    } catch (err) {
+      console.error(err);
+      // 번역 결과가 없는 것은 에러가 아니므로 404는 무시
+      if (err.response?.status !== 404) {
+        setError('번역 결과 조회에 실패했습니다.');
+      } else {
+        setTranslations([]);
+      }
     }
   };
 
-  // ✅ 번역 요청
+  useEffect(() => {
+    if (contentId) {
+      fetchContent(contentId);
+      fetchTranslations(contentId);
+    } else {
+      setContent(null);
+      setTranslations([]);
+    }
+  }, [contentId]);
+
   const handleTranslate = async () => {
     if (selectedLangs.length === 0 || !contentId) {
       setError("번역할 언어를 선택하세요.");
@@ -65,9 +71,8 @@ function Translation({ contentId }) {
         contentId: Number(contentId),
         targetLanguages: selectedLangs,
       });
-      await fetchTranslations();
+      await fetchTranslations(contentId);
       setSelectedLangs([]);
-      
     } catch (err) {
       console.error(err);
       setError('번역 요청에 실패했습니다.');
@@ -76,7 +81,6 @@ function Translation({ contentId }) {
     }
   };
 
-  // ✅ 재요청 핸들러
   const handleReRequest = async (translation) => {
     try {
       setLoading(true);
@@ -85,175 +89,139 @@ function Translation({ contentId }) {
         targetLanguages: [translation.targetLanguage],
         feedback: translation.feedback || '',
       });
-
-      // ✅ 다시 목록 새로고침
-      const data = await getTranslationsByContent(contentId, true);
-
-      // ✅ feedback 기본값 강제 삽입
-      setTranslations(
-        data.map((item) => ({
-          ...item,
-          feedback: '', // 🔑 항상 빈 상태로 초기화
-        }))
-      );
-
-      setExpandedId(null); // 폼 닫기
+      await fetchTranslations(contentId);
+      setExpandedId(null);
     } catch (err) {
-      setError(err.message || '재요청 실패');
+      setError(err.message || '재요청에 실패했습니다.');
     } finally {
       setLoading(false);
     }
   };
-
-
-  useEffect(() => {
-    if (contentId) {
-      fetchTranslations();
-    } else {
-      setTranslations([]);
-    }
-  }, [contentId]);
 
   const toggleLang = (code) => {
     setSelectedLangs((prev) =>
       prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]
     );
   };
+  
+  const langMap = { en: '영어', ja: '일본어', zh: '중국어', fr: '프랑스어', es: '스페인어', de: '독일어' };
 
   return (
-    <div className={`trans__container ${content?.contentType?.toLowerCase() === 'rulebook' ? 'rulebook-layout' : ''}`}>
-
-      {/* ---------------- 왼쪽: 원문 ---------------- */}
-      <div className="trans__left-panel">
-        <h2>
-          {content?.contentType?.toLowerCase() === 'rulebook'
-            ? '룰북 번역하기'
-            : '카드 번역하기'}
-        </h2>
+    <div className={`trans-page-layout ${content?.contentType?.toLowerCase() === 'rulebook' ? 'trans-page-layout--rulebook' : ''}`}>
+      
+      {/* 왼쪽 패널: 원문 및 요청 */}
+      <aside className="trans-panel trans-panel--left">
+        <header className="trans-panel__header">
+          <h2>{content?.contentType?.toLowerCase() === 'rulebook' ? '룰북 번역' : '카드 번역'}</h2>
+        </header>
+        
         {!contentId ? (
-          <div className="placeholder-message">
-            <h3>번역 대기 목록에서 번역할 콘텐츠를 먼저 선택해주세요.</h3>
+          <div className="trans-placeholder">
+            <FiFileText />
+            <p>번역할 콘텐츠를 선택해주세요.</p>
           </div>
         ) : content ? (
           <>
-            <div className="trans__original">
-              <h3>원문</h3>
+            <div className="trans-original-content">
+              <h3>원문 (Original)</h3>
               {content.contentType?.toLowerCase() === "rulebook" ? (
-                // ✅ 룰북은 PDF 뷰어로 표시
-                <iframe
-                  src={content.contentData}  // 백엔드에서 주는 pdf 경로
-                  title="룰북 PDF 원문"
-                  className="trans__pdf-viewer"
-                />
+                <iframe src={content.contentData} title="룰북 PDF 원문" className="trans-pdf-viewer" />
               ) : (
-                // ✅ 그 외에는 텍스트 표시
-                <p>{content.contentData || '내용 없음'}</p>
+                <p className="trans-original-content__text">{content.contentData || '내용 없음'}</p>
               )}
             </div>
 
-            <div className="trans__options">
-              <label>번역 언어 선택</label>
-              <div className="trans__checkbox-group">
+            <div className="trans-request-section">
+              <label className="trans-request-section__label">번역 언어 선택</label>
+              <div className="trans-lang-selector">
                 {SUPPORTED_LANGS.map((lang) => (
-                  <label key={lang.code} className="trans__checkbox">
-                    <input
-                      type="checkbox"
-                      checked={selectedLangs.includes(lang.code)}
-                      onChange={() => toggleLang(lang.code)}
-                    />
-                    <span>{lang.label}</span>
-                  </label>
+                  <button
+                    key={lang.code}
+                    className={`trans-lang-selector__tag ${selectedLangs.includes(lang.code) ? 'trans-lang-selector__tag--selected' : ''}`}
+                    onClick={() => toggleLang(lang.code)}
+                  >
+                    <FiPlus /> {lang.label}
+                  </button>
                 ))}
               </div>
-              <button onClick={handleTranslate} disabled={loading}>
-                {loading ? '번역 중...' : '번역 요청'}
+              <button className="trans-request-button" onClick={handleTranslate} disabled={loading || selectedLangs.length === 0}>
+                {loading ? '번역 중...' : `번역 요청 (${selectedLangs.length})`}
               </button>
             </div>
           </>
         ) : (
-          <p>원문을 불러오는 중...</p>
+          <div className="trans-placeholder">
+            <p>원문을 불러오는 중...</p>
+          </div>
         )}
-      </div>
+      </aside>
 
-      {/* ---------------- 오른쪽: 번역 결과 ---------------- */}
-      <div className="trans__right-panel">
-        <h2>번역 결과</h2>
-        <p className="trans__subtitle"> 번역 결과를 클릭하면 재요청이 가능합니다.</p>
-        {error && <div className="trans__error">{error}</div>}
-
-        {loading && <p>⏳ 번역 요청 중입니다...</p>}
-
-        {!loading && translations.length > 0 ? (
-          <div className="trans__results">
+      {/* 오른쪽 패널: 번역 결과 */}
+      <main className="trans-panel trans-panel--right">
+        <header className="trans-panel__header">
+          <h2>번역 결과</h2>
+        </header>
+        
+        {error && <div className="trans-status-message trans-status-message--error">{error}</div>}
+        
+        {translations.length > 0 ? (
+          <div className="trans-results-list">
             {translations.map((t) => {
-              let parsedText = '';
-              try {
-                const parsed = JSON.parse(t.translatedData);
-                parsedText = parsed.text || t.translatedData;
-              } catch {
-                parsedText = t.translatedData;
-              }
-              parsedText = parsedText
-                .replace(/=+ 번역 시작 =+/g, '')
-                .replace(/=+ 번역 끝 =+/g, '')
-                .replace(/=+ 翻译开始 =+/g, '')
-                .replace(/=+ 翻译结束 =+/g, '')
-                .replace(/=+ 输出开始 =+/g, '')
-                .replace(/=+ 输出结束 =+/g, '')
-                .replace(/=+ SOURCE BEGIN =+/g, '')
-                .replace(/=+ SOURCE END =+/g, '')
-                .trim();
+                const isExpanded = expandedId === t.translationId;
+                const langLabel = langMap[t.targetLanguage?.toLowerCase()] || t.targetLanguage;
+                // 간단한 JSON 파싱 로직
+                let parsedText = t.translatedData;
+                if (typeof parsedText === 'string' && parsedText.startsWith('{')) {
+                    try {
+                        const parsed = JSON.parse(parsedText);
+                        parsedText = parsed.text || parsedText;
+                    } catch {}
+                }
 
-              const langMap = { en: '영어', ja: '일본어', zh: '중국어', fr: '프랑스어', es: '스페인어', de: '독일어' };
-              const langLabel = langMap[t.targetLanguage?.toLowerCase()] || t.targetLanguage;
-
-              return (
-                <div key={t.translationId} className="trans__result-card">
-                  {/* 카드 헤더 + 본문 */}
-                  <div
-                    className="trans__result-main clickable"
-                    onClick={() =>
-                      setExpandedId(expandedId === t.translationId ? null : t.translationId)
-                    }
-                  >
-                    <span className="trans__lang">{langLabel}</span>
-                    <p className="trans__text">{parsedText}</p>
-                  </div>
-
-                  {/* ✅ 클릭 시 확장되는 재요청 폼 */}
-                  {expandedId === t.translationId && (
-                    <div className="trans__feedback-box">
-                      <textarea
-                        placeholder="피드백을 입력하세요 (예: 문장이 어색해요)"
-                        value={t.feedback || ''}
-                        onChange={(e) => {
-                          const newVal = e.target.value;
-                          setTranslations((prev) =>
-                            prev.map((item) =>
-                              item.translationId === t.translationId
-                                ? { ...item, feedback: newVal }
-                                : item
-                            )
-                          );
-                        }}
-                      />
-                      <button onClick={() => handleReRequest(t)} disabled={loading}>
-                        재요청
-                      </button>
+                return (
+                  <div key={t.translationId} className="trans-result-card">
+                    <header
+                      className="trans-result-card__header"
+                      onClick={() => setExpandedId(isExpanded ? null : t.translationId)}
+                    >
+                      <span className="trans-result-card__lang">{langLabel}</span>
+                      <FiChevronDown className={`trans-result-card__chevron ${isExpanded ? 'trans-result-card__chevron--expanded' : ''}`} />
+                    </header>
+                    <div className="trans-result-card__body">
+                      <p className="trans-result-card__text">{parsedText}</p>
                     </div>
-                  )}
-                </div>
-              );
+                    {isExpanded && (
+                      <footer className="trans-feedback-form">
+                        <textarea
+                          placeholder="번역 개선을 위한 피드백을 입력하세요..."
+                          value={t.feedback || ''}
+                          onChange={(e) => {
+                            const newVal = e.target.value;
+                            setTranslations((prev) =>
+                              prev.map((item) =>
+                                item.translationId === t.translationId ? { ...item, feedback: newVal } : item
+                              )
+                            );
+                          }}
+                        />
+                        <button onClick={() => handleReRequest(t)} disabled={loading}>
+                          <FiSend /> 재요청
+                        </button>
+                      </footer>
+                    )}
+                  </div>
+                );
             })}
           </div>
         ) : (
-          !loading && !error && translations.length === 0 && (
-            <div className="placeholder-message">
-              <h3>언어를 선택하고 번역요청을 해주세요.</h3>
+          !loading && !error && (
+            <div className="trans-placeholder">
+              <FiFileText />
+              <p>{contentId ? '아직 번역 결과가 없습니다.' : '콘텐츠를 선택하세요.'}</p>
             </div>
           )
         )}
-      </div>
+      </main>
     </div>
   );
 }

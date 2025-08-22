@@ -12,12 +12,12 @@ const HowToUse = forwardRef((props, ref) => {
         {
             icon: <FaTools />,
             title: "개발",
-            description: "생성된 기획안을 바탕으로 카드, 룰북, 3D 모델 등 게임 컴포넌트를 손쉽게 제작합니다."
+            description: "생성된 기획안을 바탕으로 카드, 룰북, 3D 모델 등 게임의 구성요소를 손쉽게 제작합니다."
         },
         {
             icon: <FaPaperPlane />,
             title: "퍼블리싱",
-            description: "완성된 게임을 커뮤니티에 공유하고, 전문가의 피드백을 받아 더 멋진 게임으로 발전시키세요."
+            description: "AI와 함께 완성된 게임을 번역하여 해외시장에 수출하고, 보드게임의 가격을 책정하세요."
         }
     ];
 

@@ -1,104 +1,183 @@
-.assign-list__container {
-  padding: 2rem;
+/* --- ✨ 디자인 시스템 변수 --- */
+:root {
+  --assign-accent: #E58A4E;
+  --assign-accent-light: #fffaf5;
+  --assign-bg-page: #f7f8fa;
+  --assign-bg-card: #ffffff;
+  --assign-text-primary: #1a202c;
+  --assign-text-secondary: #718096;
+  --assign-border-color: #e2e8f0;
+  --assign-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --assign-transition: all 0.2s ease-in-out;
+}
+
+/* --- ✨ 페이지 레이아웃 --- */
+.dev-assign-page {
+  background-color: var(--assign-bg-page);
+  padding: 40px;
   max-width: 1000px;
+  min-height: 100vh;
   margin: auto;
+  font-family: 'Pretendard', sans-serif;
 }
 
-.assign-list__title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
+.dev-assign-header {
+  margin-bottom: 24px;
+  text-align: left;
 }
 
-/* 테이블 스타일 */
-.project-table {
+.dev-assign-header__title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--assign-text-primary);
+  margin-bottom: 8px;
+}
+
+.dev-assign-header__subtitle {
+  font-size: 1rem;
+  color: var(--assign-text-secondary);
+}
+
+/* --- ✨ 필터 탭 --- */
+.dev-assign-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--assign-border-color);
+}
+
+.dev-assign-filters__button {
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--assign-text-secondary);
+  cursor: pointer;
+  transition: var(--assign-transition);
+}
+
+.dev-assign-filters__button:hover {
+  color: var(--assign-text-primary);
+  background-color: #f1f3f5;
+}
+
+.dev-assign-filters__button--active {
+  color: var(--assign-accent);
+  border-bottom-color: var(--assign-accent);
+}
+
+/* --- ✨ 데이터 테이블 --- */
+.dev-assign-table-wrapper {
+  background-color: var(--assign-bg-card);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--assign-shadow);
+}
+
+.dev-assign-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.project-table th, .project-table td {
-  padding: 0.8rem 1rem;
+.dev-assign-table thead th {
   text-align: left;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 12px 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--assign-text-secondary);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--assign-border-color);
+}
+
+.dev-assign-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.dev-assign-table tbody td {
+  padding: 16px 20px;
   font-size: 0.95rem;
+  color: var(--assign-text-primary);
+  border-bottom: 1px solid #f1f3f5; /* 더 연한 구분선 */
+  vertical-align: middle;
 }
 
-.project-table th {
-  background: #fafafa;
+.dev-assign-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.dev-assign-table tbody tr:hover {
+  background-color: var(--assign-accent-light);
+}
+
+.dev-assign-table__row--selected {
+  background-color: var(--assign-accent-light);
+  box-shadow: inset 4px 0 0 var(--assign-accent);
+}
+
+.dev-assign-table__id {
+  font-weight: 700;
+  color: var(--assign-text-secondary);
+}
+
+/* --- ✨ 상태 뱃지 (색상 점 + 텍스트) --- */
+.dev-assign-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 600;
+  font-size: 0.9rem;
 }
 
-/* 버튼 */
-.assign-btn {
-  background: #E58A4E;
+.dev-assign-status-badge::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dev-assign-status-badge--review_pending { color: #b7791f; }
+.dev-assign-status-badge--review_pending::before { background-color: #fefcbf; border: 1px solid #fde68a; }
+.dev-assign-status-badge--planning { color: #3182ce; }
+.dev-assign-status-badge--planning::before { background-color: #ebf8ff; border: 1px solid #bee3f8; }
+.dev-assign-status-badge--development { color: #2c7a7b; }
+.dev-assign-status-badge--development::before { background-color: #e6fffa; border: 1px solid #b2f5ea; }
+.dev-assign-status-badge--publishing { color: #166534; }
+.dev-assign-status-badge--publishing::before { background-color: #f0fdf4; border: 1px solid #bbf7d0; }
+.dev-assign-status-badge--completed { color: #4b5563; }
+.dev-assign-status-badge--completed::before { background-color: #f3f4f6; border: 1px solid #e5e7eb; }
+
+/* --- ✨ 하단 액션 버튼 --- */
+.dev-assign-footer {
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  margin-top: 24px;
+}
+
+.dev-assign-action-button {
+  background: var(--assign-accent);
   color: #fff;
   border: none;
-  padding: 0.45rem 0.9rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: var(--assign-transition);
+  box-shadow: var(--assign-shadow);
 }
 
-.assign-btn:hover {
-  background: #d4753a;
+.dev-assign-action-button:hover {
+  background: var(--assign-accent-dark);
+  transform: translateY(-2px);
 }
 
-/* 상태 뱃지 (프로젝트 목록과 톤 맞춤) */
-.status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  border-radius: 9999px;
-  text-transform: uppercase;
-}
-
-.status-review_pending {
-  background-color: #fefcbf; /* 연노랑 */
-  color: #b7791f;           /* 황갈색 */
-}
-
-.status-planning {
-  background-color: #ebf8ff; /* 연파랑 */
-  color: #3182ce;            /* 진파랑 */
-}
-
-.status-development {
-  background-color: #e6fffa; /* 연청록 */
-  color: #2c7a7b;            /* 진청록 */
-}
-
-.status-publishing {
-  background-color: #f0fdf4; /* 연초록 */
-  color: #166534;            /* 짙은 초록 */
-}
-
-.status-completed {
-  background-color: #f3f4f6; /* 연회색 */
-  color: #4b5563;            /* 진회색 */
-}
-
-
-.row-selected {
-  background-color: #fffaf0; /* 연아이보리 */
-}
-
-.assign-footer {
-  margin-top: 1rem;
-  text-align: right;
-}
-
-.check-cell {
-  text-align: center;
-  width: 50px;
-}
-
-.check-icon {
-  color: #E58A4E; /* 주황 */
-  font-size: 1.2rem;
+.dev-assign-action-button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }

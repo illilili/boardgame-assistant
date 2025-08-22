@@ -7,8 +7,10 @@
     box-sizing: border-box;
 }
 
+/* --- ▼ 스타일 분리 시작 ▼ --- */
+
+/* 두 컬럼에 공통으로 적용되는 레이아웃 스타일입니다. (배경색 제외) */
 .gcc__form-column, .gcc__result-column {
-    background-color: #FFFFFF;
     border-radius: 12px;
     padding: 32px;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -18,16 +20,28 @@
     box-sizing: border-box;
 }
 
+/* 왼쪽 컬럼은 기존 흰색 배경을 유지합니다. */
 .gcc__form-column {
     flex: 1;
     min-width: 400px;
+    background-color: #FFFFFF;
 }
 
+/* 오른쪽 컬럼에만 체크무늬 배경을 적용합니다. */
 .gcc__result-column {
     flex: 1.5;
     align-items: center;
     justify-content: center;
+    background-color: #f8f9fa; /* 바탕색은 유지합니다. */
+    /* --- ▼ 참조 파일에 맞춰 격자 스타일과 크기를 수정했습니다 ▼ --- */
+    background-image: 
+        linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
 }
+
+/* --- ▲ 스타일 분리 끝 ▲ --- */
+
 
 /* --- 탭 네비게이션 --- */
 .gcc__tab-navigation {
@@ -272,3 +286,12 @@
     text-align: center;
     font-weight: 500;
 }
+
+/* --- ▼ 메커니즘 목록 스타일 추가 ▼ --- */
+
+/* 메커니즘 목록의 각 항목(<p>) 사이의 간격을 조절합니다. */
+.gcc__mechanics-list p + p {
+    margin-top: 1em;
+}
+
+/* --- ▲ 여기까지 추가 ▲ --- */

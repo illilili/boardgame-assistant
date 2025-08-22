@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { getAllDevelopers, assignDeveloper } from '../../api/apiClient';
 import Select from 'react-select';
 import './DeveloperAssignModal.css';
 
-const DeveloperAssignModal = ({ project, onClose }) => {
+const DeveloperAssignModal = ({ project, onClose, onSuccess }) => {
   const [developers, setDevelopers] = useState([]);
-  const [selectedDev, setSelectedDev] = useState('');
+  const [selectedDev, setSelectedDev] = useState(null);
+  const [isAssigning, setIsAssigning] = useState(false);
 
-  // 이름 마스킹 (가운데 글자 * 처리)
+  // 이름/이메일 마스킹 함수 (기존과 동일)
   const maskName = (name) => {
     if (!name) return "-";
     if (name.length === 2) return name[0] + "*";
     if (name.length > 2) return name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
-    return name; // 한 글자면 그대로
+    return name;
   };
 
-  // 이메일 마스킹 (@ 앞 2글자만 보이게)
   const maskEmail = (email) => {
     if (!email) return "-";
     const [local, domain] = email.split("@");
@@ -36,61 +37,62 @@ const DeveloperAssignModal = ({ project, onClose }) => {
       alert('개발자를 선택해주세요.');
       return;
     }
+    setIsAssigning(true);
     try {
-      await assignDeveloper(project.projectId, selectedDev);
-      alert('배정 완료!');
-      onClose();
+      await assignDeveloper(project.projectId, selectedDev.value);
+      alert('배정이 완료되었습니다!');
+      onSuccess(); // 성공 콜백 호출
+      onClose();   // 모달 닫기
     } catch (err) {
       alert('배정 실패: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setIsAssigning(false);
     }
   };
+  
+  const developerOptions = developers.map(d => ({
+    value: d.userId,
+    label: `${maskName(d.name)} (${maskEmail(d.email)})`
+  }));
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h2>{project.projectName} - 개발자 배정</h2>
-        <Select
-          options={developers.map(d => ({
-            value: d.userId,
-            label: `${maskName(d.name)} (${maskEmail(d.email)})`
-          }))}
-          value={developers.find(d => d.userId === selectedDev) 
-            ? {
-                value: selectedDev,
-                label: `${maskName(developers.find(d => d.userId === selectedDev).name)} (${maskEmail(developers.find(d => d.userId === selectedDev).email)})`
-              }
-            : null}
-          onChange={(opt) => setSelectedDev(opt.value)}
-          placeholder="개발자 선택..."
-          styles={{
-            control: (base, state) => ({
-              ...base,
-              borderRadius: 8,
-              borderColor: state.isFocused ? '#E58A4E' : '#e5e7eb',
-              boxShadow: state.isFocused ? '0 0 0 3px rgba(229,138,78,0.2)' : 'none',
-              '&:hover': { borderColor: '#D4753A' },
-              fontSize: '0.95rem',
-            }),
-            option: (base, state) => ({
-              ...base,
-              fontSize: '0.95rem',
-              backgroundColor: state.isFocused ? '#fdf4eb' : '#fff',
-              color: state.isFocused ? '#E58A4E' : '#333',
-              cursor: 'pointer',
-            }),
-          }}
-        />
-        <div className="modal-actions">
-          <button className="modal-button assign" onClick={handleAssign}>
-            배정하기
+    <div className="dev-assign-modal-overlay" onClick={onClose}>
+      <div className="dev-assign-modal__content" onClick={(e) => e.stopPropagation()}>
+        <header className="dev-assign-modal__header">
+          <h2 className="dev-assign-modal__title">개발자 배정</h2>
+          <p className="dev-assign-modal__subtitle">
+            '{project?.projectName || '프로젝트'}'
+          </p>
+        </header>
+
+        <main className="dev-assign-modal__body">
+          <Select
+            options={developerOptions}
+            value={selectedDev}
+            onChange={setSelectedDev}
+            placeholder="배정할 개발자를 선택하세요..."
+            classNamePrefix="dev-assign-select" // CSS 스타일링을 위한 접두사
+            isDisabled={isAssigning}
+          />
+        </main>
+
+        <footer className="dev-assign-modal__actions">
+          <button className="dev-assign-modal__button dev-assign-modal__button--close" onClick={onClose} disabled={isAssigning}>
+            취소
           </button>
-          <button className="modal-button close" onClick={onClose}>
-            닫기
+          <button className="dev-assign-modal__button dev-assign-modal__button--assign" onClick={handleAssign} disabled={!selectedDev || isAssigning}>
+            {isAssigning ? '배정 중...' : '배정하기'}
           </button>
-        </div>
+        </footer>
       </div>
     </div>
   );
+};
+
+DeveloperAssignModal.propTypes = {
+  project: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func.isRequired,
 };
 
 export default DeveloperAssignModal;

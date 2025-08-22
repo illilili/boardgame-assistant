@@ -309,7 +309,7 @@ class CopyrightAnalyzer:
             overlapping = self._extract_overlapping_elements(game_data, meta)
             similar_games.append(
                 SimilarGame(
-                    title=meta.get("name", "Unknown Game"),
+                    title=meta.get("title", "Unknown Game"),
                     similarityScore=round(float(score) * 100, 1),
                     overlappingElements=overlapping,
                     bggLink=f"https://boardgamegeek.com/boardgame/{meta.get('game_id','')}" if meta.get("game_id") else None

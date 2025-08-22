@@ -251,7 +251,7 @@ function PricingEvaluation() {
 
     try {
       await completeProject(projectId);
-      setCompletionMessage('✅ 프로젝트가 완료 처리되었습니다.');
+      setCompletionMessage('프로젝트가 완료 처리되었습니다.');
       setCompletionError('');
       // navigate('/projects'); // 원하면 유지 or 제거
     } catch (error) {

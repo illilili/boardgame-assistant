@@ -26,14 +26,14 @@ function ComponentReviewDetail({ componentId, onBack }) {
 
   const handleDecision = async (approve) => {
     if (!approve && !rejectReason.trim()) {
-      setStatusMessage('❌ 반려 사유를 입력해주세요.');
+      setStatusMessage('반려 사유를 입력해주세요.');
       return;
     }
 
     try {
       setActionLoading(true);
       await reviewComponent({ componentId, approve, reason: approve ? null : rejectReason });
-      setStatusMessage(approve ? '✅ 승인되었습니다.' : '❌ 반려되었습니다.');
+      setStatusMessage(approve ? '승인되었습니다.' : '반려되었습니다.');
       setRejectReason('');
       // 승인/반려 후 목록으로 이동
       setTimeout(() => {
@@ -148,14 +148,14 @@ function ComponentReviewDetail({ componentId, onBack }) {
             disabled={actionLoading}
             className="approve-btn"
           >
-            ✅ 승인
+            승인
           </button>
           <button
             onClick={() => handleDecision(false)}
             disabled={actionLoading || !rejectReason.trim()}
             className="reject-btn"
           >
-            ❌ 반려
+            반려
           </button>
         </div>
         <button onClick={onBack} className="back-btn">
