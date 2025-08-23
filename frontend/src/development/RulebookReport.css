@@ -1,16 +1,30 @@
 .rulebook-report {
-  white-space: pre-wrap;       /* 줄바꿈 유지 */
-  line-height: 1.4;            /* 줄 간격 */
-  font-size: 0.95rem;          /* 기본 글자 크기 */
-  max-height: 80vh;            /* 최대 높이 제한 */
-  overflow-y: auto;            /* 세로 스크롤 */
-  padding-right: 8px;          /* 스크롤 여백 */
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;       /* 내용이 길어지면 세로 스크롤 생성 */
+  white-space: pre-wrap;  /* 줄바꿈과 공백 유지 */
+  line-height: 1.7;       /* 줄 간격을 넓혀 가독성 향상 */
+  font-size: 1rem;        /* 기본 글자 크기 */
+  color: #333;
+  padding: 32px;          /* 문서의 안쪽 여백 */
+  box-sizing: border-box; /* 패딩이 너비/높이에 포함되도록 설정 */
 }
 
+.rulebook-report h1,
+.rulebook-report h2,
+.rulebook-report h3,
+.rulebook-report h4 {
+  margin-top: 1.8em;
+  margin-bottom: 0.8em;
+  font-weight: 700;
+  color: #111;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid #eee; /* 제목 구분선 */
+}
 /* 제목 크기 조절 */
-.rulebook-report h1 { font-size: 1.4rem; }
-.rulebook-report h2 { font-size: 1.2rem; }
-.rulebook-report h3 { font-size: 1.05rem; }
+.rulebook-report h1 { font-size: 1.8rem; }
+.rulebook-report h2 { font-size: 1.5rem; }
+.rulebook-report h3 { font-size: 1.25rem; }
 
 /* 제목 상하 여백 축소 */
 .rulebook-report h1,
@@ -23,17 +37,32 @@
 /* 리스트 여백 축소 */
 .rulebook-report ul,
 .rulebook-report ol {
-  margin-left: 18px;
-  margin-top: 0.1em;
-  margin-bottom: 0.1em;
+  padding-left: 24px;
+  margin-bottom: 1em;
 }
 
 .rulebook-report li {
-  margin-bottom: 0.1em;
+  margin-bottom: 0.5em;
 }
+
 
 /* 문단 여백 최소화 */
 .rulebook-report p {
-  margin-top: 0.15em;
-  margin-bottom: 0.15em;
+  margin-bottom: 1em;
+}
+
+.rulebook-report strong {
+  color: #e58a4e; /* 강조 텍스트에 포인트 색상 적용 */
+}
+
+/* 스크롤바 디자인 (선택 사항) */
+.rulebook-report::-webkit-scrollbar {
+  width: 8px;
+}
+.rulebook-report::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+.rulebook-report::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
 }

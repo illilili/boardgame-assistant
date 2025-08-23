@@ -102,10 +102,10 @@ function ThumbnailGenerator({ contentId, componentId }) {
       });
       setGeneratedThumbnail(response);
       localStorage.setItem(`thumbnail_${finalContentId}`, JSON.stringify(response));
-      setMessage('✅ 썸네일 생성 성공!');
+      setMessage('썸네일 생성 성공!');
     } catch (err) {
       console.error(err);
-      setMessage('❌ 썸네일 생성 실패');
+      setMessage('썸네일 생성 실패');
     } finally {
       setIsLoading(false);
     }
@@ -133,8 +133,8 @@ function ThumbnailGenerator({ contentId, componentId }) {
   };
 
   const handleRollbackVersion = async () => {
-    if (!selectedVersion) return setMessage('❌ 롤백할 버전을 선택하세요.');
-    if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
+    if (!selectedVersion) return setMessage('롤백할 버전을 선택하세요.');
+    if (!finalContentId) return setMessage('콘텐츠 ID가 없습니다.');
     setIsLoading(true);
     setError('');
     setMessage('');
@@ -150,42 +150,42 @@ function ThumbnailGenerator({ contentId, componentId }) {
         });
       }
       await fetchVersions();
-      setMessage(`✅ 롤백 완료! (버전 ID: ${selectedVersion.value})`);
+      setMessage(`롤백 완료! (버전 ID: ${selectedVersion.value})`);
     } catch (err) {
       console.error(err);
-      setMessage('❌ 롤백 실패');
+      setMessage('롤백 실패');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleComplete = async () => {
-    if (!finalContentId) return setMessage('❌ 콘텐츠 ID가 없습니다.');
+    if (!finalContentId) return setMessage('콘텐츠 ID가 없습니다.');
     setIsLoading(true);
     setError('');
     setMessage('');
     try {
       await completeContent(finalContentId);
-      setMessage('✅ 완료 처리되었습니다. 이제 제출할 수 있어요.');
+      setMessage('완료 처리되었습니다. 이제 제출할 수 있어요.');
     } catch (err) {
       console.error(err);
-      setMessage('❌ 완료 처리 실패');
+      setMessage('완료 처리 실패');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSubmitVersion = async () => {
-    if (!componentId) return setMessage('❌ 컴포넌트 ID가 없습니다.');
+    if (!componentId) return setMessage('컴포넌트 ID가 없습니다.');
     setIsLoading(true);
     setError('');
     setMessage('');
     try {
       await submitComponent(componentId);
-      setMessage('🎉 제출 완료! 퍼블리셔 검토(PENDING_REVIEW)로 이동했습니다.');
+      setMessage('제출 완료! 퍼블리셔 검토(PENDING_REVIEW)로 이동했습니다.');
     } catch (err) {
       console.error(err);
-      setMessage('❌ 제출 실패');
+      setMessage('제출 실패');
     } finally {
       setIsLoading(false);
     }

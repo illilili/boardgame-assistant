@@ -1,4 +1,4 @@
-/* 실시간 TOP 30 분석 페이지 스타일 - Plan 폴더 디자인 시스템 적용 */
+/* 실시간 TOP 30 분석 페이지 스타일 */
 .live-top50-analysis {
   min-height: 100vh;
   background-color: var(--bg-light, #f9fafb);
@@ -7,7 +7,6 @@
   color: var(--text-primary, #111827);
 }
 
-/* 배경 - 깔끔한 디자인으로 변경 */
 .live-background {
   position: absolute;
   top: 0;
@@ -26,7 +25,7 @@
   padding: 2rem;
 }
 
-/* 헤더 */
+/* --- 헤더 --- */
 .live-dashboard-header {
   position: relative;
   margin-bottom: 3rem;
@@ -51,39 +50,12 @@
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
-  white-space: nowrap;
-  min-width: auto;
 }
 
 .back-button:hover {
   background: #f3f4f6;
   border-color: var(--accent-warm, #E58A4E);
   transform: translateY(-1px);
-}
-
-.refresh-button-header {
-  background: var(--accent-warm, #E58A4E);
-  border: 1px solid var(--accent-warm, #E58A4E);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
-}
-
-.refresh-button-header:hover:not(:disabled) {
-  background: #B8713A;
-  border-color: #B8713A;
-  transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.3);
-}
-
-.refresh-button-header:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .header-content {
@@ -110,11 +82,7 @@
   color: var(--text-secondary, #6b7280);
   margin: 0;
   font-weight: 400;
-  letter-spacing: 0.01em;
-  line-height: 1.5;
 }
-
-/* liveGlow 애니메이션 제거 - 깔끔한 디자인으로 변경 */
 
 .data-meta-info {
   display: grid;
@@ -136,24 +104,14 @@
 }
 
 .meta-item:hover {
-  background: #f9fafb;
   border-color: var(--accent-warm, #E58A4E);
   transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.1);
-}
-
-.meta-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-  color: var(--accent-warm, #E58A4E);
 }
 
 .meta-label {
   font-size: 0.9rem;
   color: var(--text-secondary, #6b7280);
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   min-width: 80px;
 }
 
@@ -164,45 +122,9 @@
   flex: 1;
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .header-navigation {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-  
-  .main-title {
-    font-size: 2.5rem;
-  }
-  
-  .subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .data-meta-info {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-  
-  .meta-item {
-    padding: 1rem;
-  }
-  
-  .meta-label {
-    min-width: 70px;
-    font-size: 0.8rem;
-  }
-  
-  .meta-value {
-    font-size: 0.9rem;
-  }
-}
-
-/* 로딩 상태 */
+/* --- 로딩 및 에러 상태 --- */
 .live-loading-container {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
@@ -211,39 +133,35 @@
 
 .live-loading-content {
   background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
   border-radius: 24px;
   padding: 3rem;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
   max-width: 500px;
 }
 
 .live-loading-spinner {
-  width: 80px;
-  height: 80px;
-  border: 4px solid rgba(239, 68, 68, 0.2);
-  border-top: 4px solid #ef4444;
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(229, 138, 78, 0.2);
+  border-top-color: var(--accent-warm, #E58A4E);
   border-radius: 50%;
   animation: liveSpinner 1s linear infinite;
   margin: 0 auto 2rem auto;
 }
 
 @keyframes liveSpinner {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 
 .live-loading-content h3 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1f2937;
   margin: 0 0 1rem 0;
 }
 
 .live-loading-content p {
   font-size: 1rem;
-  color: #6b7280;
+  color: var(--text-secondary, #6b7280);
   margin: 0 0 2rem 0;
 }
 
@@ -254,52 +172,48 @@
 }
 
 .loading-step {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: #f1f5f9;
   padding: 0.75rem;
   border-radius: 8px;
   font-size: 0.875rem;
-  color: #374151;
   font-weight: 500;
   flex: 1;
-  animation: stepPulse 2s ease-in-out infinite;
 }
 
-@keyframes stepPulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-
-/* 에러 상태 */
 .live-error-alert {
-  background: rgba(248, 113, 113, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
   border-radius: 16px;
-  padding: 3rem;
+  padding: 2rem;
   margin: 3rem auto;
   max-width: 600px;
   text-align: center;
-  animation: errorShake 0.5s ease-out;
+  color: #991b1b;
+}
+
+.error-icon-text {
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
 }
 
 .retry-button {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #ef4444;
   color: white;
-  padding: 1rem 2rem;
-  border-radius: 12px;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 1rem;
-  transition: all 0.3s ease;
+  margin-top: 1.5rem;
+  transition: background-color 0.2s ease;
 }
 
 .retry-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #dc2626;
 }
 
-/* TOP 30 랭킹 섹션 - Plan 스타일 적용 */
+/* --- TOP 30 랭킹 섹션 --- */
 .top50-ranking-section {
   margin: 2rem 0;
   background: var(--white, #ffffff);
@@ -314,37 +228,33 @@
   margin-bottom: 3rem;
 }
 
+.section-title-area {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem 2rem;
+  margin-bottom: 1rem;
+}
+
 .section-title {
   font-size: 1.875rem;
   font-weight: 700;
   color: var(--text-primary, #111827);
-  margin: 0 0 1rem 0;
-  letter-spacing: -0.01em;
+  margin: 0;
 }
 
 .section-subtitle {
   font-size: 1rem;
   color: var(--text-secondary, #6b7280);
   margin: 0;
-  font-weight: 400;
-}
-
-/* 섹션 헤더 레이아웃 */
-.section-title-area {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  margin-bottom: 1rem;
 }
 
 .section-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
 }
 
-/* 전체 번역 버튼 - Plan 스타일 */
 .translate-all-button {
   padding: 0.75rem 1.5rem;
   background: var(--accent-warm, #E58A4E);
@@ -355,71 +265,57 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
   white-space: nowrap;
-  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
   min-width: 180px;
   justify-content: center;
 }
 
 .translate-all-button:hover:not(:disabled) {
   background: #B8713A;
-  border-color: #B8713A;
   transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(229, 138, 78, 0.3);
 }
 
 .translate-all-button:disabled {
   background: var(--text-secondary, #6b7280);
-  border-color: var(--text-secondary, #6b7280);
   cursor: not-allowed;
-  transform: none;
-  box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
   opacity: 0.6;
 }
 
 .translate-all-button.translating {
   background: #f59e0b;
-  border-color: #f59e0b;
   animation: translatePulse 2s ease-in-out infinite;
 }
 
 .translate-all-button.translated {
   background: #059669;
-  border-color: #059669;
 }
 
 @keyframes translatePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  50% { opacity: 0.8; }
 }
 
-/* 게임 카드 그리드 */
+/* --- 게임 카드 그리드 --- */
 .top50-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
-  padding: 0;
 }
 
-/* 게임 카드 - Plan 스타일 적용 */
 .game-card {
   background: var(--white, #ffffff);
   border-radius: 12px;
   padding: 1.5rem;
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   position: relative;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1));
   border: 1px solid var(--border-color, #e5e7eb);
   overflow: hidden;
+  min-height: 180px;
+  align-items: flex-start;
 }
-
-/* 카드 애니메이션 제거 - 깔끔한 디자인 */
 
 .game-card:hover {
   transform: translateY(-2px);
@@ -427,13 +323,8 @@
   border-color: var(--accent-warm, #E58A4E);
 }
 
-.game-card.clickable:active {
-  transform: translateY(0);
-  transition: all 0.1s ease;
-}
-
 .game-card.clickable:hover::after {
-  content: '🔍 상세보기';
+  content: '상세보기';
   position: absolute;
   top: 10px;
   right: 15px;
@@ -444,78 +335,37 @@
   font-size: 0.75rem;
   font-weight: 500;
   z-index: 2;
-  opacity: 0.9;
 }
 
-/* 게임 순위 배지 - 썸네일 왼쪽 상단 빈 공간에 배치 */
 .game-rank {
   position: absolute;
   top: 0.75rem;
   left: 0.75rem;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.9);
   color: var(--accent-warm, #E58A4E);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
   padding: 0.3rem 0.6rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(229, 138, 78, 0.2);
-  min-width: 30px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: 0.01em;
   z-index: 2;
-  transition: all 0.2s ease;
   backdrop-filter: blur(8px);
 }
 
 .game-card:hover .game-rank {
   background: var(--accent-warm, #E58A4E);
   color: white;
-  transform: translateY(-1px) scale(1.05);
-  box-shadow: 0 3px 8px rgba(229, 138, 78, 0.3);
-  border-color: var(--accent-warm, #E58A4E);
 }
 
-/* 게임 썸네일 - 기존 작은 크기 */
-.game-thumbnail {
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.game-thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.game-card:hover .game-thumbnail img {
-  transform: scale(1.1);
-}
-
-/* 게임 썸네일 - 새로운 큰 크기 */
 .game-thumbnail-large {
   width: 120px;
   height: 120px;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #f3f4f6;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .game-thumbnail-large img {
@@ -529,249 +379,14 @@
   transform: scale(1.05);
 }
 
-/* 게임 정보 */
 .game-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .game-name {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 0.25rem 0;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.game-year {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 1rem;
-}
-
-/* 게임 통계 */
-.game-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-}
-
-.stat-icon {
-  font-size: 1rem;
-}
-
-.stat-value {
-  font-weight: 600;
-  color: #374151;
-}
-
-/* 게임 태그 */
-.game-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.game-tag {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  color: #374151;
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.25rem 0.5rem;
-  border-radius: 8px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.category-tag {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
-  color: #6366f1;
-  border-color: rgba(99, 102, 241, 0.2);
-}
-
-.mechanic-tag {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
-  color: #10b981;
-  border-color: rgba(16, 185, 129, 0.2);
-}
-
-/* 반응형 디자인 */
-@media (max-width: 1024px) {
-  .top50-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .live-container {
-    padding: 1rem;
-  }
-  
-  .live-dashboard-title {
-    font-size: 2.5rem;
-  }
-  
-  .section-title {
-    font-size: 2rem;
-  }
-  
-  .top50-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .game-card {
-    padding: 1.25rem;
-  }
-  
-  .data-info {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .loading-steps {
-    flex-direction: column;
-  }
-}
-
-/* 새로운 컴팩트 통계 스타일 */
-.game-stats-new {
-  display: flex;
-  gap: 0.75rem;
-  margin: 0.75rem 0;
-  flex-wrap: wrap;
-}
-
-.stat-item-compact {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(102, 126, 234, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(102, 126, 234, 0.2);
-  border-radius: 12px;
-  padding: 0.5rem 0.75rem;
-  min-width: 65px;
-  transition: all 0.3s ease;
-  flex: 1;
-}
-
-.stat-item-compact:hover {
-  background: rgba(102, 126, 234, 0.15);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.1);
-}
-
-.stat-item-compact .stat-icon {
-  font-size: 1rem;
-  margin-bottom: 0.25rem;
-}
-
-.stat-item-compact .stat-value {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.125rem;
-  min-height: 1.25rem;
-  display: flex;
-  align-items: center;
-}
-
-.stat-item-compact .stat-label {
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-/* 새로운 태그 스타일 */
-.game-tags-new {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-}
-
-.game-tags-new .game-tag {
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.25rem 0.6rem;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  transition: all 0.3s ease;
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.game-tags-new .category-tag {
-  background: rgba(16, 185, 129, 0.1);
-  color: #059669;
-  border-color: rgba(16, 185, 129, 0.2);
-}
-
-.game-tags-new .category-tag:hover {
-  background: rgba(16, 185, 129, 0.15);
-  transform: translateY(-1px);
-}
-
-.game-tags-new .mechanic-tag {
-  background: rgba(147, 51, 234, 0.1);
-  color: #7c3aed;
-  border-color: rgba(147, 51, 234, 0.2);
-}
-
-.game-tags-new .mechanic-tag:hover {
-  background: rgba(147, 51, 234, 0.15);
-  transform: translateY(-1px);
-}
-
-.game-tags-new .click-tag {
-  background: rgba(107, 114, 128, 0.1);
-  color: #6b7280;
-  border-color: rgba(107, 114, 128, 0.2);
-  font-style: italic;
-}
-
-.tags-loading {
-  font-size: 0.875rem;
-  color: #9ca3af;
-  font-style: italic;
-  padding: 0.5rem 0;
-  animation: pulseLoading 1.5s ease-in-out infinite;
-}
-
-@keyframes pulseLoading {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-/* 기존 게임 카드 레이아웃 조정 */
-.game-card {
-  min-height: 180px;
-  align-items: flex-start;
-}
-
-.game-card .game-info {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0; /* flex overflow 방지 */
-}
-
-.game-card .game-name {
   font-size: 1.125rem;
   font-weight: 600;
   color: #1f2937;
@@ -783,64 +398,95 @@
   overflow: hidden;
 }
 
-.game-card .game-year {
+.game-year {
   font-size: 0.875rem;
   color: #6b7280;
   margin: 0 0 0.75rem 0;
+}
+
+.game-stats-new {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.stat-item-compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 0.5rem;
+  min-width: 65px;
+  flex: 1;
+}
+
+.stat-item-compact .stat-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1f2937;
+  min-height: 1.25rem;
+}
+
+.stat-item-compact .stat-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.game-tags-new {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto; /* 태그를 카드 하단에 고정 */
+  padding-top: 0.5rem;
+}
+
+.game-tags-new .game-tag {
+  font-size: 0.75rem;
   font-weight: 500;
+  padding: 0.25rem 0.6rem;
+  border-radius: 8px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-tags-new .category-tag {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.game-tags-new .mechanic-tag {
+  background: rgba(147, 51, 234, 0.1);
+  color: #7c3aed;
+}
+
+.game-tags-new .click-tag {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.tags-loading {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+/* --- 반응형 디자인 --- */
+@media (max-width: 768px) {
+  .live-container { padding: 1rem; }
+  .main-title { font-size: 2rem; }
+  .top50-grid { grid-template-columns: 1fr; }
+  .data-meta-info { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
-  .live-dashboard-title {
-    font-size: 2rem;
-  }
-  
-  .game-thumbnail-large {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .stat-item-compact {
-    min-width: 55px;
-    padding: 0.4rem 0.6rem;
-  }
-  
-  .stat-item-compact .stat-value {
-    font-size: 0.8rem;
-  }
-  
-  .stat-item-compact .stat-label {
-    font-size: 0.7rem;
-  }
-  
-  .game-card {
-    min-height: 160px;
-    padding: 1.25rem;
-  }
-  
-  .back-button {
-    position: static;
-    margin-bottom: 1rem;
-    align-self: flex-start;
-  }
-  
-  .game-card {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .game-thumbnail {
-    width: 100px;
-    height: 100px;
-    margin: 0 auto;
-  }
-  
-  .game-rank {
-    top: 0.5rem;
-    right: 0.5rem;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    min-width: 28px;
-    height: 22px;
-  }
+  .game-card { flex-direction: column; align-items: center; text-align: center; }
+  .game-thumbnail-large { width: 100px; height: 100px; }
+  .game-info { align-items: center; }
+  .game-stats-new { justify-content: center; }
+  .game-tags-new { justify-content: center; }
 }
