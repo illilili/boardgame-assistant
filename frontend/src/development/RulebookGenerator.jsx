@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Document, Packer, Paragraph, HeadingLevel } from "docx";
 import { saveAs } from "file-saver";
-import ReactMarkdown from "react-markdown"; // RulebookReport 대신 직접 import
+import ReactMarkdown from "react-markdown";
 import {
   generateRulebook,
   getContentVersions,
@@ -57,10 +57,6 @@ function RulebookGenerator({ contentId, componentId }) {
         // 버전 목록
         const versions = await getContentVersions(finalContentId);
         setVersions(versions);
-        if (versions.length > 0) {
-          // 초기 선택값은 비워두어 사용자가 직접 선택하도록 유도
-          // setSelectedVersion(versions[0].versionId);
-        }
       } catch (err) {
         console.error(err);
         setError("룰북 데이터 불러오기 실패");
@@ -195,7 +191,6 @@ function RulebookGenerator({ contentId, componentId }) {
     setIsLoading(true);
 
     try {
-      // 룰북 텍스트를 contentData로 함께 저장
       await saveContentVersion({
         contentId: finalContentId,
         note: versionNote,
@@ -222,7 +217,7 @@ function RulebookGenerator({ contentId, componentId }) {
       const detail = await getContentDetail(finalContentId);
       if (detail?.contentData) setRulebookText(detail.contentData);
       setSuccessMessage(`롤백 완료!`);
-      setSelectedVersion(null); // 롤백 후 선택 초기화
+      setSelectedVersion(null);
     } catch {
       setError("롤백 실패");
     } finally {
@@ -234,7 +229,6 @@ function RulebookGenerator({ contentId, componentId }) {
   const renderResult = () => {
     if (!rulebookText) return null;
 
-    // PDF URL인지 판별
     if (rulebookText.startsWith("http") && rulebookText.endsWith(".pdf")) {
       return (
         <iframe
@@ -245,7 +239,6 @@ function RulebookGenerator({ contentId, componentId }) {
       );
     }
 
-    // 기본 텍스트 → 마크다운 렌더링
     return (
       <div className="rulebook-report">
         <ReactMarkdown>{rulebookText}</ReactMarkdown>
@@ -258,7 +251,7 @@ function RulebookGenerator({ contentId, componentId }) {
       {/* ------------------- 왼쪽: 입력 및 버전관리 ------------------- */}
       <div className="generator-form-section">
         <div className="form-section-header">
-          <h2> 룰북 생성</h2>
+          <h2>룰북 생성</h2>
           <p>룰북 초안을 자동 생성하고 완성된 룰북 PDF를 업로드하세요.</p>
         </div>
 
@@ -274,123 +267,134 @@ function RulebookGenerator({ contentId, componentId }) {
           </div>
         )}
 
-        <div className="rulebook-form-group">
+        {/* === 작업 #1: 룰북 초안 생성 === */}
+        <div className="control-box">
+          <h4>AI로 초안 생성</h4>
+          <div className="rulebook-form-group">
+            <button
+              className="generate-btn"
+              onClick={handleGenerate}
+              disabled={isLoading}
+            >
+              {isLoading ? "생성 중..." : "룰북 초안 생성하기"}
+            </button>
+            <button
+              type="button"
+              className="download-btn"
+              onClick={handleDownload}
+              disabled={!rulebookText || isLoading}
+            >
+              DOCX 다운로드
+            </button>
+          </div>
+        </div>
+
+        {/* === 작업 #2: 완성된 PDF 업로드 === */}
+        <div className="control-box">
+          <h4>완성된 PDF 직접 업로드</h4>
+          <div className="file-upload-group">
+            <div className="file-input-row">
+              <div className="file-input-box">
+                <input
+                  type="file"
+                  id="fileInput"
+                  onChange={handleFileChange}
+                  className="file-upload-input"
+                  accept="application/pdf"
+                />
+                <label htmlFor="fileInput" className="file-select-btn">
+                  파일 선택
+                </label>
+                <span className="file-name">
+                  {submissionFile
+                    ? submissionFile.name
+                    : "파일을 선택해 주세요"}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="file-upload-button"
+                onClick={handleUploadPdf}
+                disabled={isLoading || !submissionFile}
+              >
+                업로드
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* === 고급 기능: 버전 관리 (토글 방식) === */}
+        <details className="control-box accordion">
+          <summary>
+            <h4>버전 관리</h4>
+          </summary>
+          <div className="accordion-content">
+            <div className="model-version-note">
+              <label>버전 메모:</label>
+              <input
+                type="text"
+                value={versionNote}
+                onChange={(e) => setVersionNote(e.target.value)}
+                placeholder="예: 룰북 v1 초안"
+                disabled={!rulebookText}
+              />
+              <button
+                className="save"
+                onClick={handleSaveVersion}
+                disabled={!rulebookText || isLoading}
+              >
+                버전 저장
+              </button>
+            </div>
+            <div className="model-version-select-row">
+              <Select
+                className="version-select"
+                classNamePrefix="react-select"
+                value={selectedVersion}
+                onChange={setSelectedVersion}
+                options={versions.map((v) => ({
+                  value: v.versionId,
+                  label: `v${v.versionNo} - ${v.note} (${new Date(
+                    v.createdAt
+                  ).toLocaleString()})`,
+                }))}
+                placeholder={versions.length > 0 ? "버전 선택" : "저장된 버전 없음"}
+                isDisabled={versions.length === 0}
+                isClearable
+              />
+              {selectedVersion && (
+                <button
+                  className="rollback"
+                  onClick={handleRollbackVersion}
+                  disabled={isLoading}
+                >
+                  롤백
+                </button>
+              )}
+            </div>
+          </div>
+        </details>
+
+        {/* === 최종 제출 === */}
+        <div className="submit-complete-section">
           <button
-            className="generate-btn"
-            onClick={handleGenerate}
+            className="primary-button"
+            onClick={handleSubmitUploaded}
             disabled={isLoading}
           >
-            {isLoading ? "생성 중..." : "룰북 초안 생성하기"}
-          </button>
-          <button
-            type="button"
-            className="download-btn"
-            onClick={handleDownload}
-          >
-            DOCX 다운로드
+            최종 제출
           </button>
         </div>
 
-        {rulebookText && (
-          <>
-            <div className="model-version-manager">
-              <h4>버전 관리</h4>
-              <div className="model-version-note">
-                <label>버전 메모:</label>
-                <input
-                  type="text"
-                  value={versionNote}
-                  onChange={(e) => setVersionNote(e.target.value)}
-                  placeholder="예: 룰북 v1 초안"
-                />
-                <button
-                  className="save"
-                  onClick={handleSaveVersion}
-                  disabled={isLoading}
-                >
-                  버전 저장
-                </button>
-              </div>
-
-              <div className="model-version-select-row">
-                <Select
-                  className="version-select"
-                  classNamePrefix="react-select"
-                  value={selectedVersion}
-                  onChange={setSelectedVersion}
-                  options={versions.map((v) => ({
-                    value: v.versionId,
-                    label: `v${v.versionNo} - ${v.note} (${new Date(
-                      v.createdAt
-                    ).toLocaleString()})`,
-                  }))}
-                  placeholder={versions.length > 0 ? "버전 선택" : "저장된 버전 없음"}
-                  isDisabled={versions.length === 0}
-                  isClearable
-                />
-
-                {selectedVersion && (
-                  <button
-                    className="rollback"
-                    onClick={handleRollbackVersion}
-                    disabled={isLoading}
-                  >
-                    롤백
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="pdf-upload-section">
-              <h4>PDF 파일 업로드</h4>
-              <div className="file-upload-group">
-                <div className="file-input-row">
-                  <div className="file-input-box">
-                    <input
-                      type="file"
-                      id="fileInput"
-                      onChange={handleFileChange}
-                      className="file-upload-input"
-                      accept="application/pdf"
-                    />
-                    <label htmlFor="fileInput" className="file-select-btn">
-                      파일 선택
-                    </label>
-                    <span className="file-name">
-                      {submissionFile
-                        ? submissionFile.name
-                        : "파일을 선택해 주세요"}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    className="file-upload-button"
-                    onClick={handleUploadPdf}
-                    disabled={isLoading || !submissionFile}
-                  >
-                    업로드
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="submit-complete-section">
-              <button
-                className="primary-button"
-                onClick={handleSubmitUploaded}
-                disabled={isLoading}
-              >
-                제출
-              </button>
-            </div>
-          </>
-        )}
-
-        {error && <p className="error-message">{error}</p>}
-        {successMessage && (
-          <p className="success-message">{successMessage}</p>
-        )}
+        {/* === 메시지 표시 영역 === */}
+        <div className="message-area">
+          {error && <p className="error-message">{error}</p>}
+          {successMessage && (
+            <p className="success-message">{successMessage}</p>
+          )}
+        </div>
       </div>
+
 
       {/* ------------------- 오른쪽: 결과 뷰어 ------------------- */}
       <div
