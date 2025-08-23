@@ -69,9 +69,34 @@ public class AuthService {
                 user.getRole().name(),
                 user.getName() // ★ 이름 전달
         );
-        String refreshToken = "not-implemented";
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
 
         return new LoginResponse(accessToken, refreshToken);
+    }
+
+    public LoginResponse refreshToken(RefreshRequest request) {
+        String refreshToken = request.getRefreshToken();
+
+        // Refresh Token 검증
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        // Refresh Token에서 사용자 이메일 추출
+        String email = jwtTokenProvider.getUserEmailFromToken(refreshToken);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 새로운 Access / Refresh Token 발급
+        String newAccessToken = jwtTokenProvider.createAccessToken(
+                user.getEmail(),
+                user.getRole().name(),
+                user.getName()
+        );
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(user.getEmail());
+
+        return new LoginResponse(newAccessToken, newRefreshToken);
     }
 
     public LogoutResponse logout(String token) {
