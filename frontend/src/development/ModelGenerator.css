@@ -50,22 +50,23 @@
 }
 
 /* --- ✨ 왼쪽 패널 --- */
-.model-gen-header {
+/* 이 코드를 추가하세요 */
+/* --- ✨ 왼쪽 패널 --- */
+.form-section-header {
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--model-gen-border-color);
+  border-bottom: 1px solid #e5e7eb;
 }
-.model-gen-header h2 {
+.form-section-header h2 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--model-gen-text-primary);
+  color: #1f2328;
   margin-bottom: 8px;
 }
-.model-gen-header p {
+.form-section-header p {
   font-size: 1rem;
-  color: var(--model-gen-text-secondary);
+  color: #6e7781;
 }
-
 .model-gen-form {
   display: flex;
   flex-direction: column;

@@ -76,16 +76,16 @@ function ModelGenerator({ contentId, componentId }) {
   }, [finalContentId, fetchVersions, refreshGlbFromDetail]);
 
   const handleGenerateClick = async () => {
-    if (!finalContentId) return setMessage('❌ 콘텐츠 ID를 입력하세요.');
-    if (!style) return setMessage('❌ 스타일을 선택하세요.');
+    if (!finalContentId) return setMessage('콘텐츠 ID를 입력하세요.');
+    if (!style) return setMessage('스타일을 선택하세요.');
     setIsLoading(true);
     setMessage('');
     try {
       await generate3DModel({ contentId: finalContentId, name, description, componentInfo, theme, storyline, style });
       await refreshGlbFromDetail();
-      setMessage('✅ 3D 모델 생성 성공!');
+      setMessage('3D 모델 생성 성공!');
     } catch {
-      setMessage('❌ 3D 모델 생성 실패');
+      setMessage('3D 모델 생성 실패');
     } finally {
       setIsLoading(false);
     }
@@ -98,9 +98,9 @@ function ModelGenerator({ contentId, componentId }) {
       await saveContentVersion({ contentId: finalContentId, note: versionNote });
       setVersionNote('3D 모델 스냅샷');
       await fetchVersions();
-      setMessage('✅ 버전 저장 성공!');
+      setMessage('버전 저장 성공!');
     } catch {
-      setMessage('❌ 버전 저장 실패');
+      setMessage('버전 저장 실패');
     } finally {
       setIsLoading(false);
     }
@@ -113,9 +113,9 @@ function ModelGenerator({ contentId, componentId }) {
       await rollbackContentVersion(finalContentId, selectedVersion.value);
       await refreshGlbFromDetail();
       await fetchVersions();
-      setMessage('↩️ 이전 버전으로 롤백되었습니다.');
+      setMessage('↩ 이전 버전으로 롤백되었습니다.');
     } catch {
-      setMessage('❌ 롤백 실패');
+      setMessage('롤백 실패');
     } finally {
       setIsLoading(false);
     }
@@ -126,9 +126,9 @@ function ModelGenerator({ contentId, componentId }) {
     setIsLoading(true);
     try {
       await completeContent(finalContentId);
-      setMessage('✅ 완료 처리되었습니다.');
+      setMessage('완료 처리되었습니다.');
     } catch {
-      setMessage('❌ 완료 처리 실패');
+      setMessage('완료 처리 실패');
     } finally {
       setIsLoading(false);
     }
@@ -139,22 +139,23 @@ function ModelGenerator({ contentId, componentId }) {
     setIsLoading(true);
     try {
       await submitComponent(componentId);
-      setMessage('🎉 제출 완료!');
+      setMessage('제출 완료!');
     } catch {
-      setMessage('❌ 제출 실패');
+      setMessage('제출 실패');
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="model-gen-layout">
       {/* 왼쪽: 입력 및 버전관리 */}
       <div className="model-gen-panel model-gen-panel--form">
-        <header className="model-gen-header">
+        {/* === 헤더 클래스 이름 변경 === */}
+        <div className="form-section-header">
           <h2>3D 모델 생성</h2>
           <p>모델 정보를 입력하고 GLB 파일을 생성 및 관리합니다.</p>
-        </header>
+        </div>
 
         <form className="model-gen-form">
           {!isFromList && (
@@ -221,8 +222,8 @@ function ModelGenerator({ contentId, componentId }) {
                 value={selectedVersion}
                 onChange={(selected) => setSelectedVersion(selected)}
                 options={versions.map(v => ({
-                    value: v.versionId,
-                    label: `v${v.versionNo} - ${v.note} (${new Date(v.createdAt).toLocaleString()})`,
+                  value: v.versionId,
+                  label: `v${v.versionNo} - ${v.note} (${new Date(v.createdAt).toLocaleString()})`,
                 }))}
                 placeholder={versions.length > 0 ? "버전 선택" : "저장된 버전 없음"}
                 isDisabled={versions.length === 0}
@@ -231,14 +232,14 @@ function ModelGenerator({ contentId, componentId }) {
                 롤백
               </button>
             </div>
-            
+
             <div className="model-gen-final-actions">
               <button onClick={handleComplete} className="model-gen-button model-gen-button--secondary">완료(확정)</button>
               <button onClick={handleSubmit} className="model-gen-button model-gen-button--primary">컴포넌트 제출</button>
             </div>
           </div>
         )}
-         {message && <p className="model-gen-status-message">{message}</p>}
+        {message && <p className="model-gen-status-message">{message}</p>}
       </div>
 
       {/* 오른쪽: 결과 뷰어 */}
