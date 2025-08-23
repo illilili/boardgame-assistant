@@ -2,6 +2,8 @@
 package com.boardgame.backend_spring.project.service;
 
 import com.boardgame.backend_spring.concept.repository.BoardgameConceptRepository;
+import com.boardgame.backend_spring.global.error.CustomException;
+import com.boardgame.backend_spring.global.error.ErrorCode;
 import com.boardgame.backend_spring.plan.entity.PlanStatus;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
 import com.boardgame.backend_spring.pricing.repository.PriceRepository;
@@ -101,7 +103,7 @@ public class ProjectService {
         boolean isMember = projectMemberRepository.existsByProjectAndUser(project, user);
 
         if (!(isAdmin || isPublisher || isMember)) {
-            throw new AccessDeniedException("해당 프로젝트에 접근할 권한이 없습니다.");
+            throw new CustomException(ErrorCode.PROJECT_ACCESS_DENIED);
         }
 
         return ProjectSummaryDto.from(project);
