@@ -32,26 +32,67 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7); // "Bearer " 제거
-            if (jwtTokenProvider.validateToken(token)) {
-                String email = jwtTokenProvider.getUserEmailFromToken(token);
-                String role = jwtTokenProvider.getRoleFromToken(token);
+            try {
+                if (jwtTokenProvider.validateToken(token)) {
+                    String email = jwtTokenProvider.getUserEmailFromToken(token);
+                    String role = jwtTokenProvider.getRoleFromToken(token);
 
-                User user = userRepository.findByEmail(email)
-                        .orElse(null);
+                    User user = userRepository.findByEmail(email)
+                            .orElse(null);
 
-                if (user != null) {
-                    List<GrantedAuthority> authorities = List.of(
-                            new SimpleGrantedAuthority("ROLE_" + role)
-                    );
+                    if (user != null) {
+                        List<GrantedAuthority> authorities = List.of(
+                                new SimpleGrantedAuthority("ROLE_" + role)
+                        );
 
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(user, null, authorities);
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(user, null, authorities);
 
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                } else {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰입니다.");
+                    return;
                 }
+            } catch (Exception e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰 검증 실패: " + e.getMessage());
+                return;
             }
         }
 
         filterChain.doFilter(request, response);
     }
+
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request,
+//                                    HttpServletResponse response,
+//                                    FilterChain filterChain)
+//            throws ServletException, IOException {
+//
+//        String authHeader = request.getHeader("Authorization");
+//
+//        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+//            String token = authHeader.substring(7); // "Bearer " 제거
+//            if (jwtTokenProvider.validateToken(token)) {
+//                String email = jwtTokenProvider.getUserEmailFromToken(token);
+//                String role = jwtTokenProvider.getRoleFromToken(token);
+//
+//                User user = userRepository.findByEmail(email)
+//                        .orElse(null);
+//
+//                if (user != null) {
+//                    List<GrantedAuthority> authorities = List.of(
+//                            new SimpleGrantedAuthority("ROLE_" + role)
+//                    );
+//
+//                    UsernamePasswordAuthenticationToken authentication =
+//                            new UsernamePasswordAuthenticationToken(user, null, authorities);
+//
+//                    SecurityContextHolder.getContext().setAuthentication(authentication);
+//                }
+//            }
+//        }
+//
+//        filterChain.doFilter(request, response);
+//    }
 }
