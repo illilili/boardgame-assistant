@@ -19,6 +19,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -42,6 +43,7 @@
     opacity: 0;
     transform: translateY(20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -49,13 +51,15 @@
 }
 
 /* 모달 헤더 - Plan 스타일 */
-.modal-header {
+.modal-header1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 2rem 2.5rem 1.5rem;
   border-bottom: 1px solid var(--border-color, #e5e7eb);
-  background: var(--white, #ffffff);
+  background: var(--accent-warm, #E58A4E);
+  /* 이 부분을 주황색 테마 변수로 변경 */
+  color: white;
   border-radius: 16px 16px 0 0;
 }
 
@@ -384,8 +388,15 @@
 }
 
 @keyframes translatePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .description-text {
@@ -396,6 +407,10 @@
   padding: 1rem;
   border-radius: 8px;
   border: 1px solid rgba(229, 138, 78, 0.1);
+  max-height: 200px;
+  /* 추가된 부분 */
+  overflow-y: auto;
+  /* 추가된 부분 */
 }
 
 /* 모달 푸터 */
@@ -459,8 +474,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-container h3,
@@ -514,15 +534,15 @@
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .game-image-section {
     order: 2;
   }
-  
+
   .game-info-section {
     order: 1;
   }
-  
+
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -532,28 +552,28 @@
   .game-detail-modal {
     padding: 1rem;
   }
-  
-  .modal-header,
+
+  .modal-header1,
   .modal-body,
   .modal-footer {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
   }
-  
+
   .game-title {
     font-size: 1.5rem;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .description-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .modal-footer {
     flex-direction: column;
     gap: 1rem;

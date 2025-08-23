@@ -274,7 +274,7 @@ const OriginalGameAnalysis = () => {
       setLoading(true);
       setError(null);
       
-      console.log('📊 기존 보드게임 대시보드 데이터 로드 시작');
+      console.log('기존 보드게임 대시보드 데이터 로드 시작');
       
       const result = await fetchOriginalDashboard();
       setDashboardData(result);
@@ -298,7 +298,7 @@ const OriginalGameAnalysis = () => {
       // 카테고리/테마 차트: 기존 기준점
       ratingThreshold = 7.0;
       complexityThreshold = 2.25;
-      console.log('📊 카테고리 버블차트 - 기준점:', { ratingThreshold, complexityThreshold });
+      console.log('카테고리 버블차트 - 기준점:', { ratingThreshold, complexityThreshold });
     } else {
       // 메커니즘 차트: 조정된 기준점
       ratingThreshold = 7.15;
@@ -309,7 +309,7 @@ const OriginalGameAnalysis = () => {
     if (avgRating >= ratingThreshold && avgComplexity >= complexityThreshold) {
       return {
         quadrant: 'top-right',
-        name: '🔥 고위험 고수익',
+        name: '고위험 고수익',
         title: '고평점 · 고난이도 영역',
         description: '높은 평점을 받지만 난이도가 높은 영역입니다. 숙련된 게이머들이 선호하며, 깊이 있는 게임 경험을 제공합니다.',
         marketInsight: '전문 게이머 타겟, 프리미엄 시장',
@@ -320,7 +320,7 @@ const OriginalGameAnalysis = () => {
     } else if (avgRating < ratingThreshold && avgComplexity >= complexityThreshold) {
       return {
         quadrant: 'top-left',
-        name: '⚠️ 위험 영역',
+        name: '위험 영역',
         title: '저평점 · 고난이도 영역',
         description: '난이도는 높지만 평점이 낮은 영역입니다. 복잡함에 비해 재미가 부족할 수 있어 주의가 필요합니다.',
         marketInsight: '개발 시 신중한 접근 필요',
@@ -331,7 +331,7 @@ const OriginalGameAnalysis = () => {
     } else if (avgRating >= ratingThreshold && avgComplexity < complexityThreshold) {
       return {
         quadrant: 'bottom-right',
-        name: '✨ 대중적 성공',
+        name: '대중적 성공',
         title: '고평점 · 저난이도 영역',
         description: '높은 평점에 접근성도 좋은 최고의 영역입니다. 대중적 성공과 상업적 성과를 동시에 기대할 수 있습니다.',
         marketInsight: '베스트셀러 잠재력, 대중 시장',
@@ -342,7 +342,7 @@ const OriginalGameAnalysis = () => {
     } else {
       return {
         quadrant: 'bottom-left',
-        name: '🎯 진입 기회',
+        name: '진입 기회',
         title: '저평점 · 저난이도 영역',
         description: '아직 개발이 덜 된 블루오션 영역입니다. 혁신적인 아이디어로 시장을 선도할 기회가 있습니다.',
         marketInsight: '블루오션, 혁신 기회',
@@ -419,7 +419,7 @@ const OriginalGameAnalysis = () => {
       });
     }
     
-    console.log('📊 생성된 버블차트 데이터:', data);
+    console.log('생성된 버블차트 데이터:', data);
     
     // 차트별 데이터 분포 분석 로그
     if (data.length > 0) {
@@ -450,7 +450,7 @@ const OriginalGameAnalysis = () => {
   const loadChartData = useCallback(async () => {
     try {
       setChartLoading(true);
-      console.log(`📊 차트 데이터 로드 시작 - ${chartGroupBy} 기준`);
+      console.log(`차트 데이터 로드 시작 - ${chartGroupBy} 기준`);
       
       // 기존 API 대신 TOP10 데이터로 버블차트 생성
       const bubbleData = generateBubbleChartData();
@@ -486,7 +486,7 @@ const OriginalGameAnalysis = () => {
     <div className="original-analysis loading">
       <div className="loading-container">
         <div className="loading-spinner large"></div>
-        <h2>🎲 10,000개 보드게임 데이터 분석 중...</h2>
+        <h2>10,000개 보드게임 데이터 분석 중...</h2>
         <p>대용량 데이터셋을 분석하고 있습니다. 잠시만 기다려주세요.</p>
       </div>
     </div>
@@ -495,13 +495,12 @@ const OriginalGameAnalysis = () => {
   const renderErrorState = () => (
     <div className="original-analysis error">
       <div className="error-container">
-        <div className="error-icon">⚠️</div>
         <div className="error-message">
           데이터 로드 중 오류가 발생했습니다:<br />
           {error}
         </div>
         <button className="retry-button" onClick={loadDashboardData}>
-          🔄 다시 시도
+          다시 시도
         </button>
       </div>
     </div>
@@ -569,14 +568,13 @@ const OriginalGameAnalysis = () => {
     return (
       <div className="strategic-insight-section">
         <div className="insight-header">
-          <h3>🎯 핵심 성공 패턴 분석</h3>
+          <h3>핵심 성공 패턴 분석</h3>
           <p>10,000개 인기 게임들의 공통된 특징을 분석한 전략적 인사이트입니다</p>
         </div>
         
         <div className="insight-cards">
           {/* 가장 지배적인 테마 */}
           <div className="insight-card dominant-themes">
-            <div className="insight-icon">👑</div>
             <div className="insight-content">
               <div className="insight-title">가장 지배적인 테마</div>
               <div className="insight-values">
@@ -595,7 +593,6 @@ const OriginalGameAnalysis = () => {
 
           {/* 가장 보편적인 게임 유형 */}
           <div className="insight-card common-profile">
-            <div className="insight-icon">🎲</div>
             <div className="insight-content">
               <div className="insight-title">가장 보편적인 게임 유형</div>
               <div className="insight-values">
@@ -616,7 +613,6 @@ const OriginalGameAnalysis = () => {
 
           {/* 가장 사랑받은 메커니즘 */}
           <div className="insight-card popular-mechanisms">
-            <div className="insight-icon">⚙️</div>
             <div className="insight-content">
               <div className="insight-title">가장 사랑받은 메커니즘</div>
               <div className="insight-values">
@@ -636,7 +632,6 @@ const OriginalGameAnalysis = () => {
 
         {/* 전략적 요약 */}
         <div className="strategic-summary">
-          <div className="summary-icon">💡</div>
           <div className="summary-content">
             <h4>전략적 시사점</h4>
             <p>
@@ -653,7 +648,7 @@ const OriginalGameAnalysis = () => {
 
   // 버블 클릭 핸들러
   const handleBubbleClick = (bubbleData) => {
-    console.log('🎯 버블 클릭:', bubbleData);
+    console.log('버블 클릭:', bubbleData);
     setSelectedBubble(bubbleData);
     setShowDetailModal(true);
   };
@@ -708,7 +703,7 @@ const OriginalGameAnalysis = () => {
             {/* 4사분면 분석 섹션 */}
             {selectedBubble.quadrantAnalysis && (
               <div className="quadrant-analysis">
-                <h4>🎯 4사분면 분석</h4>
+                <h4>4사분면 분석</h4>
                 <div className="quadrant-info" style={{ borderLeft: `4px solid ${selectedBubble.quadrantAnalysis.color}` }}>
                   <div className="quadrant-header">
                     <span className="quadrant-name">{selectedBubble.quadrantAnalysis.name}</span>
@@ -719,13 +714,13 @@ const OriginalGameAnalysis = () => {
                   </p>
                   <div className="quadrant-insights">
                     <div className="insight-item">
-                      <strong>💼 시장 특성:</strong> {selectedBubble.quadrantAnalysis.marketInsight}
+                      <strong>시장 특성:</strong> {selectedBubble.quadrantAnalysis.marketInsight}
                     </div>
                     <div className="insight-item">
-                      <strong>🎮 개발 전략:</strong> {selectedBubble.quadrantAnalysis.strategy}
+                      <strong>개발 전략:</strong> {selectedBubble.quadrantAnalysis.strategy}
                     </div>
                     <div className="insight-item">
-                      <strong>⚡ 리스크 수준:</strong> 
+                      <strong>리스크 수준:</strong> 
                       <span className={`risk-level ${selectedBubble.quadrantAnalysis.riskLevel}`}>
                         {selectedBubble.quadrantAnalysis.riskLevel === 'low' ? '낮음' :
                          selectedBubble.quadrantAnalysis.riskLevel === 'medium' ? '보통' :
@@ -738,7 +733,7 @@ const OriginalGameAnalysis = () => {
             )}
             
             <div className="detail-analysis">
-              <h4>📊 상세 통계</h4>
+              <h4>상세 통계</h4>
               <div className="analysis-grid">
                 <div className="analysis-item">
                   <span className="analysis-label">시장 규모:</span>
@@ -779,7 +774,7 @@ const OriginalGameAnalysis = () => {
         <div className="bubble-chart-section">
           <div className="chart-header">
             <div className="chart-title">
-              <h3>📊 TOP 15 {chartGroupBy === 'categories' ? '테마' : '메커니즘'} 분석 (버블차트)</h3>
+              <h3>TOP 15 {chartGroupBy === 'categories' ? '테마' : '메커니즘'} 분석 (버블차트)</h3>
               <p>X축: 평균 평점 | Y축: 평균 난이도 | 버블 크기: 게임 수 (시장 규모) | 클릭하여 상세 정보를 확인하세요.</p>
             </div>
             
@@ -819,7 +814,7 @@ const OriginalGameAnalysis = () => {
 
     return (
       <div className="themes-section">
-        <h3>🎨 인기 테마 TOP 15</h3>
+        <h3>인기 테마 TOP 15</h3>
         <div className="themes-chart">
           {dashboardData.themes.slice(0, 15).map((theme, index) => (
             <div key={index} className="theme-bar">
@@ -847,7 +842,7 @@ const OriginalGameAnalysis = () => {
 
     return (
       <div className="difficulty-section">
-        <h3>⚖️ 게임 난이도 분포</h3>
+        <h3>게임 난이도 분포</h3>
         <div className="difficulty-distribution">
           {dashboardData.difficulty.map((diff, index) => (
             <div key={index} className="difficulty-item">
@@ -878,7 +873,7 @@ const OriginalGameAnalysis = () => {
 
     return (
       <div className="players-section">
-        <h3>👥 플레이어 수 분포</h3>
+        <h3>플레이어 수 분포</h3>
         <div className="players-distribution">
           {dashboardData.players.map((player, index) => (
             <div key={index} className="player-item">
@@ -914,9 +909,8 @@ const OriginalGameAnalysis = () => {
     if (!dashboardData?.mechanisms || !Array.isArray(dashboardData.mechanisms)) {
       return (
         <div className="mechanism-section">
-          <h3>⚙️ 메커니즘 분석</h3>
+          <h3>메커니즘 분석</h3>
           <div className="no-data-message">
-            <div className="no-data-icon">⚠️</div>
             <div className="no-data-text">
               <h4>메커니즘 데이터 로딩 중</h4>
               <p>백엔드 API에서 메커니즘 데이터를 불러오고 있습니다.<br />
@@ -933,7 +927,7 @@ const OriginalGameAnalysis = () => {
 
     return (
       <div className="mechanism-section">
-        <h3>⚙️ 인기 메커니즘 TOP 15</h3>
+        <h3>인기 메커니즘 TOP 15</h3>
         <div className="mechanisms-chart">
           {topMechanisms.map((mechanism, index) => (
             <div key={index} className="mechanism-bar">
@@ -980,31 +974,31 @@ const OriginalGameAnalysis = () => {
         className={`tab-button ${selectedView === 'overview' ? 'active' : ''}`}
         onClick={() => setSelectedView('overview')}
       >
-        📊 전체 개요
+        전체 개요
       </button>
       <button 
         className={`tab-button ${selectedView === 'themes' ? 'active' : ''}`}
         onClick={() => setSelectedView('themes')}
       >
-        🎨 테마 분석
+        테마 분석
       </button>
       <button 
         className={`tab-button ${selectedView === 'difficulty' ? 'active' : ''}`}
         onClick={() => setSelectedView('difficulty')}
       >
-        ⚖️ 난이도 분석
+        난이도 분석
       </button>
       <button 
         className={`tab-button ${selectedView === 'players' ? 'active' : ''}`}
         onClick={() => setSelectedView('players')}
       >
-        👥 플레이어 분석
+        플레이어 분석
       </button>
       <button 
         className={`tab-button ${selectedView === 'mechanisms' ? 'active' : ''}`}
         onClick={() => setSelectedView('mechanisms')}
       >
-        ⚙️ 메커니즘 분석
+        메커니즘 분석
       </button>
     </div>
   );
@@ -1039,22 +1033,20 @@ const OriginalGameAnalysis = () => {
             className="back-button-original"
             onClick={() => navigate('/trend/live-top50')}
           >
-            🔄 실시간 TOP30 분석
+            실시간 TOP30 분석
           </button>
         </div>
         <div className="header-content">
-          <h1>📚 기존 인기 보드게임 분석</h1>
+          <h1>기존 인기 보드게임 분석</h1>
           <p className="header-description">
             10,000개의 보드게임 데이터를 기반으로 한 종합적인 트렌드 분석
           </p>
         </div>
         <div className="data-info">
           <div className="data-info-item">
-            <span className="info-icon">🎲</span>
             <span>총 {dashboardData?.summary?.totalGames?.toLocaleString()} 개 게임</span>
           </div>
           <div className="data-info-item">
-            <span className="info-icon">📊</span>
             <span>BoardGameGeek 데이터 기반</span>
           </div>
         </div>
@@ -1067,7 +1059,7 @@ const OriginalGameAnalysis = () => {
       </div>
 
       <div className="data-source-footer">
-        <p>📊 데이터 출처: BoardGameGeek (BGG) | 분석 기준일: 2024년</p>
+        <p>데이터 출처: BoardGameGeek (BGG) | 분석 기준일: 2024년</p>
       </div>
       
       {/* 상세 정보 모달 */}

@@ -48,7 +48,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
     
     try {
       setTranslating(true);
-      console.log('🔤 게임 설명 번역 시작:', gameId, '- 원본:', gameDetail.description.substring(0, 50) + '...');
+      console.log('게임 설명 번역 시작:', gameId);
       
       // Spring 백엔드를 통해 설명 번역 API 호출
       const response = await fetch('http://localhost:8080/api/trends/live/translate-description', {
@@ -70,7 +70,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
             description: result.data.translated,
             descriptionOriginal: gameDetail.description // 원본 보존
           }));
-          console.log('✅ 게임 설명 번역 완료:', result.data.translated.substring(0, 50) + '...');
+          console.log('게임 설명 번역 완료');
         } else {
           throw new Error(result.message || '번역 결과가 올바르지 않습니다.');
         }
@@ -103,12 +103,12 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
 
   const renderLoadingState = () => (
     <div className="modal-content loading">
-      <div className="modal-header">
+      <div className="modal-header1">
         <button className="close-button" onClick={handleClose}>×</button>
       </div>
       <div className="loading-container">
         <div className="loading-spinner"></div>
-        <h3>🎲 게임 상세 정보를 불러오는 중...</h3>
+        <h3>게임 상세 정보를 불러오는 중...</h3>
         <p>BoardGameGeek에서 데이터를 가져오고 있습니다</p>
       </div>
     </div>
@@ -116,18 +116,18 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
 
   const renderErrorState = () => (
     <div className="modal-content error">
-      <div className="modal-header">
+      <div className="modal-header1">
         <h2>오류 발생</h2>
         <button className="close-button" onClick={handleClose}>×</button>
       </div>
       <div className="error-container">
-        <div className="error-icon">⚠️</div>
+        <div className="error-icon">주의</div>
         <div className="error-message">
           게임 상세 정보를 불러오는 중 오류가 발생했습니다:<br />
           {error}
         </div>
         <button className="retry-button" onClick={fetchGameDetail}>
-          🔄 다시 시도
+          다시 시도
         </button>
       </div>
     </div>
@@ -135,7 +135,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
 
   const renderGameDetail = () => (
     <div className="modal-content">
-      <div className="modal-header">
+      <div className="modal-header1">
         <h2 className="game-title">{gameDetail.name}</h2>
         <div className="header-actions">
           <button className="close-button" onClick={handleClose}>×</button>
@@ -159,7 +159,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
             )}
             
             <div className="basic-info-card">
-              <h4>📋 기본 정보</h4>
+              <h4>기본 정보</h4>
               <div className="info-grid">
                 {gameDetail.yearPublished && (
                   <div className="info-item">
@@ -179,7 +179,6 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
                   </div>
                 )}
                 
-                {/* 플레이 시간 정보 개선 */}
                 {(gameDetail.playingTime || gameDetail.minPlayTime) && (
                   <div className="info-item">
                     <span className="info-label">플레이 시간</span>
@@ -198,7 +197,6 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
                   </div>
                 )}
                 
-                {/* BGG 순위 추가 */}
                 {gameDetail.bggRank && (
                   <div className="info-item">
                     <span className="info-label">BGG 전체 순위</span>
@@ -206,7 +204,6 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
                   </div>
                 )}
                 
-                {/* 베이즈 평균 추가 */}
                 {gameDetail.bayesAverageRating && (
                   <div className="info-item">
                     <span className="info-label">베이즈 평균</span>
@@ -219,13 +216,12 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
           
           {/* 오른쪽: 상세 정보 */}
           <div className="game-info-section">
-            {/* 평점 및 난이도 */}
             <div className="stats-section">
-              <h4>📊 평가 정보</h4>
+              <h4>평가 정보</h4>
               <div className="stats-grid">
                 {gameDetail.averageRating && (
                   <div className="stat-card rating">
-                    <div className="stat-icon">⭐</div>
+                    <div className="stat-icon">★</div>
                     <div className="stat-content">
                       <div className="stat-value">{Number(gameDetail.averageRating).toFixed(1)}</div>
                       <div className="stat-label">평균 평점</div>
@@ -235,7 +231,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
                 
                 {gameDetail.averageWeight && (
                   <div className="stat-card complexity">
-                    <div className="stat-icon">⚖️</div>
+                    <div className="stat-icon">⚖</div>
                     <div className="stat-content">
                       <div className="stat-value">{Number(gameDetail.averageWeight).toFixed(1)}</div>
                       <div className="stat-label">게임 난이도</div>
@@ -245,7 +241,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
                 
                 {gameDetail.usersRated && (
                   <div className="stat-card users">
-                    <div className="stat-icon">👥</div>
+                    <div className="stat-icon">☺</div>
                     <div className="stat-content">
                       <div className="stat-value">{gameDetail.usersRated.toLocaleString()}</div>
                       <div className="stat-label">평가 참여자</div>
@@ -255,10 +251,9 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
               </div>
             </div>
             
-            {/* 카테고리 */}
             {gameDetail.categories && gameDetail.categories.length > 0 && (
               <div className="categories-section">
-                <h4>🎨 카테고리</h4>
+                <h4>카테고리</h4>
                 <div className="tags-container">
                   {gameDetail.categories.map((category, index) => (
                     <span key={index} className="category-tag">
@@ -269,10 +264,9 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
               </div>
             )}
             
-            {/* 메카닉 */}
             {gameDetail.mechanics && gameDetail.mechanics.length > 0 && (
               <div className="mechanics-section">
-                <h4>🔧 게임 메카닉</h4>
+                <h4>게임 메카닉</h4>
                 <div className="tags-container">
                   {gameDetail.mechanics.map((mechanic, index) => (
                     <span key={index} className="mechanic-tag">
@@ -283,11 +277,10 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
               </div>
             )}
             
-            {/* 디자이너 및 출판사 */}
             <div className="credits-section">
               {gameDetail.designers && gameDetail.designers.length > 0 && (
                 <div className="credit-item">
-                  <h5>🎨 디자이너</h5>
+                  <h5>디자이너</h5>
                   <div className="credit-list">
                     {gameDetail.designers.join(', ')}
                   </div>
@@ -296,7 +289,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
               
               {gameDetail.publishers && gameDetail.publishers.length > 0 && (
                 <div className="credit-item">
-                  <h5>🏢 출판사</h5>
+                  <h5>출판사</h5>
                   <div className="credit-list">
                     {gameDetail.publishers.slice(0, 3).join(', ')}
                     {gameDetail.publishers.length > 3 && ` 외 ${gameDetail.publishers.length - 3}개`}
@@ -305,24 +298,21 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
               )}
             </div>
             
-            {/* 게임 설명 */}
             {gameDetail.description && (
               <div className="description-section">
                 <div className="description-header">
-                  <h4>📝 게임 설명</h4>
+                  <h4>게임 설명</h4>
                   <button 
                     className={`translate-description-button ${translating ? 'translating' : ''}`}
                     onClick={handleTranslate}
                     disabled={translating}
                     title="게임 설명을 한국어로 번역"
                   >
-                    {translating ? '🔄 번역 중...' : '🌐 한국어 번역'}
+                    {translating ? '번역 중...' : '한국어 번역'}
                   </button>
                 </div>
                 <div className="description-text">
-                  {gameDetail.description.length > 300 
-                    ? `${gameDetail.description.substring(0, 300)}...` 
-                    : gameDetail.description}
+                  {gameDetail.description}
                 </div>
               </div>
             )}
@@ -332,7 +322,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
       
       <div className="modal-footer">
         <div className="data-source">
-          📊 데이터 출처: {gameDetail.source || 'BoardGameGeek'}
+          데이터 출처: {gameDetail.source || 'BoardGameGeek'}
         </div>
         <button className="close-footer-button" onClick={handleClose}>
           닫기

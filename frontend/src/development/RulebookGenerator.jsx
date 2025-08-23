@@ -1,7 +1,7 @@
-// src/development/RulebookGenerator.jsx
 import React, { useState, useEffect } from "react";
 import { Document, Packer, Paragraph, HeadingLevel } from "docx";
 import { saveAs } from "file-saver";
+import ReactMarkdown from "react-markdown"; // RulebookReport 대신 직접 import
 import {
   generateRulebook,
   getContentVersions,
@@ -11,10 +11,11 @@ import {
   getContentDetail,
   uploadContentFile,
 } from "../api/development";
-import RulebookReport from "./RulebookReport";
-import './ComponentGenerator.css';   // 레이아웃, 공통 폼 스타일
-import './ModelGenerator.css';       // 버전관리 UI 공통
-import './RulebookGenerator.css';    // 룰북 전용
+
+// CSS 파일 import
+import './ComponentGenerator.css';
+import './ModelGenerator.css';
+import './RulebookGenerator.css';
 import Select from "react-select";
 
 function RulebookGenerator({ contentId, componentId }) {
@@ -57,7 +58,8 @@ function RulebookGenerator({ contentId, componentId }) {
         const versions = await getContentVersions(finalContentId);
         setVersions(versions);
         if (versions.length > 0) {
-          setSelectedVersion(versions[0].versionId);
+          // 초기 선택값은 비워두어 사용자가 직접 선택하도록 유도
+          // setSelectedVersion(versions[0].versionId);
         }
       } catch (err) {
         console.error(err);
@@ -159,7 +161,6 @@ function RulebookGenerator({ contentId, componentId }) {
       setSuccessMessage("✅ PDF 업로드 성공!");
       setSubmissionFile(null);
 
-      // ✅ 업로드 후 최신 데이터 다시 로딩
       const detail = await getContentDetail(finalContentId);
       if (detail?.contentData) {
         setRulebookText(detail.contentData);
@@ -194,11 +195,15 @@ function RulebookGenerator({ contentId, componentId }) {
     setIsLoading(true);
 
     try {
-      await saveContentVersion({ contentId: finalContentId, note: versionNote });
+      // 룰북 텍스트를 contentData로 함께 저장
+      await saveContentVersion({
+        contentId: finalContentId,
+        note: versionNote,
+        contentData: rulebookText
+      });
       setSuccessMessage("버전 저장 성공!");
       const versions = await getContentVersions(finalContentId);
       setVersions(versions);
-      if (versions.length > 0) setSelectedVersion(versions[0].versionId);
     } catch {
       setError("버전 저장 실패");
     } finally {
@@ -212,10 +217,12 @@ function RulebookGenerator({ contentId, componentId }) {
     setIsLoading(true);
 
     try {
-      await rollbackContentVersion(finalContentId, selectedVersion);
+      const versionIdToRollback = selectedVersion.value;
+      await rollbackContentVersion(finalContentId, versionIdToRollback);
       const detail = await getContentDetail(finalContentId);
       if (detail?.contentData) setRulebookText(detail.contentData);
-      setSuccessMessage(`v${selectedVersion} 롤백 완료`);
+      setSuccessMessage(`롤백 완료!`);
+      setSelectedVersion(null); // 롤백 후 선택 초기화
     } catch {
       setError("롤백 실패");
     } finally {
@@ -234,14 +241,16 @@ function RulebookGenerator({ contentId, componentId }) {
           src={rulebookText}
           title="Rulebook PDF"
           className="pdf-viewer"
-          width="100%"
-          height="600px"
         />
       );
     }
 
     // 기본 텍스트 → 마크다운 렌더링
-    return <RulebookReport content={rulebookText} />;
+    return (
+      <div className="rulebook-report">
+        <ReactMarkdown>{rulebookText}</ReactMarkdown>
+      </div>
+    );
   };
 
   return (
@@ -253,7 +262,6 @@ function RulebookGenerator({ contentId, componentId }) {
           <p>룰북 초안을 자동 생성하고 완성된 룰북 PDF를 업로드하세요.</p>
         </div>
 
-        {/* 콘텐츠 ID */}
         {!isFromList && (
           <div className="form-group">
             <label>콘텐츠 ID</label>
@@ -266,7 +274,6 @@ function RulebookGenerator({ contentId, componentId }) {
           </div>
         )}
 
-        {/* 룰북 생성 + DOCX 다운로드 */}
         <div className="rulebook-form-group">
           <button
             className="generate-btn"
@@ -284,14 +291,10 @@ function RulebookGenerator({ contentId, componentId }) {
           </button>
         </div>
 
-        {/* 버전관리 + PDF 업로드 + 제출 */}
         {rulebookText && (
           <>
-            {/* 버전관리 */}
             <div className="model-version-manager">
               <h4>버전 관리</h4>
-
-              {/* 버전 메모 + 저장 */}
               <div className="model-version-note">
                 <label>버전 메모:</label>
                 <input
@@ -309,39 +312,22 @@ function RulebookGenerator({ contentId, componentId }) {
                 </button>
               </div>
 
-              {/* 버전 선택 + 롤백 */}
               <div className="model-version-select-row">
-                {versions.length > 0 ? (
-                  <Select
-                    className="version-select"
-                    classNamePrefix="react-select"
-                    value={
-                      versions
-                        .map((v) => ({
-                          value: v.versionId,
-                          label: `v${v.versionNo} - ${v.note} (${new Date(
-                            v.createdAt
-                          ).toLocaleString()})`,
-                        }))
-                        .find((opt) => opt.value === selectedVersion) || null
-                    }
-                    onChange={(selected) => setSelectedVersion(selected.value)}
-                    options={versions.map((v) => ({
-                      value: v.versionId,
-                      label: `v${v.versionNo} - ${v.note} (${new Date(
-                        v.createdAt
-                      ).toLocaleString()})`,
-                    }))}
-                    placeholder="버전 선택"
-                  />
-                ) : (
-                  <Select
-                    className="version-select"
-                    classNamePrefix="react-select"
-                    isDisabled
-                    placeholder="저장된 버전 없음"
-                  />
-                )}
+                <Select
+                  className="version-select"
+                  classNamePrefix="react-select"
+                  value={selectedVersion}
+                  onChange={setSelectedVersion}
+                  options={versions.map((v) => ({
+                    value: v.versionId,
+                    label: `v${v.versionNo} - ${v.note} (${new Date(
+                      v.createdAt
+                    ).toLocaleString()})`,
+                  }))}
+                  placeholder={versions.length > 0 ? "버전 선택" : "저장된 버전 없음"}
+                  isDisabled={versions.length === 0}
+                  isClearable
+                />
 
                 {selectedVersion && (
                   <button
@@ -353,9 +339,8 @@ function RulebookGenerator({ contentId, componentId }) {
                   </button>
                 )}
               </div>
-            </div> {/* ✅ div 닫음 */}
+            </div>
 
-            {/* PDF 업로드 */}
             <div className="pdf-upload-section">
               <h4>PDF 파일 업로드</h4>
               <div className="file-upload-group">
@@ -389,7 +374,6 @@ function RulebookGenerator({ contentId, componentId }) {
               </div>
             </div>
 
-            {/* 제출 */}
             <div className="submit-complete-section">
               <button
                 className="primary-button"
@@ -410,8 +394,7 @@ function RulebookGenerator({ contentId, componentId }) {
 
       {/* ------------------- 오른쪽: 결과 뷰어 ------------------- */}
       <div
-        className={`rulebook-preview ${rulebookText ? "filled" : "empty"
-          }`}
+        className={`rulebook-preview ${rulebookText ? "filled" : "empty"}`}
       >
         {isLoading ? (
           <div className="status-container">
@@ -431,7 +414,6 @@ function RulebookGenerator({ contentId, componentId }) {
       </div>
     </div>
   );
-
-
 }
+
 export default RulebookGenerator;
