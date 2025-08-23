@@ -6,7 +6,7 @@ import Footer from '../mainPage/Footer';
 import { ProjectContext } from '../contexts/ProjectContext';
 import './ProjectHomePage.css';
 
-const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/%EC%95%84%EC%B9%B4%EC%9E%90.png';
+const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/boardgame.4c780daaa5c5923b7a9b.png';
 
 const maskName = (name) => {
   if (typeof name !== 'string' || name.length <= 1) {

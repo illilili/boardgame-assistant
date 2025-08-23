@@ -6,7 +6,7 @@ import Footer from '../mainPage/Footer';
 import { FaPlus, FaArrowRight } from 'react-icons/fa';
 import './ProjectListPage.css';
 
-const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/%EC%95%84%EC%B9%B4%EC%9E%90.png';
+const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/boardgame.4c780daaa5c5923b7a9b.png';
 
 const ProjectListPage = () => {
     const [projects, setProjects] = useState([]);
