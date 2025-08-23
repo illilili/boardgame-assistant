@@ -2,44 +2,108 @@
 
 const API_BASE_URL = 'http://localhost:8080';
 
+// const request = async (endpoint, options = {}) => {
+//     const url = `${API_BASE_URL}${endpoint}`;
+//     const token = localStorage.getItem('accessToken');
+//     const headers = {
+//         ...options.headers,
+//     };
+//     if (!(options.body instanceof FormData)) {
+//         headers['Content-Type'] = 'application/json';
+//     }
+
+//     if (token) {
+//         headers['Authorization'] = `Bearer ${token}`;
+//     }
+
+//     const config = { ...options, headers };
+
+//     try {
+//         const response = await fetch(url, config);
+
+//         const contentType = response.headers.get('content-type');
+//         let data;
+
+//         const text = await response.text();
+//         if (contentType && contentType.startsWith('application/json')) {
+//             data = text ? JSON.parse(text) : {};
+//         } else {
+//             data = text;
+//         }
+
+//         if (!response.ok) {
+//             const errorMessage = (typeof data === 'object' && data.message) ? data.message : data;
+//             throw new Error(errorMessage || `서버 에러: ${response.status}`);
+//         }
+//         return data;
+//     } catch (error) {
+//         console.error(`API 요청 실패: ${endpoint}`, error);
+//         throw error;
+//     }
+// };
+
 const request = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
     const token = localStorage.getItem('accessToken');
-    const headers = {
-        ...options.headers,
-    };
+    const headers = { ...options.headers };
+
     if (!(options.body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
     }
-
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
 
     const config = { ...options, headers };
+    let response = await fetch(url, config);
 
-    try {
-        const response = await fetch(url, config);
+    // Access Token 만료 → Refresh Token 사용
+    if (response.status === 401) {
+        const refresh = localStorage.getItem('refreshToken');
+        if (refresh) {
+            try {
+                const newTokens = await refreshToken(refresh); // ⬆ export 함수 호출
+                localStorage.setItem('accessToken', newTokens.accessToken);
+                localStorage.setItem('refreshToken', newTokens.refreshToken);
 
-        const contentType = response.headers.get('content-type');
-        let data;
-
-        const text = await response.text();
-        if (contentType && contentType.startsWith('application/json')) {
-            data = text ? JSON.parse(text) : {};
-        } else {
-            data = text;
+                // 원래 요청 재시도
+                headers['Authorization'] = `Bearer ${newTokens.accessToken}`;
+                response = await fetch(url, { ...options, headers });
+            } catch (err) {
+                // refreshToken도 만료 → 강제 로그아웃
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+                window.location.href = '/login';
+                throw err;
+            }
         }
-
-        if (!response.ok) {
-            const errorMessage = (typeof data === 'object' && data.message) ? data.message : data;
-            throw new Error(errorMessage || `서버 에러: ${response.status}`);
-        }
-        return data;
-    } catch (error) {
-        console.error(`API 요청 실패: ${endpoint}`, error);
-        throw error;
     }
+
+    const contentType = response.headers.get('content-type');
+    const text = await response.text();
+    let data = text;
+
+    if (contentType && contentType.startsWith('application/json')) {
+        data = text ? JSON.parse(text) : {};
+    }
+
+    if (!response.ok) {
+        const errorMessage = (typeof data === 'object' && data.message) ? data.message : data;
+        throw new Error(errorMessage || `서버 에러: ${response.status}`);
+    }
+
+    return data;
+};
+
+export const refreshToken = async (refreshToken) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
+  });
+  if (!response.ok) throw new Error("리프레시 토큰 만료");
+  return await response.json();
 };
 
 // --- 기존 함수들 ---
