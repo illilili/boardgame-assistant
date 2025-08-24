@@ -1,0 +1,209 @@
+/* 파일 업로드 컨테이너 */
+.file-upload-container {
+  animation: fadeIn 0.5s ease-in-out;
+  background-color: var(--white);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.file-upload-title {
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+  text-align: center;
+  border-bottom: 3px solid var(--accent-warm);
+  padding-bottom: 10px;
+}
+
+.file-upload-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+/* 그룹 */
+.file-upload-group {
+  margin-bottom: 16px;
+}
+
+.file-upload-group label {
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.file-upload-group input[type="text"] {
+  border: 1px solid #ddd;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 80%;
+  background: #f9f9f9;
+}
+
+/* 파일 선택 + 버튼들 한 줄 */
+.file-input-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+/* 파일 선택 박스 */
+.file-input-box {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #f9f9f9;
+  min-width: 300px;
+  height: 44px;
+  cursor: pointer;
+}
+
+.file-upload-input {
+  display: none;
+}
+
+.file-select-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ccc;
+  color: #333;
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.file-select-btn:hover {
+  background: #bbb;
+}
+
+.file-name {
+  font-size: 0.9rem;
+  color: #555;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 버튼 그룹 */
+.file-button-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-upload-button {
+  background: #E58A4E;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.file-upload-button:hover {
+  background: #cf763e;
+}
+
+.file-submit-button {
+  background: #2C3E50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.file-submit-button:hover {
+  background: #1a252f;
+}
+
+/* 메시지 */
+.file-upload-message {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* --- 미리보기 정보 박스 --- */
+.preview-info-box {
+  background-color: #f9fafb;
+  /* 밝은 회색 배경 */
+  border: 1px solid #e5e7eb;
+  /* 옅은 테두리 */
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 30px;
+  /* 파일 선택 영역과의 간격 */
+  text-align: left;
+}
+
+.preview-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.preview-title {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.content-id-display {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: block;
+  /* 제목 아래에 위치하도록 블록 요소로 변경 */
+  margin-top: 6px;
+}
+
+.preview-body p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.preview-body p:last-child {
+  margin-bottom: 0;
+}
+
+.preview-body p strong {
+  color: var(--text-primary);
+  margin-right: 8px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

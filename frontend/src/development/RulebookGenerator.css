@@ -1,68 +1,346 @@
-.rulebook-page-container {
-  display: flex;
-  gap: 24px;
-  max-width: 1600px;
-  margin: auto;
-}
-
-.form-column {
-  flex: 1;
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.result-column {
-  flex: 2;
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  overflow-y: auto;
-}
-
-.primary-button {
-  width: 100%;
-  padding: 12px;
-  background: #E58A4E;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.secondary-button {
-  padding: 10px 14px;
-  background: #4A5568;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.download-controls {
+/* ============================= */
+/* 룰북 왼쪽 폼 - 버튼 묶음 */
+.rulebook-form-group {
   display: flex;
   gap: 12px;
-  margin-top: 16px;
 }
 
-.document-editor {
+.rulebook-form-group button {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+/* 룰북 초안 생성 버튼 */
+.rulebook-form-group .generate-btn {
+  background-color: #e58a4e;
+  color: #fff;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.rulebook-form-group .generate-btn:hover {
+  background-color: #d67132;
+}
+
+/* DOCX 다운로드 버튼 */
+.rulebook-form-group .download-btn {
+  background-color: #2f3c4e;
+  color: #fff;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.rulebook-form-group .download-btn:hover {
+  background-color: #1f2b3a;
+}
+
+/* ============================= */
+/* 룰북 오른쪽 초안 뷰어 (수정됨) */
+/* ============================= */
+.rulebook-preview {
+  flex: 2;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  /* NOTE: 스크롤 문제를 해결하기 위해 overflow와 관련된 속성을 자식 요소로 이동 */
+  display: flex;
+  flex-direction: column;
+  position: relative; /* 자식 요소의 position을 위해 추가 */
+  max-height: 80vh; /* 전체 뷰어의 최대 높이는 유지 */
+}
+
+.rulebook-preview.empty {
+  background-image:
+    linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.rulebook-preview.filled {
+  background-image: none;
+}
+
+/* ============================= */
+/* PDF 뷰어 */
+.pdf-viewer {
   width: 100%;
-  height: 80vh;
-  border: 1px solid #ddd;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+  display: block;
+}
+
+/* ============================= */
+/* ✨ 룰북 리포트 스타일 */
+/* ============================= */
+
+/* NOTE: 이 wrapper가 실제 스크롤을 담당하도록 수정 */
+.rulebook-report-wrapper {
+  flex: 1; /* 부모인 .rulebook-preview 안에서 공간을 모두 차지 */
+  overflow-y: auto; /* 내용이 넘칠 경우 세로 스크롤 자동 생성 */
+  background: #fdfaf6;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.rulebook-report {
+  background: #ffffff;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 3rem 4rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border-top: 6px solid #c1682a;
+  text-align: left;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+/* --- 타이포그래피 계층 --- */
+.rulebook-report h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #2c2a29;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e0ddd9;
+  line-height: 1.3;
+}
+
+.rulebook-report h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  background-color: #4a5568;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  padding: 0.8rem 1.5rem;
   border-radius: 6px;
-  padding: 16px;
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rulebook-report h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #c1682a;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.rulebook-report p {
   font-size: 1rem;
+  line-height: 1.9;
+  color: #3f3d3c;
+  margin-bottom: 1.25rem;
+  text-align: justify;
 }
 
-.error-message {
-  color: red;
-  margin-top: 8px;
+/* --- 목록 스타일 --- */
+.rulebook-report ul,
+.rulebook-report ol {
+  padding-left: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-.success-message {
-  color: green;
-  margin-top: 8px;
+.rulebook-report li {
+  margin-bottom: 0.8rem;
+  padding-left: 0.5rem;
+  color: #4f4d4c;
+  line-height: 1.8;
+}
+
+.rulebook-report li::marker {
+  color: #e58a4e;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* --- 기타 요소 --- */
+.rulebook-report strong {
+  color: #c1682a;
+  font-weight: 700;
+}
+
+.rulebook-report code {
+  background-color: #f3f0ec;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  font-family: "Consolas", "Monaco", monospace;
+  font-size: 0.9em;
+  color: #5c5a59;
+}
+
+
+/* ============================= */
+/* 제어판 UI */
+/* ============================= */
+.control-box {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+}
+
+.control-box h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 1rem 0;
+}
+
+/* ============================= */
+/* ✨ 버전 관리 UI */
+/* ============================= */
+.version-control-content {
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.version-control-note {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.version-control-note input {
+  flex-grow: 1;
+  padding: 0 12px;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.version-control-note input:focus {
+  border-color: #E58A4E;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+  outline: none;
+}
+
+.btn-save-version {
+  height: 42px;
+  padding: 0 1.2rem;
+  background-color: #374151;
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.btn-save-version:hover {
+  background-color: #1f2937;
+  transform: translateY(-1px);
+}
+.btn-save-version:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.version-control-select-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.version-control-select-row .version-select {
+  flex-grow: 1;
+  position: relative;
+  z-index: 10;
+}
+
+/* React-Select 커스텀 스타일 */
+.react-select__control {
+  min-height: 42px;
+  border-radius: 8px !important;
+  border-color: #d1d5db !important;
+  box-shadow: none !important;
+}
+.react-select__control--is-focused {
+  border-color: #E58A4E !important;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2) !important;
+}
+.react-select__placeholder {
+  color: #9ca3af !important;
+}
+
+.btn-rollback {
+  height: 42px;
+  padding: 0 1.5rem;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.btn-rollback:hover {
+  background-color: #fecaca;
+  border-color: #ef4444;
+}
+
+/* ============================= */
+/* 최종 제출 및 메시지 영역 */
+/* ============================= */
+.submit-complete-section {
+  margin-top: 1.5rem;
+}
+
+.submit-complete-section .primary-button {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.message-area {
+  margin-top: 1.5rem;
+  text-align: center;
+  min-height: 1.5rem;
+}
+
+/* ============================= */
+/* ✨ 룰북 전용 로딩 인디케이터 스타일 */
+/* ============================= */
+.rb-loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+}
+
+.rb-loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #e58a4e;
+  border-radius: 50%;
+  animation: rb-spin 1.2s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+.rb-loading-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #555;
+}
+
+@keyframes rb-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

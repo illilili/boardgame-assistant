@@ -1,217 +1,525 @@
-.card-generator {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+/* ComponentGenerator.css */
+
+/* --- ✨ 디자인 시스템 변수 --- */
+:root {
+  --accent-warm: #E58A4E;
+  --accent-warm-dark: #D4753A;
+  --accent-blue: #2c3e50;
+  --accent-blue-dark: #1a252f;
+  --text-dark: #1f2328;
+  --text-light: #6e7781;
+  --bg-main: #f6f8fa;
+  --bg-card: #ffffff;
+  --border-color: #d8dee4;
+  --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-medium: 0 8px 24px rgba(140, 149, 159, 0.15);
+  --transition-fast: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
 }
 
-.card-gen-content {
-    display: flex;
-    flex-direction: row;
-    gap: 30px;
-    width: 100%;
+/* --- ✨ 애니메이션 --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.card-gen-form {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- ✨ 전체 레이아웃 --- */
+.generator-layout {
+  display: flex;
+  gap: 32px;
+  width: 100%;
+  height: 100%;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.generator-form-section,
+.generator-result-section {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.generator-form-section {
+  flex: 0 0 500px;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+.generator-result-section {
+  flex: 1 1 auto;
+  padding: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background-color: var(--bg-card);
+  background-image: linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+  background-size: 40px 40px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+/* --- ✨ 1. 왼쪽 폼 섹션 --- */
+.form-section-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 8px 0;
+  padding-bottom: 6px;
+  border-bottom: 3px solid var(--accent-warm);
+}
+
+.form-section-header p {
+  font-size: 1rem;
+  color: var(--text-light);
+  margin: 0 0 32px 0;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .concept-info {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 0.9em;
+  background-color: var(--bg-main);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
 }
 
 .concept-info h3 {
-    margin-top: 0;
-    color: #495057;
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
 }
 
 .concept-info p {
-    margin: 5px 0;
+  margin: 0;
+  line-height: 1.5;
+  color: var(--text-light);
+  letter-spacing: 0.5px;
+  line-height: 1.8;
+}
+
+.concept-info p strong {
+  color: #d3702e;
+}
+
+.card-gen-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .form-group {
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
 }
 
 .form-group label {
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #333;
+  display: block;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+  font-size: 0.875rem;
 }
 
 .form-group input,
 .form-group textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1em;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--bg-main);
+  color: var(--text-dark);
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-warm);
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+  background-color: white;
 }
 
 .form-group textarea {
-    resize: vertical;
+  resize: vertical;
+  min-height: 80px;
 }
 
-.generate-buttons-container {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
+/* --- ✨ 2. 버전 관리 섹션 (개선된 스타일) --- */
+.content-version-manager {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.content-version-manager h4 {
+  font-size: 1.25rem;
+  margin: 0 0 20px 0;
+  color: var(--text-dark);
+}
+
+.version-note-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.version-note-inline label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  white-space: nowrap;
+}
+
+.version-note-inline input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-main);
+  font-size: 0.9rem;
+}
+
+.version-block {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.version-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.version-block-header label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-dark);
+}
+
+.version-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.version-select-wrapper {
+  flex-grow: 1;
+}
+
+.version-select {
+  font-size: 0.9rem;
+}
+
+.version-block button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.version-block button:disabled {
+  background-color: #ccc !important;
+  color: #888 !important;
+  cursor: not-allowed;
+  border-color: transparent !important;
+}
+
+button.save {
+  background-color: #8896a5;
+  color: white;
+  border: 1px solid transparent;
+}
+
+button.save:hover {
+  background-color: #6B7A8F;
+}
+
+button.rollback {
+  background-color: #f6f8fa;
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
+}
+
+button.rollback:hover:not(:disabled) {
+  background-color: #eef1f4;
+  border-color: #bbb;
+}
+
+.react-select__control {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: none !important;
+}
+
+.react-select__control--is-focused {
+  border-color: var(--accent-warm) !important;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2) !important;
+}
+
+/* --- ✨ 3. 버튼 스타일 (공통 및 개별) --- */
+.initial-generate-buttons,
+.result-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .generate-button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  flex: 1;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.generate-button:hover {
+  transform: translateY(-3px);
+}
+
+.generate-button:disabled {
+  background: #e0e0e0 !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .text-btn {
-    background-color: #007bff;
-}
-.text-btn:hover {
-    background-color: #0056b3;
+  background: linear-gradient(90deg, var(--accent-warm), var(--accent-warm-dark));
+  color: white;
 }
 
 .image-btn {
-    background-color: #28a745;
-}
-.image-btn:hover {
-    background-color: #1e7e34;
-}
-
-
-.card-result-container {
-    flex: 1;
-    padding: 20px;
-    background-color: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    border-radius: 8px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.result-section {
-    width: 100%;
-}
-
-.generated-text {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 5px;
-    text-align: left;
-    white-space: pre-wrap; /* 줄바꿈 유지 */
-    border: 1px solid #ddd;
-}
-
-.card-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ddd;
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-blue-dark));
+  color: white;
 }
 
 .reset-button-bottom {
-    padding: 10px 15px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    align-self: center; /* 가운데 정렬 */
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: var(--bg-card);
+  color: var(--text-light);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
 }
 
 .reset-button-bottom:hover {
-    background-color: #c82333;
+  background-color: var(--bg-main);
+  border-color: #ccc;
 }
 
-/* 로딩 및 에러 스타일은 ThumbnailGenerator.css와 공유하거나 여기에 추가 */
-.status-container {
-    /* ... */
-}
-.error-text {
-    /* ... */
+.submit-complete-section {
+  display: flex;
+  gap: 14px;
+  margin-top: 20px;
 }
 
-/* ... 기존 CSS는 그대로 둡니다 ... */
+.submit-complete-section button {
+  flex: 1;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
 
+.submit-complete-section button:hover {
+  transform: translateY(-3px);
+}
+
+.submit-complete-section button:first-child {
+  background: var(--accent-warm);
+  color: white;
+}
+
+.submit-complete-section button:nth-child(2) {
+  background: var(--accent-warm);
+  color: white;
+}
+
+.submit-complete-section button:last-child {
+  background: var(--accent-blue);
+  color: white;
+}
+
+/* --- ✨ 4. 오른쪽 결과 섹션 --- */
+/* --- ✨ 4. 오른쪽 결과 섹션 --- */
 .card-result-container {
-    flex: 1;
-    padding: 20px;
-    background-color: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* 내부 요소들을 가운데 정렬합니다. */
-    gap: 20px;
+  width: 100%;
+  max-width: 600px;
+  animation: fadeIn 0.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* [신규] 생성된 카드를 감싸는 컨테이너 */
+.card-result-container h3 {
+  font-size: 1.75rem;
+  color: #166534;
+  margin: 0 0 2rem 0;
+  text-align: center;
+}
+
+/* 🎨 변경된 부분 시작 */
 .generated-card-preview {
-    width: 100%;
-    max-width: 350px; /* 카드의 최대 너비를 지정합니다. */
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    background-color: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    overflow: hidden; /* 이미지의 둥근 모서리를 적용하기 위해 추가 */
+  /* 이 컨테이너가 카드 전체의 틀이 됩니다. */
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow-medium);
+  overflow: hidden;
+  /* 내부 요소가 둥근 모서리를 넘어가지 않도록 설정 */
+  margin-bottom: 24px;
+  width: 100%;
 }
 
-/* [수정] 카드 이미지 스타일 */
 .card-image {
-    width: 100%;
-    height: auto;
-    display: block; /* 이미지 아래의 작은 여백을 제거합니다. */
+  width: 100%;
+  display: block;
+  /* 이미지 아래 작은 여백 제거 */
+  /* 개별 테두리, 그림자, 둥근 모서리 제거 */
 }
 
-/* [신규] 텍스트 영역 스타일 */
 .card-text-area {
-    padding: 15px;
-    text-align: center;
-    font-size: 0.95em;
-    min-height: 60px; /* 텍스트가 없어도 최소 높이를 유지합니다. */
+  /* 개별 배경, 테두리, 둥근 모서리 제거 */
+  padding: 20px;
+  line-height: 1.6;
+  text-align: center;
 }
 
-.card-text-area p {
-    margin: 0;
-    white-space: pre-wrap; /* 줄바꿈을 그대로 보여줍니다. */
-}
+/* 🎨 변경된 부분 끝 */
 
-/* [신규] 이미지/텍스트가 없을 때 보여줄 플레이스홀더 스타일 */
-.image-placeholder, .text-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    background-color: #f0f0f0;
-    font-size: 0.9em;
+.image-placeholder,
+.text-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  background-color: var(--bg-main);
+  color: var(--text-light);
+  font-weight: 500;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .image-placeholder {
-    height: 200px; /* 이미지 영역의 높이를 지정합니다. */
+  min-height: 300px;
+  border-bottom: 2px dashed var(--border-color);
 }
 
-.text-placeholder {
-    min-height: 60px;
-    padding: 15px;
+/* --- ✨ 5. 상태 표시 (로딩, 에러, 초기) --- */
+.status-container,
+.placeholder-message,
+.error-message {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-/* [신규] 결과 화면의 버튼들을 감싸는 컨테이너 */
-.result-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    align-items: center;
+.status-container h3,
+.placeholder-message h3 {
+  font-size: 1.25rem;
+  margin-top: 1rem;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(229, 138, 78, 0.2);
+  border-top-color: var(--accent-warm);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+.error-message {
+  width: 100%;
+  max-width: 500px;
+  padding: 16px;
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.upload-message {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.placeholder-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  height: 100%;
+  text-align: center;
+}
+
+.placeholder-message p {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.react-select__option--is-focused {
+  background-color: rgba(229, 138, 78, 0.15) !important;
+  color: var(--text-dark) !important;
+}
+
+/* 현재 선택된 옵션 */
+.react-select__option--is-selected {
+  background-color: var(--accent-warm) !important;
+  color: white !important;
 }

@@ -1,39 +1,62 @@
 import React, { useState, useEffect } from "react";
 import { Document, Packer, Paragraph, HeadingLevel } from "docx";
 import { saveAs } from "file-saver";
-import { generateRulebook, getRulebookPreview } from '../api/development'; // getRulebookPreview 추가 가능
-import RulebookReport from "./RulebookReport";
-import "./RulebookGenerator.css";
+import ReactMarkdown from "react-markdown";
+import {
+  generateRulebook,
+  getContentVersions,
+  saveContentVersion,
+  rollbackContentVersion,
+  submitComponent,
+  getContentDetail,
+  uploadContentFile,
+} from "../api/development";
 
-function RulebookGenerator({ contentId }) {
+// CSS 파일 import
+import './ComponentGenerator.css';
+import './ModelGenerator.css';
+import './RulebookGenerator.css';
+import Select from "react-select";
+
+function RulebookGenerator({ contentId, componentId }) {
   const [rulebookText, setRulebookText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [submissionFile, setSubmissionFile] = useState(null);
+
+  // 메시지 상태
   const [successMessage, setSuccessMessage] = useState("");
   const [error, setError] = useState("");
+
+  // PDF 업로드 상태
+  const [submissionFile, setSubmissionFile] = useState(null);
 
   const isFromList = Boolean(contentId);
   const [manualId, setManualId] = useState(contentId || "");
   const finalContentId = isFromList ? contentId : manualId;
 
-  /** 📌 초기 로드 시 기존 저장된 룰북 불러오기 */
+  // 버전 관리 상태
+  const [versions, setVersions] = useState([]);
+  const [selectedVersion, setSelectedVersion] = useState(null);
+  const [versionNote, setVersionNote] = useState("룰북 스냅샷");
+
+  /** 📌 초기 로드 */
   useEffect(() => {
     if (!finalContentId) return;
-
     (async () => {
       try {
-        // 1) 로컬스토리지에서 읽기
+        // 로컬 저장본
         const saved = localStorage.getItem(`rulebook_${finalContentId}`);
         if (saved) {
           const parsed = JSON.parse(saved);
           setRulebookText(parsed.rulebookText || "");
         }
-
-        // 2) (선택) 서버에서 미리보기 불러오기
-        // const preview = await getRulebookPreview(finalContentId);
-        // if (preview?.rulebookText) {
-        //   setRulebookText(preview.rulebookText);
-        // }
+        // 서버 저장본
+        const detail = await getContentDetail(finalContentId);
+        if (detail?.contentData) {
+          setRulebookText(detail.contentData);
+        }
+        // 버전 목록
+        const versions = await getContentVersions(finalContentId);
+        setVersions(versions);
       } catch (err) {
         console.error(err);
         setError("룰북 데이터 불러오기 실패");
@@ -41,7 +64,7 @@ function RulebookGenerator({ contentId }) {
     })();
   }, [finalContentId]);
 
-  /** 룰북 생성 요청 */
+  /** 룰북 생성 */
   const handleGenerate = async () => {
     if (!finalContentId) {
       setError("콘텐츠 ID를 입력하세요.");
@@ -55,6 +78,7 @@ function RulebookGenerator({ contentId }) {
       const res = await generateRulebook({ contentId: Number(finalContentId) });
       setRulebookText(res.rulebookText || "");
       localStorage.setItem(`rulebook_${finalContentId}`, JSON.stringify(res));
+      setSuccessMessage("룰북 생성 성공!");
     } catch (err) {
       console.error(err);
       setError("룰북 생성 실패");
@@ -63,7 +87,7 @@ function RulebookGenerator({ contentId }) {
     }
   };
 
-  /** 다운로드 */
+  /** 다운로드 (docx) */
   const handleDownload = () => {
     if (!rulebookText) {
       setError("다운로드할 내용이 없습니다.");
@@ -72,7 +96,6 @@ function RulebookGenerator({ contentId }) {
     downloadAsDocx();
   };
 
-  /** docx 변환 */
   const downloadAsDocx = () => {
     if (!rulebookText) return;
 
@@ -109,7 +132,7 @@ function RulebookGenerator({ contentId }) {
     Packer.toBlob(doc).then((blob) => saveAs(blob, "boardgame-rulebook.docx"));
   };
 
-  /** PDF 제출 */
+  /** 📌 PDF 파일 선택 */
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type !== "application/pdf") {
@@ -120,96 +143,281 @@ function RulebookGenerator({ contentId }) {
     setSubmissionFile(file);
   };
 
-  const handleSubmitPdf = async (e) => {
-    e.preventDefault();
-    if (!submissionFile) {
-      setError("제출할 PDF 파일을 선택하세요.");
-      return;
-    }
+  /** 📌 PDF 업로드 */
+  const handleUploadPdf = async () => {
+    if (!submissionFile) return setError("업로드할 PDF 파일을 선택하세요.");
+    if (!finalContentId) return setError("콘텐츠 ID가 없습니다.");
+
     setIsLoading(true);
     setError("");
     setSuccessMessage("");
 
     try {
-      const formData = new FormData();
-      formData.append("file", submissionFile);
-
-      await fetch(`/api/content/${finalContentId}/submit-rulebook`, {
-        method: "POST",
-        body: formData,
-      });
-
-      setSuccessMessage("룰북 제출 성공!");
+      await uploadContentFile(finalContentId, submissionFile, "manual");
+      setSuccessMessage("PDF 업로드 성공!");
       setSubmissionFile(null);
-    } catch {
-      setError("룰북 제출 실패");
+
+      const detail = await getContentDetail(finalContentId);
+      if (detail?.contentData) {
+        setRulebookText(detail.contentData);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("PDF 업로드 실패");
     } finally {
       setIsLoading(false);
     }
   };
 
+  /** 📌 업로드된 PDF 제출 */
+  const handleSubmitUploaded = async () => {
+    if (!componentId) return setError("컴포넌트 ID가 없습니다.");
+    setIsLoading(true);
+
+    try {
+      await submitComponent(componentId);
+      setSuccessMessage("룰북 제출 성공!");
+    } catch {
+      setError("제출 실패");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /** 버전 저장 */
+  const handleSaveVersion = async () => {
+    if (!versionNote.trim()) return setError("버전 메모를 입력하세요.");
+    if (!finalContentId) return setError("콘텐츠 ID가 없습니다.");
+    setIsLoading(true);
+
+    try {
+      await saveContentVersion({
+        contentId: finalContentId,
+        note: versionNote,
+        contentData: rulebookText
+      });
+      setSuccessMessage("버전 저장 성공!");
+      const versions = await getContentVersions(finalContentId);
+      setVersions(versions);
+    } catch {
+      setError("버전 저장 실패");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /** 롤백 */
+  const handleRollbackVersion = async () => {
+    if (!selectedVersion) return setError("롤백할 버전을 선택하세요.");
+    setIsLoading(true);
+
+    try {
+      const versionIdToRollback = selectedVersion.value;
+      await rollbackContentVersion(finalContentId, versionIdToRollback);
+      const detail = await getContentDetail(finalContentId);
+      if (detail?.contentData) setRulebookText(detail.contentData);
+      setSuccessMessage(`롤백 완료!`);
+      setSelectedVersion(null);
+    } catch {
+      setError("롤백 실패");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /** 📌 렌더링 - PDF or Text 구분 */
+  const renderResult = () => {
+    if (!rulebookText) return null;
+
+    if (rulebookText.startsWith("http") && rulebookText.endsWith(".pdf")) {
+      return (
+        <iframe
+          src={rulebookText}
+          title="Rulebook PDF"
+          className="pdf-viewer"
+        />
+      );
+    }
+    
+    // 키워드 바로 뒤에 한글/숫자가 붙어있는 경우를 찾아 공백을 추가합니다.
+    const formattedText = rulebookText.replace(
+      /(게임 제목|게임 개요|구성품|적정 연령|게임 준비|게임 규칙|게임 진행 방식|승리 조건|턴 순서)(?=[가-힣0-9])/g,
+      '$1 '
+    );
+
+    return (
+      <div className="rulebook-report-wrapper">
+        <div className="rulebook-report">
+          <ReactMarkdown>{formattedText}</ReactMarkdown>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="rulebook-page-container">
-      <div className="form-column">
-        <h1>📖 룰북 생성</h1>
-        <div className="id-input-container">
-          <label>콘텐츠 ID</label>
-          <input
-            type="text"
-            value={manualId}
-            onChange={(e) => !isFromList && setManualId(e.target.value)}
-            placeholder="콘텐츠 ID 입력"
-            disabled={isFromList}
-          />
+    <div className="generator-layout">
+      {/* ------------------- 왼쪽: 입력 및 버전관리 ------------------- */}
+      <div className="generator-form-section">
+        <div className="form-section-header">
+          <h2>룰북 생성</h2>
+          <p>룰북 초안을 자동 생성하고 완성된 룰북 PDF를 업로드하세요.</p>
         </div>
 
-        <button
-          className="primary-button"
-          onClick={handleGenerate}
-          disabled={isLoading}
-        >
-          {isLoading ? "생성 중..." : "룰북 생성하기"}
-        </button>
-
-        {rulebookText && (
-          <>
-            <div className="download-controls">
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={handleDownload}
-              >
-                다운로드
-              </button>
-            </div>
-
-            <form className="submit-section" onSubmit={handleSubmitPdf}>
-              <label>PDF 파일 제출</label>
-              <input
-                type="file"
-                accept="application/pdf"
-                onChange={handleFileChange}
-              />
-              <button
-                className="primary-button"
-                type="submit"
-                disabled={isLoading || !submissionFile}
-              >
-                제출하기
-              </button>
-            </form>
-          </>
+        {!isFromList && (
+          <div className="form-group">
+            <label>콘텐츠 ID</label>
+            <input
+              type="text"
+              value={manualId}
+              onChange={(e) => setManualId(e.target.value)}
+              placeholder="콘텐츠 ID 입력"
+            />
+          </div>
         )}
 
-        {error && <p className="error-message">{error}</p>}
-        {successMessage && <p className="success-message">{successMessage}</p>}
+        {/* === 작업 #1: 룰북 초안 생성 === */}
+        <div className="control-box">
+          <h4>AI로 초안 생성</h4>
+          <div className="rulebook-form-group">
+            <button
+              className="generate-btn"
+              onClick={handleGenerate}
+              disabled={isLoading}
+            >
+              {isLoading ? "생성 중..." : "룰북 초안 생성하기"}
+            </button>
+            <button
+              type="button"
+              className="download-btn"
+              onClick={handleDownload}
+              disabled={!rulebookText || isLoading}
+            >
+              DOCX 다운로드
+            </button>
+          </div>
+        </div>
+
+        {/* === 작업 #2: 완성된 PDF 업로드 === */}
+        <div className="control-box">
+          <h4>완성된 PDF 직접 업로드</h4>
+          <div className="file-upload-group">
+            <div className="file-input-row">
+              <div className="file-input-box">
+                <input
+                  type="file"
+                  id="fileInput"
+                  onChange={handleFileChange}
+                  className="file-upload-input"
+                  accept="application/pdf"
+                />
+                <label htmlFor="fileInput" className="file-select-btn">
+                  파일 선택
+                </label>
+                <span className="file-name">
+                  {submissionFile
+                    ? submissionFile.name
+                    : "파일을 선택해 주세요"}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="file-upload-button"
+                onClick={handleUploadPdf}
+                disabled={isLoading || !submissionFile}
+              >
+                업로드
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* === 고급 기능: 버전 관리 (항상 보임) === */}
+        <div className="control-box">
+          <h4>버전 관리</h4>
+          <div className="version-control-content">
+            <div className="version-control-note">
+              <input
+                type="text"
+                value={versionNote}
+                onChange={(e) => setVersionNote(e.target.value)}
+                placeholder="예: 룰북 v1 초안"
+                disabled={!rulebookText || isLoading}
+              />
+              <button
+                className="btn-save-version"
+                onClick={handleSaveVersion}
+                disabled={!rulebookText || isLoading}
+              >
+                버전 저장
+              </button>
+            </div>
+            <div className="version-control-select-row">
+              <Select
+                className="version-select"
+                classNamePrefix="react-select"
+                value={selectedVersion}
+                onChange={setSelectedVersion}
+                options={versions.map((v) => ({
+                  value: v.versionId,
+                  label: `v${v.versionNo} - ${v.note} (${new Date(
+                    v.createdAt
+                  ).toLocaleString()})`,
+                }))}
+                placeholder={versions.length > 0 ? "복구할 버전 선택" : "저장된 버전 없음"}
+                isDisabled={versions.length === 0}
+                isClearable
+              />
+              {selectedVersion && (
+                <button
+                  className="btn-rollback"
+                  onClick={handleRollbackVersion}
+                  disabled={isLoading}
+                >
+                  롤백
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* === 최종 제출 === */}
+        <div className="submit-complete-section">
+          <button
+            className="primary-button"
+            onClick={handleSubmitUploaded}
+            disabled={isLoading}
+          >
+            최종 제출
+          </button>
+        </div>
+
+        {/* === 메시지 표시 영역 === */}
+        <div className="message-area">
+          {error && <p className="error-message">{error}</p>}
+          {successMessage && (
+            <p className="success-message">{successMessage}</p>
+          )}
+        </div>
       </div>
 
-      <div className="result-column">
+      {/* ------------------- 오른쪽: 결과 뷰어 ------------------- */}
+      <div
+        className={`rulebook-preview ${rulebookText ? "filled" : "empty"}`}
+      >
         {isLoading ? (
-          <div className="spinner"></div>
+          <div className="rb-loading-container">
+            <div className="rb-loader"></div>
+            <h3 className="rb-loading-text">처리 중...</h3>
+          </div>
+        ) : rulebookText ? (
+          renderResult()
         ) : (
-          <RulebookReport content={rulebookText} />
+          <div className="placeholder-message">
+            <p>
+              룰북 생성을 눌러주세요. 자동 생성된 초안 또는 업로드된 PDF가
+              이곳에 표시됩니다.
+            </p>
+          </div>
         )}
       </div>
     </div>

@@ -1,54 +1,92 @@
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
-    }
-    70% {
-        transform: scale(1.05);
-        box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
-    }
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    }
+/* --- ✨ 고유 디자인 시스템 변수 --- */
+:root {
+  --bga-cta-accent: #E58A4E;
+  --bga-cta-accent-dark: #D4753A;
+  --bga-cta-text-light: #ffffff;
 }
 
-.cta-section {
-    padding: 100px 20px;
-    text-align: center;
-    color: white;
-    background: linear-gradient(135deg, #E58A4E, #c06c38);
+@keyframes bga-cta-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  70% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
 }
 
-.cta-content h2 {
-    font-size: clamp(2rem, 4vw, 2.5rem);
-    font-weight: 800;
-    margin: 0 auto 40px auto;
-    max-width: 600px;
-    line-height: 1.4;
+@keyframes bga-cta-aurora-move {
+  0% { transform: translate(-50%, -50%) rotate(0deg) scale(1.5); }
+  50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.8); }
+  100% { transform: translate(-50%, -50%) rotate(360deg) scale(1.5); }
 }
 
-.cta-button {
-    background-color: white;
-    color: var(--accent-warm);
-    border: none;
-    padding: 20px 45px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    animation: pulse 2s infinite;
+/* --- ✨ 전체 섹션 스타일 --- */
+.bga-cta-section {
+  padding: 120px 40px;
+  text-align: center;
+  color: var(--bga-cta-text-light);
+  background: linear-gradient(135deg, #1f2328 0%, #343f49 100%);
+  position: relative;
+  overflow: hidden; /* 오로라 효과가 넘치지 않도록 */
 }
 
-.cta-button:hover {
-    background-color: var(--text-dark);
-    color: white;
-    transform: scale(1.05);
-    animation-play-state: paused;
+/* --- ✨ 동적 배경 효과 --- */
+.bga-cta-aurora {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1200px;
+  height: 1200px;
+  background: radial-gradient(circle, #D4753A 0%,  #E58A4E 60%);
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: bga-cta-aurora-move 20s infinite linear;
+  z-index: 1;
 }
 
-.cta-button:active {
-    transform: scale(1.02);
+.bga-cta-content {
+  position: relative;
+  z-index: 2; /* 컨텐츠가 오로라 효과 위에 오도록 */
+}
+
+.bga-cta-title {
+  font-size: clamp(2rem, 4vw, 2.8rem); /* 폰트 크기 약간 증가 */
+  font-weight: 800;
+  margin: 0 auto 40px auto;
+  max-width: 700px;
+  line-height: 1.5;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* --- ✨ 버튼 스타일 --- */
+.bga-cta-button {
+  background-color: var(--bga-cta-text-light);
+  color: var(--bga-cta-accent);
+  border: none;
+  padding: 20px 45px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: bga-cta-pulse 2.5s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+.bga-cta-button:hover {
+  background-color: var(--bga-cta-text-light);
+  color: var(--bga-cta-accent-dark);
+  transform: translateY(-5px) scale(1.05); /* 더 입체적인 효과 */
+  box-shadow: 0 0 25px 0 rgba(229, 138, 78, 0.5), 0 15px 30px rgba(0,0,0,0.25);
+  animation-play-state: paused;
+}
+
+.bga-cta-button:active {
+  transform: translateY(-2px) scale(1.02);
 }

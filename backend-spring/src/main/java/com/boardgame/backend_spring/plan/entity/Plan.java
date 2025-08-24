@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * 생성된 기획서의 현재 상태를 저장하는 엔티티입니다.
@@ -30,6 +32,7 @@ public class Plan {
     // 기획서의 기반이 되는 컨셉과 1:1 관계를 맺습니다.
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "concept_id", unique = true, nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private BoardgameConcept boardgameConcept;
 
     // 사용자가 수정한 내용을 포함한 기획서의 현재 내용을 저장합니다.

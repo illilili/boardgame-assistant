@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import './RuleCreator.css';
 import { getAllConcepts, generateRule, regenerateRule } from '../api/auth.js';
 import { ProjectContext } from '../contexts/ProjectContext';
@@ -13,6 +13,29 @@ const RuleCreator = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [feedback, setFeedback] = useState('');
+    const restoredOnLoad = useRef(false);
+
+    useEffect(() => {
+        if (generatedRules) {
+            sessionStorage.setItem('rc_last_rules', JSON.stringify(generatedRules));
+        } else {
+            sessionStorage.removeItem('rc_last_rules');
+        }
+    }, [generatedRules]);
+
+    useEffect(() => {
+        const savedRulesJSON = sessionStorage.getItem('rc_last_rules');
+        if (savedRulesJSON) {
+            try {
+                const savedRules = JSON.parse(savedRulesJSON);
+                setGeneratedRules(savedRules);
+                restoredOnLoad.current = true;
+            } catch (e) {
+                console.error("저장된 규칙을 불러오는 데 실패했습니다:", e);
+                sessionStorage.removeItem('rc_last_rules');
+            }
+        }
+    }, []);
 
     useEffect(() => {
         const fetchAllConcepts = async () => {
@@ -26,6 +49,7 @@ const RuleCreator = () => {
         fetchAllConcepts();
     }, []);
 
+    // ✨ 수정된 최종 useEffect 로직
     useEffect(() => {
         if (!projectId || conceptList.length === 0) {
             setFilteredConceptList([]);
@@ -35,12 +59,26 @@ const RuleCreator = () => {
         
         const conceptsForProject = conceptList.filter(c => c.projectId === parseInt(projectId));
         setFilteredConceptList(conceptsForProject.sort((a, b) => b.conceptId - a.conceptId));
+        
         if (conceptsForProject.length > 0) {
-            setSelectedConceptId(conceptsForProject[0].conceptId.toString());
+            if (generatedRules?.conceptId && conceptsForProject.some(c => c.conceptId === generatedRules.conceptId)) {
+                setSelectedConceptId(generatedRules.conceptId.toString());
+            } else {
+                setSelectedConceptId(conceptsForProject[0].conceptId.toString());
+            }
         } else {
             setSelectedConceptId('');
         }
-    }, [projectId, conceptList]);
+    }, [projectId, conceptList, generatedRules]); // ✨ 의존성 배열 수정됨
+
+    useEffect(() => {
+        if (restoredOnLoad.current) {
+            restoredOnLoad.current = false;
+            return;
+        }
+        setGeneratedRules(null);
+        setError('');
+    }, [selectedConceptId]);
 
     const handleGenerateRules = async () => {
         if (!selectedConceptId) {
@@ -49,14 +87,15 @@ const RuleCreator = () => {
         }
         setIsLoading(true);
         setError('');
-        setGeneratedRules(null);
         setFeedback('');
 
         try {
-            const data = await generateRule({ conceptId: parseInt(selectedConceptId, 10) });
-            setGeneratedRules(data);
+            const conceptId = parseInt(selectedConceptId, 10);
+            const data = await generateRule({ conceptId });
+            setGeneratedRules({ ...data, conceptId }); 
         } catch (err) {
             setError(err.message);
+            setGeneratedRules(null);
         } finally {
             setIsLoading(false);
         }
@@ -71,13 +110,14 @@ const RuleCreator = () => {
         setError('');
 
         try {
+            const conceptId = parseInt(selectedConceptId, 10);
             const requestBody = {
-                conceptId: parseInt(selectedConceptId, 10),
+                conceptId,
                 ruleId: generatedRules.ruleId,
                 feedback: feedback
             };
             const data = await regenerateRule(requestBody);
-            setGeneratedRules(data);
+            setGeneratedRules({ ...data, conceptId });
             setFeedback('');
         } catch (err) {
             setError(err.message);
@@ -124,32 +164,48 @@ const RuleCreator = () => {
                             value={feedback}
                             onChange={(e) => setFeedback(e.target.value)}
                         />
-                        <button onClick={handleRegenerateRules} disabled={!feedback} className="submit-button regenerate-button">
-                            피드백 반영하여 재생성
+                        <button onClick={handleRegenerateRules} disabled={isLoading || !feedback} className="submit-button regenerate-button">
+                            {isLoading ? 'AI 반영 중...' : '피드백 반영하여 재생성'}
                         </button>
                     </div>
                 )}
             </div>
 
             <div className="rule-result-section">
-                {isLoading && <div className="spinner"></div>}
-                {error && <div className="error-message">{error}</div>}
-                
-                {generatedRules ? (
+                {isLoading && (
+                    <div className="rule-creator__loading-state">
+                        <div className="rule-creator__spinner"></div>
+                        <p>AI가 게임 규칙을 설계하고 있습니다...</p>
+                    </div>
+                )}
+
+                {!isLoading && error && <div className="error-message">{error}</div>}
+
+                {!isLoading && generatedRules && (
                     <div className="rule-card">
-                        <h3>AI가 설계한 게임 규칙 (Rule ID: {generatedRules.ruleId})</h3>
-                        <div className="rule-item"><h4>턴 순서</h4><p>{generatedRules.turnStructure}</p></div>
+                        <h3>AI가 설계한 게임 규칙</h3>
+                        <div className="rule-item">
+                            <h4>턴 순서</h4>
+                            <div className="turn-structure-list">
+                                {generatedRules.turnStructure.split(/\s(?=\d\.)/).map((part, index) => (
+                                    <div key={index} className="turn-structure-item">
+                                        <span className="turn-number">{part.substring(0, 2)}</span>
+                                        <span className="turn-description">{part.substring(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                         <div className="rule-item"><h4>행동 규칙</h4><ul>{generatedRules.actionRules.map((rule, index) => <li key={index}>{rule}</li>)}</ul></div>
                         <div className="rule-item"><h4>승리 조건</h4><p>{generatedRules.victoryCondition}</p></div>
                         <div className="rule-item"><h4>페널티 규칙</h4><ul>{generatedRules.penaltyRules.map((rule, index) => <li key={index}>{rule}</li>)}</ul></div>
                         <div className="rule-item"><h4>설계 노트</h4><p>{generatedRules.designNote}</p></div>
                     </div>
-                ) : (
-                    !isLoading && !error && (
-                        <div className="initial-state">
-                            <p>기획안을 선택하고 '게임 규칙 생성하기' 버튼을 누르면 AI가 설계한 결과가 여기에 표시됩니다.</p>
-                        </div>
-                    )
+                )}
+                
+                {!isLoading && !generatedRules && !error && (
+                    <div className="rule-creator__initial-state">
+                        <p>기획안을 선택하고 '게임 규칙 생성하기' 버튼을 누르면 AI가 설계한 결과가 여기에 표시됩니다.</p>
+                    </div>
                 )}
             </div>
         </div>

@@ -1,0 +1,182 @@
+/* --- ✨ 디자인 시스템 변수 (통일성 유지) --- */
+:root {
+  --detail-accent: #E58A4E;
+  --detail-accent-dark: #D4753A;
+  --detail-accent-light: #fef4e8;
+  --detail-reject: #2D3748;
+  --detail-reject-dark: #1A202C;
+  --detail-bg-page: #f6f8fa;
+  --detail-bg-card: #ffffff;
+  --detail-text-primary: #1f2328;
+  --detail-text-secondary: #6e7781;
+  --detail-border-color: #d8dee4;
+  --detail-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --detail-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.15);
+  --detail-transition: all 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+}
+
+/* --- ✨ 페이지 레이아웃 --- */
+.plan-detail-wrapper {
+  background-color: var(--detail-bg-page);
+  padding: 40px;
+  max-width: 1000px;
+  min-height: 100vh;
+  margin: auto;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.plan-detail-header {
+  margin-bottom: 24px;
+}
+.plan-detail-header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--detail-text-primary);
+  margin-bottom: 8px;
+}
+
+.plan-detail-meta {
+  display: flex;
+  gap: 24px;
+  font-size: 0.9rem;
+  color: var(--detail-text-secondary);
+}
+.plan-detail-meta b {
+  color: var(--detail-text-primary);
+  font-weight: 600;
+}
+
+/* --- ✨ PDF 뷰어 --- */
+.plan-detail-viewer, .plan-detail-viewer--empty {
+  width: 100%;
+  height: 80vh;
+  border: 1px solid var(--detail-border-color);
+  border-radius: 12px;
+  box-shadow: var(--detail-shadow-lg);
+  background-color: var(--detail-bg-card);
+}
+.plan-detail-viewer--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--detail-text-secondary);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* --- ✨ 상태 메시지 --- */
+.plan-detail-status-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 24px;
+}
+.plan-detail-status-message--success {
+  background: var(--detail-accent-light);
+  color: var(--detail-accent-dark);
+}
+.plan-detail-status-message--error {
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+/* --- ✨ 반려 사유 및 버튼 영역 --- */
+.plan-detail-decision-area {
+  margin-top: 24px;
+  background-color: var(--detail-bg-card);
+  border: 1px solid var(--detail-border-color);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.plan-detail-reject-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid var(--detail-border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--detail-bg-page);
+  resize: vertical;
+  min-height: 100px;
+  transition: var(--detail-transition);
+}
+.plan-detail-reject-textarea:focus {
+  outline: none;
+  border-color: var(--detail-accent);
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+  background-color: white;
+}
+
+.plan-detail-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+.plan-detail-actions__left, .plan-detail-actions__right {
+  display: flex;
+  gap: 12px;
+}
+
+/* 공통 버튼 스타일 */
+.plan-detail-button {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--detail-transition);
+}
+.plan-detail-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+.plan-detail-button:disabled {
+  background-color: #a0aec0 !important;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  color: white !important;
+}
+
+/* 개별 버튼 스타일 */
+.plan-detail-button--approve {
+  background: var(--detail-accent);
+  color: white;
+  box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
+}
+.plan-detail-button--approve:hover:not(:disabled) {
+  background: var(--detail-accent-dark);
+}
+
+.plan-detail-button--reject {
+  background: var(--detail-reject);
+  color: white;
+  box-shadow: 0 4px 15px rgba(45, 55, 72, 0.2);
+}
+.plan-detail-button--reject:hover:not(:disabled) {
+  background: var(--detail-reject-dark);
+}
+
+.plan-detail-button--back {
+  background: none;
+  color: var(--detail-text-secondary);
+  border: 1px solid var(--detail-border-color);
+}
+.plan-detail-button--back:hover {
+  background: var(--detail-bg-page);
+  border-color: #c8d1dc;
+}
+
+/* 로딩/에러 상태 */
+.plan-detail-state-info {
+  padding: 4rem 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--detail-text-secondary);
+}
+.plan-detail-state-info--error {
+  color: #be123c;
+}

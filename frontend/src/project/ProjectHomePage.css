@@ -1,177 +1,373 @@
-.project-home-layout {
-  display: flex;
-  gap: 48px;
-  width: 100%;
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 0 2rem;
-  min-height: calc(100vh - 70px - 4rem);
-  box-sizing: border-box;
+/* --- ✨ 디자인 시스템 변수 --- */
+:root {
+    --accent-warm: #E58A4E;
+    --text-dark: #1f2328;
+    --text-light: #6e7781;
+    --bg-main: #f6f8fa;
+    --bg-card: #ffffff;
+    --border-color: #d0d7de;
+    --shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --font-main: 'Inter', sans-serif;
+    --transition-fast: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
 }
 
-/* 사이드바 스타일 */
-.sidebar {
-  width: 220px;
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* --- ✨ 고유 클래스 이름을 사용한 전체 레이아웃 --- */
+.project-home-page__container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    background-color: var(--bg-main);
+    min-height: calc(100vh - 70px);
+    font-family: var(--font-main);
 }
 
-.sidebar h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  color: #2c2825;
+.project-home-page__sidebar {
+    width: 280px;
+    background-color: #161b22;
+    color: #c9d1d9;
+    padding: 24px 0;
+    box-sizing: border-box;
 }
 
-.sidebar button {
-  padding: 12px;
-  background-color: #F8F8F8;
-  border: 1px solid #EAEAEA;
-  border-radius: 8px;
-  font-size: 1rem;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
+.project-home-page__nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.sidebar button:hover {
-  background-color: #E58A4E;
-  color: white;
+.project-home-page__nav-item {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all var(--transition-fast);
 }
 
-/* 메인 컨텐츠 */
-.main-content {
-  flex: 1;
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.project-home-page__nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--accent-warm);
+}
+
+.project-home-page__main-content {
+    padding: 32px 48px;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    /* ✅ 기존 1fr 1fr → 3:2 비율 */
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "header header"
+        "members logs";
+    /* ✅ 최근작업 왼쪽(넓게), 멤버 오른쪽(좁게) */
+    gap: 32px;
+    align-content: start;
+}
+
+.project-home-page__header {
+    grid-area: header;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+    box-shadow: var(--shadow-subtle);
+}
+
+.project-home-page__info h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 10px 0;
+}
+
+.project-home-page__info {
+    flex: 1;
+    /* 남는 공간 전부 차지 */
+    min-width: 0;
+    /* flex item 잘림 방지 */
+}
+
+.project-home-page__description {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 24px;
+}
+
+.project-home-page__thumbnail-wrapper {
+    flex-shrink: 0;
+}
+
+.project-home-page__thumbnail {
+    width: 340px;
+    /* 280 → 320 */
+    height: 240px;
+    /* 180 → 200 */
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.project-home-page__status-badge {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
+
+.status--planning {
+    background-color: #dbf4ff;
+    color: #0969da;
+}
+
+/* ... (다른 상태 색상들) ... */
+
+.project-home-page__progress-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.project-home-page__progress-bar {
+    height: 12px;
+    background: linear-gradient(90deg, #ffd1a8, var(--accent-warm));
+    border-radius: 6px;
+    transition: width 0.5s ease-in-out;
+}
+
+.project-home-page__progress-container span {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.project-home-page__info-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow-subtle);
+}
+
+.project-home-page__info-card:nth-of-type(1) {
+    grid-area: members;
+}
+
+.project-home-page__info-card:nth-of-type(2) {
+    grid-area: logs;
+}
+
+.project-home-page__info-card h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.project-home-page__member-list,
+.project-home-page__log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 
-.project-home-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
+.project-home-page__member-item,
+.project-home-page__log-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f4f8;
 }
 
-.project-info {
-  flex: 1;
+.project-home-page__member-role {
+    font-weight: 600;
+    color: var(--accent-warm);
 }
 
-.project-thumbnail-wrapper {
-  flex-shrink: 0;
+.project-home-page__member-name {
+    color: var(--text-dark);
 }
 
-.project-home-thumbnail {
-  width: 400px; /* 썸네일 가로 크기 */
-  height: auto; /* 비율 유지 */
-  border-radius: 8px;
-  object-fit: cover; /* 비율 유지하며 자르기 */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-/* 멤버 목록 */
-.member-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.project-home-page__log-action {
+    font-weight: 500;
 }
 
-.member-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+.project-home-page__log-user {
+    color: var(--text-light);
 }
 
-.member-role {
-  font-weight: bold;
-  color: #E58A4E;
+.project-home-page__log-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
 }
 
-.member-name {
-  color: #333;
+.project-home-page__edit-btn {
+    margin-top: 24px;
+    padding: 10px 20px;
+    background-color: var(--accent-warm);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all var(--transition-fast);
 }
 
-/* 로그 목록 */
-.log-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.project-home-page__edit-btn:hover {
+    background-color: var(--accent-warm-dark);
 }
 
-.log-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+.project-home-page__modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 25, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
-.log-action {
-  font-weight: bold;
-  color: #4a4a4a;
+.project-home-page__modal-content {
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.log-user {
-  color: #E58A4E;
+.project-home-page__modal-content h3 {
+    font-size: 1.5rem;
+    margin: 0 0 8px 0;
 }
 
-.log-date {
-  font-size: 0.85rem;
-  color: #888;
+.project-home-page__modal-content input,
+.project-home-page__modal-content textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    box-sizing: border-box;
 }
 
-/* 프로젝트 정보 수정 */
-
-.edit-project-btn {
-  margin-top: 12px;
-  padding: 8px 16px;
-  background-color: #ff7f50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.edit-project-btn:hover {
-  background-color: #ff6333;
+.project-home-page__modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.project-home-page__modal-actions button {
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
 }
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+
+.project-home-page__modal-actions button:nth-child(1) {
+    background-color: var(--accent-warm);
+    color: white;
 }
-.modal-content input,
-.modal-content textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+
+.project-home-page__modal-actions button:nth-child(2) {
+    background-color: #f6f8fa;
+    border: 1px solid var(--border-color);
 }
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+
+.project-home-page__log-list {
+    /* grid를 사용하여 각 항목을 깔끔하게 정렬합니다. */
+    display: grid;
+    /* 3개의 열을 정의합니다. 첫 번째는 내용에 맞게, 두 번째는 유연하게, 세 번째는 너비를 고정합니다. */
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    /* 열 사이의 간격 설정 */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.project-home-page__log-item {
+    /* 각 그리드 아이템의 수직 중앙 정렬 */
+    display: contents;
+    /* 부모의 grid를 따라가도록 설정 */
+    border-bottom: 1px solid #f0f4f8;
+    padding: 12px 0;
+}
+
+.project-home-page__log-item>span {
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f4f8;
+}
+
+.project-home-page__log-action {
+    font-weight: 500;
+    color: var(--text-dark);
+    /* 색상 통일 */
+    text-align: left;
+}
+
+.project-home-page__log-user {
+    color: var(--text-light);
+    text-align: right;
+    /* 부모의 flex-grow: 1과 유사한 역할을 합니다. */
+    justify-self: end;
+}
+
+.project-home-page__log-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    text-align: right;
+    white-space: nowrap;
+    /* 줄바꿈 방지 */
+}
+
+.project-home-page__container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    background-color: var(--bg-main);
+    min-height: calc(100vh - 70px);
+    font-family: var(--font-main);
+}
+
+.project-home-page__sidebar {
+    width: 280px;
+    background-color: #161b22;
+    color: #c9d1d9;
+    padding: 24px 0;
+    box-sizing: border-box;
+    /* ✨ 수정된 부분 시작: Flexbox 적용 */
+    display: flex;
+    flex-direction: column;
+    /* ✨ 수정된 부분 끝 */
+}
+
+.project-home-page__bottom-nav-list {
+    /* ✨ 추가된 부분 시작 */
+    margin-top: auto;
+    /* 상위 Flexbox 컨테이너의 남은 공간을 모두 차지 */
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    /* ✨ 추가된 부분 끝 */
+}
+
+.icon-sidebar {
+    color: #c9d1d9;
+    /* 기본 색상 */
+    transition: color var(--transition-fast);
+}
+
+.project-home-page__nav-item:hover .icon-sidebar {
+    color: var(--accent-warm);
+    /* 호버 시 강조 색상 적용 */
 }

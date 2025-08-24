@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 
 import java.util.ArrayList;
@@ -21,11 +23,13 @@ public class BoardgameConcept {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long conceptId;
 
-    @Column(unique = true)
-    private Long planId;
+//    @Column(unique = true)
+//    private Long planId;
+    //중복으로 되어있어서 삭제함
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Project project;
 
     private String theme;

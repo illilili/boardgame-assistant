@@ -1,22 +1,41 @@
-/* Development.css 또는 Plan.css (Orange Theme) */
+/* Development.css (전문가 레이아웃 버전, Plan.css 참고) */
+/* --- 전체 레이아웃 (Development 한정) --- */
+.development-page .workspace-container.new-design {
+  display: flex;
+  height: calc(100vh - var(--header-height)); /* 내부 스크롤만 */
+  background-color: var(--bg-light);
+}
 
-/* --- 기본 설정 및 변수 (Vibrant Orange 테마) --- */
-:root {
-  /* [변경] 주황색을 메인/보조 강조 색상으로 변경했습니다. */
-  --accent-primary: #ea580c; /* 메인 강조 색상 (선명한 주황) */
-  --accent-secondary: #f97316; /* 보조 강조 색상 (밝은 주황) */
+/* --- 메인 컨텐츠 (Development 한정) --- */
+.development-page .workspace-main-content {
+  flex-grow: 1;
+  padding: 40px 60px;
+  overflow-y: auto;   /* 안쪽에서만 스크롤 */
+  display: flex;
+  flex-direction: column;
+}
 
-  /* [변경] 사이드바 배경을 좀 더 따뜻하고 중립적인 어두운 색으로 변경했습니다. */
-  --bg-dark: #18181b; /* 사이드바 배경 (따뜻한 다크 그레이) */
-  --bg-light: #f9fafb; /* 메인 컨텐츠 배경 (아주 밝은 회색) */
-  --text-primary: #111827; /* 메인 텍스트 (거의 검정) */
-  --text-secondary: #a1a1aa; /* 보조 텍스트 (회색) */
-  --border-color: #e5e7eb; /* 테두리 색상 */
-  --white: #ffffff;
-  --font-main: 'Inter', sans-serif;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+/* --- 반응형 (Development 한정) --- */
+@media (max-width: 1024px) {
+  .development-page .workspace-container.new-design {
+    flex-direction: column;
+  }
+
+  .development-page .workspace-main-content {
+    padding: 32px 24px;
+  }
+}
+
+.workspace-sidebar {
+  width: 280px;
+  background-color: var(--white);
+  /* ✨ 기존: var(--bg-dark) */
+  border-right: 1px solid var(--border-color);
+  padding: 32px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 body {
@@ -24,38 +43,40 @@ body {
   margin: 0;
   background-color: var(--bg-light);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- 전체 레이아웃 --- */
-.workspace-container.new-design {
-  display: flex;
-  height: 100vh;
-}
 
 /* --- 사이드바 --- */
-.workspace-sidebar {
+.dev-workspace-sidebar {
   width: 280px;
-  background-color: var(--bg-dark);
-  color: var(--text-secondary);
+  background-color: var(--white);
+  /* ✨ Dev는 흰색 */
+  border-right: 1px solid var(--border-color);
   padding: 32px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; 
+  box-sizing: border-box;
 }
 
+/* --- 사이드바 헤더 --- */
 .sidebar-header {
   margin-bottom: 40px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 20px;
 }
 
-.logo {
+.dev-logo {
   font-weight: 800;
   font-size: 1.5rem;
-  color: var(--white);
   letter-spacing: 1px;
+  text-transform: uppercase; /* DEV 대문자 */
+  cursor: pointer;
+  color: var(--text-primary);
 }
 
+/* --- 네비게이션 --- */
 .workspace-nav-list {
   list-style: none;
   padding: 0;
@@ -65,151 +86,68 @@ body {
   gap: 8px;
 }
 
-.nav-item {
+.dev-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 1rem;
   font-weight: 500;
-  padding: 12px 16px;
+  padding: 12px;
   border-radius: 8px;
   cursor: pointer;
-  position: relative;
-  color: #d1d5db;
+  color: var(--text-secondary);
   transition: color 0.2s, background-color 0.2s;
 }
 
-.nav-item:hover {
-  color: var(--white);
-  background-color: rgba(255, 255, 255, 0.05);
+.dev-nav-item:hover {
+  color: var(--text-primary);
+  background-color: #f3f4f6;
 }
 
-.nav-item.active {
-  color: var(--white);
+.dev-nav-item.active {
+  color: var(--accent-warm);
   font-weight: 600;
-  background-color: var(--accent-primary);
+  background-color: #f3f4f6;
 }
 
-/* --- 메인 컨텐츠 영역 --- */
+/* --- 메인 컨텐츠 --- */
 .workspace-main-content {
   flex-grow: 1;
-  background-color: var(--bg-light);
   padding: 40px 60px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 
-/* --- 시작 화면 스타일 --- */
-.welcome-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-grow: 1;
-  text-align: center;
-  color: var(--text-primary);
-}
-
-.welcome-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  line-height: 1;
-  color: var(--accent-primary); /* 강조 색상 적용 */
-}
-
-.welcome-screen h2 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0 0 10px 0;
-}
-
-.welcome-screen p {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  max-width: 450px;
-  line-height: 1.6;
-  margin-bottom: 30px;
-}
-
-/* [변경] 시작 버튼의 그라데이션을 주황색 계열로 변경했습니다. */
-.start-button {
-  background: linear-gradient(to right, var(--accent-primary), #fb923c);
-  color: var(--white);
-  border: none;
-  padding: 14px 28px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: var(--shadow-md);
-}
-
-.start-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-
-/* --- 각 컴포넌트 플레이스홀더 스타일 --- */
-.component-placeholder {
-    animation: fadeIn 0.5s ease-in-out;
-    background-color: var(--white);
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-lg);
-}
-
-.component-placeholder h2 {
-    font-size: 2rem;
-    color: var(--text-primary);
-    border-bottom: 2px solid var(--accent-primary); /* 강조 색상 적용 */
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-.component-placeholder p {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    line-height: 1.7;
-}
-
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-
 /* --- 반응형 --- */
 @media (max-width: 1024px) {
   .workspace-container.new-design {
     flex-direction: column;
   }
+
   .workspace-sidebar {
     width: 100%;
     height: auto;
     flex-direction: row;
     align-items: center;
     padding: 16px 24px;
+    border-right: none;
     border-bottom: 1px solid var(--border-color);
-    box-sizing: border-box;
-    overflow-x: auto;
   }
+
   .sidebar-header {
     margin: 0;
   }
+
   .workspace-nav-list {
     flex-direction: row;
     gap: 16px;
     margin-left: auto;
   }
-  .nav-item {
-    white-space: nowrap;
-  }
-  .nav-item.active {
+
+  .dev-nav-item.active {
     background-color: transparent;
-    color: var(--accent-primary); /* 강조 색상 적용 */
-  }
-  .workspace-main-content {
-    padding: 32px 24px;
+    color: var(--accent-warm);
+    /* 모바일도 주황 */
   }
 }

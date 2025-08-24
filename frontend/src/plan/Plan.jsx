@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ProjectContext } from '../contexts/ProjectContext';
 import './Plan.css';
 import Header from '../mainPage/Header';
 
-// 분리된 컴포넌트들을 import 합니다.
+// ✨ 아이콘 라이브러리 import
+import { FaLightbulb, FaBullseye, FaScroll, FaCubes, FaBalanceScale, FaFileAlt } from 'react-icons/fa';
+
 import GameConceptCreator from './GameConceptCreator';
 import Goal from './Goal';
 import Components from './Components';
@@ -13,7 +15,7 @@ import Review from './Review';
 import WelcomeScreen from './WelcomeScreen';
 import PlanPage from './PlanPage';
 
-// 기획 단계별 네비게이션 아이템 목록
+// ✨ 각 항목에 아이콘 추가
 const workspaceNavItems = [
   { id: 'concept', title: '게임 컨셉 제작', component: <GameConceptCreator /> },
   { id: 'goal', title: '게임 목표 설계', component: <Goal /> },
@@ -23,39 +25,45 @@ const workspaceNavItems = [
   { id: 'planPage', title: '기획안 관리', component: <PlanPage /> },
 ];
 
-/**
- * 전체 기획 프로세스를 관리하는 메인 컴포넌트입니다.
- * 왼쪽 사이드바와 오른쪽 메인 콘텐츠 영역으로 구성됩니다.
- */
 function Plan() {
   const { projectId } = useParams();
-  const [activeViewId, setActiveViewId] = useState('concept');
+  const navigate = useNavigate();
+  const [activeViewId, setActiveViewId] = useState(null);
 
   const activeView = activeViewId ? workspaceNavItems.find(item => item.id === activeViewId) : null;
 
   return (
     <>
-      <Header />
+      <Header projectMode={true} />
       <ProjectContext.Provider value={{ projectId }}>
-        <div className="workspace-container new-design">
-          <aside className="workspace-sidebar">
-            <div className="sidebar-header">
-              <div className="logo">PLANNING</div>
+        <div className="plan-page__container">
+          <aside className="plan-page__sidebar">
+            <div className="plan-page__sidebar-header">
+              <div
+                className="plan-page__logo"
+                onClick={() => navigate(`/projects/${projectId}`)}
+              >
+                PLAN
+              </div>
             </div>
-            <ul className="workspace-nav-list">
-              {workspaceNavItems.map((item) => (
-                <li
-                  key={item.id}
-                  className={`nav-item ${activeViewId === item.id ? 'active' : ''}`}
-                  onClick={() => setActiveViewId(item.id)}
-                >
-                  {item.title}
-                </li>
-              ))}
-            </ul>
+            <nav className="plan-page__nav">
+              <ul className="plan-page__nav-list">
+                {workspaceNavItems.map((item) => (
+                  <li
+                    key={item.id}
+                    className={`plan-page__nav-item ${activeViewId === item.id ? 'active' : ''}`}
+                    onClick={() => setActiveViewId(item.id)}
+                  >
+                    {/* ✨ 아이콘과 타이틀 렌더링 */}
+                    <span className="nav-item__icon">{item.icon}</span>
+                    <span className="nav-item__title">{item.title}</span>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </aside>
 
-          <main className="workspace-main-content">
+          <main className="plan-page__main-content">
             {activeView ? activeView.component : <WelcomeScreen onStart={() => setActiveViewId('concept')} />}
           </main>
         </div>

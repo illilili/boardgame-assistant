@@ -6,10 +6,7 @@ import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import com.boardgame.backend_spring.concept.repository.BoardgameConceptRepository;
 import com.boardgame.backend_spring.goal.entity.GameObjective;
 import com.boardgame.backend_spring.goal.repository.GameObjectiveRepository;
-import com.boardgame.backend_spring.plan.dto.PlanVersionDto;
-import com.boardgame.backend_spring.plan.dto.SummaryDto;
-import com.boardgame.backend_spring.plan.dto.PlanSaveRequest;
-import com.boardgame.backend_spring.plan.dto.PlanSaveResponse;
+import com.boardgame.backend_spring.plan.dto.*;
 import com.boardgame.backend_spring.plan.entity.Plan;
 import com.boardgame.backend_spring.plan.entity.PlanVersion;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
@@ -46,11 +43,18 @@ public class SummaryService {
     @Transactional(readOnly = true)
     public List<SummaryDto.ConceptListInfo> getConceptList() {
         return conceptRepository.findAll().stream()
-                .map(concept -> SummaryDto.ConceptListInfo.builder()
-                        .conceptId(concept.getConceptId())
-                        .theme(concept.getTheme())
-                        .projectId(concept.getProject().getId())
-                        .build())
+                .map(concept -> {
+                    Long planId = planRepository.findByBoardgameConcept(concept)
+                            .map(Plan::getPlanId)
+                            .orElse(null); // Plan 없으면 null
+
+                    return SummaryDto.ConceptListInfo.builder()
+                            .conceptId(concept.getConceptId())
+                            .theme(concept.getTheme())
+                            .projectId(concept.getProject().getId())
+                            .planId(planId)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

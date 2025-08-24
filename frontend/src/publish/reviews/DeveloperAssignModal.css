@@ -1,0 +1,123 @@
+/* --- ✨ 모달 기본 스타일 --- */
+.dev-assign-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(26, 32, 44, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: modal-fade-in 0.3s ease;
+}
+
+.dev-assign-modal__content {
+  background-color: var(--assign-bg-card);
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: var(--assign-shadow);
+  width: 90%;
+  max-width: 500px;
+  animation: modal-slide-up 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-slide-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- ✨ 모달 내부 요소 --- */
+.dev-assign-modal__header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.dev-assign-modal__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--assign-text-primary);
+}
+
+.dev-assign-modal__subtitle {
+  font-size: 1rem;
+  color: var(--assign-text-secondary);
+  margin-top: 4px;
+}
+
+.dev-assign-modal__actions {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.dev-assign-modal__button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: var(--assign-transition);
+  border: 1px solid transparent;
+}
+
+.dev-assign-modal__button--assign {
+  background-color: var(--assign-accent);
+  color: #fff;
+}
+.dev-assign-modal__button--assign:hover {
+  background-color: #D4753A;
+}
+.dev-assign-modal__button--assign:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.dev-assign-modal__button--close {
+  background-color: var(--assign-bg-card);
+  color: var(--assign-text-secondary);
+  border-color: var(--assign-border-color);
+}
+.dev-assign-modal__button--close:hover {
+  background-color: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+
+/* --- ✨ React Select 커스텀 스타일 --- */
+.dev-assign-select__control {
+  border-radius: 8px !important;
+  border: 1px solid var(--assign-border-color) !important;
+  padding: 4px;
+  box-shadow: none !important;
+  transition: var(--assign-transition) !important;
+}
+
+.dev-assign-select__control--is-focused {
+  border-color: var(--assign-accent) !important;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2) !important;
+}
+
+.dev-assign-select__placeholder {
+  color: #a0aec0 !important;
+}
+
+.dev-assign-select__option {
+  padding: 12px 16px;
+  cursor: pointer !important;
+}
+
+.dev-assign-select__option--is-focused {
+  background-color: #fffaf0 !important;
+  color: var(--assign-accent-dark) !important;
+}
+
+.dev-assign-select__option--is-selected {
+  background-color: var(--assign-accent) !important;
+  color: white !important;
+}

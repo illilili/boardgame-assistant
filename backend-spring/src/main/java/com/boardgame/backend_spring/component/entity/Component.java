@@ -6,6 +6,8 @@ import com.boardgame.backend_spring.component.enumtype.ComponentStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ public class Component {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "concept_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private BoardgameConcept boardgameConcept;
 
     @OneToMany(mappedBy = "component", cascade = CascadeType.ALL, orphanRemoval = true)

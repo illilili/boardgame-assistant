@@ -1,8 +1,12 @@
 package com.boardgame.backend_spring.content.controller;
 
+import com.boardgame.backend_spring.component.entity.Component;
+import com.boardgame.backend_spring.content.dto.GenericPreviewDto;
 import com.boardgame.backend_spring.content.dto.card.CardPreviewDto;
 import com.boardgame.backend_spring.content.dto.model3d.Model3DPreviewDto;
 import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailPreviewDto;
+import com.boardgame.backend_spring.content.entity.Content;
+import com.boardgame.backend_spring.content.repository.ContentRepository;
 import com.boardgame.backend_spring.content.service.card.CardContentService;
 import com.boardgame.backend_spring.content.service.model3d.Model3dContentService;
 import com.boardgame.backend_spring.content.service.thumbnail.ThumbnailContentService;
@@ -18,6 +22,7 @@ public class PreviewController {
     private final CardContentService cardContentService;
     private final Model3dContentService model3dContentService;
     private final ThumbnailContentService thumbnailContentService;
+    private final ContentRepository contentRepository;
 
     /**
      * 카드 콘텐츠 미리보기 (텍스트/이미지)
@@ -41,5 +46,23 @@ public class PreviewController {
     @GetMapping("/{contentId}/preview/thumbnail")
     public ResponseEntity<ThumbnailPreviewDto> getThumbnailPreview(@PathVariable Long contentId) {
         return ResponseEntity.ok(thumbnailContentService.getThumbnailPreview(contentId));
+    }
+
+    @GetMapping("/{contentId}/preview/info")
+    public ResponseEntity<GenericPreviewDto> getGenericPreview(@PathVariable Long contentId) {
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
+
+        Component component = content.getComponent();
+
+        GenericPreviewDto dto = new GenericPreviewDto();
+        dto.setContentId(contentId);
+        dto.setComponentId(component.getComponentId());
+        dto.setTitle(component.getTitle());
+        dto.setRoleAndEffect(component.getRoleAndEffect());
+        dto.setArtConcept(component.getArtConcept());
+        dto.setInterconnection(component.getInterconnection());
+
+        return ResponseEntity.ok(dto);
     }
 }

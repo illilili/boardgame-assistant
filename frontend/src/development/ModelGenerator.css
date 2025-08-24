@@ -1,126 +1,278 @@
-/* ModelGenerator.css */
 
-/* --- 상태 표시 컨테이너 (로딩, 에러) --- */
-.status-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 400px;
-    text-align: center;
-}
-.status-container h3 {
-    font-size: 1.5rem;
-    color: var(--text-primary);
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-.status-container p {
-    color: var(--text-secondary);
-    max-width: 400px;
-}
-.error-container {
-    background-color: #fff1f2;
-    border: 1px solid #ffdde0;
-    border-radius: 12px;
-    padding: 2rem;
-}
-.error-container h3 { color: #be123c; }
-.error-container p { color: #be123c; }
-.error-container .generate-button { margin-top: 1rem; }
-
-/* --- 결과 표시 컨테이너 --- */
-.model-result-container {
-    display: flex;
-    gap: 2rem;
-    animation: fadeIn 0.5s ease-in-out;
+/* --- ✨ 디자인 시스템 변수 (고유 스코프) --- */
+:root {
+  --model-gen-accent: #E58A4E;
+  --model-gen-accent-dark: #D4753A;
+  --model-gen-text-primary: #1f2328;
+  --model-gen-text-secondary: #6e7781;
+  --model-gen-bg-page: #f6f8fa;
+  --model-gen-bg-panel: #ffffff;
+  --model-gen-border-color: #d8dee4;
+  --model-gen-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --model-gen-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.15);
+  --model-gen-transition: all 0.2s ease-in-out;
 }
 
-/* 3D 뷰어 */
-.model-viewer-wrapper {
-    flex: 3; /* 3:2 비율로 뷰어가 더 넓게 */
-    min-width: 0;
-}
-model-viewer {
-    width: 100%;
-    height: 500px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background-color: #f9fafb;
-}
-
-/* 모델 정보 */
-.model-info-wrapper {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-}
-.model-info-wrapper h3 {
-    font-size: 1.5rem;
-    color: #166534; /* Success Green */
-    margin-top: 0;
-}
-.info-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--border-color);
-}
-.info-item strong {
-    color: var(--text-secondary);
-}
-.info-item span {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-.status-badge.status-completed {
-    background-color: #16a34a;
-    color: white;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
-    border-radius: 999px;
+/* --- ✨ 전체 레이아웃 --- */
+.model-gen-layout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: var(--model-gen-bg-page);
+  font-family: 'Pretendard', sans-serif;
 }
 
-/* 다운로드 링크 */
-.download-links {
-    margin-top: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+.model-gen-panel {
+  background-color: var(--model-gen-bg-panel);
+  border: 1px solid var(--model-gen-border-color);
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: var(--model-gen-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
-.download-links a {
-    display: block;
-    text-align: center;
-    padding: 0.75rem;
-    border-radius: 8px;
-    background-color: #f3f4f6;
-    color: var(--text-primary);
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color 0.2s;
+.model-gen-panel--form {
+  flex: 0 0 450px;
+  overflow-y: auto;
 }
-.download-links a:hover {
-    background-color: #e5e7eb;
-}
-
-.model-info-wrapper .reset-button {
-    margin-top: auto; /* 버튼을 맨 아래로 밀어냄 */
+.model-gen-panel--result {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background-image:
+    linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-/* --- 기존 스타일 재활용 --- */
-.source-data-preview { margin-top: 2rem; padding: 1.5rem; background-color: #f9fafb; border: 1px solid var(--border-color); border-radius: 8px; }
-.source-data-preview h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem; color: var(--text-primary); }
-.generate-button-container { text-align: center; margin-top: 2rem; }
-.generate-button { background: var(--accent-primary); color: var(--white); border: none; padding: 1rem 2rem; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s ease-in-out; box-shadow: var(--shadow-md); }
-.reset-button { background-color: var(--white); color: var(--text-secondary); border: 1px solid var(--border-color); padding: 0.8rem; font-size: 1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.2s; width: 100%;}
-.reset-button:hover { background-color: #f9fafb; border-color: #d1d5db; }
-.loader { border: 5px solid #f3f3f3; border-top: 5px solid var(--accent-primary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+/* --- ✨ 왼쪽 패널 --- */
+/* 이 코드를 추가하세요 */
+/* --- ✨ 왼쪽 패널 --- */
+.form-section-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.form-section-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2328;
+  margin-bottom: 8px;
+}
+.form-section-header p {
+  font-size: 1rem;
+  color: #6e7781;
+}
+.model-gen-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.model-gen-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.model-gen-form-group label {
+  font-weight: 600;
+  color: var(--model-gen-text-primary);
+  font-size: 0.875rem;
+}
+.model-gen-form-group input,
+.model-gen-form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1px solid var(--model-gen-border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--model-gen-bg-page);
+  transition: var(--model-gen-transition);
+}
+.model-gen-form-group input:focus,
+.model-gen-form-group textarea:focus {
+  outline: none;
+  border-color: var(--model-gen-accent);
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+  background-color: white;
+}
+.model-gen-form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
 
-/* 반응형 */
-@media (max-width: 900px) {
-    .model-result-container {
-        flex-direction: column;
-    }
+.model-gen-concept-info {
+  background-color: var(--model-gen-bg-page);
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--model-gen-accent);
+}
+.model-gen-concept-info h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.model-gen-concept-info p {
+  font-size: 0.9rem;
+  color: var(--model-gen-text-secondary);
+  line-height: 1.6;
+}
+.model-gen-concept-info p strong {
+  color: var(--model-gen-text-primary);
+}
+
+/* 버전 관리 */
+.model-gen-version-manager {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--model-gen-border-color);
+}
+.model-gen-version-manager h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+.model-gen-version-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.model-gen-version-group input {
+  flex-grow: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--model-gen-border-color);
+  background-color: var(--model-gen-bg-page);
+  font-size: 0.9rem;
+}
+.model-gen-version-select {
+  flex-grow: 1;
+}
+
+/* --- ✨ 버튼 --- */
+.model-gen-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--model-gen-transition);
+  white-space: nowrap;
+}
+.model-gen-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+.model-gen-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none !important;
+}
+
+.model-gen-button--primary {
+  background: linear-gradient(90deg, var(--model-gen-accent), var(--model-gen-accent-dark));
+  color: white;
+  box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
+}
+.model-gen-button--primary:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(229, 138, 78, 0.3);
+}
+
+.model-gen-button--secondary {
+  background-color: var(--model-gen-bg-page);
+  color: var(--model-gen-text-secondary);
+  border-color: var(--model-gen-border-color);
+}
+.model-gen-button--secondary:hover:not(:disabled) {
+  background-color: #eef1f4;
+  color: var(--model-gen-text-primary);
+  border-color: #c8d1dc;
+}
+
+.model-gen-action-group, .model-gen-final-actions {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--model-gen-border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* --- ✨ 오른쪽 패널 --- */
+.model-gen-status-display {
+  text-align: center;
+  color: var(--model-gen-text-secondary);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.model-gen-status-display--error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 80%;
+}
+.model-gen-spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid rgba(229, 138, 78, 0.2);
+  border-top-color: var(--model-gen-accent);
+  border-radius: 50%;
+  animation: model-gen-spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+@keyframes model-gen-spin { to { transform: rotate(360deg); } }
+
+.model-gen-viewer-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.model-gen-viewer-container model-viewer {
+  width: 100%;
+  height: 100%;
+  flex-grow: 1;
+  border: 1px solid var(--model-gen-border-color);
+  border-radius: 8px;
+  background-color: #eef1f4;
+}
+.model-gen-viewer-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}
+.model-gen-status-message {
+  text-align: center;
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+/* --- ✨ react-select 커스텀 --- */
+.model-gen-select__control {
+  padding: 2px;
+  border-color: var(--model-gen-border-color) !important;
+  box-shadow: none !important;
+  transition: var(--model-gen-transition) !important;
+}
+.model-gen-select__control--is-focused {
+  border-color: var(--model-gen-accent) !important;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2) !important;
+}
+.model-gen-select__option--is-focused {
+  background-color: var(--model-gen-accent-light) !important;
+}
+.model-gen-select__option--is-selected {
+  background-color: var(--model-gen-accent) !important;
 }

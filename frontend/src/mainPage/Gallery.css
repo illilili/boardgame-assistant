@@ -1,132 +1,185 @@
-/* Gallery.css (업그레이드 버전) */
-
-.gallery-section {
-    padding: 120px 0;
-    text-align: center;
-    /* ✨ 배경에 깊이감을 주기 위한 미세한 그라데이션 추가 */
-    background: linear-gradient(180deg, var(--bg-white) 0%, #fcf9f6 100%);
+/* --- ✨ 고유 디자인 시스템 변수 --- */
+:root {
+    --gallery-accent: #E58A4E;
+    --gallery-bg-section: #f9fafb;
+    --gallery-text-light: #f9fafb;
+    --gallery-text-secondary: #9ca3af;
+    --gallery-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.gallery-section h2 {
-    font-size: clamp(2rem, 4vw, 2.8rem);
-    font-weight: 800;
-    margin-bottom: 10px;
-    color: var(--text-dark);
-}
-
-.gallery-subtitle {
-    font-size: 1.1rem;
-    color: var(--text-light);
-    margin-bottom: 80px;
-}
-
-/* --- ✨ 3D & 글로우 효과를 위한 부모 컨테이너 설정 --- */
-.gallery-card-wrapper {
-    padding: 20px 15px; /* 글로우 효과가 잘리지 않도록 상하 여백 추가 */
-    perspective: 1000px; /* 3D 효과를 위한 원근감 설정 */
-}
-
-/* --- ✨ 메인 카드 디자인 업그레이드 --- */
-.gallery-card {
-    position: relative;
-    border-radius: 18px; /* 더 부드러운 곡률 */
+/* --- ✨ 전체 섹션 스타일 --- */
+.bga-gallery-section {
+    padding: 100px 0;
+    background-color: var(--gallery-bg-section);
     overflow: hidden;
-    height: 450px;
+}
+
+.bga-gallery-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.bga-gallery-title {
+    font-size: clamp(2.2rem, 5vw, 3rem);
+    font-weight: 800;
+    color: black;
+    margin-bottom: 16px;
+}
+
+.bga-gallery-subtitle {
+    font-size: 1.2rem;
+    color: var(--gallery-text-secondary);
+    max-width: 600px;
+    line-height: 1.6;
+    margin: 0 auto 40px;
+}
+
+/* --- ✨ 카테고리 네비게이션 스타일 --- */
+.bga-category-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 50px;
+}
+
+.bga-category-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4b5563;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.bga-category-button:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.bga-category-button.active {
+    background-color: var(--gallery-accent);
+    color: white;
+    border-color: var(--gallery-accent);
+    box-shadow: 0 4px 12px rgba(229, 138, 78, 0.3);
+    transform: translateY(-2px);
+}
+
+/* --- ✨ 슬라이드 및 카드 기본 스타일 --- */
+.bga-gallery-slide {
+    padding: 40px 15px;
+    perspective: 1500px;
+}
+
+.bga-gallery-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    height: 420px;
     cursor: grab;
-    transform-style: preserve-3d; /* 자식 요소의 3D 변환 유지 */
-    will-change: transform; /* 애니메이션 성능 최적화 */
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: var(--gallery-transition);
+
+    /* ✨ 마우스 위치에 따라 동적으로 변하는 3D 틸트 효과 */
+    transform: perspective(1500px) rotateY(calc((var(--mouse-x, 50%) - 50%) / 50 * 8deg)) rotateX(calc((var(--mouse-y, 50%) - 50%) / 50 * -8deg));
 }
 
-.gallery-card:hover {
-    /* ✨ 마우스 호버 시 입체적으로 기울어지는 효과 */
-    transform: scale(1.05) rotateX(10deg) rotateY(-5deg);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-/* --- ✨ Aurora Glow 효과 (카드 뒷면) --- */
-.gallery-card::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: 90%;
-    background: radial-gradient(circle, var(--accent-warm) 0%, transparent 70%);
-    filter: blur(40px); /* 빛이 부드럽게 퍼지는 효과 */
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    z-index: -1; /* 카드 뒤로 배치 */
-}
-
-.gallery-card:hover::before {
-    opacity: 0.5; /* 호버 시 빛이 나타남 */
-}
-
-.gallery-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-/* --- ✨ 글래스모피즘 캡션 & 오버레이 --- */
-/* 기존 after는 오버레이 역할 유지 */
-.gallery-card::after {
+/* --- ✨ 마우스 따라다니는 글로우 효과 --- */
+.bga-gallery-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);
-    opacity: 0.8;
-    transition: opacity var(--transition-fast);
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(255, 255, 255, 0.15) 0%,
+            rgba(255, 255, 255, 0) 25%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    will-change: background;
 }
 
-.gallery-caption {
+.bga-gallery-card:hover::before {
+    opacity: 1;
+}
+
+.bga-gallery-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* --- ✨ 글래스모피즘 캡션 --- */
+.bga-gallery-card__caption {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    z-index: 2;
-    color: white;
-    padding: 25px;
-    font-size: 1.3rem;
+    color: var(--gallery-text-light);
+    padding: 20px;
+    font-size: 1.25rem;
     font-weight: 700;
     text-align: left;
     box-sizing: border-box;
-    
-    /* ✨ Glassmorphism 효과 */
-    background: rgba(20, 20, 20, 0.25);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px); /* Safari 지원 */
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
 
-    transform: translateY(100%); /* 기본적으로 숨김 */
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+
+    transform: translateY(100%);
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.gallery-card:hover .gallery-caption {
+.bga-gallery-card:hover .bga-gallery-card__caption {
     transform: translateY(0);
     opacity: 1;
 }
 
-/* --- react-slick 커스텀 --- */
-.slick-dots li button:before {
-    font-size: 12px;
-    color: var(--border-color);
-}
-.slick-dots li.slick-active button:before {
-    color: var(--accent-warm) !important;
+/* --- ✨ react-slick 커스텀 --- */
+.slick-track {
+    display: flex;
+    align-items: center;
 }
 
-/* 슬라이더 중앙 카드 강조 효과 */
-.slick-center .gallery-card {
-    transform: scale(1.08);
+/* 중앙이 아닌 슬라이드 스타일 */
+.slick-slide {
+    transition: var(--gallery-transition);
 }
-.slick-center .gallery-card:hover {
-    transform: scale(1.12) rotateX(10deg) rotateY(-5deg);
+
+.slick-slide:not(.slick-center) .bga-gallery-card {
+    transform: scale(0.85);
+    filter: brightness(0.6) grayscale(0.2);
+}
+
+/* 중앙 슬라이드 강조 */
+.slick-center .bga-gallery-card {
+    transform: scale(1);
+    filter: brightness(1) grayscale(0);
+}
+
+.slick-center .bga-gallery-card:hover {
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4);
+}
+
+.slick-dots {
+    bottom: -40px;
+}
+
+.slick-dots li button:before {
+    font-size: 12px;
+    color: #4b5563;
+}
+
+.slick-dots li.slick-active button:before {
+    color: var(--gallery-accent) !important;
 }

@@ -1,0 +1,265 @@
+/* --- ✨ 디자인 시스템 변수 --- */
+:root {
+  --trans-accent: #E58A4E;
+  --trans-accent-dark: #D4753A;
+  --trans-accent-light: #fef4e8;
+  --trans-bg-page: #f6f8fa;
+  --trans-bg-panel: #ffffff;
+  --trans-text-primary: #1f2328;
+  --trans-text-secondary: #6e7781;
+  --trans-border-color: #d8dee4;
+  --trans-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --trans-shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.15);
+  --trans-transition: all 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+}
+
+/* --- ✨ 전체 레이아웃 --- */
+.trans-page-layout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  height: calc(100vh - 120px);
+  padding: 24px;
+  box-sizing: border-box;
+  background-color: var(--trans-bg-page);
+  font-family: 'Pretendard', sans-serif;
+}
+
+.trans-panel {
+  background-color: var(--trans-bg-panel);
+  border: 1px solid var(--trans-border-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--trans-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.trans-panel--left {
+  flex: 0 0 440px;
+}
+.trans-panel--right {
+  flex: 1;
+}
+.trans-page-layout--rulebook .trans-panel--left,
+.trans-page-layout--rulebook .trans-panel--right {
+  flex: 1;
+}
+
+.trans-panel__header {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--trans-border-color);
+}
+.trans-panel__header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--trans-text-primary);
+}
+
+/* --- ✨ 왼쪽 패널: 원문 & 요청 --- */
+.trans-original-content {
+  margin-bottom: 24px;
+  background-color: var(--trans-bg-page);
+  border: 1px solid var(--trans-border-color);
+  border-radius: 8px;
+  padding: 16px;
+}
+.trans-original-content h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--trans-text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.trans-original-content__text {
+  line-height: 1.6;
+  color: var(--trans-text-primary);
+  white-space: pre-wrap;
+}
+
+.trans-pdf-viewer {
+  width: 100%;
+  height: 60vh;
+  border: 1px solid var(--trans-border-color);
+  border-radius: 8px;
+}
+
+.trans-request-section {
+  margin-top: auto; /* 하단에 고정 */
+  padding-top: 24px;
+  border-top: 1px solid var(--trans-border-color);
+}
+.trans-request-section__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--trans-text-secondary);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.trans-lang-selector {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.trans-lang-selector__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: 1px solid var(--trans-border-color);
+  border-radius: 20px;
+  background-color: var(--trans-bg-panel);
+  color: var(--trans-text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--trans-transition);
+}
+.trans-lang-selector__tag:hover {
+  background-color: var(--trans-bg-page);
+  color: var(--trans-text-primary);
+}
+.trans-lang-selector__tag--selected {
+  background-color: var(--trans-accent);
+  color: white;
+  border-color: var(--trans-accent);
+}
+
+.trans-request-button {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--trans-accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--trans-transition);
+  box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
+}
+.trans-request-button:hover:not(:disabled) {
+  background-color: var(--trans-accent-dark);
+  transform: translateY(-2px);
+}
+.trans-request-button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* --- ✨ 오른쪽 패널: 결과 --- */
+.trans-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.trans-result-card {
+  background: var(--trans-bg-panel);
+  border: 1px solid var(--trans-border-color);
+  border-radius: 8px;
+  transition: var(--trans-transition);
+}
+.trans-result-card:hover {
+  border-color: #c8d1dc;
+  box-shadow: var(--trans-shadow);
+}
+.trans-result-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  cursor: pointer;
+}
+.trans-result-card__lang {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--trans-accent-dark);
+}
+.trans-result-card__chevron {
+  color: var(--trans-text-secondary);
+  transition: transform 0.2s ease-in-out;
+}
+.trans-result-card__chevron--expanded {
+  transform: rotate(180deg);
+}
+
+.trans-result-card__body {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--trans-border-color);
+}
+.trans-result-card__text {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--trans-text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 피드백 폼 */
+.trans-feedback-form {
+  padding: 16px;
+  background-color: var(--trans-bg-page);
+  border-top: 1px solid var(--trans-border-color);
+  border-radius: 0 0 8px 8px;
+}
+.trans-feedback-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1px solid var(--trans-border-color);
+  border-radius: 6px;
+  resize: vertical;
+  min-height: 60px;
+  margin-bottom: 8px;
+}
+.trans-feedback-form button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: var(--trans-text-secondary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--trans-transition);
+}
+.trans-feedback-form button:hover:not(:disabled) {
+  background-color: var(--trans-text-primary);
+}
+
+/* --- ✨ 플레이스홀더 및 상태 메시지 --- */
+.trans-placeholder {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--trans-text-secondary);
+}
+.trans-placeholder svg {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+.trans-placeholder p {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.trans-status-message {
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.trans-status-message--error {
+  background-color: #fef2f2;
+  color: #991b1b;
+}

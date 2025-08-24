@@ -1,155 +1,287 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './ThumbnailGenerator.css';
-import { generateThumbnail, getThumbnailPreview } from '../api/development';
+import './ComponentGenerator.css';
+import './ModelGenerator.css';
+import Select from 'react-select';
+import {
+    getThumbnailPreview,
+    generateThumbnail,
+    saveContentVersion,
+    getContentVersions,
+    submitComponent,
+    rollbackContentVersion,
+    getContentDetail,
+    completeContent,
+} from '../api/development';
 
-function ThumbnailGenerator({ contentId }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [generatedThumbnail, setGeneratedThumbnail] = useState(null);
-  const [error, setError] = useState('');
+function ThumbnailGenerator({ contentId, componentId }) {
+    const [isLoading, setIsLoading] = useState(false);
+    const [generatedThumbnail, setGeneratedThumbnail] = useState(null);
+    const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
 
-  // 폼 입력 값
-  const [manualId, setManualId] = useState(contentId || '');
-  const [theme, setTheme] = useState('');
-  const [storyline, setStoryline] = useState('');
+    const [manualId, setManualId] = useState(contentId || '');
+    const [theme, setTheme] = useState('');
+    const [storyline, setStoryline] = useState('');
 
-  const isFromList = Boolean(contentId); // 개발 목록에서 온 경우
-  const finalContentId = isFromList ? contentId : manualId;
+    const isFromList = Boolean(contentId);
+    const finalContentId = isFromList ? contentId : manualId;
 
-  // 미리보기 데이터 & 저장된 생성 결과 불러오기
-  useEffect(() => {
-    if (!finalContentId) return;
+    // 버전 관리
+    const [versions, setVersions] = useState([]);
+    const [selectedVersion, setSelectedVersion] = useState(null);
+    const [versionNote, setVersionNote] = useState('썸네일 스냅샷');
 
-    (async () => {
-      try {
-        // 1) 미리보기 API 호출
-        const preview = await getThumbnailPreview(finalContentId);
-        if (preview) {
-          setTheme(preview.theme || '');
-          setStoryline(preview.storyline || '');
+    const fetchVersions = useCallback(async () => {
+        if (!finalContentId) return;
+        try {
+            const list = await getContentVersions(finalContentId);
+            setVersions(list);
+        } catch (err) {
+            console.error(err);
+            setError('버전 목록 불러오기 실패');
         }
+    }, [finalContentId]);
 
-        // 2) 로컬 저장된 생성 결과 불러오기
-        const saved = localStorage.getItem(`thumbnail_${finalContentId}`);
-        if (saved) {
-          setGeneratedThumbnail(JSON.parse(saved));
+    const loadPreview = useCallback(async (cid) => {
+        try {
+            const detail = await getContentDetail(cid);
+            if (detail && detail.contentData && detail.contentData.startsWith('http')) {
+                setGeneratedThumbnail({
+                    contentId: cid,
+                    thumbnailUrl: detail.contentData,
+                });
+            }
+
+            const preview = await getThumbnailPreview(cid);
+            if (preview) {
+                setTheme(preview.theme || '');
+                setStoryline(preview.storyline || '');
+            }
+        } catch (err) {
+            console.error(err);
+            setError('미리보기 불러오기 실패');
         }
-      } catch (err) {
-        console.error(err);
-        setError('미리보기 데이터 불러오기 실패');
-      }
-    })();
-  }, [finalContentId]);
+    }, []);
 
-  // 생성 요청
-  const handleGenerateClick = async () => {
-    if (!finalContentId) {
-      setError('콘텐츠 ID를 입력하세요.');
-      return;
-    }
-    setIsLoading(true);
-    setError('');
-    try {
-      const response = await generateThumbnail({
-        contentId: finalContentId,
-        theme,
-        storyline
-      });
-      setGeneratedThumbnail(response);
-      localStorage.setItem(`thumbnail_${finalContentId}`, JSON.stringify(response));
-    } catch (err) {
-      console.error(err);
-      setError('썸네일 생성 실패');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    useEffect(() => {
+        if (finalContentId) {
+            loadPreview(finalContentId);
+            fetchVersions();
+        }
+    }, [finalContentId, loadPreview, fetchVersions]);
 
-  // 다시 생성
-  const handleReset = () => {
-    setGeneratedThumbnail(null);
-    setError('');
-    if (finalContentId) {
-      localStorage.removeItem(`thumbnail_${finalContentId}`);
-    }
-  };
+    const handleGenerateClick = async () => {
+        if (!finalContentId) return setError('콘텐츠 ID를 입력하세요.');
+        setIsLoading(true);
+        setError('');
+        setMessage('');
+        try {
+            const response = await generateThumbnail({
+                contentId: finalContentId,
+                theme,
+                storyline,
+            });
+            setGeneratedThumbnail(response);
+            setMessage('썸네일 생성 성공!');
+        } catch (err) {
+            console.error(err);
+            setError('썸네일 생성 실패');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-  return (
-    <div className="component-placeholder">
-      {isLoading && (
-        <div className="status-container">
-          <div className="loader"></div>
-          <h3>썸네일 생성 중...</h3>
+    const handleSaveVersion = async () => {
+        if (!generatedThumbnail) return;
+        setIsLoading(true);
+        try {
+            await saveContentVersion({
+                contentId: finalContentId,
+                note: versionNote || '썸네일 스냅샷',
+                contentData: generatedThumbnail.thumbnailUrl,
+            });
+            setMessage('버전이 저장되었습니다.');
+            await fetchVersions();
+        } catch (err) {
+            setError(err.response?.data?.message || '버전 저장 실패');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleRollbackVersion = async () => {
+        if (!selectedVersion) return setError('롤백할 버전을 선택하세요.');
+        setIsLoading(true);
+        try {
+            await rollbackContentVersion(finalContentId, selectedVersion.value);
+            const detail = await getContentDetail(finalContentId);
+            if (detail && detail.contentData) {
+                setGeneratedThumbnail({
+                    contentId: finalContentId,
+                    thumbnailUrl: detail.contentData,
+                });
+            }
+            await fetchVersions();
+            setMessage(`롤백 완료!`);
+            setSelectedVersion(null);
+        } catch (err) {
+            console.error(err);
+            setError('롤백 실패');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleComplete = async () => {
+        if (!finalContentId) return;
+        setIsLoading(true);
+        try {
+            await completeContent(finalContentId);
+            setMessage('완료 처리되었습니다.');
+        } catch (err) {
+            console.error(err);
+            setError('완료 처리 실패');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSubmitVersion = async () => {
+        if (!componentId) return;
+        setIsLoading(true);
+        try {
+            await submitComponent(componentId);
+            setMessage('제출 완료!');
+        } catch (err) {
+            console.error(err);
+            setError('제출 실패');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleReset = () => {
+        setGeneratedThumbnail(null);
+        setError('');
+        setMessage('');
+    };
+
+    return (
+        <div className="generator-layout">
+            <div className="generator-form-section">
+                <div className="form-section-header">
+                    <h2>썸네일 생성</h2>
+                    <p>테마와 스토리라인을 입력하고 썸네일 이미지를 생성/관리합니다.</p>
+                </div>
+
+                {!isFromList && (
+                    <div className="control-box">
+                        <div className="form-group">
+                            <label>콘텐츠 ID</label>
+                            <input
+                                type="text"
+                                value={manualId}
+                                onChange={(e) => setManualId(e.target.value)}
+                                placeholder="콘텐츠 ID 입력"
+                            />
+                        </div>
+                    </div>
+                )}
+
+                <div className="control-box">
+                    <h4 className="tg-h4">컨셉 정보</h4>
+                    <div className="form-group">
+                        <label>테마</label>
+                        <input type="text" value={theme} onChange={(e) => setTheme(e.target.value)} />
+                    </div>
+                    <div className="form-group">
+                        <label>스토리라인</label>
+                        <textarea rows={3} value={storyline} onChange={(e) => setStoryline(e.target.value)} />
+                    </div>
+                    {!generatedThumbnail && (
+                        <div className="form-actions">
+                            <button
+                                onClick={handleGenerateClick}
+                                className="primary-button"
+                                disabled={isLoading}
+                            >
+                                썸네일 생성하기
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* NOTE: 버전 관리 섹션을 항상 보이도록 수정하고, 룰북과 동일한 클래스 이름으로 변경 */}
+                <div className="control-box">
+                    <h4 className="tg-h4">버전 관리</h4>
+                    <div className="version-control-content">
+                        <div className="version-control-note">
+                            <input
+                                type="text"
+                                value={versionNote}
+                                onChange={(e) => setVersionNote(e.target.value)}
+                                placeholder="썸네일 스냅샷"
+                                disabled={!generatedThumbnail || isLoading}
+                            />
+                            <button className="btn-save-version" onClick={handleSaveVersion} disabled={!generatedThumbnail || isLoading}>
+                                버전 저장
+                            </button>
+                        </div>
+                        <div className="version-control-select-row">
+                            <Select
+                                className="version-select"
+                                classNamePrefix="react-select"
+                                value={selectedVersion}
+                                onChange={setSelectedVersion}
+                                options={versions.map((v) => ({
+                                    value: v.versionId,
+                                    label: `v${v.versionNo} - ${v.note} (${new Date(v.createdAt).toLocaleString()})`,
+                                }))}
+                                placeholder={versions.length > 0 ? "복구할 버전 선택" : "저장된 버전 없음"}
+                                isDisabled={versions.length === 0}
+                                isClearable
+                            />
+                            {selectedVersion && (
+                                <button className="btn-rollback" onClick={handleRollbackVersion} disabled={isLoading}>
+                                    롤백
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="tg-submit-complete-section">
+                    <button className="secondary-button" onClick={handleComplete} disabled={!generatedThumbnail || isLoading}>완료(확정)</button>
+                    <button className="primary-button" onClick={handleSubmitVersion} disabled={!generatedThumbnail || isLoading}>제출</button>
+                </div>
+
+                <div className="message-area">
+                    {message && <p className="success-message">{message}</p>}
+                    {error && <p className="error-message">{error}</p>}
+                </div>
+            </div>
+
+            <div className="generator-result-section">
+                {isLoading ? (
+                    <div className="status-container"><div className="loader"></div><h3>처리 중...</h3></div>
+                ) : generatedThumbnail ? (
+                    <div className="card-result-container">
+                        <img src={generatedThumbnail.thumbnailUrl} alt="thumbnail" className="thumbnail-image" />
+                        <div className="result-actions">
+                            <button onClick={handleReset} className="secondary-button">
+                                다시 생성
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="placeholder-message">
+                        <p>테마와 스토리라인을 입력하고 '썸네일 생성하기' 버튼을 눌러주세요.</p>
+                    </div>
+                )}
+            </div>
         </div>
-      )}
-
-      {error && <p className="error-text">{error}</p>}
-
-      {!isLoading && (
-        <>
-          {/* 콘텐츠 ID */}
-          <div className="id-input-container">
-            <label>콘텐츠 ID</label>
-            <input
-              type="text"
-              value={manualId}
-              onChange={(e) => !isFromList && setManualId(e.target.value)}
-              placeholder="콘텐츠 ID 입력"
-              disabled={isFromList}
-            />
-          </div>
-
-          {/* Theme */}
-          <div className="form-group">
-            <label>테마</label>
-            <input
-              type="text"
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              placeholder="테마 입력"
-            />
-          </div>
-
-          {/* Storyline */}
-          <div className="form-group">
-            <label>스토리라인</label>
-            <textarea
-              value={storyline}
-              onChange={(e) => setStoryline(e.target.value)}
-              placeholder="스토리라인 입력"
-              rows={3}
-            />
-          </div>
-
-          {/* 생성 버튼 */}
-          {!generatedThumbnail && (
-            <div className="generate-button-container">
-              <button onClick={handleGenerateClick} className="generate-button">
-                썸네일 생성하기
-              </button>
-            </div>
-          )}
-
-          {/* 생성 결과 */}
-          {generatedThumbnail && (
-            <div className="thumbnail-result-container">
-              <h3>🎉 생성 완료!</h3>
-              <img
-                src={generatedThumbnail.thumbnailUrl}
-                alt="thumbnail"
-                className="thumbnail-image"
-              />
-              <div className="thumbnail-info">
-                <span>콘텐츠 ID: {generatedThumbnail.contentId}</span>
-              </div>
-              <button onClick={handleReset} className="reset-button-bottom">
-                다시 생성
-              </button>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
+    );
 }
 
 export default ThumbnailGenerator;

@@ -1,6 +1,7 @@
 package com.boardgame.backend_spring.concept.repository;
 
 import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
+import com.boardgame.backend_spring.project.entity.Project;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BoardgameConceptRepository extends JpaRepository<BoardgameConcept, Long> {
-    Optional<BoardgameConcept> findByPlanId(Long planId);
+//    Optional<BoardgameConcept> findByPlanId(Long planId);
 
     List<BoardgameConcept> findByProjectId(Long projectId);
 
@@ -24,4 +25,6 @@ public interface BoardgameConceptRepository extends JpaRepository<BoardgameConce
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT c FROM BoardgameConcept c WHERE c.conceptId = :id")
     Optional<BoardgameConcept> findByIdWithLock(@Param("id") Long id);
+
+    void deleteAllByProject(Project project);
 }

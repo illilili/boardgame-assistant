@@ -1,157 +1,144 @@
-/* Plan.css */
+/* Plan.css (전문가 레이아-웃 버전) */
 
-/* --- 기본 설정 및 변수 (Creative Focus 테마) --- */
+/* --- ✨ 디자인 시스템 변수 (색상은 그대로 유지) --- */
 :root {
-  --bg-dark: #1f2937; /* 사이드바 배경 (깊은 네이비) */
-  --bg-light: #f9fafb; /* 메인 컨텐츠 배경 (아주 밝은 회색) */
-  --accent-primary: #4f46e5; /* 메인 강조 색상 (인디고) */
-  --accent-secondary: #db2777; /* 보조 강조 색상 (핑크) */
-  --text-primary: #111827; /* 메인 텍스트 (거의 검정) */
-  --text-secondary: #6b7280; /* 보조 텍스트 (회색) */
-  --border-color: #e5e7eb; /* 테두리 색상 */
-  --white: #ffffff;
-  --font-main: 'Inter', sans-serif;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --bg-dark: #1f2937;
+    --bg-light: #f9fafb;
+    --accent-primary: #4f46e5;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --white: #ffffff;
+    --font-main: 'Inter', sans-serif;
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --header-height: 70px;
+    /* ✨ 주황색 변수 추가 (일관성을 위해) */
+    --accent-warm: #E58A4E; 
 }
 
 body {
-  font-family: var(--font-main);
-  margin: 0;
-  background-color: var(--bg-light);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* --- 전체 레이아웃 --- */
-.workspace-container.new-design {
-  display: flex;
-  height: 100vh;
-}
-
-/* --- 사이드바 --- */
-.workspace-sidebar {
-  width: 280px;
-  background-color: var(--bg-dark);
-  color: var(--text-secondary);
-  padding: 32px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar-header {
-  margin-bottom: 40px;
-}
-
-.logo {
-  font-weight: 800;
-  font-size: 1.5rem;
-  color: var(--white);
-  letter-spacing: 1px;
-}
-
-.workspace-nav-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.nav-item {
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 12px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  position: relative;
-  color: #d1d5db; /* 밝은 회색 텍스트 */
-  transition: color 0.2s, background-color 0.2s;
-}
-
-.nav-item:hover {
-  color: var(--white);
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.nav-item.active {
-  color: var(--white);
-  font-weight: 600;
-  background-color: var(--accent-primary);
-}
-
-/* --- 메인 컨텐츠 영역 --- */
-.workspace-main-content {
-  flex-grow: 1;
-  background-color: var(--bg-light);
-  padding: 40px 60px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
-/* --- 시작 화면 스타일 (Plan.js에서 사용) --- */
-.welcome-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-grow: 1;
-  text-align: center;
-  color: var(--text-primary);
-}
-
-.welcome-icon {
-  font-size: 4rem;
-  margin-bottom: 20px;
-  line-height: 1;
-  color: var(--accent-primary);
-}
-
-.welcome-screen h2 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0 0 10px 0;
-}
-
-.welcome-screen p {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  max-width: 450px;
-  line-height: 1.6;
-  margin-bottom: 30px;
-}
-
-/* --- 반응형 --- */
-@media (max-width: 1024px) {
-  .workspace-container.new-design {
-    flex-direction: column;
-  }
-  .workspace-sidebar {
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    align-items: center;
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border-color);
-    box-sizing: border-box;
-  }
-  .sidebar-header {
+    font-family: var(--font-main);
     margin: 0;
-  }
-  .workspace-nav-list {
-    flex-direction: row;
+    background-color: var(--bg-light);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- ✨ 전체 레이아웃 (참고 이미지 스타일 적용) --- */
+.plan-page__container {
+    display: flex;
+    height: calc(100vh - var(--header-height));
+    background-color: var(--bg-light);
+}
+
+/* --- ✨ 사이드바 (디자인 업그레이드) --- */
+.plan-page__sidebar {
+    width: 280px;
+    background-color: var(--white); /* ✨ 흰색 배경으로 변경 */
+    border-right: 1px solid var(--border-color); /* ✨ 오른쪽 경계선 추가 */
+    padding: 32px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.plan-page__sidebar-header {
+    margin-bottom: 40px;
+    padding-left: 12px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px; /* ✅ 밑줄과 글자 간격 확보 */
+}
+
+.plan-page__logo {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--text-primary); /* ✨ 어두운 텍스트 색상으로 변경 */
+    letter-spacing: 1px;
+}
+
+.plan-page__nav {
+    flex-grow: 1;
+}
+
+.plan-page__nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.plan-page__nav-item {
+    display: flex;
+    align-items: center;
     gap: 16px;
-    margin-left: auto;
-  }
-  .nav-item.active {
-    background-color: transparent;
-    color: var(--accent-primary);
-  }
-  .workspace-main-content {
-    padding: 32px 24px;
-  }
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-secondary); /* ✨ 기본 텍스트 색상 변경 */
+    transition: color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.plan-page__nav-item:hover {
+    color: var(--text-primary);
+    background-color: #f3f4f6; /* ✨ 밝은 회색 배경으로 호버 효과 */
+}
+
+/* --- ✨ 여기가 수정되었습니다 --- */
+.plan-page__nav-item.active {
+    color: var(--accent-warm); /* ✨ 아이콘과 텍스트 색상을 강조 색상으로 변경 */
+    font-weight: 600;
+    background-color: #f3f4f6; /* ✨ 연한 회색 배경 적용 */
+    box-shadow: none; /* 그림자 제거 */
+}
+/* --- ✨ --- */
+
+.nav-item__icon {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+/* --- ✨ 메인 컨텐츠 영역 --- */
+.plan-page__main-content {
+    flex-grow: 1;
+    padding: 40px 60px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* WelcomeScreen.css에서 관리되므로 관련 스타일은 삭제 또는 주석 처리합니다. */
+
+/* --- 반응형 (기존 유지) --- */
+@media (max-width: 1024px) {
+    .plan-page__container {
+        flex-direction: column;
+    }
+    .plan-page__sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        padding: 16px 24px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .plan-page__sidebar-header {
+        margin: 0;
+    }
+    .plan-page__nav-list {
+        flex-direction: row;
+        gap: 16px;
+        margin-left: auto;
+    }
+    .plan-page__nav-item.active {
+        background-color: transparent;
+        color: var(--accent-primary);
+    }
+    .plan-page__main-content {
+        padding: 32px 24px;
+    }
 }

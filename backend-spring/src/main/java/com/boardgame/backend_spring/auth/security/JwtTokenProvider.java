@@ -13,7 +13,8 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 30; // 30분
+    private final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 120; // 120분
+    private final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 14; // 14일
 
     // JWT 생성
     public String createAccessToken(String email, String role, String name) {
@@ -26,6 +27,20 @@ public class JwtTokenProvider {
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
+
+    /**
+     * Refresh Token 생성
+     * (별도 claim은 넣지 않고, subject(email)만 넣는 경우가 일반적)
+     */
+    public String createRefreshToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALID_TIME))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+
 
     // JWT 유효성 검사
     public boolean validateToken(String token) {

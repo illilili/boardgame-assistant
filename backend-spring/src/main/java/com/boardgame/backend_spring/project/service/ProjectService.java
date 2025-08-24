@@ -1,8 +1,12 @@
 // ProjectService.java
 package com.boardgame.backend_spring.project.service;
 
+import com.boardgame.backend_spring.concept.repository.BoardgameConceptRepository;
+import com.boardgame.backend_spring.global.error.CustomException;
+import com.boardgame.backend_spring.global.error.ErrorCode;
 import com.boardgame.backend_spring.plan.entity.PlanStatus;
 import com.boardgame.backend_spring.plan.repository.PlanRepository;
+import com.boardgame.backend_spring.pricing.repository.PriceRepository;
 import com.boardgame.backend_spring.project.dto.*;
 import com.boardgame.backend_spring.project.entity.Project;
 import com.boardgame.backend_spring.project.entity.ProjectMember;
@@ -11,6 +15,9 @@ import com.boardgame.backend_spring.project.repository.ProjectMemberRepository;
 import com.boardgame.backend_spring.user.entity.User;
 import com.boardgame.backend_spring.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +34,8 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final PlanRepository planRepository;
+    private final BoardgameConceptRepository boardgameConceptRepository;
+    private final PriceRepository priceRepository;
 
     // 🚨 [신규] 로그인 사용자가 참여한 프로젝트 목록 조회
     @Transactional(readOnly = true)
@@ -51,7 +60,7 @@ public class ProjectService {
     @Transactional
     public ProjectCreateResponseDto createProject(ProjectCreateRequestDto dto, User user) {
         if (user.getRole() != User.Role.PLANNER) {
-            throw new RuntimeException("기획자만 프로젝트를 생성할 수 있습니다.");
+            throw new CustomException(ErrorCode.PROJECT_CREATE_FORBIDDEN);
         }
 
         Project project = Project.builder()
@@ -82,29 +91,51 @@ public class ProjectService {
         return new ProjectStatusResponseDto(project.getStatus());
     }
 
-    // 프로젝트 단건 조회용
+    // 프로젝트 단건 조회 (권한 체크 추가)
     @Transactional(readOnly = true)
-    public ProjectSummaryDto getProjectDetail(Long projectId) {
+    public ProjectSummaryDto getProjectDetail(Long projectId, User user) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다."));
+
+        // 권한 체크
+        boolean isAdmin = user.getRole() == User.Role.ADMIN;
+        boolean isPublisher = user.getRole() == User.Role.PUBLISHER;
+        boolean isMember = projectMemberRepository.existsByProjectAndUser(project, user);
+
+        if (!(isAdmin || isPublisher || isMember)) {
+            throw new CustomException(ErrorCode.PROJECT_ACCESS_DENIED);
+        }
+
         return ProjectSummaryDto.from(project);
     }
 
-    // 프로젝트 이름 변경 (PUBLISHER or ADMIN or 참여자)
-    public ProjectRenameResponseDto renameProject(Long projectId, String newTitle, User user) {
+    // 프로젝트 정보 변경 (PUBLISHER or ADMIN or 참여자)
+    public ProjectRenameResponseDto renameProject(Long projectId, String newTitle, String newDescription, User user) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
+        // 권한 체크
         if (user.getRole() != User.Role.PUBLISHER &&
                 user.getRole() != User.Role.ADMIN &&
                 !projectMemberRepository.existsByProjectAndUser(project, user)) {
             throw new RuntimeException("프로젝트 멤버 또는 관리자, 퍼블리셔만 수정할 수 있습니다.");
         }
 
-        project.setName(newTitle);
+        if (newTitle != null && !newTitle.isBlank()) {
+            project.setName(newTitle);
+        }
+        if (newDescription != null) {
+            project.setDescription(newDescription);
+        }
+
         projectRepository.save(project);
 
-        return new ProjectRenameResponseDto(projectId, newTitle, "프로젝트 이름이 성공적으로 수정되었습니다.");
+        return new ProjectRenameResponseDto(
+                projectId,
+                project.getName(),
+                project.getDescription(),
+                "프로젝트 정보가 성공적으로 수정되었습니다."
+        );
     }
 
     // 개발자 배정 (PUBLISHER만 가능)
@@ -157,5 +188,36 @@ public class ProjectService {
                         .build()
                 )
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteProject(Long projectId, User user) {
+        // 권한 체크
+        if (user.getRole() != User.Role.ADMIN) {
+            throw new RuntimeException("관리자만 프로젝트를 삭제할 수 있습니다.");
+        }
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("프로젝트를 찾을 수 없습니다."));
+
+        // 1) 프로젝트 멤버 삭제
+        projectMemberRepository.deleteAll(projectMemberRepository.findAllByProject(project));
+
+        // 3) plan과 연결된 price 먼저 삭제
+        planRepository.findAllByProject(project).forEach(plan -> {
+            priceRepository.deleteByPlanId(plan.getPlanId());
+        });
+
+        // 4) plan 삭제
+        planRepository.deleteAllByProject(project);
+
+        // 5) boardgame_concept 삭제
+        boardgameConceptRepository.deleteAllByProject(project);
+
+        // TODO: taskRepository.deleteByProjectId(projectId);
+        // TODO: activityLogRepository.deleteByProjectId(projectId);
+
+        // 6) 마지막 프로젝트 삭제
+        projectRepository.delete(project);
     }
 }

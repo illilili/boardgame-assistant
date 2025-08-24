@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
-import './GameConceptCreator.css'; 
-import { generateConcept, regenerateConcept, getAllConcepts } from '../api/auth'; 
+// 1. React에서 useRef를 추가로 import 합니다.
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import './GameConceptCreator.css';
+import { generateConcept, regenerateConcept, getAllConcepts } from '../api/auth';
 import { ProjectContext } from '../contexts/ProjectContext';
 
 const GameConceptCreator = () => {
@@ -17,7 +18,34 @@ const GameConceptCreator = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isInitialState, setIsInitialState] = useState(true);
-    
+
+    // 2. 페이지 첫 로드 시 데이터를 복원했는지 추적하기 위한 ref를 추가합니다.
+    const restoredOnLoad = useRef(false);
+
+    // 3. (새로 추가) concept 데이터가 변경될 때마다 sessionStorage에 자동으로 저장합니다.
+    useEffect(() => {
+        if (concept) {
+            sessionStorage.setItem('gcc_last_concept', JSON.stringify(concept));
+        }
+    }, [concept]);
+
+    // 4. (새로 추가) 페이지에 처음 들어왔을 때 sessionStorage에서 데이터를 불러옵니다.
+    useEffect(() => {
+        const savedConceptJSON = sessionStorage.getItem('gcc_last_concept');
+        if (savedConceptJSON) {
+            try {
+                const savedConcept = JSON.parse(savedConceptJSON);
+                setConcept(savedConcept);
+                setIsInitialState(false);
+                restoredOnLoad.current = true; // 데이터를 복원했다고 표시합니다.
+            } catch (e) {
+                console.error("저장된 컨셉을 불러오는 데 실패했습니다:", e);
+                sessionStorage.removeItem('gcc_last_concept');
+            }
+        }
+    }, []); // []는 이 코드가 단 한 번, 첫 렌더링 시에만 실행되게 합니다.
+
+    // 5. 기존 useEffect 로직을 수정합니다.
     useEffect(() => {
         if (activeTab === 'regenerate' && projectId) {
             const fetchListForDropdown = async () => {
@@ -42,8 +70,17 @@ const GameConceptCreator = () => {
             };
             fetchListForDropdown();
         } else {
-             setConcept(null);
-             setIsInitialState(true);
+            // '새로 만들기' 탭 로직입니다.
+            // 페이지 첫 로드 시 데이터를 복원한 경우에는 아래 코드를 실행하지 않고 건너뜁니다.
+            if (restoredOnLoad.current) {
+                restoredOnLoad.current = false; // 다음 탭 클릭부터는 정상 작동하도록 플래그를 리셋합니다.
+                return;
+            }
+            
+            // 사용자가 직접 '새로 만들기' 탭을 클릭한 경우, 기존처럼 컨셉을 초기화합니다.
+            setConcept(null);
+            setIsInitialState(true);
+            sessionStorage.removeItem('gcc_last_concept');
         }
     }, [activeTab, projectId]);
 
@@ -80,7 +117,7 @@ const GameConceptCreator = () => {
             setError('재생성할 컨셉과 피드백을 모두 입력해주세요.');
             return;
         }
-        
+
         const selectedConceptId = parseInt(selectedConceptInfo.split(',')[0], 10);
         const originalConceptData = regenerateConceptList.find(c => c.conceptId === selectedConceptId);
 
@@ -114,42 +151,42 @@ const GameConceptCreator = () => {
         const conceptToPreview = regenerateConceptList.find(c => c.conceptId === selectedConceptId);
 
         if (conceptToPreview) {
-            setConcept(conceptToPreview); 
+            setConcept(conceptToPreview);
             setIsInitialState(false);
             setError(null);
         }
     };
-    
+
     return (
-        <div className="creator-container">
-            <div className="form-column">
-                <div className="tab-navigation">
-                    <button className={`tab-button ${activeTab === 'generate' ? 'active' : ''}`} onClick={() => setActiveTab('generate')}>
+        <div className="gcc__container">
+            <div className="gcc__form-column">
+                <div className="gcc__tab-navigation">
+                    <button className={`gcc__tab-button ${activeTab === 'generate' ? 'active' : ''}`} onClick={() => setActiveTab('generate')}>
                         새로 만들기
                     </button>
-                    <button className={`tab-button ${activeTab === 'regenerate' ? 'active' : ''}`} onClick={() => setActiveTab('regenerate')}>
+                    <button className={`gcc__tab-button ${activeTab === 'regenerate' ? 'active' : ''}`} onClick={() => setActiveTab('regenerate')}>
                         다시 만들기
                     </button>
                 </div>
 
                 {activeTab === 'generate' && (
-                    <div className="form-content">
-                        <h2 className="form-title">새로운 게임 컨셉 만들기</h2>
-                        <p className="form-description">게임의 기본 요소를 입력하여 AI에게 새로운 아이디어를 얻어보세요.</p>
+                    <div className="gcc__form-content">
+                        <h2 className="gcc__form-title">새로운 게임 컨셉 만들기</h2>
+                        <p className="gcc__form-description">게임의 기본 요소를 입력하여 AI에게 새로운 아이디어를 얻어보세요.</p>
                         <form onSubmit={handleGenerateSubmit}>
-                            <div className="form-group">
+                            <div className="gcc__form-group">
                                 <label htmlFor="theme">게임 테마</label>
                                 <input id="theme" type="text" value={theme} onChange={(e) => setTheme(e.target.value)} placeholder="예: 우주 탐험, 사이버펑크" required />
                             </div>
-                            <div className="form-group">
+                            <div className="gcc__form-group">
                                 <label htmlFor="playerCount">플레이어 수</label>
                                 <input id="playerCount" type="text" value={playerCount} onChange={(e) => setPlayerCount(e.target.value)} placeholder="예: 2-4명" required />
                             </div>
-                            <div className="form-group">
+                            <div className="gcc__form-group">
                                 <label htmlFor="averageWeight">난이도: {averageWeight}</label>
                                 <input id="averageWeight" type="range" value={averageWeight} onChange={(e) => setAverageWeight(e.target.value)} min="1.0" max="5.0" step="0.1" required />
                             </div>
-                            <button type="submit" className="submit-button" disabled={loading || !projectId}>
+                            <button type="submit" className="gcc__submit-button" disabled={loading || !projectId}>
                                 {loading ? '생성 중...' : '컨셉 생성하기'}
                             </button>
                         </form>
@@ -157,11 +194,11 @@ const GameConceptCreator = () => {
                 )}
 
                 {activeTab === 'regenerate' && (
-                    <div className="form-content">
-                        <h2 className="form-title">기존 컨셉 발전시키기</h2>
-                        <p className="form-description">피드백을 제공하여 기존 컨셉을 AI와 함께 개선해보세요.</p>
+                    <div className="gcc__form-content">
+                        <h2 className="gcc__form-title">기존 컨셉 발전시키기</h2>
+                        <p className="gcc__form-description">피드백을 제공하여 기존 컨셉을 AI와 함께 개선해보세요.</p>
                         <form onSubmit={handleRegenerateSubmit}>
-                            <div className="form-group">
+                            <div className="gcc__form-group">
                                 <label htmlFor="regenerateConcept">재생성할 컨셉 선택</label>
                                 <select id="regenerateConcept" value={selectedConceptInfo} onChange={handleConceptSelectionChange} required>
                                     <option value="" disabled>-- 컨셉을 선택하세요 --</option>
@@ -176,11 +213,11 @@ const GameConceptCreator = () => {
                                     )}
                                 </select>
                             </div>
-                            <div className="form-group">
+                            <div className="gcc__form-group">
                                 <label htmlFor="feedback">피드백</label>
                                 <textarea id="feedback" value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder="예: 좀 더 캐주얼한 분위기, 전략적 깊이 추가" rows="5" required></textarea>
                             </div>
-                            <button type="submit" className="submit-button" disabled={loading}>
+                            <button type="submit" className="gcc__submit-button" disabled={loading}>
                                 {loading ? '재생성 중...' : '컨셉 재생성하기'}
                             </button>
                         </form>
@@ -188,35 +225,42 @@ const GameConceptCreator = () => {
                 )}
             </div>
 
-            <div className="result-column">
-                {error && <div className="error-message">{error}</div>}
+            <div className="gcc__result-column">
+                {error && <div className="gcc__error-message">{error}</div>}
                 {loading && (
-                    <div className="loading-state">
-                        <div className="spinner"></div>
+                    <div className="gcc__loading-state">
+                        <div className="gcc__spinner"></div>
                         <p>AI가 멋진 아이디어를 구상하고 있어요...</p>
                     </div>
                 )}
                 {!loading && !error && isInitialState && (
-                    <div className="initial-state">
+                    <div className="gcc__initial-state">
                         <h3>AI 컨셉 결과</h3>
                         <p>왼쪽 양식을 작성하거나, '다시 만들기'에서 컨셉을 선택하면 상세 내용이 여기에 표시됩니다.</p>
                     </div>
                 )}
                 {concept && !loading && (
-                    <div className="concept-card">
-                        <div className="card-header">
-                            <span className="card-tag">Plan ID: {concept.planId}</span>
-                            <span className="card-tag">Concept ID: {concept.conceptId}</span>
+                    <div className="gcc__concept-card">
+                        <div className="gcc__card-header">
+                            <span className="gcc__card-tag">Plan ID: {concept.planId}</span>
+                            <span className="gcc__card-tag">Concept ID: {concept.conceptId}</span>
                         </div>
-                        <h3 className="concept-title">{concept.theme}</h3>
-                        <div className="concept-meta">
+                        <h3 className="gcc__concept-title">{concept.theme}</h3>
+                        <div className="gcc__concept-meta">
                             <span><strong>플레이 인원:</strong> {concept.playerCount}</span>
                             <span><strong>난이도:</strong> {concept.averageWeight.toFixed(1)}</span>
                         </div>
-                        <div className="concept-section"><h4>핵심 아이디어</h4><p>{concept.ideaText}</p></div>
-                        <div className="concept-section"><h4>주요 메커니즘</h4><p>{concept.mechanics}</p></div>
-                        <div className="concept-section"><h4>배경 스토리</h4><p>{concept.storyline}</p></div>
-                        <div className="card-footer">생성 시간: {new Date(concept.createdAt).toLocaleString('ko-KR')}</div>
+                        <div className="gcc__concept-section"><h4>핵심 아이디어</h4><p>{concept.ideaText}</p></div>
+                        <div className="gcc__concept-section">
+                            <h4>주요 메커니즘</h4>
+                            <div className="gcc__mechanics-list">
+                                {concept.mechanics && (concept.mechanics.match(/\d+\..*?(?=\d+\.|$)/gs) || [concept.mechanics]).map((mechanic, index) => (
+                                    <p key={index}>{mechanic.trim()}</p>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="gcc__concept-section"><h4>배경 스토리</h4><p>{concept.storyline}</p></div>
+                        <div className="gcc__card-footer">생성 시간: {new Date(concept.createdAt).toLocaleString('ko-KR')}</div>
                     </div>
                 )}
             </div>

@@ -1,345 +1,297 @@
-/* GameConceptCreator.css (새로운 Architect 스타일에 맞춤) */
-.creator-container {
-  display: flex;
-  gap: 48px;
-  width: 100%;
-  height: calc(100vh - 70px - 4rem); /* App.js 헤더, main 패딩 고려 */
-  box-sizing: border-box;
+/* GameConceptCreator.css (고유 클래스 이름 적용) */
+.gcc__container {
+    display: flex;
+    gap: 48px;
+    width: 100%;
+    height: calc(100vh - 70px - 4rem);
+    box-sizing: border-box;
 }
 
-.form-column, .result-column {
-  background-color: #FFFFFF;
-  border-radius: 12px;
-  padding: 32px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  display: flex;
-  flex-direction: column;
-  max-height: 100%;
-  box-sizing: border-box;
+/* --- ▼ 스타일 분리 시작 ▼ --- */
+
+/* 두 컬럼에 공통으로 적용되는 레이아웃 스타일입니다. (배경색 제외) */
+.gcc__form-column, .gcc__result-column {
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    box-sizing: border-box;
 }
 
-.form-column {
-  flex: 1;
-  min-width: 400px;
+/* 왼쪽 컬럼은 기존 흰색 배경을 유지합니다. */
+.gcc__form-column {
+    flex: 1;
+    min-width: 400px;
+    background-color: #FFFFFF;
 }
 
-.result-column {
-  flex: 1.5;
-  align-items: center;
-  justify-content: center;
+/* 오른쪽 컬럼에만 체크무늬 배경을 적용합니다. */
+.gcc__result-column {
+    flex: 1.5;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa; /* 바탕색은 유지합니다. */
+    /* --- ▼ 참조 파일에 맞춰 격자 스타일과 크기를 수정했습니다 ▼ --- */
+    background-image: 
+        linear-gradient(rgba(224, 217, 211, 0.3) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(224, 217, 211, 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
 }
+
+/* --- ▲ 스타일 분리 끝 ▲ --- */
+
 
 /* --- 탭 네비게이션 --- */
-.tab-navigation {
-  display: flex;
-  background-color: #F8F8F8;
-  border-radius: 8px;
-  padding: 4px;
-  margin-bottom: 32px;
-  flex-shrink: 0;
+.gcc__tab-navigation {
+    display: flex;
+    background-color: #F8F8F8;
+    border-radius: 8px;
+    padding: 4px;
+    margin-bottom: 32px;
+    flex-shrink: 0;
 }
 
-.tab-button {
-  flex: 1;
-  padding: 12px 16px;
-  border: none;
-  background-color: transparent;
-  color: #888888;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
+.gcc__tab-button {
+    flex: 1;
+    padding: 12px 16px;
+    border: none;
+    background-color: transparent;
+    color: #888888;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
 }
 
-.tab-button.active {
-  background-color: #FFFFFF;
-  color: #E58A4E;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+.gcc__tab-button.active {
+    background-color: #FFFFFF;
+    color: #E58A4E;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
 /* --- 폼 콘텐츠 --- */
-.form-content {
-  display: flex;
-  flex-direction: column;
+.gcc__form-content {
+    display: flex;
+    flex-direction: column;
 }
 
-.form-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #2c2825;
-  margin: 0 0 8px 0;
+.gcc__form-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2c2825;
+    margin: 0 0 8px 0;
 }
 
-.form-description {
-  font-size: 1rem;
-  color: #888888;
-  margin: 0 0 32px 0;
+.gcc__form-description {
+    font-size: 1rem;
+    color: #888888;
+    margin: 0 0 32px 0;
 }
 
-.form-group {
-  margin-bottom: 24px;
+.gcc__form-group {
+    margin-bottom: 24px;
 }
 
-.form-group label {
-  display: block;
-  font-weight: 600;
-  color: #2c2825;
-  margin-bottom: 8px;
-  font-size: 0.875rem;
+.gcc__form-group label {
+    display: block;
+    font-weight: 600;
+    color: #2c2825;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
 }
 
-input[type="text"],
-input[type="number"],
-textarea,
-select {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #EAEAEA;
-  border-radius: 8px;
-  font-size: 1rem;
-  box-sizing: border-box;
-  background-color: #F8F8F8;
-  color: #2c2825;
-  transition: border-color 0.2s, box-shadow 0.2s;
+.gcc__container input[type="text"],
+.gcc__container input[type="number"],
+.gcc__container textarea,
+.gcc__container select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #EAEAEA;
+    border-radius: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    background-color: #F8F8F8;
+    color: #2c2825;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: #E58A4E;
-  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+.gcc__container input[type="text"]:focus,
+.gcc__container input[type="number"]:focus,
+.gcc__container textarea:focus,
+.gcc__container select:focus {
+    outline: none;
+    border-color: #E58A4E;
+    box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
 }
 
-textarea {
-  resize: vertical;
-  min-height: 120px;
+.gcc__container textarea {
+    resize: vertical;
+    min-height: 120px;
 }
 
-input[type="range"] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  background: #EAEAEA;
-  border-radius: 3px;
-  outline: none;
-  cursor: pointer;
+.gcc__container input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #EAEAEA;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
 }
 
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: #E58A4E;
-  border-radius: 50%;
-  cursor: pointer;
+.gcc__container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #E58A4E;
+    border-radius: 50%;
+    cursor: pointer;
 }
 
-.submit-button {
-  width: 100%;
-  padding: 14px 20px;
-  background-color: #E58A4E;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
-  margin-top: 16px;
+.gcc__submit-button {
+    width: 100%;
+    padding: 14px 20px;
+    background-color: #E58A4E;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    margin-top: 16px;
 }
 
-.submit-button:hover {
-  background-color: #c06c38;
+.gcc__submit-button:hover {
+    background-color: #c06c38;
 }
 
-.submit-button:active {
-  transform: scale(0.98);
+.gcc__submit-button:active {
+    transform: scale(0.98);
 }
 
-.submit-button:disabled {
-  background-color: #fbd6c0;
-  cursor: not-allowed;
+.gcc__submit-button:disabled {
+    background-color: #fbd6c0;
+    cursor: not-allowed;
 }
 
 /* --- 결과 표시 영역 --- */
-.initial-state, .loading-state {
-  text-align: center;
-  color: #888888;
+.gcc__initial-state, .gcc__loading-state {
+    text-align: center;
+    color: #888888;
 }
 
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 5px solid rgba(229, 138, 78, 0.2);
-  border-top-color: #E58A4E;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 24px;
+.gcc__spinner {
+    width: 48px;
+    height: 48px;
+    border: 5px solid rgba(229, 138, 78, 0.2);
+    border-top-color: #E58A4E;
+    border-radius: 50%;
+    animation: gcc-spin 1s linear infinite;
+    margin: 0 auto 24px;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+@keyframes gcc-spin {
+    to { transform: rotate(360deg); }
 }
 
-.concept-card {
-  width: 100%;
-  height: 100%;
-  padding: 32px;
-  border-radius: 12px;
-  background-color: #FFFFFF;
-  overflow-y: auto;
-  line-height: 1.7;
-  box-sizing: border-box;
-}
-.card-header, .concept-meta, .card-footer { flex-shrink: 0; }
-.concept-section { flex-grow: 1; }
-
-
-.card-header {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-bottom: 16px;
+.gcc__concept-card {
+    width: 100%;
+    height: 100%;
+    padding: 32px;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    overflow-y: auto;
+    line-height: 1.7;
+    box-sizing: border-box;
 }
 
-.card-tag {
-  background-color: #F8F8F8;
-  color: #888888;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 500;
+.gcc__card-header {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 
-.concept-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #2c2825;
-  margin-bottom: 12px;
+.gcc__card-tag {
+    background-color: #F8F8F8;
+    color: #888888;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
-.concept-meta {
-  display: flex;
-  gap: 24px;
-  color: #888888;
-  margin-bottom: 32px;
-  font-size: 0.875rem;
-  border-bottom: 1px solid #EAEAEA;
-  padding-bottom: 16px;
-}
-.concept-meta strong {
-  color: #2c2825;
+.gcc__concept-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c2825;
+    margin-bottom: 12px;
 }
 
-
-.concept-section {
-  margin-bottom: 24px;
+.gcc__concept-meta {
+    display: flex;
+    gap: 24px;
+    color: #888888;
+    margin-bottom: 32px;
+    font-size: 0.875rem;
+    border-bottom: 1px solid #EAEAEA;
+    padding-bottom: 16px;
 }
 
-.concept-section h4 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #2c2825;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #E58A4E;
-  display: inline-block;
+.gcc__concept-meta strong {
+    color: #2c2825;
 }
 
-.concept-section p {
-  color: #374151;
-  margin: 0;
-  white-space: pre-wrap;
+.gcc__concept-section {
+    margin-bottom: 24px;
 }
 
-.card-footer {
-  text-align: right;
-  font-size: 0.875rem;
-  color: #888888;
-  margin-top: 32px;
-  padding-top: 16px;
-  border-top: 1px solid #EAEAEA;
+.gcc__concept-section h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #2c2825;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #E58A4E;
+    display: inline-block;
 }
 
-.error-message {
-  width: 100%;
-  padding: 16px;
-  background-color: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fca5a5;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 500;
+.gcc__concept-section p {
+    color: #374151;
+    margin: 0;
+    white-space: pre-wrap;
 }
 
-/* --- 목록 보기 뷰 스타일 (추가) --- */
-.result-column.list-view {
-  padding: 0;
-  background-color: transparent;
-  box-shadow: none;
-  align-items: flex-start;
-  justify-content: flex-start;
+.gcc__card-footer {
+    text-align: right;
+    font-size: 0.875rem;
+    color: #888888;
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #EAEAEA;
 }
 
-.result-column.list-view h2 {
-  margin: 0 32px 1.5rem 32px;
-  color: #2c2825;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 0.5rem;
+.gcc__error-message {
+    width: 100%;
+    padding: 16px;
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
 }
 
-.concept-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-  width: 100%;
-  max-height: calc(100% - 70px); /* 헤더 높이만큼 빼서 스크롤되도록 함 */
-  overflow-y: auto;
-  padding: 0 32px 32px 32px;
-  box-sizing: border-box;
+/* --- ▼ 메커니즘 목록 스타일 추가 ▼ --- */
+
+/* 메커니즘 목록의 각 항목(<p>) 사이의 간격을 조절합니다. */
+.gcc__mechanics-list p + p {
+    margin-top: 1em;
 }
 
-.concept-card.small-card {
-  padding: 1rem;
-  background: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.concept-card.small-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.07);
-}
-
-.concept-card.small-card .concept-title {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-}
-
-.concept-card.small-card .concept-meta {
-  font-size: 0.8rem;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-
-.concept-card.small-card .concept-idea-snippet {
-  font-size: 0.9rem;
-  color: #555;
-  line-height: 1.5;
-  margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.concept-card.small-card .card-footer {
-  padding-top: 0.5rem;
-  font-size: 0.75rem;
-  margin-top: 1rem;
-}
+/* --- ▲ 여기까지 추가 ▲ --- */
