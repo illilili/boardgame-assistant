@@ -186,7 +186,7 @@ function RulebookGenerator({ contentId, componentId }) {
 
   /** 버전 저장 */
   const handleSaveVersion = async () => {
-    if (!versionNote.trim()) return setError("버전 노트를 입력하세요.");
+    if (!versionNote.trim()) return setError("버전 메모를 입력하세요.");
     if (!finalContentId) return setError("콘텐츠 ID가 없습니다.");
     setIsLoading(true);
 
@@ -238,10 +238,18 @@ function RulebookGenerator({ contentId, componentId }) {
         />
       );
     }
+    
+    // 키워드 바로 뒤에 한글/숫자가 붙어있는 경우를 찾아 공백을 추가합니다.
+    const formattedText = rulebookText.replace(
+      /(게임 제목|게임 개요|구성품|적정 연령|게임 준비|게임 규칙|게임 진행 방식|승리 조건|턴 순서)(?=[가-힣0-9])/g,
+      '$1 '
+    );
 
     return (
-      <div className="rulebook-report">
-        <ReactMarkdown>{rulebookText}</ReactMarkdown>
+      <div className="rulebook-report-wrapper">
+        <div className="rulebook-report">
+          <ReactMarkdown>{formattedText}</ReactMarkdown>
+        </div>
       </div>
     );
   };
@@ -323,30 +331,27 @@ function RulebookGenerator({ contentId, componentId }) {
           </div>
         </div>
 
-        {/* === 고급 기능: 버전 관리 (토글 방식) === */}
-        <details className="control-box accordion">
-          <summary>
-            <h4>버전 관리</h4>
-          </summary>
-          <div className="accordion-content">
-            <div className="model-version-note">
-              <label>버전 메모:</label>
+        {/* === 고급 기능: 버전 관리 (항상 보임) === */}
+        <div className="control-box">
+          <h4>버전 관리</h4>
+          <div className="version-control-content">
+            <div className="version-control-note">
               <input
                 type="text"
                 value={versionNote}
                 onChange={(e) => setVersionNote(e.target.value)}
                 placeholder="예: 룰북 v1 초안"
-                disabled={!rulebookText}
+                disabled={!rulebookText || isLoading}
               />
               <button
-                className="save"
+                className="btn-save-version"
                 onClick={handleSaveVersion}
                 disabled={!rulebookText || isLoading}
               >
                 버전 저장
               </button>
             </div>
-            <div className="model-version-select-row">
+            <div className="version-control-select-row">
               <Select
                 className="version-select"
                 classNamePrefix="react-select"
@@ -358,13 +363,13 @@ function RulebookGenerator({ contentId, componentId }) {
                     v.createdAt
                   ).toLocaleString()})`,
                 }))}
-                placeholder={versions.length > 0 ? "버전 선택" : "저장된 버전 없음"}
+                placeholder={versions.length > 0 ? "복구할 버전 선택" : "저장된 버전 없음"}
                 isDisabled={versions.length === 0}
                 isClearable
               />
               {selectedVersion && (
                 <button
-                  className="rollback"
+                  className="btn-rollback"
                   onClick={handleRollbackVersion}
                   disabled={isLoading}
                 >
@@ -373,7 +378,7 @@ function RulebookGenerator({ contentId, componentId }) {
               )}
             </div>
           </div>
-        </details>
+        </div>
 
         {/* === 최종 제출 === */}
         <div className="submit-complete-section">
@@ -395,15 +400,14 @@ function RulebookGenerator({ contentId, componentId }) {
         </div>
       </div>
 
-
       {/* ------------------- 오른쪽: 결과 뷰어 ------------------- */}
       <div
         className={`rulebook-preview ${rulebookText ? "filled" : "empty"}`}
       >
         {isLoading ? (
-          <div className="status-container">
-            <div className="loader"></div>
-            <h3>처리 중...</h3>
+          <div className="rb-loading-container">
+            <div className="rb-loader"></div>
+            <h3 className="rb-loading-text">처리 중...</h3>
           </div>
         ) : rulebookText ? (
           renderResult()
