@@ -2,7 +2,6 @@
 :root {
     --gallery-accent: #E58A4E;
     --gallery-bg-section: #f9fafb;
-    /* 어둡고 몰입감 있는 배경 */
     --gallery-text-light: #f9fafb;
     --gallery-text-secondary: #9ca3af;
     --gallery-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -30,14 +29,45 @@
 
 .bga-gallery-subtitle {
     font-size: 1.2rem;
-    /* 폰트 크기 약간 증가 */
     color: var(--gallery-text-secondary);
-    ;
-    /* 위아래 여백 조정 및 중앙 정렬 */
     max-width: 600px;
-    /* 최대 너비 제한하여 가독성 확보 */
     line-height: 1.6;
-    /* 줄 간격 조정 */
+    margin: 0 auto 40px;
+}
+
+/* --- ✨ 카테고리 네비게이션 스타일 --- */
+.bga-category-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 50px;
+}
+
+.bga-category-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4b5563;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.bga-category-button:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.bga-category-button.active {
+    background-color: var(--gallery-accent);
+    color: white;
+    border-color: var(--gallery-accent);
+    box-shadow: 0 4px 12px rgba(229, 138, 78, 0.3);
+    transform: translateY(-2px);
 }
 
 /* --- ✨ 슬라이드 및 카드 기본 스타일 --- */
@@ -119,7 +149,6 @@
 .slick-track {
     display: flex;
     align-items: center;
-    /* 슬라이드 높이를 중앙으로 정렬 */
 }
 
 /* 중앙이 아닌 슬라이드 스타일 */
@@ -149,7 +178,6 @@
 .slick-dots li button:before {
     font-size: 12px;
     color: #4b5563;
-    /* Gray-600 */
 }
 
 .slick-dots li.slick-active button:before {
