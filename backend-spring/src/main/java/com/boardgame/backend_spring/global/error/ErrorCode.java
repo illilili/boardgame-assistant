@@ -11,6 +11,7 @@ public enum ErrorCode {
     ACCOUNT_LOCKED(HttpStatus.UNAUTHORIZED, "계정이 잠겨있습니다. 관리자에게 문의하세요."),
     TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "약관에 동의하지 않았습니다."),
     PROJECT_ACCESS_DENIED(HttpStatus.FORBIDDEN, "프로젝트 권한이 없습니다."),
+    PROJECT_CREATE_FORBIDDEN(HttpStatus.FORBIDDEN, "프로젝트 생성 권한이 없습니다. (기획자만 생성 가능)"),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다.");
 
     private final HttpStatus status;

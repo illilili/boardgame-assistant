@@ -60,7 +60,7 @@ public class ProjectService {
     @Transactional
     public ProjectCreateResponseDto createProject(ProjectCreateRequestDto dto, User user) {
         if (user.getRole() != User.Role.PLANNER) {
-            throw new RuntimeException("기획자만 프로젝트를 생성할 수 있습니다.");
+            throw new CustomException(ErrorCode.PROJECT_CREATE_FORBIDDEN);
         }
 
         Project project = Project.builder()
