@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: boardgame
+      MYSQL_USER: boardgame_user
+      MYSQL_PASSWORD: boardgame_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  fastapi:
+    build: ./backend-python
+    container_name: fastapi
+    restart: always
+    env_file:
+      - ./backend-python/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend-python/faiss_boardgame_index:/app/faiss_boardgame_index
+      - ./backend-python/pricing/data:/app/data
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+
+  spring:
+    build: ./backend-spring
+    container_name: spring
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
+      - fastapi
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/boardgame
+      SPRING_DATASOURCE_USERNAME: boardgame_user
+      SPRING_DATASOURCE_PASSWORD: boardgame_pass
+      FASTAPI_SERVICE_URL: http://fastapi:8000
+      JWT_SECRET: Y3VzdG9tLXNlY3JldC1rZXktZm9yLXNwcmluZy1ib29rLTIwMjU=
+
+volumes:
+  mariadb_data:
