@@ -28,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/content")
@@ -108,7 +109,24 @@ public class ContentController {
 
     @GetMapping("/generate-3d/status/{taskId}")
     public ResponseEntity<?> get3DModelStatus(@PathVariable String taskId) {
-        return ResponseEntity.ok(pythonApiService.get3DStatus(taskId));
+        Map<String, Object> result = pythonApiService.get3DStatus(taskId);
+
+        // ✅ refine 완료되면 DB에도 반영
+        if ("DONE".equals(result.get("status"))) {
+            String glbUrl = (String) result.get("glbUrl");
+            if (glbUrl != null) {
+                // contentId를 함께 넘기도록 FastAPI 수정 필요 (이미 task에 저장해둠)
+                Long contentId = Long.valueOf(result.get("contentId").toString());
+
+                Content content = contentRepository.findById(contentId)
+                        .orElseThrow(() -> new RuntimeException("존재하지 않는 콘텐츠입니다."));
+
+                content.setContentData(glbUrl); // refine된 GLB URL 저장
+                contentRepository.save(content);
+            }
+        }
+
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/generate-rulebook")

@@ -112,7 +112,11 @@ async def get_3d_status(task_id: str):
 
             task["status"] = "DONE"
             task["glbUrl"] = s3_url
-            return {"status": "DONE", "glbUrl": s3_url}
+            return {
+                "status": "DONE",
+                "glbUrl": s3_url,
+                "contentId": task["content_id"]  # ✅ contentId 같이 반환
+            }
 
         elif status == "FAILED":
             task["status"] = "FAILED"
