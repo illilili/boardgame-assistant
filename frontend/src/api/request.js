@@ -1,5 +1,5 @@
 // src/api/request.js
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://615ckg0wf0.execute-api.ap-northeast-2.amazonaws.com';
 
 export const request = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;

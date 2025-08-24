@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const USER_URL = 'http://localhost:8080/api/admin';
-const PROJECT_URL = 'http://localhost:8080/api/projects';
+const USER_URL = 'http://15.164.210.141:8080/api/admin';
+const PROJECT_URL = 'http://15.164.210.141:8080/api/projects';
 
 // === 유저 관리 ===
 export const fetchAllUsers = async () => {

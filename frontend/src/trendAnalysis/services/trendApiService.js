@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API 기본 설정
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://615ckg0wf0.execute-api.ap-northeast-2.amazonaws.com';
 
 // Axios 인스턴스 생성
 const trendApiClient = axios.create({
