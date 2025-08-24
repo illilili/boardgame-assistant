@@ -45,6 +45,7 @@ public class ContentController {
     private final S3Uploader s3Uploader;
 
     private final ComponentStatusService componentStatusService;
+    private final PythonApiService pythonApiService;
 
     @GetMapping("/{contentId}")
     public ResponseEntity<ContentDetailResponse> getContent(@PathVariable Long contentId) {
