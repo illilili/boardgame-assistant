@@ -18,7 +18,8 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class PythonApiService {
     private final RestTemplate restTemplate = new RestTemplate();
-    private static final String PYTHON_API_BASE_URL = "http://localhost:8000";
+    @Value("${fastapi.service.url:http://localhost:8000}")
+    private String fastApiBaseUrl;
 
     public CardTextResponse generateText(CardTextRequest request) {
         String url = PYTHON_API_BASE_URL + "/api/content/generate-text";

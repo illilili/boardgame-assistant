@@ -35,7 +35,7 @@ public class TranslateServiceImpl implements TranslateService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${fastapi.service.url}")
-    private String fastapiBaseUrl;  // e.g., http://localhost:8000
+    private String fastapiBaseUrl; 
 
     @Override
     @Transactional
