@@ -22,6 +22,7 @@ import com.boardgame.backend_spring.content.service.thumbnail.ThumbnailContentSe
 import com.boardgame.backend_spring.content.service.version.ContentVersionService;
 import com.boardgame.backend_spring.content.dto.version.ContentSaveRequest;
 import com.boardgame.backend_spring.content.dto.model3d.Generate3DTaskResponse;
+import com.boardgame.backend_spring.content.service.PythonApiService;
 import com.boardgame.backend_spring.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
