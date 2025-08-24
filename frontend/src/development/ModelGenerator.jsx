@@ -88,8 +88,6 @@ function ModelGenerator({ contentId, componentId }) {
         contentId: finalContentId, name, description, componentInfo, theme, storyline, style
       });
 
-      setMessage('3D 모델 생성 요청됨. 처리 중입니다...');
-
       // 2. 상태 확인 시작
       poll3DStatus(taskId);
 

@@ -16,8 +16,8 @@ public class Generate3DModelResponse {
 
     private String name;
 
-    @JsonProperty("preview_url")
-    private String previewUrl;
+//    @JsonProperty("preview_url")
+//    private String previewUrl;
 
     @JsonProperty("refined_url")
     private String refinedUrl;
