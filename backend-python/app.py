@@ -29,7 +29,7 @@ app = FastAPI()
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # React 개발 서버
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "https://d3b7pbgbe6t4iw.cloudfront.net"],  # React 개발 서버
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
