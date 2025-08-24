@@ -6,7 +6,7 @@ import Footer from '../mainPage/Footer';
 import { ProjectContext } from '../contexts/ProjectContext';
 import './ProjectHomePage.css';
 
-const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/%EC%95%84%EC%B9%B4%EC%9E%90.png';
+const DEFAULT_THUMBNAIL = 'https://boardgame-assistant.s3.ap-northeast-2.amazonaws.com/thumbnails/boardgame.4c780daaa5c5923b7a9b.png';
 
 const maskName = (name) => {
   if (typeof name !== 'string' || name.length <= 1) {
@@ -17,6 +17,7 @@ const maskName = (name) => {
     return name[0] + '*';
   }
 
+  // 이름이 세 글자 이상이면 첫 글자와 마지막 글자만 빼고 마스킹
   const middle = '*'.repeat(name.length - 2);
   return name[0] + middle + name[name.length - 1];
 };
@@ -67,7 +68,15 @@ const ProjectHomePage = () => {
       })
       .catch(err => {
         console.error("프로젝트 정보 로딩 실패:", err);
-        navigate('/projects');
+        if (err.response?.status === 403) {
+          alert("해당 프로젝트에 접근할 권한이 없습니다.");
+          navigate('/projects');
+        } else if (err.response?.status === 401) {
+          alert("로그인이 필요합니다.");
+          navigate('/login');
+        } else {
+          alert("프로젝트 정보를 불러오는 중 오류가 발생했습니다.");
+        }
       });
   }, [projectId, navigate]);
 
@@ -84,24 +93,6 @@ const ProjectHomePage = () => {
     }
   };
 
-  // ✨ 여기에 로그아웃 핸들러 함수를 추가합니다.
-  const handleLogout = () => {
-    // 1. localStorage에서 로그인 정보 삭제
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('role');
-    localStorage.removeItem('name');
-
-    // 2. 로그아웃 완료 알림
-    alert('로그아웃 되었습니다.');
-
-    // 3. 다른 컴포넌트(e.g., Header)의 상태 업데이트를 위해 storage 이벤트 발생
-    window.dispatchEvent(new Event("storage"));
-
-    // 4. 홈페이지로 이동
-    navigate('/');
-  };
-
   if (!status) {
     return (
       <>
@@ -115,18 +106,13 @@ const ProjectHomePage = () => {
   return (
     <ProjectContext.Provider value={{ projectId }}>
       <Header projectMode={true} />
+      {/* ✨ 고유 클래스 이름 적용 */}
       <div className="project-home-page__container">
         <aside className="project-home-page__sidebar">
           <ul className="project-home-page__nav-list">
             <li className="project-home-page__nav-item" onClick={() => navigate(`/projects/${projectId}/plan`)}>PLAN</li>
             <li className="project-home-page__nav-item" onClick={() => navigate(`/projects/${projectId}/development`)}>DEVELOP</li>
             <li className="project-home-page__nav-item" onClick={() => navigate(`/projects/${projectId}/publish`)}>PUBLISH</li>
-          </ul>
-          <ul className="project-home-page__nav-list project-home-page__bottom-nav-list">
-            <li className="project-home-page__nav-item" onClick={() => navigate('/settings')}>Settings</li>
-            <li className="project-home-page__nav-item" onClick={() => navigate('/mypage')}>MyPage</li>
-            {/* ✨ onClick 이벤트를 handleLogout 함수로 변경합니다. */}
-            <li className="project-home-page__nav-item" onClick={handleLogout}>Logout</li>
           </ul>
         </aside>
 
