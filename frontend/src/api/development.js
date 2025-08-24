@@ -27,6 +27,12 @@ export const generate3DModel = (data) =>
     body: JSON.stringify(data), // { contentId, name, description, componentInfo, theme, storyline, style }
   });
 
+  
+// 3D 모델 작업 상태 조회
+export const get3DModelStatus = (taskId) =>
+  request(`/api/content/generate-3d/status/${taskId}`, {
+    method: 'GET',
+  });
 
 
 // 카드 생성

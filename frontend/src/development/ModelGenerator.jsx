@@ -8,7 +8,8 @@ import {
   rollbackContentVersion,
   getContentDetail,
   completeContent,
-  submitComponent
+  submitComponent,
+  get3DModelStatus
 } from '../api/development';
 import Select from "react-select";
 import { FiDownload, FiRotateCcw } from 'react-icons/fi';
@@ -80,15 +81,55 @@ function ModelGenerator({ contentId, componentId }) {
     if (!style) return setMessage('스타일을 선택하세요.');
     setIsLoading(true);
     setMessage('');
+
     try {
-      await generate3DModel({ contentId: finalContentId, name, description, componentInfo, theme, storyline, style });
-      await refreshGlbFromDetail();
-      setMessage('3D 모델 생성 성공!');
-    } catch {
-      setMessage('3D 모델 생성 실패');
-    } finally {
+      // 1. 생성 요청 → taskId 받기
+      const { taskId } = await generate3DModel({
+        contentId: finalContentId, name, description, componentInfo, theme, storyline, style
+      });
+
+      setMessage('3D 모델 생성 요청됨. 처리 중입니다...');
+
+      // 2. 상태 확인 시작
+      poll3DStatus(taskId);
+
+    } catch (err) {
+      console.error(err);
+      setMessage('3D 모델 생성 요청 실패');
       setIsLoading(false);
     }
+  };
+
+  const poll3DStatus = (taskId) => {
+    let retries = 120; // 최대 10분 (5초 x 120)
+    const interval = setInterval(async () => {
+      try {
+        const data = await get3DModelStatus(taskId);
+
+        if (data.status === 'DONE') {
+          setGlbUrl(data.glbUrl);
+          setMessage('3D 모델 생성 완료!');
+          setIsLoading(false);
+          clearInterval(interval);
+        } else if (data.status === 'FAILED') {
+          setMessage('3D 모델 생성 실패');
+          setIsLoading(false);
+          clearInterval(interval);
+        }
+      } catch (e) {
+        console.error(e);
+        setMessage('상태 확인 중 오류 발생');
+        clearInterval(interval);
+        setIsLoading(false);
+      }
+
+      retries--;
+      if (retries <= 0) {
+        setMessage('생성 시간이 너무 오래 걸립니다. 다시 시도해주세요.');
+        setIsLoading(false);
+        clearInterval(interval);
+      }
+    }, 5000); // 5초마다 체크
   };
 
   const handleSaveVersion = async () => {

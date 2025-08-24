@@ -98,4 +98,23 @@ public class Model3dContentServiceImpl implements Model3dContentService {
 
         return dto;
     }
+
+    @Override
+    public Generate3DTaskResponse generate3DModelTask(Model3DUserRequest userRequest) {
+        // 콘텐츠 조회
+        Content content = contentRepository.findById(userRequest.getContentId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
+
+        // 상태 변경: IN_PROGRESS
+        SubTask subTask = subTaskRepository.findByContentId(userRequest.getContentId())
+                .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
+        subTask.setStatus("IN_PROGRESS");
+        subTaskRepository.save(subTask);
+        componentStatusService.recalcAndSave(subTask.getComponent());
+
+        // FastAPI 비동기 API 호출
+        Generate3DTaskResponse response = pythonApiService.generate3DModelTask(userRequest);
+
+        return response;
+    }
 }

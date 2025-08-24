@@ -1,17 +1,20 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Dict
 import os
 import logging
 import requests
-import tempfile
+import uuid
 
 from utils.s3_utils import upload_model3d_to_s3
 from .service import MeshyClient, create_visual_prompt
 
 router = APIRouter()
 meshy_client = MeshyClient(api_key=os.getenv("MESHY_API_KEY"))
+
+# 임시 메모리 저장 (실제 운영은 DB/Redis 권장)
+tasks: Dict[str, dict] = {}
 
 # 요청 DTO
 class Model3DGenerateRequest(BaseModel):
@@ -27,94 +30,102 @@ class Model3DGenerateRequest(BaseModel):
         populate_by_name = True
         validate_by_name = True
 
-# 응답 DTO
-class Model3DGenerateResponse(BaseModel):
-    content_id: Optional[int] = Field(None, alias="contentId")
-    name: str
-    preview_url: Optional[str]
-    refined_url: Optional[str]
-    status: str
 
-    class Config:
-        populate_by_name = True
-        validate_by_name = True
-
-# API 엔드포인트
-@router.post("/api/content/generate-3d", response_model=Model3DGenerateResponse, tags=["3D Model"])
-async def api_generate_3d_model(request: Model3DGenerateRequest):
+# 작업 시작 API
+@router.post("/api/content/generate-3d", tags=["3D Model"])
+async def start_generate_3d_model(request: Model3DGenerateRequest):
     try:
+        # 1) 프롬프트 생성
         visual_prompt = await run_in_threadpool(
             create_visual_prompt,
             item_name=request.name,
-            description=f"{request.description}. Theme: {request.theme}. Storyline: {request.storyline}. Component Info: {request.component_info}",
+            description=f"{request.description}. Theme: {request.theme}. "
+                        f"Storyline: {request.storyline}. Component Info: {request.component_info}",
             theme=request.theme,
             component_info=request.component_info,
             art_style=request.style
         )
-
         if not visual_prompt:
-            return Model3DGenerateResponse(
-                content_id=request.content_id,
-                name=request.name,
-                preview_url=None,
-                refined_url=None,
-                status="prompt_failed"
-            )
+            raise HTTPException(status_code=500, detail="프롬프트 생성 실패")
 
-        result_data = await run_in_threadpool(
-            meshy_client.generate_model,
-            prompt=visual_prompt,
-            art_style=request.style
+        # 2) Meshy Preview Task 생성
+        response = requests.post(
+            meshy_client.base_url,
+            headers=meshy_client.headers,
+            json={"mode": "preview", "prompt": visual_prompt, "art_style": request.style}
         )
+        response.raise_for_status()
+        preview_id = response.json().get("result")
 
-        if not result_data or not result_data.get("refined_url"):
-            return Model3DGenerateResponse(
-                content_id=request.content_id,
-                name=request.name,
-                preview_url=None,
-                refined_url=None,
-                status="generation_failed"
-            )
+        # 3) taskId 생성 및 저장
+        task_id = str(uuid.uuid4())
+        tasks[task_id] = {
+            "status": "IN_PROGRESS",
+            "preview_id": preview_id,
+            "content_id": request.content_id,
+            "name": request.name,
+            "style": request.style
+        }
 
-        # refined 파일 다운로드 및 S3 업로드
-        temp_dir = tempfile.gettempdir()
-        local_path = os.path.join(temp_dir, f"{request.content_id}.glb")
-        try:
-            with requests.get(result_data["refined_url"], stream=True) as r:
-                r.raise_for_status()
-                with open(local_path, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=8192):
-                        f.write(chunk)
-        except Exception as e:
-            logging.error(f"모델 다운로드 실패: {e}")
-            return Model3DGenerateResponse(
-                content_id=request.content_id,
-                name=request.name,
-                preview_url=result_data["preview_url"],
-                refined_url=None,
-                status="download_failed"
-            )
-
-        try:
-            s3_url = upload_model3d_to_s3(local_path)
-        except Exception as e:
-            logging.error(f"S3 업로드 실패: {e}")
-            return Model3DGenerateResponse(
-                content_id=request.content_id,
-                name=request.name,
-                preview_url=result_data["preview_url"],
-                refined_url=None,
-                status="upload_failed"
-            )
-
-        return Model3DGenerateResponse(
-            content_id=request.content_id,
-            name=request.name,
-            preview_url=result_data["preview_url"],
-            refined_url=s3_url,
-            status="completed"
-        )
+        return {"taskId": task_id, "status": "IN_PROGRESS"}
 
     except Exception as e:
-        logging.error(f"예상치 못한 오류: {e}")
-        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+        logging.error(f"3D 모델 작업 시작 실패: {e}")
+        raise HTTPException(status_code=500, detail=f"3D 모델 작업 시작 실패: {str(e)}")
+
+
+# 상태 확인 API
+@router.get("/api/content/generate-3d/status/{task_id}")
+async def get_3d_status(task_id: str):
+    task = tasks.get(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="잘못된 taskId")
+
+    try:
+        # Meshy 작업 상태 확인
+        response = requests.get(
+            f"{meshy_client.base_url}/{task['preview_id']}",
+            headers=meshy_client.headers
+        )
+        response.raise_for_status()
+        data = response.json()
+        status = data.get("status")
+
+        if status == "SUCCEEDED":
+            glb_url = data.get("model_urls", {}).get("glb")
+
+            # 필요하다면 GLB → 다운로드 후 S3 업로드
+            try:
+                s3_url = upload_model3d_to_s3_from_url(glb_url, task["content_id"])
+            except Exception as e:
+                logging.error(f"S3 업로드 실패: {e}")
+                return {"status": "UPLOAD_FAILED"}
+
+            task["status"] = "DONE"
+            task["glbUrl"] = s3_url
+            return {"status": "DONE", "glbUrl": s3_url}
+
+        elif status == "FAILED":
+            task["status"] = "FAILED"
+            return {"status": "FAILED"}
+
+        return {"status": "IN_PROGRESS"}
+
+    except Exception as e:
+        logging.error(f"상태 확인 실패: {e}")
+        raise HTTPException(status_code=500, detail=f"상태 확인 실패: {str(e)}")
+
+
+# S3 업로드 헬퍼
+def upload_model3d_to_s3_from_url(glb_url: str, content_id: Optional[int]) -> str:
+    import tempfile
+    temp_dir = tempfile.gettempdir()
+    local_path = os.path.join(temp_dir, f"{content_id or uuid.uuid4()}.glb")
+
+    with requests.get(glb_url, stream=True) as r:
+        r.raise_for_status()
+        with open(local_path, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+
+    return upload_model3d_to_s3(local_path)

@@ -9,11 +9,14 @@ import com.boardgame.backend_spring.content.dto.rulebook.RulebookRequest;
 import com.boardgame.backend_spring.content.dto.rulebook.RulebookGenerateResponse;
 import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailGenerateRequest;
 import com.boardgame.backend_spring.content.dto.thumbnail.ThumbnailGenerateResponse;
+import com.boardgame.backend_spring.content.dto.model3d.Generate3DTaskResponse;
+import com.boardgame.backend_spring.content.dto.model3d.Model3DUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value; 
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -79,6 +82,16 @@ public class PythonApiService {
         }
     }
 
+    public Map<String, Object> get3DStatus(String taskId) {
+        String url = fastApiBaseUrl + "/api/content/generate-3d/status/" + taskId;
+
+        try {
+            return restTemplate.getForObject(url, Map.class);
+        } catch (Exception e) {
+            throw new RuntimeException("3D 모델 상태 조회 실패", e);
+        }
+    }
+
     public RulebookGenerateResponse generateRulebook(RulebookRequest request) {
         String url = fastApiBaseUrl + "/api/content/generate-rulebook";
 
@@ -125,6 +138,13 @@ public class PythonApiService {
         } catch (Exception e) {
             throw new RuntimeException("썸네일 생성 실패", e);
         }
+    }
+    public Generate3DTaskResponse generate3DModelTask(Model3DUserRequest request) {
+        return restTemplate.postForObject(
+            fastApiBaseUrl + "/api/content/generate-3d",
+            request,
+            Generate3DTaskResponse.class
+        );
     }
 
 }

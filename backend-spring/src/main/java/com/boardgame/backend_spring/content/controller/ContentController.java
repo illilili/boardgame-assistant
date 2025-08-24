@@ -21,6 +21,7 @@ import com.boardgame.backend_spring.content.service.rulebook.RulebookContentServ
 import com.boardgame.backend_spring.content.service.thumbnail.ThumbnailContentService;
 import com.boardgame.backend_spring.content.service.version.ContentVersionService;
 import com.boardgame.backend_spring.content.dto.version.ContentSaveRequest;
+import com.boardgame.backend_spring.content.dto.model3d.Generate3DTaskResponse;
 import com.boardgame.backend_spring.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -112,9 +113,18 @@ public class ContentController {
         return ResponseEntity.ok(contentService.generateImage(request));
     }
 
+    // @PostMapping("/generate-3d")
+    // public ResponseEntity<Generate3DModelResponse> generate3DModel(@RequestBody Model3DUserRequest request) {
+    //     return ResponseEntity.ok(model3dContentService.generate3DModel(request));
+    // }
     @PostMapping("/generate-3d")
-    public ResponseEntity<Generate3DModelResponse> generate3DModel(@RequestBody Model3DUserRequest request) {
-        return ResponseEntity.ok(model3dContentService.generate3DModel(request));
+    public ResponseEntity<Generate3DTaskResponse> generate3DModel(@RequestBody Model3DUserRequest request) {
+        return ResponseEntity.ok(model3dContentService.generate3DModelTask(request));
+    }
+
+    @GetMapping("/generate-3d/status/{taskId}")
+    public ResponseEntity<?> get3DModelStatus(@PathVariable String taskId) {
+        return ResponseEntity.ok(pythonApiService.get3DStatus(taskId));
     }
 
     @PostMapping("/generate-rulebook")
@@ -128,4 +138,5 @@ public class ContentController {
         ThumbnailGenerateResponse response = thumbnailContentService.generateThumbnail(request.getContentId());
         return ResponseEntity.ok(response);
     }
+
 }
