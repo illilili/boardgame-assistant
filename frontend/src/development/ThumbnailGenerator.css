@@ -1,166 +1,161 @@
 /* ======================================= */
-/* ✨ 공통 카드 및 폼 스타일 (다른 페이지와 통일) */
-/* ======================================= */
-.control-box {
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
-}
-
-.control-box h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 1rem 0;
-}
-
-.accordion {
-  padding: 0;
-  overflow: hidden;
-}
-
-.accordion summary {
-  padding: 1.5rem;
-  cursor: pointer;
-  list-style: none;
-  position: relative;
-  transition: background-color 0.2s ease;
-}
-
-.accordion summary:hover {
-  background-color: #f9fafb;
-}
-
-.accordion summary::after {
-  content: '▼';
-  position: absolute;
-  right: 1.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.8rem;
-  color: #9ca3af;
-  transition: transform 0.2s ease;
-}
-
-.accordion[open] summary::after {
-  transform: translateY(-50%) rotate(180deg);
-}
-
-.accordion .accordion-content {
-  padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  /* 수정된 부분 시작 */
-  max-height: 250px;
-  /* 원하는 높이로 설정 */
-  overflow-y: auto;
-  /* 수정된 부분 끝 */
-}
-
-.form-actions {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: flex-end;
-}
-
-/* ======================================= */
 /* ✨ 썸네일 생성기 전용 스타일 */
 /* ======================================= */
 
 .card-result-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
 }
 
 .thumbnail-image {
-  max-width: 100%;
-  max-height: 75vh;
-  height: auto;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-medium);
-  object-fit: contain;
+    max-width: 100%;
+    max-height: 75vh;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-medium);
+    object-fit: contain;
 }
 
 .result-actions {
-  flex-shrink: 0;
+    flex-shrink: 0;
 }
 
-.model-version-note,
-.model-version-select-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.tg-version-note,
+.tg-version-select-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
-.model-version-note label {
-  flex-shrink: 0;
-  font-size: 0.9rem;
-  color: #4b5563;
-  font-weight: 500;
+.tg-version-note label {
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    color: #4b5563;
+    font-weight: 500;
 }
 
-.model-version-note input {
-  flex-grow: 1;
-  padding: 0 12px;
-  height: 40px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
+.tg-version-note input {
+    flex-grow: 1;
+    padding: 0 12px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
 }
 
-.model-version-select-row .version-select {
-  flex-grow: 1;
-  /* Select 컴포넌트가 다른 요소 위에 보이도록 z-index 추가 */
-  position: relative;
-  z-index: 10;
+.tg-version-select-row .version-select {
+    flex-grow: 1;
+    position: relative;
+    z-index: 10;
 }
 
-.model-version-note .save,
-.model-version-select-row .rollback {
-  height: 40px;
-  padding: 0 1rem;
-  background-color: #f3f4f6;
-  border: 1px solid #d1d5db;
-  color: #374151;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+.tg-version-note .tg-save,
+.tg-version-select-row .tg-rollback {
+    height: 40px;
+    padding: 0 1rem;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
-.model-version-note .save:hover,
-.model-version-select-row .rollback:hover {
-  background-color: #e5e7eb;
-  border-color: #9ca3af;
+.tg-version-note .tg-save:hover,
+.tg-version-select-row .tg-rollback:hover {
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
 }
 
-.submit-complete-section {
-  display: flex;
-  gap: 12px;
-  margin-top: 1.5rem;
+.tg-submit-complete-section {
+    display: flex;
+    gap: 12px;
+    margin-top: 1.5rem;
 }
 
-.submit-complete-section button {
-  flex: 1;
+.tg-submit-complete-section button {
+    flex: 1;
 }
 
 .message-area {
-  margin-top: 1.5rem;
-  text-align: center;
-  min-height: 1.5rem;
+    margin-top: 1.5rem;
+    text-align: center;
+    min-height: 1.5rem;
 }
 
+/* ======================================= */
+/* ✨ 공통 스타일 (컨트롤 박스, 아코디언) */
+/* ======================================= */
+.control-box {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+}
+
+.control-box .tg-h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 1rem 0;
+}
+
+.tg-accordion {
+    padding: 0;
+    overflow: hidden;
+}
+
+.tg-accordion summary {
+    padding: 1.5rem;
+    cursor: pointer;
+    list-style: none;
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+.tg-accordion summary:hover {
+    background-color: #f9fafb;
+}
+
+.tg-accordion summary::after {
+    content: '▼';
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: #9ca3af;
+    transition: transform 0.2s ease;
+}
+
+.tg-accordion[open] summary::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.tg-accordion-content {
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.form-actions {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+}
 
 /* ======================================= */
 /* ✨ 공통 버튼 스타일 (Primary / Secondary) */
@@ -168,48 +163,48 @@
 
 .primary-button,
 .secondary-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
 }
 
 .primary-button:disabled,
 .secondary-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none !important;
 }
 
 .primary-button {
-  background-color: #E58A4E;
-  color: white;
-  box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
+    background-color: #E58A4E;
+    color: white;
+    box-shadow: 0 4px 15px rgba(229, 138, 78, 0.2);
 }
 
 .primary-button:hover:not(:disabled) {
-  background-color: #D4753A;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(229, 138, 78, 0.3);
+    background-color: #D4753A;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 138, 78, 0.3);
 }
 
 .secondary-button {
-  background-color: #ffffff;
-  color: #4b5563;
-  border-color: #d1d5db;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    background-color: #ffffff;
+    color: #4b5563;
+    border-color: #d1d5db;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .secondary-button:hover:not(:disabled) {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
-  color: #1f2937;
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+    color: #1f2937;
 }

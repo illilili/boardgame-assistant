@@ -154,7 +154,7 @@ function RulebookGenerator({ contentId, componentId }) {
 
     try {
       await uploadContentFile(finalContentId, submissionFile, "manual");
-      setSuccessMessage("✅ PDF 업로드 성공!");
+      setSuccessMessage("PDF 업로드 성공!");
       setSubmissionFile(null);
 
       const detail = await getContentDetail(finalContentId);
@@ -163,7 +163,7 @@ function RulebookGenerator({ contentId, componentId }) {
       }
     } catch (err) {
       console.error(err);
-      setError("❌ PDF 업로드 실패");
+      setError("PDF 업로드 실패");
     } finally {
       setIsLoading(false);
     }
@@ -176,9 +176,9 @@ function RulebookGenerator({ contentId, componentId }) {
 
     try {
       await submitComponent(componentId);
-      setSuccessMessage("🎉 룰북 제출 성공!");
+      setSuccessMessage("룰북 제출 성공!");
     } catch {
-      setError("❌ 제출 실패");
+      setError("제출 실패");
     } finally {
       setIsLoading(false);
     }

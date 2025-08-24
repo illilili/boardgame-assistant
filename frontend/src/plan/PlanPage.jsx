@@ -308,7 +308,7 @@ input[type="file"]::file-selector-button:active {
   border-bottom: 1px solid #eaeaea;
   padding-bottom: 16px;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #4A5568, #2D3748); /* 남색 그라데이션 */
+  background: linear-gradient(135deg, #E58A4E, #E58A4E); /* 남색 그라데이션 */
   color: #FFFFFF; /* 글자색을 흰색으로 변경 */
   border: none; /* 테두리 제거 */
 }

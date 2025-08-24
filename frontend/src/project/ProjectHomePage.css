@@ -22,7 +22,7 @@
 }
 
 .project-home-page__sidebar {
-  width: 280px;
+    width: 280px;
     background-color: #161b22;
     color: #c9d1d9;
     padding: 24px 0;
@@ -46,17 +46,19 @@
 
 .project-home-page__nav-item:hover {
     background-color: rgba(255, 255, 255, 0.05);
-    color: white;
+    color: var(--accent-warm);
 }
 
 .project-home-page__main-content {
     padding: 32px 48px;
     display: grid;
-    grid-template-columns: 3fr 2fr; /* ✅ 기존 1fr 1fr → 3:2 비율 */
+    grid-template-columns: 3fr 2fr;
+    /* ✅ 기존 1fr 1fr → 3:2 비율 */
     grid-template-rows: auto 1fr;
     grid-template-areas:
         "header header"
-        "members logs"; /* ✅ 최근작업 왼쪽(넓게), 멤버 오른쪽(좁게) */
+        "members logs";
+    /* ✅ 최근작업 왼쪽(넓게), 멤버 오른쪽(좁게) */
     gap: 32px;
     align-content: start;
 }
@@ -82,8 +84,10 @@
 }
 
 .project-home-page__info {
-  flex: 1;       /* 남는 공간 전부 차지 */
-  min-width: 0;  /* flex item 잘림 방지 */
+    flex: 1;
+    /* 남는 공간 전부 차지 */
+    min-width: 0;
+    /* flex item 잘림 방지 */
 }
 
 .project-home-page__description {
@@ -97,11 +101,14 @@
 }
 
 .project-home-page__thumbnail {
-    width: 340px;   /* 280 → 320 */
-    height: 240px;  /* 180 → 200 */
+    width: 340px;
+    /* 280 → 320 */
+    height: 240px;
+    /* 180 → 200 */
     border-radius: 10px;
     object-fit: cover;
 }
+
 .project-home-page__status-badge {
     padding: 6px 12px;
     font-size: 0.8rem;
@@ -109,7 +116,12 @@
     border-radius: 20px;
     text-transform: uppercase;
 }
-.status--planning { background-color: #dbf4ff; color: #0969da; }
+
+.status--planning {
+    background-color: #dbf4ff;
+    color: #0969da;
+}
+
 /* ... (다른 상태 색상들) ... */
 
 .project-home-page__progress-container {
@@ -137,8 +149,14 @@
     padding: 24px;
     box-shadow: var(--shadow-subtle);
 }
-.project-home-page__info-card:nth-of-type(1) { grid-area: members; }
-.project-home-page__info-card:nth-of-type(2) { grid-area: logs; }
+
+.project-home-page__info-card:nth-of-type(1) {
+    grid-area: members;
+}
+
+.project-home-page__info-card:nth-of-type(2) {
+    grid-area: logs;
+}
 
 .project-home-page__info-card h2 {
     font-size: 1.25rem;
@@ -148,25 +166,43 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-.project-home-page__member-list, .project-home-page__log-list {
+.project-home-page__member-list,
+.project-home-page__log-list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
 
-.project-home-page__member-item, .project-home-page__log-item {
+.project-home-page__member-item,
+.project-home-page__log-item {
     display: flex;
     justify-content: space-between;
     padding: 12px 0;
     border-bottom: 1px solid #f0f4f8;
 }
 
-.project-home-page__member-role { font-weight: 600; color: var(--accent-warm); }
-.project-home-page__member-name { color: var(--text-dark); }
-.project-home-page__log-action { font-weight: 500; }
-.project-home-page__log-user { color: var(--text-light); }
-.project-home-page__log-date { font-size: 0.85rem; color: var(--text-light); }
+.project-home-page__member-role {
+    font-weight: 600;
+    color: var(--accent-warm);
+}
+
+.project-home-page__member-name {
+    color: var(--text-dark);
+}
+
+.project-home-page__log-action {
+    font-weight: 500;
+}
+
+.project-home-page__log-user {
+    color: var(--text-light);
+}
+
+.project-home-page__log-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
 
 .project-home-page__edit-btn {
     margin-top: 24px;
@@ -186,7 +222,10 @@
 
 .project-home-page__modal-overlay {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: rgba(10, 10, 25, 0.5);
     backdrop-filter: blur(4px);
     display: flex;
@@ -235,48 +274,100 @@
     border: none;
     cursor: pointer;
 }
-.project-home-page__modal-actions button:nth-child(1) { background-color: var(--accent-warm); color: white; }
-.project-home-page__modal-actions button:nth-child(2) { background-color: #f6f8fa; border: 1px solid var(--border-color); }
+
+.project-home-page__modal-actions button:nth-child(1) {
+    background-color: var(--accent-warm);
+    color: white;
+}
+
+.project-home-page__modal-actions button:nth-child(2) {
+    background-color: #f6f8fa;
+    border: 1px solid var(--border-color);
+}
 
 .project-home-page__log-list {
-  /* grid를 사용하여 각 항목을 깔끔하게 정렬합니다. */
-  display: grid;
-  /* 3개의 열을 정의합니다. 첫 번째는 내용에 맞게, 두 번째는 유연하게, 세 번째는 너비를 고정합니다. */
-  grid-template-columns: auto 1fr auto;
-  gap: 16px; /* 열 사이의 간격 설정 */
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    /* grid를 사용하여 각 항목을 깔끔하게 정렬합니다. */
+    display: grid;
+    /* 3개의 열을 정의합니다. 첫 번째는 내용에 맞게, 두 번째는 유연하게, 세 번째는 너비를 고정합니다. */
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    /* 열 사이의 간격 설정 */
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .project-home-page__log-item {
-  /* 각 그리드 아이템의 수직 중앙 정렬 */
-  display: contents; /* 부모의 grid를 따라가도록 설정 */
-  border-bottom: 1px solid #f0f4f8;
-  padding: 12px 0;
+    /* 각 그리드 아이템의 수직 중앙 정렬 */
+    display: contents;
+    /* 부모의 grid를 따라가도록 설정 */
+    border-bottom: 1px solid #f0f4f8;
+    padding: 12px 0;
 }
 
-.project-home-page__log-item > span {
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f4f8;
+.project-home-page__log-item>span {
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f4f8;
 }
 
 .project-home-page__log-action {
-  font-weight: 500;
-  color: var(--text-dark); /* 색상 통일 */
-  text-align: left;
+    font-weight: 500;
+    color: var(--text-dark);
+    /* 색상 통일 */
+    text-align: left;
 }
 
 .project-home-page__log-user {
-  color: var(--text-light);
-  text-align: right;
-  /* 부모의 flex-grow: 1과 유사한 역할을 합니다. */
-  justify-self: end;
+    color: var(--text-light);
+    text-align: right;
+    /* 부모의 flex-grow: 1과 유사한 역할을 합니다. */
+    justify-self: end;
 }
 
 .project-home-page__log-date {
-  font-size: 0.85rem;
-  color: var(--text-light);
-  text-align: right;
-  white-space: nowrap; /* 줄바꿈 방지 */
+    font-size: 0.85rem;
+    color: var(--text-light);
+    text-align: right;
+    white-space: nowrap;
+    /* 줄바꿈 방지 */
+}
+
+.project-home-page__container {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    background-color: var(--bg-main);
+    min-height: calc(100vh - 70px);
+    font-family: var(--font-main);
+}
+
+.project-home-page__sidebar {
+    width: 280px;
+    background-color: #161b22;
+    color: #c9d1d9;
+    padding: 24px 0;
+    box-sizing: border-box;
+    /* ✨ 수정된 부분 시작: Flexbox 적용 */
+    display: flex;
+    flex-direction: column;
+    /* ✨ 수정된 부분 끝 */
+}
+
+.project-home-page__bottom-nav-list {
+    /* ✨ 추가된 부분 시작 */
+    margin-top: auto;
+    /* 상위 Flexbox 컨테이너의 남은 공간을 모두 차지 */
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    /* ✨ 추가된 부분 끝 */
+}
+
+.icon-sidebar {
+    color: #c9d1d9;
+    /* 기본 색상 */
+    transition: color var(--transition-fast);
+}
+
+.project-home-page__nav-item:hover .icon-sidebar {
+    color: var(--accent-warm);
+    /* 호버 시 강조 색상 적용 */
 }
