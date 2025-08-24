@@ -45,6 +45,7 @@ services:
       JWT_SECRET: Y3VzdG9tLXNlY3JldC1rZXktZm9yLXNwcmluZy1ib29rLTIwMjU=
     volumes:
       - ./backend-spring/.env:/app/.env
+      - ./backend-python/pricing/data:/app/data
 
 volumes:
   mariadb_data:
