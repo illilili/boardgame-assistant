@@ -38,11 +38,11 @@ import thumnailImage4 from '../assets/thumnail5.png';
 // 2. 데이터를 카테고리별로 그룹화합니다. (각 5개씩 예시)
 const galleryData = {
     'AI 생성 카드': [
-        { title: '중세 불꽃놀이 카드', image: cardImage },
+        { title: '거인의 축복 카드', image: cardImage },
         { title: '고슴도치의 경고', image: cardImage1 },
-        { title: '신비한 야채의 씨앗', image: cardImage2 },
+        { title: '영역 확장 카드', image: cardImage2 },
         { title: '거인공격 방어카드', image: cardImage3 },
-        { title: '태양의 축복', image: cardImage4 },
+        { title: '실험 방해 카드', image: cardImage4 },
     ],
     '3D 피규어': [
         { title: '강철 병사', image: threedImage },
