@@ -131,8 +131,8 @@ class MeshyClient:
 
         # 3단계: 최종 결과 반환
         return {
-            "preview_id": preview_id,
+            # "preview_id": preview_id,
             "refine_id": refine_id,
-            "preview_url": preview_result.get("model_urls", {}).get("glb"),
+            # "preview_url": preview_result.get("model_urls", {}).get("glb"),
             "refined_url": refine_result.get("model_urls", {}).get("glb")
         }
