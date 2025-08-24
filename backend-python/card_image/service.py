@@ -8,12 +8,11 @@ from utils.s3_utils import upload_image_bytes_to_s3
 # 영어 프롬프트 생성 함수 (DALL·E용)
 def generate_card_image_prompt(title: str, effect: str, game_concept: str) -> str:
     return (
-        f"A single object fantasy illustration of a magical item called '{title}', "
-        f"inspired by the concept: {effect}. "
+        f"A single fantasy illustration of '{title}', inspired by: {effect}. "
         f"Theme: {game_concept}.\n\n"
-        f"Do not include any text, numbers, card frame, UI, borders, labels, or symbols.\n"
-        f"Do not show characters, monsters, or scenes.\n"
-        f"Only draw the object itself, centered, isolated, on a soft abstract background.\n"
+        f"Strictly no text, numbers, card frames, UI, borders, labels, or symbols.\n"
+        f"Focus on the main subject (object, character, or creature) as the centerpiece, "
+        f"with a simple soft abstract background. "
         f"Style: watercolor, painterly, richly colored, softly lit."
     )
 
