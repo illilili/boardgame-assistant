@@ -13,16 +13,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value; 
 
 @Service
 @RequiredArgsConstructor
 public class PythonApiService {
     private final RestTemplate restTemplate = new RestTemplate();
+
     @Value("${fastapi.service.url:http://localhost:8000}")
     private String fastApiBaseUrl;
 
     public CardTextResponse generateText(CardTextRequest request) {
-        String url = PYTHON_API_BASE_URL + "/api/content/generate-text";
+        String url = fastApiBaseUrl + "/api/content/generate-text";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -36,7 +38,7 @@ public class PythonApiService {
         return response.getBody();
     }
     public CardImageResponse generateImage(CardTextRequest request) {
-        String url = PYTHON_API_BASE_URL + "/api/content/generate-image";
+        String url = fastApiBaseUrl + "/api/content/generate-image";
 
 
         try {
@@ -57,7 +59,7 @@ public class PythonApiService {
         }
     }
     public Generate3DModelResponse generate3DModel(Generate3DModelRequest request) {
-        String url = PYTHON_API_BASE_URL + "/api/content/generate-3d";
+        String url = fastApiBaseUrl + "/api/content/generate-3d";
 
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -78,7 +80,7 @@ public class PythonApiService {
     }
 
     public RulebookGenerateResponse generateRulebook(RulebookRequest request) {
-        String url = PYTHON_API_BASE_URL + "/api/content/generate-rulebook";
+        String url = fastApiBaseUrl + "/api/content/generate-rulebook";
 
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -105,7 +107,7 @@ public class PythonApiService {
     }
 
     public ThumbnailGenerateResponse generateThumbnail(ThumbnailGenerateRequest request) {
-        String url = PYTHON_API_BASE_URL + "/api/content/generate-thumbnail";
+        String url = fastApiBaseUrl + "/api/content/generate-thumbnail";
 
         try {
             HttpHeaders headers = new HttpHeaders();
