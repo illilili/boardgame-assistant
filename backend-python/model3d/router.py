@@ -48,20 +48,29 @@ async def start_generate_3d_model(request: Model3DGenerateRequest):
         if not visual_prompt:
             raise HTTPException(status_code=500, detail="프롬프트 생성 실패")
 
-        # 2) Meshy Preview Task 생성
-        response = requests.post(
+        # 2) Preview Task 생성
+        preview_resp = requests.post(
             meshy_client.base_url,
             headers=meshy_client.headers,
             json={"mode": "preview", "prompt": visual_prompt, "art_style": request.style}
         )
-        response.raise_for_status()
-        preview_id = response.json().get("result")
+        preview_resp.raise_for_status()
+        preview_id = preview_resp.json().get("result")
 
-        # 3) taskId 생성 및 저장
+        # 3) Refine Task 생성
+        refine_resp = requests.post(
+            meshy_client.base_url,
+            headers=meshy_client.headers,
+            json={"mode": "refine", "preview_task_id": preview_id}
+        )
+        refine_resp.raise_for_status()
+        refine_id = refine_resp.json().get("result")
+
+        # 4) taskId 생성 및 저장
         task_id = str(uuid.uuid4())
         tasks[task_id] = {
             "status": "IN_PROGRESS",
-            "preview_id": preview_id,
+            "refine_id": refine_id,      # 🚩 refine id 저장
             "content_id": request.content_id,
             "name": request.name,
             "style": request.style
@@ -82,9 +91,10 @@ async def get_3d_status(task_id: str):
         raise HTTPException(status_code=404, detail="잘못된 taskId")
 
     try:
-        # Meshy 작업 상태 확인
+        # 🚩 refine_id 기준으로 폴링
+        refine_id = task["refine_id"]
         response = requests.get(
-            f"{meshy_client.base_url}/{task['preview_id']}",
+            f"{meshy_client.base_url}/{refine_id}",
             headers=meshy_client.headers
         )
         response.raise_for_status()
@@ -94,7 +104,6 @@ async def get_3d_status(task_id: str):
         if status == "SUCCEEDED":
             glb_url = data.get("model_urls", {}).get("glb")
 
-            # 필요하다면 GLB → 다운로드 후 S3 업로드
             try:
                 s3_url = upload_model3d_to_s3_from_url(glb_url, task["content_id"])
             except Exception as e:
