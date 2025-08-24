@@ -44,7 +44,7 @@ const Login = () => {
         <div className="login-card">
           <h2 className="login-title">로그인</h2>
           <form onSubmit={handleSubmit}>
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="login-error-message">{error}</div>}
 
             <input
               type="email"

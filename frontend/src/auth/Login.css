@@ -11,7 +11,8 @@
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -24,10 +25,10 @@ body {
 }
 
 .main-content {
-  flex: 1; 
+  flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center; 
+  align-items: center;
   background-color: var(--bg-light);
   padding: 20px;
 }
@@ -52,7 +53,7 @@ body {
   opacity: 0.15;
   filter: blur(50px);
   /* --- 🎨 추가: 애니메이션 적용 --- */
-  animation: moveAndFloat 25s linear infinite; 
+  animation: moveAndFloat 25s linear infinite;
 }
 
 .login-page::before {
@@ -88,13 +89,17 @@ body {
 
 /* --- 🎨 추가된 애니메이션 부분 --- */
 @keyframes moveAndFloat {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) translateX(0) rotate(0deg);
   }
+
   50% {
     transform: translateY(30px) translateX(20px) rotate(20deg);
   }
 }
+
 /* --- 🎨 여기까지 추가된 부분 --- */
 
 
@@ -106,7 +111,7 @@ body {
   margin-bottom: 20px;
 }
 
-.error-message {
+.login-error-message {
   background-color: #fef2f2;
   color: #991b1b;
   font-size: 0.9rem;
@@ -114,6 +119,10 @@ body {
   border-radius: 8px;
   margin-bottom: 16px;
   border: 1px solid #fca5a5;
+
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
 }
 
 .login-input {
@@ -178,6 +187,13 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
