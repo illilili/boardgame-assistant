@@ -1,4 +1,3 @@
-# router_model3d.py
 from fastapi import APIRouter, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
@@ -14,7 +13,7 @@ from .service import MeshyClient, create_visual_prompt
 router = APIRouter()
 meshy_client = MeshyClient(api_key=os.getenv("MESHY_API_KEY"))
 
-# 🚩 메모리에 task 관리 (운영에서는 Redis/DB 권장)
+# 임시 메모리 저장 (운영 시에는 Redis/DB 권장)
 tasks: Dict[str, dict] = {}
 
 # 요청 DTO
@@ -32,11 +31,11 @@ class Model3DGenerateRequest(BaseModel):
         validate_by_name = True
 
 
-# === 1) 작업 시작 API (Preview + Refine taskId 반환) ===
+# === 1) 작업 시작 API ===
 @router.post("/api/content/generate-3d", tags=["3D Model"])
 async def start_generate_3d_model(request: Model3DGenerateRequest):
     try:
-        # 1) 프롬프트 생성 (OpenAI)
+        # 1) 프롬프트 생성
         visual_prompt = await run_in_threadpool(
             create_visual_prompt,
             item_name=request.name,
@@ -50,24 +49,36 @@ async def start_generate_3d_model(request: Model3DGenerateRequest):
             raise HTTPException(status_code=500, detail="프롬프트 생성 실패")
 
         # 2) Preview Task 생성
+        preview_payload = {
+            "mode": "preview",
+            "prompt": visual_prompt,
+            "art_style": request.style or "realistic",
+            "enable_pbr": True,
+            "negative_prompt": ""
+        }
         preview_resp = requests.post(
             meshy_client.base_url,
             headers=meshy_client.headers,
-            json={"mode": "preview", "prompt": visual_prompt, "art_style": request.style}
+            json=preview_payload
         )
         preview_resp.raise_for_status()
         preview_id = preview_resp.json().get("result")
+        if not preview_id:
+            raise HTTPException(status_code=500, detail="Preview Task 생성 실패")
 
         # 3) Refine Task 생성
+        refine_payload = {"mode": "refine", "preview_task_id": preview_id, "enable_pbr": True}
         refine_resp = requests.post(
             meshy_client.base_url,
             headers=meshy_client.headers,
-            json={"mode": "refine", "preview_task_id": preview_id}
+            json=refine_payload
         )
         refine_resp.raise_for_status()
         refine_id = refine_resp.json().get("result")
+        if not refine_id:
+            raise HTTPException(status_code=500, detail="Refine Task 생성 실패")
 
-        # 4) taskId 생성 후 저장 (status=IN_PROGRESS)
+        # 4) 내부 taskId 저장
         task_id = str(uuid.uuid4())
         tasks[task_id] = {
             "status": "IN_PROGRESS",
@@ -77,7 +88,6 @@ async def start_generate_3d_model(request: Model3DGenerateRequest):
             "style": request.style
         }
 
-        # 5) 응답 즉시 반환 (Blocking 없음!)
         return {"taskId": task_id, "status": "IN_PROGRESS"}
 
     except Exception as e:
@@ -85,7 +95,7 @@ async def start_generate_3d_model(request: Model3DGenerateRequest):
         raise HTTPException(status_code=500, detail=f"3D 모델 작업 시작 실패: {str(e)}")
 
 
-# === 2) 상태 확인 API (프론트에서 폴링) ===
+# === 2) 상태 확인 API ===
 @router.get("/api/content/generate-3d/status/{task_id}")
 async def get_3d_status(task_id: str):
     task = tasks.get(task_id)
@@ -93,18 +103,17 @@ async def get_3d_status(task_id: str):
         raise HTTPException(status_code=404, detail="잘못된 taskId")
 
     try:
-        # Refine ID 가져오기
         refine_id = task["refine_id"]
-        response = requests.get(
-            f"{meshy_client.base_url}/{refine_id}",
-            headers=meshy_client.headers
-        )
-        response.raise_for_status()
-        data = response.json()
+        resp = requests.get(f"{meshy_client.base_url}/{refine_id}", headers=meshy_client.headers)
+        resp.raise_for_status()
+        data = resp.json()
         status = data.get("status")
 
         if status == "SUCCEEDED":
             glb_url = data.get("model_urls", {}).get("glb")
+            if not glb_url:
+                task["status"] = "FAILED"
+                return {"status": "FAILED"}
 
             # GLB → S3 업로드
             try:
@@ -113,15 +122,9 @@ async def get_3d_status(task_id: str):
                 logging.error(f"S3 업로드 실패: {e}")
                 return {"status": "UPLOAD_FAILED"}
 
-            # 상태 업데이트
             task["status"] = "DONE"
             task["glbUrl"] = s3_url
-
-            return {
-                "status": "DONE",
-                "glbUrl": s3_url,
-                "contentId": task["content_id"]
-            }
+            return {"status": "DONE", "glbUrl": s3_url, "contentId": task["content_id"]}
 
         elif status == "FAILED":
             task["status"] = "FAILED"

@@ -2,21 +2,17 @@
 """
 게임 구성요소 텍스트를 입력받아 3D 모델을 생성하는 전체 로직을 담당하는 모듈.
 - OpenAI: 입력 텍스트를 3D 모델링에 적합한 시각적 프롬프트로 변환합니다.
-- MeshyClient: Meshy AI API와 통신하여 3D 모델의 초안 생성 및 정교화를 수행합니다.
+- MeshyClient: Meshy AI API와의 기본 통신 정보를 보관합니다.
 """
 
-# service.py
-
 import os
-import requests
-import time
 import logging
 from dotenv import load_dotenv
-from typing import Optional, Dict, Any
+from typing import Optional
 from openai import OpenAI
 
-# --- 1. 로깅 및 전역 클라이언트 설정 ---
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# --- 1. 로깅 및 전역 설정 ---
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 load_dotenv()
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -29,7 +25,10 @@ def create_visual_prompt(
     component_info: Optional[str],
     art_style: str
 ) -> Optional[str]:
-    """OpenAI를 사용해 3D 모델링을 위한 시각적 묘사 프롬프트를 생성합니다."""
+    """
+    OpenAI를 사용해 3D 모델링을 위한 시각적 묘사 프롬프트를 생성합니다.
+    - 아이템 이름, 설명, 테마, 컴포넌트 정보를 받아 500자 이하의 영어 설명으로 변환.
+    """
     logging.info(f"[OpenAI] '{item_name}' 의 시각적 프롬프트 생성을 시작합니다.")
     try:
         system_prompt = (
@@ -42,7 +41,6 @@ def create_visual_prompt(
             "Focus on a clear silhouette suitable for a tabletop game. The entire description must be under 500 characters."
         )
 
-        # 핵심 정보만 포함
         full_description = f"{description}. Theme: {theme or 'None'}. Component Info: {component_info or 'N/A'}"
 
         user_prompt = (
@@ -64,75 +62,19 @@ def create_visual_prompt(
     except Exception as e:
         logging.error(f"[OpenAI] 프롬프트 생성 실패: {e}")
         return None
-    
-# --- 3. Meshy AI 클라이언트 클래스  ---
+
+
+# --- 3. Meshy AI 클라이언트 클래스 ---
 class MeshyClient:
-    """Meshy AI API와의 통신을 담당하는 최적화된 클라이언트 클래스."""
+    """
+    Meshy AI API와의 통신 정보를 보관하는 클라이언트 클래스.
+    - 실제 요청/응답 로직은 router_model3d.py에서 담당.
+    """
     def __init__(self, api_key: Optional[str]):
         if not api_key:
             raise ValueError("Meshy API 키가 .env 파일에 설정되지 않았습니다.")
         self.base_url = "https://api.meshy.ai/openapi/v2/text-to-3d"
-        self.headers = {"Authorization": f"Bearer {api_key}"}
-
-    def _poll_task_status(self, task_id: str, task_name: str) -> Optional[Dict[str, Any]]:
-        """Helper 메서드: 작업 상태를 확인하고, 완료되면 결과 데이터를 반환합니다."""
-        logging.info(f"[{task_name}] 작업({task_id})의 완료를 기다립니다...")
-        while True:
-            try:
-                response = requests.get(f"{self.base_url}/{task_id}", headers=self.headers)
-                response.raise_for_status()
-                data = response.json()
-                status = data.get("status")
-                
-                if status == "SUCCEEDED":
-                    logging.info(f"✅ [{task_name}] 작업({task_id}) 성공!")
-                    return data
-                elif status == "FAILED":
-                    error_msg = data.get("task_error", {}).get("message", "알 수 없는 오류")
-                    logging.error(f"❌ [{task_name}] 작업({task_id}) 실패. 원인: {error_msg}")
-                    return None
-                
-                time.sleep(10)
-            except requests.exceptions.RequestException as e:
-                logging.error(f"❌ [{task_name}] 상태 확인 중 오류 발생: {e}")
-                return None
-
-
-    # generate_model 함수를 다시 추가합니다.
-    def generate_model(self, prompt: str, art_style: str = "realistic") -> Optional[Dict[str, Any]]:
-        """[통합 기능] Preview와 Refine을 모두 실행하고 최종 결과 딕셔너리를 반환합니다."""
-        # 1단계: Preview Task 생성
-        logging.info(f"[Meshy] Preview Task 생성을 시작합니다.")
-        preview_payload = {"mode": "preview", "prompt": prompt, "art_style": art_style}
-        try:
-            response = requests.post(self.base_url, headers=self.headers, json=preview_payload)
-            response.raise_for_status()
-            preview_id = response.json().get("result")
-        except requests.exceptions.RequestException as e:
-            logging.error(f"[Meshy] Preview Task 생성 요청 실패: {e}")
-            return None
-        
-        preview_result = self._poll_task_status(preview_id, "Preview")
-        if not preview_result: return None
-
-        # 2단계: Refine Task 생성
-        logging.info(f"[Meshy] Refine Task 생성을 시작합니다.")
-        refine_payload = {"mode": "refine", "preview_task_id": preview_id}
-        try:
-            response = requests.post(self.base_url, headers=self.headers, json=refine_payload)
-            response.raise_for_status()
-            refine_id = response.json().get("result")
-        except requests.exceptions.RequestException as e:
-            logging.error(f"[Meshy] Refine Task 생성 요청 실패: {e}")
-            return None
-
-        refine_result = self._poll_task_status(refine_id, "Refine")
-        if not refine_result: return None
-
-        # 3단계: 최종 결과 반환
-        return {
-            # "preview_id": preview_id,
-            "refine_id": refine_id,
-            # "preview_url": preview_result.get("model_urls", {}).get("glb"),
-            "refined_url": refine_result.get("model_urls", {}).get("glb")
+        self.headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
         }
