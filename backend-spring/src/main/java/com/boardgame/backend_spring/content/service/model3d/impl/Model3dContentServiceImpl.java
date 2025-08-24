@@ -8,6 +8,7 @@ import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelRequest;
 import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelResponse;
 import com.boardgame.backend_spring.content.dto.model3d.Model3DPreviewDto;
 import com.boardgame.backend_spring.content.dto.model3d.Model3DUserRequest;
+import com.boardgame.backend_spring.content.dto.model3d.Generate3DTaskResponse;
 import com.boardgame.backend_spring.content.entity.Content;
 import com.boardgame.backend_spring.content.repository.ContentRepository;
 import com.boardgame.backend_spring.content.service.PythonApiService;
