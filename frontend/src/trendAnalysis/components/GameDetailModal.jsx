@@ -51,7 +51,7 @@ const GameDetailModal = ({ gameId, isOpen, onClose, cachedGameDetail = null }) =
       console.log('게임 설명 번역 시작:', gameId);
       
       // Spring 백엔드를 통해 설명 번역 API 호출
-      const response = await fetch('https://615ckg0wf0.execute-api.ap-northeast-2.amazonaws.com/api/trends/live/translate-description', {
+      const response = await fetch('https://cnbvrfg4kb.execute-api.ap-northeast-2.amazonaws.com/api/trends/live/translate-description', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

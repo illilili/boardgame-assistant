@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // API 클라이언트 기본 설정
 const apiClient = axios.create({
-  baseURL: 'https://615ckg0wf0.execute-api.ap-northeast-2.amazonaws.com/api', // Spring Boot 서버 주소
+  baseURL: 'https://cnbvrfg4kb.execute-api.ap-northeast-2.amazonaws.com/api', // Spring Boot 서버 주소
   headers: {
     'Content-Type': 'application/json',
   },

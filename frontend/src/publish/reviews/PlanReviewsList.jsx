@@ -1,8 +1,20 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { getPendingPlans } from '../../api/apiClient';
 import { FiFileText, FiInbox } from 'react-icons/fi'; // 아이콘 추가
 import './PlanReviewsList.css';
+
+function maskName(name) {
+  if (!name) return '알 수 없음';
+  if (name.length === 2) {
+    return name[0] + '*';
+  }
+  if (name.length > 2) {
+    return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1];
+  }
+  return name;
+}
+
 
 /**
  * PlanReviewsList
@@ -68,7 +80,7 @@ function PlanReviewsList({ onSelect, onBack }) {
                 </p>
                 <div className="plan-reviews-item__meta">
                   <span>ID: <b>{plan.planId}</b></span>
-                  <span>제출자: <b>{plan.submittedBy || '알 수 없음'}</b></span>
+                  <span>제출자: <b>{maskName(plan.submittedBy)}</b></span>
                 </div>
               </div>
             </li>

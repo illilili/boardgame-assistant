@@ -1,6 +1,6 @@
 // 파일 위치: src/api/auth.js
 
-const API_BASE_URL = 'https://615ckg0wf0.execute-api.ap-northeast-2.amazonaws.com';
+const API_BASE_URL = 'https://cnbvrfg4kb.execute-api.ap-northeast-2.amazonaws.com';
 
 // const request = async (endpoint, options = {}) => {
 //     const url = `${API_BASE_URL}${endpoint}`;
