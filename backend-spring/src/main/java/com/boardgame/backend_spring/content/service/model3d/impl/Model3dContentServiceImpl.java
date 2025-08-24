@@ -113,9 +113,27 @@ public class Model3dContentServiceImpl implements Model3dContentService {
         subTaskRepository.save(subTask);
         componentStatusService.recalcAndSave(subTask.getComponent());
 
-        // FastAPI 비동기 API 호출
-        Generate3DTaskResponse response = pythonApiService.generate3DModelTask(userRequest);
+        // ✅ 컨셉 정보 가져오기
+        Component component = content.getComponent();
+        BoardgameConcept concept = component.getBoardgameConcept();
+        Plan plan = planRepository.findByBoardgameConcept(concept)
+                .orElseThrow(() -> new IllegalArgumentException("해당 컨셉에 연결된 기획안이 없습니다."));
 
-        return response;
+        // ✅ FastAPI 요청 DTO로 변환 (theme, storyline 채워서)
+        Generate3DModelRequest request = new Generate3DModelRequest();
+        request.setContentId(userRequest.getContentId());
+        request.setName(userRequest.getName());
+        request.setDescription(userRequest.getDescription());
+        request.setComponentInfo(
+                (userRequest.getComponentInfo() == null || userRequest.getComponentInfo().isBlank())
+                        ? component.getArtConcept()
+                        : userRequest.getComponentInfo()
+        );
+        request.setStyle(userRequest.getStyle());
+        request.setTheme(concept.getTheme());
+        request.setStoryline(concept.getStoryline());
+
+        // ✅ FastAPI 비동기 API 호출
+        return pythonApiService.generate3DModelTask(request);
     }
 }

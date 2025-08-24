@@ -139,11 +139,13 @@ public class PythonApiService {
             throw new RuntimeException("썸네일 생성 실패", e);
         }
     }
-    public Generate3DTaskResponse generate3DModelTask(Model3DUserRequest request) {
+
+
+    public Generate3DTaskResponse generate3DModelTask(Generate3DModelRequest request) {
         return restTemplate.postForObject(
-            fastApiBaseUrl + "/api/content/generate-3d",
-            request,
-            Generate3DTaskResponse.class
+                fastApiBaseUrl + "/api/content/generate-3d",
+                request,   // ✅ 이제 theme, storyline 포함된 DTO
+                Generate3DTaskResponse.class
         );
     }
 
