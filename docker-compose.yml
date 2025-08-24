@@ -26,7 +26,7 @@ services:
     volumes:
       - ./backend-python/faiss_boardgame_index:/app/faiss_boardgame_index
       - ./backend-python/pricing/data:/app/data
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
 
   spring:
     build: ./backend-spring
@@ -43,6 +43,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: boardgame_pass
       FASTAPI_SERVICE_URL: http://fastapi:8000
       JWT_SECRET: Y3VzdG9tLXNlY3JldC1rZXktZm9yLXNwcmluZy1ib29rLTIwMjU=
+    volumes:
+      - ./backend-spring/.env:/app/.env
 
 volumes:
   mariadb_data:
