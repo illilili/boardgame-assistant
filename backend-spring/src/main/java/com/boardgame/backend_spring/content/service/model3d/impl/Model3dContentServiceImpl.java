@@ -5,7 +5,6 @@ import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.ComponentRepository;
 import com.boardgame.backend_spring.component.repository.SubTaskRepository;
 import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelRequest;
-import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelResponse;
 import com.boardgame.backend_spring.content.dto.model3d.Model3DPreviewDto;
 import com.boardgame.backend_spring.content.dto.model3d.Model3DUserRequest;
 import com.boardgame.backend_spring.content.dto.model3d.Generate3DTaskResponse;
@@ -20,9 +19,6 @@ import com.boardgame.backend_spring.concept.entity.BoardgameConcept;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/**
- * 3D 모델 생성 요청을 처리하는 서비스 구현체
- */
 @Service
 @RequiredArgsConstructor
 public class Model3dContentServiceImpl implements Model3dContentService {
@@ -35,50 +31,40 @@ public class Model3dContentServiceImpl implements Model3dContentService {
     private final ComponentStatusService componentStatusService;
 
     @Override
-    public Generate3DModelResponse generate3DModel(Model3DUserRequest userRequest) {
+    public Generate3DTaskResponse generate3DModelTask(Model3DUserRequest userRequest) {
         // 콘텐츠 조회
         Content content = contentRepository.findById(userRequest.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
-        // 상태 변경: IN_PROGRESS
+
+        // SubTask 상태 변경
         SubTask subTask = subTaskRepository.findByContentId(userRequest.getContentId())
                 .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
         subTask.setStatus("IN_PROGRESS");
         subTaskRepository.save(subTask);
         componentStatusService.recalcAndSave(subTask.getComponent());
 
-        // 구성요소 및 기획안 정보 추출
+        // 컨셉 정보 가져오기
         Component component = content.getComponent();
         BoardgameConcept concept = component.getBoardgameConcept();
         Plan plan = planRepository.findByBoardgameConcept(concept)
                 .orElseThrow(() -> new IllegalArgumentException("해당 컨셉에 연결된 기획안이 없습니다."));
 
-        // FastAPI 요청용 DTO 생성 및 보완
+        // FastAPI 요청 DTO 생성
         Generate3DModelRequest request = new Generate3DModelRequest();
         request.setContentId(userRequest.getContentId());
         request.setName(userRequest.getName());
         request.setDescription(userRequest.getDescription());
-        request.setComponentInfo(userRequest.getComponentInfo());
+        request.setComponentInfo(
+                (userRequest.getComponentInfo() == null || userRequest.getComponentInfo().isBlank())
+                        ? component.getArtConcept()
+                        : userRequest.getComponentInfo()
+        );
         request.setStyle(userRequest.getStyle());
-
         request.setTheme(concept.getTheme());
         request.setStoryline(concept.getStoryline());
 
-        if (request.getComponentInfo() == null || request.getComponentInfo().isBlank()) {
-            request.setComponentInfo(component.getArtConcept());
-        }
-
-        // FastAPI 호출
-        Generate3DModelResponse response = pythonApiService.generate3DModel(request);
-
-        // 콘텐츠에 previewUrl 저장
-        if (response.getRefinedUrl() != null && !response.getRefinedUrl().isBlank()) {
-            content.setContentData(response.getRefinedUrl());
-        } else {
-            content.setContentData(response.getPreviewUrl());
-        }
-        contentRepository.save(content);
-
-        return response;
+        // FastAPI 호출 (taskId만 반환)
+        return pythonApiService.generate3DModelTask(request);
     }
 
     @Override
@@ -98,42 +84,5 @@ public class Model3dContentServiceImpl implements Model3dContentService {
         dto.setStoryline(concept.getStoryline());
 
         return dto;
-    }
-
-    @Override
-    public Generate3DTaskResponse generate3DModelTask(Model3DUserRequest userRequest) {
-        // 콘텐츠 조회
-        Content content = contentRepository.findById(userRequest.getContentId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 콘텐츠입니다."));
-
-        // 상태 변경: IN_PROGRESS
-        SubTask subTask = subTaskRepository.findByContentId(userRequest.getContentId())
-                .orElseThrow(() -> new IllegalArgumentException("SubTask가 존재하지 않습니다."));
-        subTask.setStatus("IN_PROGRESS");
-        subTaskRepository.save(subTask);
-        componentStatusService.recalcAndSave(subTask.getComponent());
-
-        // ✅ 컨셉 정보 가져오기
-        Component component = content.getComponent();
-        BoardgameConcept concept = component.getBoardgameConcept();
-        Plan plan = planRepository.findByBoardgameConcept(concept)
-                .orElseThrow(() -> new IllegalArgumentException("해당 컨셉에 연결된 기획안이 없습니다."));
-
-        // ✅ FastAPI 요청 DTO로 변환 (theme, storyline 채워서)
-        Generate3DModelRequest request = new Generate3DModelRequest();
-        request.setContentId(userRequest.getContentId());
-        request.setName(userRequest.getName());
-        request.setDescription(userRequest.getDescription());
-        request.setComponentInfo(
-                (userRequest.getComponentInfo() == null || userRequest.getComponentInfo().isBlank())
-                        ? component.getArtConcept()
-                        : userRequest.getComponentInfo()
-        );
-        request.setStyle(userRequest.getStyle());
-        request.setTheme(concept.getTheme());
-        request.setStoryline(concept.getStoryline());
-
-        // ✅ FastAPI 비동기 API 호출
-        return pythonApiService.generate3DModelTask(request);
     }
 }

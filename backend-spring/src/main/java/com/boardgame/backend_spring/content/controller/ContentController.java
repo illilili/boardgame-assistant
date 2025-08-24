@@ -2,12 +2,11 @@ package com.boardgame.backend_spring.content.controller;
 
 import com.boardgame.backend_spring.component.entity.SubTask;
 import com.boardgame.backend_spring.component.repository.SubTaskRepository;
-import com.boardgame.backend_spring.component.service.ComponentStatusService; // ★ 추가
+import com.boardgame.backend_spring.component.service.ComponentStatusService;
 import com.boardgame.backend_spring.content.dto.ContentDetailResponse;
 import com.boardgame.backend_spring.content.dto.card.CardImageResponse;
 import com.boardgame.backend_spring.content.dto.card.CardTextGenerateRequest;
 import com.boardgame.backend_spring.content.dto.card.CardTextResponse;
-import com.boardgame.backend_spring.content.dto.model3d.Generate3DModelResponse;
 import com.boardgame.backend_spring.content.dto.model3d.Model3DUserRequest;
 import com.boardgame.backend_spring.content.dto.rulebook.RulebookGenerateRequest;
 import com.boardgame.backend_spring.content.dto.rulebook.RulebookGenerateResponse;
@@ -28,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 
 @RestController
@@ -44,7 +42,6 @@ public class ContentController {
     private final ThumbnailContentService thumbnailContentService;
     private final ContentVersionService contentVersionService;
     private final S3Uploader s3Uploader;
-
     private final ComponentStatusService componentStatusService;
     private final PythonApiService pythonApiService;
 
@@ -55,21 +52,18 @@ public class ContentController {
         return ResponseEntity.ok(ContentDetailResponse.from(content));
     }
 
-    /**
-     * 파일 업로드(룰북/이미지/썸네일 등) → 콘텐츠 저장 + SubTask=COMPLETED → 컴포넌트 상태 재계산
-     */
     @PutMapping("/{contentId}/upload")
     public ResponseEntity<?> uploadContentFile(
             @PathVariable Long contentId,
             @RequestPart("file") MultipartFile file,
-            @RequestPart("dir") String dirName // 예: rulebooks, card-images, thumbnails
-    ) throws IOException {
+            @RequestPart("dir") String dirName) throws IOException {
+
         String s3Url = s3Uploader.upload(file, dirName);
 
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 콘텐츠입니다."));
 
-        // 덮어쓰기 직전 자동 스냅샷
+        // 버전 스냅샷
         ContentSaveRequest req = new ContentSaveRequest();
         req.setContentId(contentId);
         req.setNote("before file upload overwrite");
@@ -82,26 +76,18 @@ public class ContentController {
                 .orElseThrow(() -> new RuntimeException("SubTask가 존재하지 않습니다."));
         subTask.setStatus("COMPLETED");
         subTaskRepository.save(subTask);
-
-        // 컴포넌트 상태 재계산
         componentStatusService.recalcAndSave(subTask.getComponent());
 
         return ResponseEntity.ok("파일 업로드 및 상태 완료");
     }
 
-    /**
-     * 수동 완료 처리(파일 없이 텍스트 등 생성 결과가 이미 저장된 경우)
-     */
     @PutMapping("/{contentId}/complete")
     public ResponseEntity<?> completeContent(@PathVariable Long contentId) {
         SubTask subTask = subTaskRepository.findByContentId(contentId)
                 .orElseThrow(() -> new RuntimeException("SubTask가 존재하지 않습니다."));
         subTask.setStatus("COMPLETED");
         subTaskRepository.save(subTask);
-
-        // 컴포넌트 상태 재계산
         componentStatusService.recalcAndSave(subTask.getComponent());
-
         return ResponseEntity.ok("작업이 완료되었습니다.");
     }
 
@@ -115,10 +101,6 @@ public class ContentController {
         return ResponseEntity.ok(contentService.generateImage(request));
     }
 
-    // @PostMapping("/generate-3d")
-    // public ResponseEntity<Generate3DModelResponse> generate3DModel(@RequestBody Model3DUserRequest request) {
-    //     return ResponseEntity.ok(model3dContentService.generate3DModel(request));
-    // }
     @PostMapping("/generate-3d")
     public ResponseEntity<Generate3DTaskResponse> generate3DModel(@RequestBody Model3DUserRequest request) {
         return ResponseEntity.ok(model3dContentService.generate3DModelTask(request));
@@ -135,10 +117,7 @@ public class ContentController {
     }
 
     @PostMapping("/generate-thumbnail")
-    public ResponseEntity<ThumbnailGenerateResponse> generateThumbnail(
-            @RequestBody ThumbnailGenerateRequest request) {
-        ThumbnailGenerateResponse response = thumbnailContentService.generateThumbnail(request.getContentId());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ThumbnailGenerateResponse> generateThumbnail(@RequestBody ThumbnailGenerateRequest request) {
+        return ResponseEntity.ok(thumbnailContentService.generateThumbnail(request.getContentId()));
     }
-
 }
