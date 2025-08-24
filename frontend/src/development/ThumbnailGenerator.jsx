@@ -212,24 +212,23 @@ function ThumbnailGenerator({ contentId, componentId }) {
                     )}
                 </div>
 
-                <details className="control-box tg-accordion">
-                    <summary>
-                        <h4 className="tg-h4">버전 관리</h4>
-                    </summary>
-                    <div className="tg-accordion-content">
-                        <div className="tg-version-note">
-                            <label>버전 메모:</label>
+                {/* NOTE: 버전 관리 섹션을 항상 보이도록 수정하고, 룰북과 동일한 클래스 이름으로 변경 */}
+                <div className="control-box">
+                    <h4 className="tg-h4">버전 관리</h4>
+                    <div className="version-control-content">
+                        <div className="version-control-note">
                             <input
+                                type="text"
                                 value={versionNote}
                                 onChange={(e) => setVersionNote(e.target.value)}
                                 placeholder="썸네일 스냅샷"
                                 disabled={!generatedThumbnail || isLoading}
                             />
-                            <button className="tg-save" onClick={handleSaveVersion} disabled={!generatedThumbnail || isLoading}>
+                            <button className="btn-save-version" onClick={handleSaveVersion} disabled={!generatedThumbnail || isLoading}>
                                 버전 저장
                             </button>
                         </div>
-                        <div className="tg-version-select-row">
+                        <div className="version-control-select-row">
                             <Select
                                 className="version-select"
                                 classNamePrefix="react-select"
@@ -239,16 +238,18 @@ function ThumbnailGenerator({ contentId, componentId }) {
                                     value: v.versionId,
                                     label: `v${v.versionNo} - ${v.note} (${new Date(v.createdAt).toLocaleString()})`,
                                 }))}
-                                placeholder={versions.length > 0 ? "버전 선택" : "저장된 버전 없음"}
+                                placeholder={versions.length > 0 ? "복구할 버전 선택" : "저장된 버전 없음"}
                                 isDisabled={versions.length === 0}
                                 isClearable
                             />
-                            <button className="tg-rollback" onClick={handleRollbackVersion} disabled={!selectedVersion || isLoading}>
-                                롤백
-                            </button>
+                            {selectedVersion && (
+                                <button className="btn-rollback" onClick={handleRollbackVersion} disabled={isLoading}>
+                                    롤백
+                                </button>
+                            )}
                         </div>
                     </div>
-                </details>
+                </div>
 
                 <div className="tg-submit-complete-section">
                     <button className="secondary-button" onClick={handleComplete} disabled={!generatedThumbnail || isLoading}>완료(확정)</button>

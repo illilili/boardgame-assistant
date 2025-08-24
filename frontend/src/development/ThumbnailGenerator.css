@@ -24,54 +24,6 @@
     flex-shrink: 0;
 }
 
-.tg-version-note,
-.tg-version-select-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.tg-version-note label {
-    flex-shrink: 0;
-    font-size: 0.9rem;
-    color: #4b5563;
-    font-weight: 500;
-}
-
-.tg-version-note input {
-    flex-grow: 1;
-    padding: 0 12px;
-    height: 40px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-}
-
-.tg-version-select-row .version-select {
-    flex-grow: 1;
-    position: relative;
-    z-index: 10;
-}
-
-.tg-version-note .tg-save,
-.tg-version-select-row .tg-rollback {
-    height: 40px;
-    padding: 0 1rem;
-    background-color: #f3f4f6;
-    border: 1px solid #d1d5db;
-    color: #374151;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-.tg-version-note .tg-save:hover,
-.tg-version-select-row .tg-rollback:hover {
-    background-color: #e5e7eb;
-    border-color: #9ca3af;
-}
-
 .tg-submit-complete-section {
     display: flex;
     gap: 12px;
@@ -107,54 +59,96 @@
     margin: 0 0 1rem 0;
 }
 
-.tg-accordion {
-    padding: 0;
-    overflow: hidden;
-}
-
-.tg-accordion summary {
-    padding: 1.5rem;
-    cursor: pointer;
-    list-style: none;
-    position: relative;
-    transition: background-color 0.2s ease;
-}
-
-.tg-accordion summary:hover {
-    background-color: #f9fafb;
-}
-
-.tg-accordion summary::after {
-    content: '▼';
-    position: absolute;
-    right: 1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.8rem;
-    color: #9ca3af;
-    transition: transform 0.2s ease;
-}
-
-.tg-accordion[open] summary::after {
-    transform: translateY(-50%) rotate(180deg);
-}
-
-.tg-accordion-content {
-    padding: 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-height: 250px;
-    overflow-y: auto;
-}
-
 .form-actions {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid #e5e7eb;
     display: flex;
     justify-content: flex-end;
+}
+
+/* ======================================= */
+/* ✨ 버전 관리 UI (룰북과 통일) */
+/* ======================================= */
+.version-control-content {
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.version-control-note {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.version-control-note input {
+  flex-grow: 1;
+  padding: 0 12px;
+  height: 42px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.version-control-note input:focus {
+  border-color: #E58A4E;
+  box-shadow: 0 0 0 3px rgba(229, 138, 78, 0.2);
+  outline: none;
+}
+
+.btn-save-version {
+  height: 42px;
+  padding: 0 1.2rem;
+  background-color: #374151;
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-save-version:hover {
+  background-color: #1f2937;
+  transform: translateY(-1px);
+}
+.btn-save-version:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.version-control-select-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.version-control-select-row .version-select {
+  flex-grow: 1;
+}
+
+.btn-rollback {
+  height: 42px;
+  padding: 0 1.5rem;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-rollback:hover {
+  background-color: #fecaca;
+  border-color: #ef4444;
 }
 
 /* ======================================= */
