@@ -22,7 +22,7 @@ function WelcomeScreen({ onStart }) {
         왼쪽 메뉴에서 원하는 개발 작업을 선택하여 프로젝트를 진행할 수 있습니다.
         각 단계에 맞춰 필요한 콘텐츠를 생성하고 관리해 보세요.
       </p>
-      <button className="start-button" onClick={onStart}>
+      <button className="welcome-start-button" onClick={onStart}>
         개발 시작하기
       </button>
     </div>

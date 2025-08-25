@@ -284,7 +284,14 @@ function ModelGenerator({ contentId, componentId }) {
       {/* 오른쪽: 결과 뷰어 */}
       <div className="model-gen-panel model-gen-panel--result">
         {isLoading ? (
-          <div className="model-gen-status-display"><div className="model-gen-spinner"></div><h3>처리 중...</h3></div>
+          <div className="model-gen-status-display">
+            <div className="model-gen-spinner"></div>
+            <h3>처리 중...</h3>
+            <p className="model-gen-info-text">
+              3D 모델링 작업은 평균 3~5분 정도 소요됩니다.<br />
+              처리 중 다른 작업 병행이 가능합니다.
+            </p>
+          </div>
         ) : error ? (
           <div className="model-gen-status-display model-gen-status-display--error">{error}</div>
         ) : glbUrl ? (

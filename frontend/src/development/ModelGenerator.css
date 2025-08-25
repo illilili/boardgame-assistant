@@ -208,12 +208,31 @@
 }
 
 /* --- ✨ 오른쪽 패널 --- */
+/* .model-gen-status-display {
+  text-align: center;
+  color: var(--model-gen-text-secondary);
+  font-size: 1.1rem;
+  font-weight: 500;
+} */
 .model-gen-status-display {
+  display: flex;
+  flex-direction: column;   /* 세로 정렬 */
+  align-items: center;      /* 가운데 정렬 */
+  justify-content: center;  /* 수직 가운데 */
   text-align: center;
   color: var(--model-gen-text-secondary);
   font-size: 1.1rem;
   font-weight: 500;
 }
+
+.model-gen-info-text {
+  margin-top: 8px;
+  font-size: 0.9rem;       /* 본문보다 살짝 작게 */
+  color: var(--model-gen-text-secondary);
+  line-height: 1.5;
+  text-align: center; 
+}
+
 .model-gen-status-display--error {
   background-color: #fef2f2;
   color: #991b1b;
