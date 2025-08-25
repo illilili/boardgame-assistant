@@ -13,15 +13,15 @@ const LiveTop50Analysis = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
-  
+
   // 모달 상태 관리
   const [selectedGameId, setSelectedGameId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // 게임 상세 정보 캐시 및 로딩 상태
   const [gameDetails, setGameDetails] = useState(new Map());
   const [detailsLoading, setDetailsLoading] = useState(new Set());
-  
+
   // 전체 게임 번역 상태
   const [translatingAll, setTranslatingAll] = useState(false);
   const [isTranslated, setIsTranslated] = useState(false);
@@ -31,20 +31,20 @@ const LiveTop50Analysis = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       console.log('TOP 30 데이터 조회를 시작합니다...');
-      
+
       const result = await fetchLiveTop50();
-      
+
       setTop50Data(result);
       setLastUpdated(new Date());
       console.log('TOP 30 데이터 조회가 완료되었습니다:', result);
-      
+
       // 게임 상세 정보 점진적 로딩 시작
       if (result.games && result.games.length > 0) {
         loadGameDetails(result.games);
       }
-      
+
     } catch (err) {
       console.error('TOP 30 데이터 조회 중 오류가 발생했습니다:', err);
       const userFriendlyError = formatTrendApiError(err);
@@ -62,37 +62,37 @@ const LiveTop50Analysis = () => {
   const loadGameDetails = async (games) => {
     try {
       console.log('배치 로딩을 시작합니다:', games.length, '개 게임');
-      
-      const gamesNeedLoading = games.filter(game => 
+
+      const gamesNeedLoading = games.filter(game =>
         !detailsLoading.has(game.id) && !gameDetails.has(game.id)
       );
-      
+
       if (gamesNeedLoading.length === 0) {
         console.log('모든 게임의 상세 정보가 이미 로드되었습니다.');
         return;
       }
-      
+
       const batchSize = 20;
       const batches = [];
-      
+
       for (let i = 0; i < gamesNeedLoading.length; i += batchSize) {
         batches.push(gamesNeedLoading.slice(i, i + batchSize));
       }
-      
+
       console.log(`${gamesNeedLoading.length}개의 게임을 ${batches.length}개의 배치로 나누어 처리합니다.`);
-      
+
       for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
         const batch = batches[batchIndex];
         const gameIds = batch.map(game => game.id);
-        
+
         batch.forEach(game => {
           setDetailsLoading(prev => new Set(prev).add(game.id));
         });
-        
+
         try {
           console.log(`배치 ${batchIndex + 1}/${batches.length} 처리를 시작합니다:`, gameIds);
           const batchResult = await fetchLiveGameDetailsBatch(gameIds);
-          
+
           if (batchResult?.games) {
             console.log(`배치 ${batchIndex + 1} 처리 성공: ${batchResult.games.length}/${gameIds.length}개`);
             const newDetails = new Map();
@@ -105,13 +105,13 @@ const LiveTop50Analysis = () => {
           } else {
             console.warn(`배치 ${batchIndex + 1} 처리 결과 데이터가 비어있습니다:`, batchResult);
           }
-          
+
         } catch (batchError) {
           console.error(`배치 ${batchIndex + 1} 처리 중 오류가 발생했습니다:`, batchError);
           console.log(`배치 처리 실패로 인해 개별 재시도를 시작합니다: ${gameIds.length}개`);
           await loadGameDetailsIndividually(batch);
         }
-        
+
         batch.forEach(game => {
           setDetailsLoading(prev => {
             const newSet = new Set(prev);
@@ -119,27 +119,27 @@ const LiveTop50Analysis = () => {
             return newSet;
           });
         });
-        
+
         if (batchIndex < batches.length - 1) {
           console.log('다음 배치 처리를 위해 3초 대기합니다...');
           await new Promise(resolve => setTimeout(resolve, 3000));
         }
       }
-      
+
       console.log('모든 배치 로딩이 완료되었습니다.');
-      
+
     } catch (error) {
       console.error('배치 로딩 중 전체적인 오류가 발생했습니다:', error);
       await loadGameDetailsIndividually(games);
     }
   };
- 
+
   // 개별 로딩 (폴백용)
   const loadGameDetailsIndividually = async (games) => {
     console.log('개별 로딩 폴백을 시작합니다:', games.length, '개 게임');
     for (const game of games) {
       if (detailsLoading.has(game.id) || gameDetails.has(game.id)) continue;
-      
+
       try {
         setDetailsLoading(prev => new Set(prev).add(game.id));
         const gameDetail = await fetchLiveGameDetail(game.id);
@@ -180,7 +180,7 @@ const LiveTop50Analysis = () => {
       <div className="error-message">
         실시간 데이터 조회 중 오류가 발생했습니다: {error}
       </div>
-      <button 
+      <button
         className="retry-button"
         onClick={fetchTop50Data}
       >
@@ -192,14 +192,14 @@ const LiveTop50Analysis = () => {
   const renderHeader = () => (
     <div className="live-dashboard-header">
       <div className="header-navigation">
-        <button 
+        <button
           className="back-button"
           onClick={() => navigate('/trend/original')}
         >
           기존 인기 보드게임 분석
         </button>
       </div>
-      
+
       <div className="header-content">
         <div className="title-section">
           <h1 className="main-title">
@@ -209,7 +209,7 @@ const LiveTop50Analysis = () => {
             BoardGameGeek 실시간 Hot List 기반 심층 시장 분석 대시보드
           </p>
         </div>
-        
+
         <div className="data-meta-info">
           <div className="meta-item">
             <span className="meta-label">데이터 소스</span>
@@ -223,8 +223,8 @@ const LiveTop50Analysis = () => {
             <div className="meta-item">
               <span className="meta-label">마지막 업데이트</span>
               <span className="meta-value">
-                {lastUpdated.toLocaleString('ko-KR', { 
-                  year: 'numeric', month: '2-digit', day: '2-digit', 
+                {lastUpdated.toLocaleString('ko-KR', {
+                  year: 'numeric', month: '2-digit', day: '2-digit',
                   hour: '2-digit', minute: '2-digit'
                 })}
               </span>
@@ -250,12 +250,12 @@ const LiveTop50Analysis = () => {
 
   const handleTranslateAll = async () => {
     if (!top50Data?.games || translatingAll) return;
-    
+
     try {
       setTranslatingAll(true);
       setTranslationProgress(`번역 준비 중... (${top50Data.games.length}개)`);
       console.log('TOP 30 전체 번역을 시작합니다:', top50Data.games.length, '개 게임');
-      
+
       const gamesForTranslation = top50Data.games.map(game => {
         const details = gameDetails.get(game.id);
         return {
@@ -269,25 +269,37 @@ const LiveTop50Analysis = () => {
           })
         };
       });
-      
+
       setTranslationProgress('번역 진행 중...');
       const result = await translateAllGames(gamesForTranslation);
-      
+
       if (result?.games) {
         console.log('번역이 완료되었습니다:', result.games.length, '개 게임');
-        
+
         const translatedGameMap = new Map(result.games.map(g => [g.id, g]));
-        
+
         // 상세 정보 캐시 업데이트
+        // setGameDetails(prev => {
+        //   const newDetails = new Map(prev);
+        //   result.games.forEach(translatedGame => {
+        //     const existingDetails = newDetails.get(translatedGame.id) || {};
+        //     newDetails.set(translatedGame.id, { ...existingDetails, ...translatedGame });
+        //   });
+        //   return newDetails;
+        // });
         setGameDetails(prev => {
           const newDetails = new Map(prev);
           result.games.forEach(translatedGame => {
             const existingDetails = newDetails.get(translatedGame.id) || {};
-            newDetails.set(translatedGame.id, { ...existingDetails, ...translatedGame });
+            newDetails.set(translatedGame.id, {
+              ...existingDetails,
+              ...translatedGame,
+              isTranslated: true   // ✅ 번역된 데이터임을 표시
+            });
           });
           return newDetails;
         });
-        
+
         // 목록 데이터 업데이트
         setTop50Data(prevData => ({
           ...prevData,
@@ -296,7 +308,7 @@ const LiveTop50Analysis = () => {
             return translatedGame ? { ...game, ...translatedGame } : game;
           })
         }));
-        
+
         setIsTranslated(true);
         console.log(`전체 번역 완료: ${result.successCount}개 성공, ${result.failureCount}개 실패`);
       }
@@ -320,14 +332,14 @@ const LiveTop50Analysis = () => {
           <div className="section-title-area">
             <h2 className="section-title">TOP 30 랭킹</h2>
             <div className="section-actions">
-              <button 
+              <button
                 className={`translate-all-button ${translatingAll ? 'translating' : ''} ${isTranslated ? 'translated' : ''}`}
                 onClick={handleTranslateAll}
                 disabled={translatingAll}
                 title="전체 게임의 카테고리와 메카닉을 한국어로 번역합니다."
               >
-                {translatingAll 
-                  ? (translationProgress || '번역 중...') 
+                {translatingAll
+                  ? (translationProgress || '번역 중...')
                   : (isTranslated ? '번역 완료' : '전체 한국어 번역')
                 }
               </button>
@@ -337,36 +349,36 @@ const LiveTop50Analysis = () => {
             각 게임을 클릭하면 상세 정보를 볼 수 있습니다
           </p>
         </div>
-        
+
         <div className="top50-grid">
           {top50Data.games.map((game, index) => {
             const details = gameDetails.get(game.id);
             const isLoadingDetails = detailsLoading.has(game.id);
 
             return (
-              <div 
-                key={game.id || index} 
+              <div
+                key={game.id || index}
                 className="game-card clickable"
                 onClick={() => handleGameClick(game.id)}
               >
                 <div className="game-rank">#{game.rank || index + 1}</div>
-                
+
                 {game.thumbnail && (
                   <div className="game-thumbnail-large">
-                    <img 
-                      src={game.thumbnail} 
+                    <img
+                      src={game.thumbnail}
                       alt={`${game.name} 썸네일`}
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
                   </div>
                 )}
-                
+
                 <div className="game-info">
                   <h3 className="game-name">{game.name}</h3>
                   {game.yearPublished && (
                     <div className="game-year">({game.yearPublished})</div>
                   )}
-                  
+
                   <div className="game-stats-new">
                     <div className="stat-item-compact">
                       <span className="stat-value">
@@ -374,19 +386,19 @@ const LiveTop50Analysis = () => {
                       </span>
                       <span className="stat-label">난이도</span>
                     </div>
-                    
+
                     <div className="stat-item-compact">
                       <span className="stat-value">
-                        {isLoadingDetails ? '...' : 
-                          details?.minPlayers && details?.maxPlayers ? 
-                          (details.minPlayers === details.maxPlayers ? 
-                           `${details.minPlayers}명` : 
-                           `${details.minPlayers}-${details.maxPlayers}명`) : 
-                          'N/A'}
+                        {isLoadingDetails ? '...' :
+                          details?.minPlayers && details?.maxPlayers ?
+                            (details.minPlayers === details.maxPlayers ?
+                              `${details.minPlayers}명` :
+                              `${details.minPlayers}-${details.maxPlayers}명`) :
+                            'N/A'}
                       </span>
                       <span className="stat-label">인원</span>
                     </div>
-                    
+
                     <div className="stat-item-compact">
                       <span className="stat-value">
                         {isLoadingDetails ? '...' : details?.averageRating ? details.averageRating.toFixed(1) : 'N/A'}
@@ -394,7 +406,7 @@ const LiveTop50Analysis = () => {
                       <span className="stat-label">평점</span>
                     </div>
                   </div>
-                  
+
                   <div className="game-tags-new">
                     {isLoadingDetails ? (
                       <div className="tags-loading">태그 로딩 중...</div>
@@ -435,18 +447,18 @@ const LiveTop50Analysis = () => {
       <Header projectMode={false} />
       <div className="live-top50-analysis">
         <div className="live-background"></div>
-        
+
         <div className="live-container">
           {renderHeader()}
-          
-          <TrendSummaryCards 
-            trendSummary={top50Data?.trendSummary} 
+
+          <TrendSummaryCards
+            trendSummary={top50Data?.trendSummary}
             isLoading={loading}
           />
-          
+
           {renderTOP50Cards()}
-          
-          <GameDetailModal 
+
+          <GameDetailModal
             gameId={selectedGameId}
             isOpen={isModalOpen}
             onClose={handleCloseModal}

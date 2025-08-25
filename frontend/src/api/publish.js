@@ -84,3 +84,6 @@ export const getContentsByProject = (projectId) => request(`/api/projects/${proj
 export const completeProject = (projectId) => request(`/api/projects/${projectId}/complete`, {
     method: 'PUT',
 });
+
+export const getTranslationCandidates = (projectId) =>
+  request(`/api/translate/candidates?projectId=${projectId}`, { method: 'GET' });

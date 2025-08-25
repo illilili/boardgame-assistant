@@ -1,6 +1,7 @@
 // src/publish/TranslationList.jsx
 import React, { useEffect, useState, useContext } from 'react';
 import { ProjectContext } from '../contexts/ProjectContext';
+import { getTranslationCandidates } from '../api/publish';
 import './TranslationList.css';
 
 function TranslationList({ onSelectContent }) {
@@ -9,23 +10,21 @@ function TranslationList({ onSelectContent }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (!projectId) return;
-    const fetchCandidates = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/translate/candidates?projectId=${projectId}`);
-        if (!res.ok) throw new Error('번역 후보 불러오기 실패');
-        const data = await res.json();
-        setContents(data || []);
-      } catch (err) {
-        setError(err.message || '에러 발생');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCandidates();
-  }, [projectId]);
+useEffect(() => {
+  if (!projectId) return;
+  const fetchCandidates = async () => {
+    try {
+      setLoading(true);
+      const data = await getTranslationCandidates(projectId);
+      setContents(data || []);
+    } catch (err) {
+      setError(err.message || '에러 발생');
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchCandidates();
+}, [projectId]);
 
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;

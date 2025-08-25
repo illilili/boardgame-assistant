@@ -93,16 +93,16 @@ const ProjectHomePage = () => {
     }
   };
   
-  // ✨ 여기에 로그아웃 핸들러 함수를 추가합니다.
-  const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('role');
-    localStorage.removeItem('name');
-    alert('로그아웃 되었습니다.');
-    window.dispatchEvent(new Event("storage"));
-    navigate('/');
-  };
+  // // ✨ 여기에 로그아웃 핸들러 함수를 추가합니다.
+  // const handleLogout = () => {
+  //   localStorage.removeItem('accessToken');
+  //   localStorage.removeItem('refreshToken');
+  //   localStorage.removeItem('role');
+  //   localStorage.removeItem('name');
+  //   alert('로그아웃 되었습니다.');
+  //   window.dispatchEvent(new Event("storage"));
+  //   navigate('/');
+  // };
 
   if (!status) {
     return (
@@ -125,12 +125,12 @@ const ProjectHomePage = () => {
             <li className="project-home-page__nav-item" onClick={() => navigate(`/projects/${projectId}/publish`)}>PUBLISH</li>
           </ul>
           
-          {/* ✨ 여기에 Settings, MyPage, Logout 메뉴를 추가합니다. */}
+          {/* ✨ 여기에 Settings, MyPage, Logout 메뉴를 추가합니다.
           <ul className="project-home-page__nav-list project-home-page__bottom-nav-list">
             <li className="project-home-page__nav-item" onClick={() => navigate('/settings')}>Settings</li>
             <li className="project-home-page__nav-item" onClick={() => navigate('/mypage')}>MyPage</li>
             <li className="project-home-page__nav-item" onClick={handleLogout}>Logout</li>
-          </ul>
+          </ul> */}
         </aside>
 
         <main className="project-home-page__main-content">
