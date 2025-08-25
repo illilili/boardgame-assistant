@@ -87,3 +87,9 @@ export const completeProject = (projectId) => request(`/api/projects/${projectId
 
 export const getTranslationCandidates = (projectId) =>
   request(`/api/translate/candidates?projectId=${projectId}`, { method: 'GET' });
+
+export const estimatePrice = (estimateData) =>
+  request('/api/pricing/estimate', {
+    method: 'POST',
+    body: JSON.stringify(estimateData),
+  });

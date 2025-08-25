@@ -294,7 +294,7 @@ const LiveTop50Analysis = () => {
             newDetails.set(translatedGame.id, {
               ...existingDetails,
               ...translatedGame,
-              isTranslated: true   // ✅ 번역된 데이터임을 표시
+              isTranslated: true   // 번역된 데이터임을 표시
             });
           });
           return newDetails;

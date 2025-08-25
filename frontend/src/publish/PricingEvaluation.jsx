@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getApprovedPlan, getTasksForProject } from '../api/auth';
-import { completeProject } from '../api/publish';
+import { getApprovedPlan, } from '../api/auth';
+import { completeProject, estimatePrice } from '../api/publish';
 import { ProjectContext } from '../contexts/ProjectContext';
+import { getProjectDetail, getTasksForProject } from '../api/project';
 import './PricingEvaluation.css';
 
 function PricingEvaluation() {
@@ -48,17 +49,7 @@ function PricingEvaluation() {
 
     try {
       console.log('프로젝트 정보 조회 시작:', projectId);
-      const response = await fetch(`/api/projects/${projectId}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`프로젝트 정보 조회 실패: ${response.status}`);
-      }
-
-      const projectData = await response.json();
+      const projectData = await getProjectDetail(projectId);
       console.log('프로젝트 정보 조회 결과:', projectData);
       setProjectInfo(projectData);
     } catch (error) {
@@ -135,30 +126,30 @@ function PricingEvaluation() {
     projectComponents.components.forEach(component => {
       const componentType = component.type?.toLowerCase() || '';
       const componentTitle = component.title?.toLowerCase() || '';
-      
+
       // 카드 관련
-      if (componentType.includes('카드') || componentTitle.includes('카드') || 
-          componentType.includes('card') || componentTitle.includes('card')) {
+      if (componentType.includes('카드') || componentTitle.includes('카드') ||
+        componentType.includes('card') || componentTitle.includes('card')) {
         totalCards += 1;
         componentBreakdown['카드'] = (componentBreakdown['카드'] || 0) + 1;
       }
       // 토큰 관련
       else if (componentType.includes('토큰') || componentTitle.includes('토큰') ||
-               componentType.includes('token') || componentTitle.includes('token') ||
-               componentType.includes('아이템') || componentTitle.includes('아이템')) {
+        componentType.includes('token') || componentTitle.includes('token') ||
+        componentType.includes('아이템') || componentTitle.includes('아이템')) {
         totalTokens += 1;
         componentBreakdown['토큰'] = (componentBreakdown['토큰'] || 0) + 1;
       }
       // 주사위 관련
       else if (componentType.includes('주사위') || componentTitle.includes('주사위') ||
-               componentType.includes('dice') || componentTitle.includes('dice')) {
+        componentType.includes('dice') || componentTitle.includes('dice')) {
         totalDice += 1;
         componentBreakdown['주사위'] = (componentBreakdown['주사위'] || 0) + 1;
       }
       // 보드 관련
       else if (componentType.includes('보드') || componentTitle.includes('보드') ||
-               componentType.includes('board') || componentTitle.includes('board') ||
-               componentType.includes('게임판') || componentTitle.includes('게임판')) {
+        componentType.includes('board') || componentTitle.includes('board') ||
+        componentType.includes('게임판') || componentTitle.includes('게임판')) {
         totalBoards += 1;
         componentBreakdown['보드'] = (componentBreakdown['보드'] || 0) + 1;
       }
@@ -169,9 +160,9 @@ function PricingEvaluation() {
       }
     });
 
-    const totalComponents = totalCards + totalTokens + totalDice + totalBoards + 
-                          Object.values(componentBreakdown).reduce((sum, count) => sum + count, 0) - 
-                          (totalCards + totalTokens + totalDice + totalBoards);
+    const totalComponents = totalCards + totalTokens + totalDice + totalBoards +
+      Object.values(componentBreakdown).reduce((sum, count) => sum + count, 0) -
+      (totalCards + totalTokens + totalDice + totalBoards);
 
     return {
       totalCards,
@@ -195,37 +186,24 @@ function PricingEvaluation() {
 
     try {
       console.log('AI 가격 측정 시작:', { planId: currentPlanId, projectId });
-      
+
       // 구성품 분석 결과 생성
       const componentAnalysis = analyzeComponentsFromData();
       console.log('구성품 분석 결과:', componentAnalysis);
 
-      // 승인된 플랜의 텍스트 가져오기 (간단한 예시 텍스트 사용)
+      // 승인된 플랜의 텍스트 가져오기
       const planText = projectInfo?.projectName || '보드게임 프로젝트';
 
-      const response = await fetch('/api/pricing/estimate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: JSON.stringify({
-          planId: currentPlanId,
-          planText: planText,
-          componentAnalysis: componentAnalysis
-        })
+      // 통일된 API 함수 호출
+      const result = await estimatePrice({
+        planId: currentPlanId,
+        planText,
+        componentAnalysis
       });
 
-      if (!response.ok) {
-        throw new Error(`가격 측정 실패: ${response.status}`);
-      }
-
-      const result = await response.json();
       console.log('AI 가격 측정 결과:', result);
-      
       setAiPriceResult(result);
-      
-      // 추천 가격을 suggestedPrice에 설정
+
       if (result.kor_price) {
         const priceWithoutWon = result.kor_price.replace('원', '').replace(/,/g, '');
         setPricingData(prev => ({
@@ -241,7 +219,6 @@ function PricingEvaluation() {
       setPriceEstimateLoading(false);
     }
   };
-
   // 프로젝트 완료 처리
   const handleCompleteProject = async () => {
     if (!projectId) {

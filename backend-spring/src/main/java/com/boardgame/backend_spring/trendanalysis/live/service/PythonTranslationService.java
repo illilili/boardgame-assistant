@@ -21,7 +21,7 @@ public class PythonTranslationService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${python.api.base-url:http://localhost:8000}")
+    @Value("${fastapi.service.url}")
     private String pythonApiBaseUrl;
 
     /**
