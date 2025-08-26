@@ -92,7 +92,7 @@ body {
   margin-bottom: 24px;
 }
 
-.error-message {
+.sign-up-error-message {
   background-color: #fef2f2;
   color: #991b1b;
   font-size: 0.9rem;
@@ -100,6 +100,9 @@ body {
   border-radius: 8px;
   margin-bottom: 16px;
   border: 1px solid #fca5a5;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center; /* 가운데 정렬 */
 }
 
 .signup-input {

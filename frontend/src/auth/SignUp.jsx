@@ -55,7 +55,7 @@ const SignUp = () => {
           <h2 className="signup-title">회원가입</h2>
 
           <form onSubmit={handleSubmit}>
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="sign-up-error-message">{error}</div>}
 
             <input
               type="text"
